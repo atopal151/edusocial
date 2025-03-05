@@ -2,23 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  var isLoading = false.obs;
+  var isFirstLogin = true.obs; // Kullanıcının ilk kez giriş yapıp yapmadığını kontrol et
 
-  void login() {
-    String email = emailController.text;
-    String password = passwordController.text;
+  @override
+  void onInit() {
+    super.onInit();
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+  }
 
-    if (email.isNotEmpty && password.isNotEmpty) {
-      // Burada giriş işlemi yapılacak (API çağrısı veya Firebase doğrulama)
-      print("Giriş başarılı: $email");
+  void login() async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      Get.snackbar("Hata", "Lütfen tüm alanları doldurun.");
+      return;
+    }
+
+    isLoading.value = true;
+    await Future.delayed(Duration(seconds: 2)); // Mock API simülasyonu
+    isLoading.value = false;
+
+    Get.snackbar("Başarılı", "Giriş başarılı!");
+
+    // Eğer kullanıcı ilk kez giriş yapıyorsa onboarding sayfalarına yönlendir
+    if (isFirstLogin.value) {
+      Future.delayed(Duration(milliseconds: 200), () {
+        Get.offAllNamed('/step1');
+      });
     } else {
-      Get.snackbar("Uyarı", "Lütfen tüm alanları doldurun.");
+      Future.delayed(Duration(milliseconds: 200), () {
+        Get.offAllNamed('/home');
+      });
     }
   }
 
-   void loginPasswordUpgrade() {
-      Get.snackbar("Mesaj", "Şifre Yenileme Alanına Yönlendirileceksiniz.");
+  void loginPasswordUpgrade() {
+    Get.snackbar("Mesaj", "Şifre Yenileme Alanına Yönlendirileceksiniz.");
   }
 
   @override

@@ -82,7 +82,8 @@ class SignupView extends StatelessWidget {
                           CustomTextField(
                               hintText: "Şifre Tekrar",
                               isPassword: true,
-                              controller: controller.confirmPasswordSuController),
+                              controller:
+                                  controller.confirmPasswordSuController),
                           SizedBox(height: 10),
                           Row(
                             children: [
@@ -114,7 +115,9 @@ class SignupView extends StatelessWidget {
                           ),
                           SizedBox(height: 20),
                           CustomButton(
+                              backgroundColor: Color(0xffE75454),
                               text: "Kayıt Ol",
+                              isLoading: controller.isSuLoading,
                               onPressed: () {
                                 controller.signup();
                               }),
@@ -129,13 +132,13 @@ class SignupView extends StatelessWidget {
                                 Text("Hesabınız var mı? ",
                                     style: TextStyle(color: Color(0xFF414751))),
                                 Text(
-                                        "Giriş Yap.",
-                                        style: TextStyle(
-                                          color: Color(0xFFE55050),
-                                          decoration: TextDecoration.underline,
-                                          decorationColor: Color(0xFFE55050),
-                                        ),
-                                      )
+                                  "Giriş Yap.",
+                                  style: TextStyle(
+                                    color: Color(0xFFE55050),
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Color(0xFFE55050),
+                                  ),
+                                )
                               ],
                             ),
                           )

@@ -107,7 +107,7 @@ class LoginView extends StatelessWidget {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: InkWell(
-                                  onTap: (){
+                                  onTap: () {
                                     controller.loginPasswordUpgrade();
                                   },
                                   child: Text(
@@ -123,7 +123,9 @@ class LoginView extends StatelessWidget {
                               ),
                               SizedBox(height: 20),
                               CustomButton(
+                                backgroundColor: Color(0xffE75454),
                                 text: "Giriş Yap",
+                                isLoading: controller.isLoading,
                                 onPressed: () {
                                   controller.login();
                                 },
@@ -133,7 +135,7 @@ class LoginView extends StatelessWidget {
                                 alignment: Alignment.center,
                                 child: TextButton(
                                   onPressed: () {
-                                     Get.toNamed('/signup');
+                                    Get.toNamed('/signup');
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

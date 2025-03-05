@@ -7,7 +7,7 @@ class SignupController extends GetxController {
   TextEditingController passwordSuController = TextEditingController();
   TextEditingController confirmPasswordSuController = TextEditingController();
   var isAccepted = false.obs;
-  var isLoading = false.obs;
+  var isSuLoading = false.obs;
 
   void toggleAcceptance() {
     isAccepted.value = !isAccepted.value;
@@ -27,9 +27,9 @@ class SignupController extends GetxController {
       return;
     }
     
-    isLoading.value = true;
+    isSuLoading.value = true;
     await Future.delayed(Duration(seconds: 2)); // Mock API isteği simülasyonu
-    isLoading.value = false;
+    isSuLoading.value = false;
 
     Get.snackbar("Başarılı", "Kayıt başarılı! Giriş yapabilirsiniz.");
     Get.offAllNamed('/login'); // Kullanıcıyı login ekranına yönlendir
