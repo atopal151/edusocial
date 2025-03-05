@@ -4,15 +4,14 @@ import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/dialogs/warning_box.dart';
 import '../../components/onboarding_header/on_header.dart';
+import '../../controllers/onboarding_controller.dart';
 
 class Step1View extends StatelessWidget {
   const Step1View({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final RxString selectedSchool = "Monnet International School".obs;
-    final RxString selectedDepartment = "Computer Engineering".obs;
-    final RxBool isLoading = false.obs;
+    final OnboardingController controller = Get.find();
 
     return Scaffold(
       backgroundColor: Color(0xffFAFAFA),
@@ -26,37 +25,60 @@ class Step1View extends StatelessWidget {
             OnboardingHeader(
               imagePath: "images/icons/Graduate.png",
               title: "Okul Bilgilerinizi Tamamlayın",
-              subtitle: "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!",
+              subtitle:
+                  "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!",
             ),
             SizedBox(height: 30),
-            CustomDropDown(
-              label: "Okul",
-              items: ["Monnet International School", "Another School"],
-              selectedItem: selectedSchool.value,
-              onChanged: (value) => selectedSchool.value = value!,
-            ),
+            Obx(() {
+              if (controller.schools.isEmpty) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return CustomDropDown(
+                label: "Okul",
+                items: controller.schools,
+                selectedItem: controller.schools
+                            .contains(controller.selectedSchool.value) &&
+                        controller.selectedSchool.value.isNotEmpty
+                    ? controller.selectedSchool.value
+                    : controller
+                        .schools.first, // Varsayılan olarak ilk öğe ata
+                onChanged: (value) {
+                  if (value != null) {
+                    controller.selectedSchool.value = value;
+                  }
+                },
+              );
+            }),
             SizedBox(height: 20),
-            CustomDropDown(
-              label: "Bölüm",
-              items: ["Computer Engineering", "Mathematics", "Physics"],
-              selectedItem: selectedDepartment.value,
-              onChanged: (value) => selectedDepartment.value = value!,
-            ),
+             Obx(() {
+              if (controller.departments.isEmpty) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return CustomDropDown(
+                label: "Bölüm",
+                items: controller.departments,
+                selectedItem: controller.departments.contains(controller.selectedDepartment.value) && controller.selectedDepartment.value.isNotEmpty
+                    ? controller.selectedDepartment.value
+                    : controller.departments.first, // Varsayılan olarak ilk öğe ata
+                onChanged: (value) {
+                  if (value != null) {
+                    controller.selectedDepartment.value = value;
+                  }
+                },
+              );
+            }),
             SizedBox(height: 20),
-            WarningBox(message: "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir."),
+            WarningBox(
+                message:
+                    "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir."),
             SizedBox(height: 30),
             CustomButton(
-              text: "Devam Et",
-              onPressed: () {
-                isLoading.value = true;
-                Future.delayed(Duration(seconds: 2), () {
-                  isLoading.value = false;
-                  Get.toNamed("/step2");
-                });
-              },
-              isLoading: isLoading,
-              backgroundColor: Color(0xFF414751),
-            ),
+                  text: "Devam Et",
+                  onPressed: controller.proceedToNextStep,
+                  isLoading: controller.isLoading,
+                  backgroundColor: Color(0xFF414751),
+                ),
+            SizedBox(height: 20),
           ],
         ),
       ),
