@@ -12,24 +12,27 @@ class LoginView extends StatelessWidget {
     final LoginController controller = Get.put(LoginController());
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFF26B6B), Color(0xFFE55050)],
-                ),
-              ),
-              child: Column(
+      backgroundColor: Color(0xffffff),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFF26B6B), Color(0xFFE55050)],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 40.0, right: 40.0),
                     child: Container(
                       width: double.infinity,
-                      height: MediaQuery.of(context).size.height * 0.35,
+                      height: MediaQuery.of(context).size.height *
+                          0.30, // Yükseklik biraz düşürüldü
+
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
@@ -61,7 +64,7 @@ class LoginView extends StatelessWidget {
                         Text(
                           "Benzer İlgi Alanlarına\n Sahip Kişilerle Tanış!",
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -70,7 +73,7 @@ class LoginView extends StatelessWidget {
                         SizedBox(height: 10),
                         Text(
                           "EduSocial, Polonya’daki uluslararası okullarda eğitim gören öğrenciler için tasarlanmış yenilikçi bir sosyal platformdur.",
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                          style: TextStyle(fontSize: 12, color: Colors.white),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 30),
@@ -126,6 +129,7 @@ class LoginView extends StatelessWidget {
                                 backgroundColor: Color(0xffE75454),
                                 text: "Giriş Yap",
                                 isLoading: controller.isLoading,
+                                textColor: Colors.white,
                                 onPressed: () {
                                   controller.login();
                                 },
@@ -168,8 +172,8 @@ class LoginView extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

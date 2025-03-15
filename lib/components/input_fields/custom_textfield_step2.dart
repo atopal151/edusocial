@@ -1,0 +1,60 @@
+import 'package:flutter/material.dart';
+
+class CustomTextFieldStep2 extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onAdd;
+
+  const CustomTextFieldStep2({
+    super.key,
+    required this.controller,
+    required this.onAdd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                border: InputBorder.none,
+                hintText: "Ders adı giriniz",
+                hintStyle: TextStyle(
+                    color: Color(0xff9CA3AE),
+                    fontSize: 13.28,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              onAdd();
+            },
+            child: Container(
+                margin: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Color(0xFFE75454),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 16.0, right: 16, top: 8, bottom: 8),
+                  child: Text(
+                    "Ekle",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+}

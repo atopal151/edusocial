@@ -77,6 +77,7 @@ class Step1View extends StatelessWidget {
                   onPressed: controller.proceedToNextStep,
                   isLoading: controller.isLoading,
                   backgroundColor: Color(0xFF414751),
+                    textColor: Colors.white,
                 ),
             SizedBox(height: 20),
           ],

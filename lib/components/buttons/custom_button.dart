@@ -7,12 +7,13 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final RxBool isLoading;
   final Color backgroundColor;
+  final Color textColor;
 
   const CustomButton({super.key,
     required this.text,
     required this.onPressed,
     required this.isLoading,
-    required this.backgroundColor,
+    required this.backgroundColor, required this.textColor,
   });
 
   @override
@@ -32,7 +33,7 @@ class CustomButton extends StatelessWidget {
             ? CircularProgressIndicator(color: Colors.white)
             : Text(
                 text,
-                style: TextStyle(color: Colors.white, fontSize: 13.28, fontWeight: FontWeight.bold),
+                style: TextStyle(color: textColor, fontSize: 13.28, fontWeight: FontWeight.bold),
               ),
       )),
     );

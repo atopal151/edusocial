@@ -34,7 +34,7 @@ class SignupView extends StatelessWidget {
                     Text(
                       "Benzer İlgi Alanlarına\nSahip Kişilerle Tanış! ",
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -118,6 +118,7 @@ class SignupView extends StatelessWidget {
                               backgroundColor: Color(0xffE75454),
                               text: "Kayıt Ol",
                               isLoading: controller.isSuLoading,
+                    textColor: Colors.white,
                               onPressed: () {
                                 controller.signup();
                               }),
