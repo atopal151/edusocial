@@ -1,5 +1,7 @@
+import 'package:edusocial/bindings/calendar_binding.dart';
 import 'package:edusocial/bindings/match_binding.dart';
 import 'package:edusocial/bindings/settings_binding.dart';
+import 'package:edusocial/screens/calendar/calendar_screen.dart';
 import 'package:edusocial/screens/chat/chat_list_screen.dart';
 import 'package:edusocial/screens/event/event_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
@@ -31,7 +33,8 @@ class Routes {
   static const String match = '/match';
   static const String matchResult = '/math_result';
   static const String main = '/main';
-  static const String editProfile="/settings";
+  static const String editProfile = "/settings";
+  static const String calendar = "/calendar";
 
   static final List<GetPage> pages = [
     GetPage(
@@ -79,10 +82,16 @@ class Routes {
       name: matchResult,
       page: () => MatchResultScreen(),
       binding: MatchBinding(),
-    ),GetPage(
+    ),
+    GetPage(
       name: editProfile,
       page: () => EditProfileScreen(),
       binding: SettingsBinding(),
+    ),
+     GetPage(
+      name: calendar,
+      page: () => CalendarScreen(),
+      binding: CalendarBinding(),
     ),
     GetPage(
       name: profile,

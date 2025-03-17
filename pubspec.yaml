@@ -40,6 +40,7 @@ dependencies:
   web_socket_channel: ^3.0.2
   flutter_svg: ^2.0.17
   vector_graphics: ^1.1.18
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +89,9 @@ flutter:
     - images/icons/back_icon.svg
     - images/icons/edit_icon.svg
     - images/icons/settings_icon.svg
+    - images/icons/clock_icon.svg
+    - images/icons/delete_icon.svg
+    - images/icons/calendar_icon.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png

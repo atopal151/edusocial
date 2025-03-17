@@ -5,7 +5,6 @@ class NavigationController extends GetxController {
 
   void changeIndex(int index) {
   selectedIndex.value = index;
-  print("Navbar Index Değişti: $index"); // Terminalde kontrol et
 }
 
 }

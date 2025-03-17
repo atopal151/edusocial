@@ -14,20 +14,23 @@ class AppBarController extends GetxController {
     //Get.toNamed("/search");
   }
 
-void navigateToProfile() {
-  navController.changeIndex(4); // 4. indexe yönlendir
-}
-
+  void navigateToProfile() {
+    navController.changeIndex(4); // 4. indexe yönlendir
+  }
 
   void navigateToGroups() {
     //Get.toNamed("/groups");
   }
 
   void navigateToNotifications() {
-    //Get.toNamed("/notifications");
+    Get.toNamed("/calendar");
   }
 
   void updateProfileImage(String newPath) {
     profileImagePath.value = newPath;
+  }
+
+  void backToPage(){
+    Get.back();
   }
 }
