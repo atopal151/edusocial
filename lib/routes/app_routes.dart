@@ -1,5 +1,7 @@
 import 'package:edusocial/bindings/calendar_binding.dart';
 import 'package:edusocial/bindings/match_binding.dart';
+import 'package:edusocial/bindings/profile_binding.dart';
+import 'package:edusocial/bindings/search_binding.dart';
 import 'package:edusocial/bindings/settings_binding.dart';
 import 'package:edusocial/screens/calendar/calendar_screen.dart';
 import 'package:edusocial/screens/chat/chat_list_screen.dart';
@@ -8,6 +10,7 @@ import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/profile/edit_profile_screen.dart';
 import 'package:edusocial/screens/profile/profile_screen.dart';
+import 'package:edusocial/screens/search/search_text_screen.dart';
 import 'package:get/get.dart';
 import '../bindings/signup_binding.dart';
 import '../bindings/login_binding.dart';
@@ -35,6 +38,7 @@ class Routes {
   static const String main = '/main';
   static const String editProfile = "/settings";
   static const String calendar = "/calendar";
+  static const String searchText = "/search_text";
 
   static final List<GetPage> pages = [
     GetPage(
@@ -92,10 +96,15 @@ class Routes {
       name: calendar,
       page: () => CalendarScreen(),
       binding: CalendarBinding(),
+    ),GetPage(
+      name: searchText,
+      page: () => SearchTextScreen(),
+      binding: SearchBinding(),
     ),
     GetPage(
       name: profile,
       page: () => ProfileScreen(),
+      binding: ProfileBinding()
     ),
     GetPage(
       name: main,

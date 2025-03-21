@@ -47,7 +47,7 @@ class SettingsController extends GetxController {
   }
 
   void changeProfilePicture() {
-    print("Profil fotoğrafı değiştirildi");
+    //print("Profil fotoğrafı değiştirildi");
   }
 
   void toggleNotification(bool value) {

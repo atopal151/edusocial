@@ -7,6 +7,8 @@ class CustomButton extends StatelessWidget {
   final RxBool isLoading;
   final Color backgroundColor;
   final Color textColor;
+  final Color? iconColor;
+  final IconData? icon;
 
   const CustomButton({
     super.key,
@@ -15,6 +17,8 @@ class CustomButton extends StatelessWidget {
     required this.isLoading,
     required this.backgroundColor,
     required this.textColor,
+    this.icon,
+    this.iconColor,
   });
 
   @override
@@ -23,28 +27,39 @@ class CustomButton extends StatelessWidget {
           onTap: isLoading.value ? null : onPressed,
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               color: isLoading.value ? Colors.grey : backgroundColor,
               borderRadius: BorderRadius.circular(15),
             ),
             alignment: Alignment.center,
             child: isLoading.value
-                ? SizedBox(
+                ? const SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                      color: textColor,
+                      color: Colors.white, // Text rengi ile uyumlu olacak şekilde
                       strokeWidth: 2,
                     ),
                   )
-                : Text(
-                    text,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 13.28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                : Row(
+                    mainAxisSize: MainAxisSize.min, // Buton içinde sıkışmaması için
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (icon != null) ...[
+                        Icon(icon, color: iconColor ?? textColor),
+                        const SizedBox(width: 8), // İkon ile metin arasındaki boşluk
+                      ],
+                      Text(
+                        text,
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ));

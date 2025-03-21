@@ -11,7 +11,7 @@ class AppBarController extends GetxController {
   final NavigationController navController = Get.find<NavigationController>();
 
   void navigateToSearch() {
-    //Get.toNamed("/search");
+    Get.toNamed("/search_text");
   }
 
   void navigateToProfile() {

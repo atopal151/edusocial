@@ -12,7 +12,7 @@ class LoginView extends StatelessWidget {
     final LoginController controller = Get.put(LoginController());
 
     return Scaffold(
-      backgroundColor: Color(0xffffff),
+      backgroundColor: Color(0xffffffff),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

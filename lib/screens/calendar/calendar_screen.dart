@@ -128,15 +128,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                   SizedBox(width: 8),
                   // Add butonu
-                  Container(
-                    height: 50,
-                    width: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: GestureDetector(
-                      onTap: controller.addReminder,
+                  GestureDetector(
+                    onTap: controller.addReminder,
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Icon(Icons.add),
                     ),
                   ),

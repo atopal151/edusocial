@@ -49,7 +49,7 @@ class GroupCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12.withOpacity(0.2),
+                    color: Colors.black12.withAlpha(60),
                     blurRadius: 5,
                     spreadRadius: 1,
                   ),

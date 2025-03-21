@@ -1,9 +1,15 @@
-import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import '../../controllers/appbar_controller.dart';
-//import 'package:flutter_svg/flutter_svg.dart';
+import '../../components/buttons/custom_button.dart';
+import '../../components/cards/entry_card.dart';
+import '../../components/cards/post_card.dart';
+import '../../components/cards/profile_cards.dart';
+import '../../components/cards/profile_header.dart';
+import '../../components/profile_tabbar/profile_tabbar.dart';
+import '../../components/profile_tabbar/toggle_tab_bar.dart';
+import '../../controllers/entry_controller.dart';
+import '../../controllers/post_controller.dart';
+import '../../controllers/profile_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,43 +18,173 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  final AppBarController controller = Get.put(AppBarController());
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
+  final ProfileController controller = Get.put(ProfileController());
+  final PostController postController = Get.put(PostController());
+  final EntryController entryController = Get.put(EntryController());
+  // TabController
+  late TabController _tabController;
+
+  // Seçili ToggleTabBar'ı kontrol eden değişken
+  final RxInt selectedTabIndex = 0.obs;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
 
   @override
   Widget build(BuildContext context) {
-    bool isNavigatedFromRoute = Get.previousRoute.isNotEmpty;
     return Scaffold(
+      backgroundColor: const Color(0xffffffff),
       appBar: AppBar(
-        surfaceTintColor: Color(0xffffffff), 
-        backgroundColor: Color(0xffffffff),
-        leading: isNavigatedFromRoute
-            ? BackAppBar()
-            : null,
+        backgroundColor: const Color(0xffffffff),
+        surfaceTintColor: const Color(0xffFFFFFF),
+        centerTitle: true,
         actions: [
           InkWell(
-            onTap: controller.navigateToProfile,
+            onTap: () {},
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                    color: Color(0xffFAFAFA),
-                    borderRadius: BorderRadius.all(Radius.circular(50))),
+                  color: const Color(0xffFAFAFA),
+                  borderRadius: BorderRadius.circular(50),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: SvgPicture.asset(
-                    'images/icons/settings_icon.svg',
-                  ),
+                  child: Icon(Icons.settings, color: Colors.black),
                 ),
               ),
             ),
           )
         ],
       ),
-      backgroundColor: const Color(0xffffffff),
-      body: const Center(
-        child: Text("Profile"),
+      body: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  buildProfileHeader(),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: 200,
+                    child: CustomButton(
+                      text: "Profili Düzenle",
+                      onPressed: () {
+                        controller.getToSettingScreen();
+                      },
+                      backgroundColor: const Color(0xfff4f4f5),
+                      textColor: const Color(0xff414751),
+                      icon: Icons.person,
+                      isLoading: controller.isPrLoading,
+                    ),
+                  ),
+
+                  /// **✅ Üst TabBar (İkonlu)**
+                  ProfileTabBar(tabController: _tabController),
+                ],
+              ),
+            ),
+          ],
+          body: TabBarView(
+            controller: _tabController,
+            physics: NeverScrollableScrollPhysics(),
+            children: [
+              /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
+              buildProfileDetails(),
+
+              /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
+              Column(
+                children: [
+                  Container(
+                    color: Color(0xfffafafa),
+                    child: ToggleTabBar(
+                      selectedIndex: selectedTabIndex,
+                      onTabChanged: (index) {
+                        selectedTabIndex.value = index;
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: Obx(() {
+                      return selectedTabIndex.value == 0
+                          ? _buildPosts()
+                          : _buildEntries();
+                    }),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  /// **Gönderiler Sekmesi İçeriği**
+  Widget _buildPosts() {
+    return Obx(() {
+      if (postController.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (postController.postList.isEmpty) {
+        return const Center(child: Text("Hiç gönderi bulunamadı."));
+      }
+
+      return ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: postController.postList.length,
+        itemBuilder: (context, index) {
+          final post = postController.postList[index];
+          return Container(
+            color: Color(0xfffafafa),
+            child: PostCard(
+              profileImage: post.profileImage,
+              userName: post.userName,
+              postDate: post.postDate,
+              postDescription: post.postDescription,
+              postImage: post.postImage,
+              likeCount: post.likeCount,
+              commentCount: post.commentCount,
+            ),
+          );
+        },
+      );
+    });
+  }
+
+   /// **Entryler Sekmesi İçeriği**
+  Widget _buildEntries() {
+    return Obx(() {
+      if (entryController.entryList.isEmpty) {
+        return const Center(child: Text("Hiç entry bulunamadı."));
+      }
+
+      return ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: entryController.entryList.length,
+        itemBuilder: (context, index) {
+          final entry = entryController.entryList[index];
+          return Container(
+            color: Color(0xfffafafa),
+            child: EntryCard(
+              entry: entry,
+              onUpvote: () => entryController.upvoteEntry(index),
+              onDownvote: () => entryController.downvoteEntry(index),
+              onShare: () {},
+            ),
+          );
+        },
+      );
+    });
   }
 }

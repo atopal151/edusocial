@@ -92,9 +92,14 @@ flutter:
     - images/icons/clock_icon.svg
     - images/icons/delete_icon.svg
     - images/icons/calendar_icon.svg
+    - images/icons/profile_tab_icon.svg
+    - images/icons/grid_tab_icon.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png
+    - images/card_car.png
+    - images/user1.png
+    - images/user2.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

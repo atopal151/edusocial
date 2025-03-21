@@ -49,8 +49,8 @@ class Step3View extends StatelessWidget {
                       groupDescription: group["description"] ?? "Açıklama yok",
                       memberCount: group["members"] ?? 0,
                       onJoinPressed: () {
-                        print(
-                            "Gruba katılma isteği gönderildi: ${group["name"]}");
+                       /* print(
+                            "Gruba katılma isteği gönderildi: ${group["name"]}");*/
                         controller.joinGroup(group["name"] ?? "");
                       },
                     ),
