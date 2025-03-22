@@ -1,3 +1,4 @@
+import 'package:edusocial/controllers/home_controller.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,7 @@ class MainScreen extends StatelessWidget {
 
     Get.put(EventController());
     Get.put(SearchTextController());
+    Get.put(HomeController());
 
 
     return Scaffold(
