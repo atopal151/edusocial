@@ -19,7 +19,7 @@ class GroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Container(padding: EdgeInsets.all(8),
       width: 200,
       height: 230,
       decoration: BoxDecoration(
@@ -47,13 +47,7 @@ class GroupCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12.withAlpha(60),
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                  ),
-                ],
+                
               ),
               child: Row(
                 children: [
@@ -63,7 +57,7 @@ class GroupCard extends StatelessWidget {
                     memberCount.toString(),
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xff414751),
                     ),
                   ),
@@ -94,15 +88,15 @@ class GroupCard extends StatelessWidget {
                     groupName,
                     style: TextStyle(
                       fontSize: 13.28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff414751),
                     ),
                   ),
                   SizedBox(height: 5),
                   Text(
                     groupDescription,
                     style: TextStyle(
-                      fontSize: 12.1,
+                      fontSize: 10,
                       color: Colors.grey,
                     ),
                     maxLines: 2,

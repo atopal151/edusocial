@@ -1,6 +1,7 @@
 import 'package:edusocial/bindings/calendar_binding.dart';
 import 'package:edusocial/bindings/chat_binding.dart';
 import 'package:edusocial/bindings/event_binding.dart';
+import 'package:edusocial/bindings/group_binding.dart';
 import 'package:edusocial/bindings/match_binding.dart';
 import 'package:edusocial/bindings/profile_binding.dart';
 import 'package:edusocial/bindings/search_binding.dart';
@@ -9,6 +10,7 @@ import 'package:edusocial/screens/calendar/calendar_screen.dart';
 import 'package:edusocial/screens/chat/chat_detail_screen.dart';
 import 'package:edusocial/screens/chat/chat_list_screen.dart';
 import 'package:edusocial/screens/event/event_screen.dart';
+import 'package:edusocial/screens/groups/group_list_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/profile/edit_profile_screen.dart';
@@ -43,6 +45,7 @@ class Routes {
   static const String editProfile = "/settings";
   static const String calendar = "/calendar";
   static const String searchText = "/search_text";
+  static const String groupList = "/group_list";
 
   static final List<GetPage> pages = [
     GetPage(
@@ -74,20 +77,12 @@ class Routes {
       name: home,
       page: () => HomeScreen(),
     ),
+    GetPage(name: chat, page: () => ChatListScreen(), binding: ChatBinding()),
     GetPage(
-      name: chat,
-      page: () => ChatListScreen(),
-      binding: ChatBinding()
-    ), GetPage(
-      name: chatDetail,
-      page: () => ChatDetailScreen(),
-      binding: ChatBinding()
-    ),
-    GetPage(
-      name: event,
-      page: () => EventScreen(),
-      binding: EventBinding()
-    ),
+        name: chatDetail,
+        page: () => ChatDetailScreen(),
+        binding: ChatBinding()),
+    GetPage(name: event, page: () => EventScreen(), binding: EventBinding()),
     GetPage(
       name: match,
       page: () => MatchScreen(),
@@ -102,20 +97,23 @@ class Routes {
       page: () => EditProfileScreen(),
       binding: SettingsBinding(),
     ),
-     GetPage(
+    GetPage(
       name: calendar,
       page: () => CalendarScreen(),
       binding: CalendarBinding(),
-    ),GetPage(
+    ),
+    GetPage(
+      name: groupList,
+      page: () => GroupListScreen(),
+      binding: GroupBinding(),
+    ),
+    GetPage(
       name: searchText,
       page: () => SearchTextScreen(),
       binding: SearchBinding(),
     ),
     GetPage(
-      name: profile,
-      page: () => ProfileScreen(),
-      binding: ProfileBinding()
-    ),
+        name: profile, page: () => ProfileScreen(), binding: ProfileBinding()),
     GetPage(
       name: main,
       page: () => MainScreen(),

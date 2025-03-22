@@ -19,7 +19,7 @@ class AppBarController extends GetxController {
   }
 
   void navigateToGroups() {
-    //Get.toNamed("/groups");
+    Get.toNamed("/group_list");
   }
 
   void navigateToNotifications() {

@@ -43,11 +43,11 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
-                        child: SvgPicture.asset(
+                        child: /*SvgPicture.asset(
                           'images/icons/group_icon.svg',
                           width: 20,
                           height: 17,
-                        ),
+                        ),*/Icon(Icons.group_outlined,size: 22,color: Color(0xff414751),)
                       ),
                     ),
                     Positioned(
@@ -86,11 +86,11 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: SvgPicture.asset(
+            child: /*SvgPicture.asset(
               'images/icons/search_icon.svg',
-              width: 19,
-              height: 19,
-            ),
+              width: 16,
+              height: 16,
+            ),*/Icon(Icons.search,size: 22,color: Color(0xff414751))
           ),
         ),
         SizedBox(width: 10),
@@ -104,11 +104,11 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: SvgPicture.asset(
+            child: /*SvgPicture.asset(
               'images/icons/notification_icon.svg',
               width: 16,
               height: 22.76,
-            ),
+            ),*/Icon(Icons.notifications_outlined,size: 22,color: Color(0xff414751))
           ),
         ),
         SizedBox(width: 10),

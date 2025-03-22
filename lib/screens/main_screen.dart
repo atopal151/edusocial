@@ -33,7 +33,7 @@ class MainScreen extends StatelessWidget {
               ProfileScreen(),
             ],
           )),
-      bottomNavigationBar: NavbarMenu(), // 🔥 YENİ NAVBAR ENTEGRE EDİLDİ!
+      bottomNavigationBar: NavbarMenu(),
     );
   }
 }
