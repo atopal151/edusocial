@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/search_text_controller.dart';
+import '../buttons/icon_button.dart';
 
 class EventCard extends StatelessWidget {
   final String eventTitle;
@@ -32,7 +33,39 @@ class EventCard extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Column(
           children: [
-            Image.asset(eventImage),
+           
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  child: Image.network(
+                    eventImage,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 180,
+                  ),
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Row(
+                    children: [
+                      buildIconButton(Icons.notifications, onPressed: () {
+                        Get.snackbar(
+                            "Bildirim", "Etkinlik bildirimi ayarlandı.");
+                      }),
+                      SizedBox(width: 8),
+                      buildIconButton(Icons.more_vert, onPressed: () {
+                        Get.snackbar("Aksiyon", "Daha fazla seçenek");
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -57,10 +90,13 @@ class EventCard extends StatelessWidget {
                     height: 20,
                   ),
                   Text(eventTitle,
-                      style:
-                          TextStyle(fontSize: 13.28, fontWeight: FontWeight.w600)),
+                      style: TextStyle(
+                          fontSize: 13.28, fontWeight: FontWeight.w600)),
                   Text(eventDescription,
-                      style: TextStyle(fontSize: 10, color: Color(0xff414751),fontWeight: FontWeight.w500)),
+                      style: TextStyle(
+                          fontSize: 10,
+                          color: Color(0xff414751),
+                          fontWeight: FontWeight.w500)),
                   SizedBox(
                     height: 20,
                   ),

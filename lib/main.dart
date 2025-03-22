@@ -6,7 +6,8 @@ import 'routes/app_routes.dart';
 
 void main() {
   Get.put(LoginController(), permanent: true);
-  Get.put(NavigationController()); 
+  Get.put(NavigationController());
+   
   
   runApp(MyApp());
 }

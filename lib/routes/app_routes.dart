@@ -1,9 +1,12 @@
 import 'package:edusocial/bindings/calendar_binding.dart';
+import 'package:edusocial/bindings/chat_binding.dart';
+import 'package:edusocial/bindings/event_binding.dart';
 import 'package:edusocial/bindings/match_binding.dart';
 import 'package:edusocial/bindings/profile_binding.dart';
 import 'package:edusocial/bindings/search_binding.dart';
 import 'package:edusocial/bindings/settings_binding.dart';
 import 'package:edusocial/screens/calendar/calendar_screen.dart';
+import 'package:edusocial/screens/chat/chat_detail_screen.dart';
 import 'package:edusocial/screens/chat/chat_list_screen.dart';
 import 'package:edusocial/screens/event/event_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
@@ -31,6 +34,7 @@ class Routes {
   static const String step3 = '/step3';
   static const String home = '/home';
   static const String chat = '/chat';
+  static const String chatDetail = '/chat_detail';
   static const String event = '/event';
   static const String profile = '/profile';
   static const String match = '/match';
@@ -73,10 +77,16 @@ class Routes {
     GetPage(
       name: chat,
       page: () => ChatListScreen(),
+      binding: ChatBinding()
+    ), GetPage(
+      name: chatDetail,
+      page: () => ChatDetailScreen(),
+      binding: ChatBinding()
     ),
     GetPage(
       name: event,
       page: () => EventScreen(),
+      binding: EventBinding()
     ),
     GetPage(
       name: match,

@@ -45,13 +45,13 @@ class SearchTextController extends GetxController {
         date: "31 Ocak Cuma 16:33",
         description:
             "Lise buluşması için etkinlik yapıyoruz.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        image: "images/card_car.png"),
+        image: "https://images.pexels.com/photos/3184394/pexels-photo-3184394.jpeg"),
     EventModel(
         title: "Teknoloji Zirvesi",
         date: "5 Nisan 2025 10:00",
         description:
             "Yapay zeka ve yazılım alanındaki son gelişmeler konuşulacak.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        image: "images/card_car.png"),
+        image: "https://images.pexels.com/photos/3184394/pexels-photo-3184394.jpeg"),
   ].obs;
 
   var filteredUsers = <UserModel>[].obs;
