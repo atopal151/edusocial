@@ -6,6 +6,7 @@ import '../../components/cards/story_card.dart';
 import 'group_suggestion_list.dart';
 import '../../controllers/group_controller.dart';
 import '../../controllers/home_controller.dart';
+import 'hot_topics_list.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
@@ -40,11 +41,11 @@ class HomeScreen extends StatelessWidget {
             }),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left:16.0,top: 12,bottom: 12),
             child: const Text(
               "İlgini Çekebilecek Gruplar",
               style: TextStyle(
-                fontSize: 13.28,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xff1F1F1F),
               ),
@@ -52,16 +53,17 @@ class HomeScreen extends StatelessWidget {
           ),
           GroupSuggestionListView(),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left:16.0,top: 12,bottom: 12),
             child: const Text(
               "Gündemdeki Konular",
               style: TextStyle(
-                fontSize: 13.28,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xff1F1F1F),
               ),
             ),
           ),
+          HotTopicsListView()
         ],
       ),
     );
