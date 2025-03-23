@@ -61,7 +61,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             Expanded(
               child: Obx(() => ListView.builder(
                     controller: controller
-                        .scrollController, // 📌 ScrollController bağlandı
+                        .scrollController,
                     itemCount: controller.messages.length,
                     padding: EdgeInsets.only(bottom: 75),
                     itemBuilder: (context, index) {
@@ -80,12 +80,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             ),
             Container(
               decoration: BoxDecoration(color: Color(0xffffffff)),
-              child: Expanded(
-                  child: Padding(
+              child: Padding(
                 padding: const EdgeInsets.only(
                     left: 12.0, right: 12, top: 8, bottom: 20),
                 child: buildMessageInputField(),
-              )),
+              ),
             ),
           ],
         ),

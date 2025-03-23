@@ -1,11 +1,15 @@
 import 'package:edusocial/components/user_appbar/user_appbar.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/cards/story_card.dart';
+import 'group_suggestion_list.dart';
+import '../../controllers/group_controller.dart';
 import '../../controllers/home_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
+  final GroupController groupController = Get.put(GroupController());
 
   HomeScreen({super.key});
 
@@ -34,6 +38,29 @@ class HomeScreen extends StatelessWidget {
                 ),
               );
             }),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: const Text(
+              "İlgini Çekebilecek Gruplar",
+              style: TextStyle(
+                fontSize: 13.28,
+                fontWeight: FontWeight.w600,
+                color: Color(0xff1F1F1F),
+              ),
+            ),
+          ),
+          GroupSuggestionListView(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: const Text(
+              "Gündemdeki Konular",
+              style: TextStyle(
+                fontSize: 13.28,
+                fontWeight: FontWeight.w600,
+                color: Color(0xff1F1F1F),
+              ),
+            ),
           ),
         ],
       ),

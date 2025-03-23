@@ -1,5 +1,5 @@
-
 // group_controller.dart
+import 'package:edusocial/models/grup_suggestion_model.dart';
 import 'package:get/get.dart';
 import '../models/group_model.dart';
 import '../services/group_service.dart';
@@ -7,6 +7,7 @@ import '../services/group_service.dart';
 class GroupController extends GetxController {
   var userGroups = <GroupModel>[].obs;
   var allGroups = <GroupModel>[].obs;
+  var suggestionGroups = <GroupSuggestionModel>[].obs;
   var isLoading = false.obs;
   var selectedCategory = "Kimya".obs;
 
@@ -19,6 +20,7 @@ class GroupController extends GetxController {
     super.onInit();
     fetchUserGroups();
     fetchAllGroups();
+    fetchSuggestionGroups();
   }
 
   void fetchUserGroups() async {
@@ -26,7 +28,12 @@ class GroupController extends GetxController {
     userGroups.value = await _groupServices.fetchUserGroups();
     isLoading.value = false;
   }
-  
+
+  void fetchSuggestionGroups() async {
+    isLoading.value = true;
+    suggestionGroups.value = await _groupServices.fetchSuggestionGroups();
+    isLoading.value = false;
+  }
 
   void fetchAllGroups() async {
     isLoading.value = true;
@@ -42,7 +49,8 @@ class GroupController extends GetxController {
     final index = allGroups.indexWhere((group) => group.id == id);
     if (index != -1) {
       allGroups[index] = allGroups[index].copyWith(isJoined: true);
-      Get.snackbar("Katılım Başarılı", "${allGroups[index].name} grubuna katıldınız");
+      Get.snackbar(
+          "Katılım Başarılı", "${allGroups[index].name} grubuna katıldınız");
     }
   }
 }

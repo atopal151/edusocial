@@ -12,7 +12,7 @@ class MatchController extends GetxController {
   var currentIndex = 0.obs;
 
   final NavigationController navigationController =
-      Get.put(NavigationController()); // Get.find yerine Get.put kullan
+      Get.put(NavigationController());
 
   MatchModel get currentMatch => matches[currentIndex.value];
 
@@ -27,33 +27,151 @@ class MatchController extends GetxController {
   }
 
   void _loadMockData() {
-   
-   matches.addAll([
+    matches.addAll([
       MatchModel(
-        name: "Khan Aleran",
-        age: 25,
-        about: "ysa ki dostoyevski; dünyaca ünlü ukraynalı yazar raskolnikov'un tercih ettiği bir çeşit salamura zeytindir. tanım: korkan birisinin beyanı. derin korkularının vardır bir sebebi, muhakkak.",
-        profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
+        name: "Merve Gökçen",
+        age: 24,
+        about: "Tıpta uzmanlık alanım nöroloji. Bilimsel makale yazıyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg",
         isOnline: true,
-        schoolName: "Monnet International School",
-        schoolLogo: "https://s3-alpha-sig.figma.com/img/5dd4/2293/d960cc339e8c771cd95a449eb4c4aa42?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=WAWo5lofVH2qVIGeHFaFrhd9sQY07hAbg-trezJOzP2QAwZEZBZ2HnSJ3w3VwBYYuW7X5DLsz5m7k9BGq6QBqHn7i7HyF~BqCivZ~KrPXPdBx40P2Zrg8qiY~Zz4718z0DdjFT-P5q5MmdFvtz75TvUdCW4rqRf5A0s5~4UO71pAEaTGFExDxfRLGPLDwx7hjRGc~ks6aZ5zB5ZiPPMu9fofP9kPv8mw53ROQMFLuVZWLt0xYSPcVfQzHsB5XaGRi2GFW~lwvPaP-~4k71LfhmwBdAKTm~xrJZUTRqEp3swN8hHwcWbOXjomU9xidIQJxLsg3tTtYfNuOI-SHl7yEA__",
-        department: "Computer Engineering",
-        grade: 2,
-        matchedTopics: ["Veri Yapıları ve Algoritmalar", "Pazarlama Yönetimi",],
+        schoolName: "Hacettepe Üniversitesi",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvoc1IJGlYmyiG6XEhiO7YKCs9Rf2HZzBuNw&s",
+        department: "Medicine",
+        grade: 5,
+        matchedTopics: ["Nöroloji", "Genetik Araştırmalar"],
       ),
       MatchModel(
-        name: "Elena Moris",
-        age: 22,
-        about: "ysa ki dostoyevski; dünyaca ünlü ukraynalı yazar raskolnikov'un tercih ettiği bir çeşit salamura zeytindir. tanım: korkan birisinin beyanı. derin korkularının vardır bir sebebi, muhakkak.",
-        profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
-        isOnline: false,
-        schoolName: "Harvard University",
-        schoolLogo: "https://s3-alpha-sig.figma.com/img/5dd4/2293/d960cc339e8c771cd95a449eb4c4aa42?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=WAWo5lofVH2qVIGeHFaFrhd9sQY07hAbg-trezJOzP2QAwZEZBZ2HnSJ3w3VwBYYuW7X5DLsz5m7k9BGq6QBqHn7i7HyF~BqCivZ~KrPXPdBx40P2Zrg8qiY~Zz4718z0DdjFT-P5q5MmdFvtz75TvUdCW4rqRf5A0s5~4UO71pAEaTGFExDxfRLGPLDwx7hjRGc~ks6aZ5zB5ZiPPMu9fofP9kPv8mw53ROQMFLuVZWLt0xYSPcVfQzHsB5XaGRi2GFW~lwvPaP-~4k71LfhmwBdAKTm~xrJZUTRqEp3swN8hHwcWbOXjomU9xidIQJxLsg3tTtYfNuOI-SHl7yEA__",
-        department: "Business Administration",
-        grade: 3,
-        matchedTopics: ["Yönetim Stratejileri", "Ekonomi","Deneme",],
+        name: "Ayşe Nur Kaya",
+        age: 21,
+        about: "Psikoloji alanında gözlem yapmayı ve yazmayı seviyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
+        isOnline: true,
+        schoolName: "Boğaziçi Üniversitesi",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReiTPY4lDPjzgH1SWoUQRPcZhED7fAqT5eRQ&s",
+        department: "Psychology",
+        grade: 2,
+        matchedTopics: ["Davranış Bilimleri", "Toplum Psikolojisi"],
       ),
-      // 8 tane daha örnek veri ekleyebilirsin
+      MatchModel(
+        name: "Sofia Ramirez",
+        age: 23,
+        about:
+            "İlgi alanım yapay zekâ, sürdürülebilirlik ve kadın girişimciliği.",
+        profileImage:
+            "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
+        isOnline: true,
+        schoolName: "Oxford University",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReiTPY4lDPjzgH1SWoUQRPcZhED7fAqT5eRQ&s",
+        department: "Artificial Intelligence",
+        grade: 3,
+        matchedTopics: ["Makine Öğrenmesi", "Etik ve Teknoloji"],
+      ),
+      MatchModel(
+        name: "Liam Chen",
+        age: 24,
+        about: "Kod yazmayı ve açık kaynak katkılarını çok severim.",
+        profileImage:
+            "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg",
+        isOnline: false,
+        schoolName: "Stanford University",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Computer Science",
+        grade: 4,
+        matchedTopics: ["Veri Yapıları", "Blockchain Teknolojisi"],
+      ),
+      MatchModel(
+        name: "Takeshi Nakamura",
+        age: 22,
+        about:
+            "UI/UX tasarımı ve insan-bilgisayar etkileşimi konularında çalışıyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/1704488/pexels-photo-1704488.jpeg",
+        isOnline: false,
+        schoolName: "Kyoto University",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Design Engineering",
+        grade: 3,
+        matchedTopics: ["Kullanıcı Deneyimi", "Arayüz Tasarımı"],
+      ),
+      MatchModel(
+        name: "Nora Jensen",
+        age: 20,
+        about: "Çevre politikaları üzerine çalışıyor ve yazılar yazıyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg",
+        isOnline: true,
+        schoolName: "Copenhagen University",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvoc1IJGlYmyiG6XEhiO7YKCs9Rf2HZzBuNw&s",
+        department: "Environmental Science",
+        grade: 2,
+        matchedTopics: ["İklim Değişikliği", "Sürdürülebilir Kalkınma"],
+      ),
+      MatchModel(
+        name: "Marco Esposito",
+        age: 26,
+        about:
+            "Girişimcilik ve teknoloji tabanlı iş modelleri üzerine çalışıyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg",
+        isOnline: false,
+        schoolName: "Politecnico di Milano",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Business Innovation",
+        grade: 4,
+        matchedTopics: ["Startup Kültürü", "Yatırım Altyapısı"],
+      ),
+      MatchModel(
+        name: "Elif Demir",
+        age: 22,
+        about: "Yazılım mühendisliği okuyorum. Mobil uygulama geliştiriyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg",
+        isOnline: true,
+        schoolName: "İstanbul Teknik Üniversitesi",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Software Engineering",
+        grade: 3,
+        matchedTopics: ["Flutter", "Siber Güvenlik"],
+      ),
+      MatchModel(
+        name: "David Wilson",
+        age: 27,
+        about: "Veri bilimi ve istatistiksel modelleme üzerine uzmanlaştım.",
+        profileImage:
+            "https://images.pexels.com/photos/1704487/pexels-photo-1704487.jpeg",
+        isOnline: false,
+        schoolName: "MIT",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Data Science",
+        grade: 4,
+        matchedTopics: ["İstatistiksel Modelleme", "Makine Öğrenmesi"],
+      ),
+      
+      MatchModel(
+        name: "Alex Müller",
+        age: 21,
+        about: "Sanat ve teknoloji birleşimi konularında çalışıyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/1704486/pexels-photo-1704486.jpeg",
+        isOnline: false,
+        schoolName: "Berlin University of the Arts",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvoc1IJGlYmyiG6XEhiO7YKCs9Rf2HZzBuNw&s",
+        department: "Digital Arts",
+        grade: 2,
+        matchedTopics: ["Dijital Medya", "Yaratıcı Kodlama"],
+      ),
     ]);
   }
 

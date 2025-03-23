@@ -1,3 +1,4 @@
+import '../models/grup_suggestion_model.dart';
 import '../models/user_model.dart';
 
 class ProfileService {
@@ -21,18 +22,22 @@ class ProfileService {
         "Cebirsel Sayılar",
       ],
       joinedGroups: [
-        GroupModel(
-          groupName: "Murata Hayranlar Grubu",
-          groupImage: "https://images.pexels.com/photos/3931501/pexels-photo-3931501.jpeg?auto=compress&cs=tinysrgb&h=200&w=400",
-          groupAvatar: "https://i.pravatar.cc/150?img=5",
-          memberCount: 352,
-        ),
-        GroupModel(
-          groupName: "Flutter Developers",
-          groupImage: "https://images.pexels.com/photos/6348129/pexels-photo-6348129.jpeg?auto=compress&cs=tinysrgb&h=200&w=400",
-          groupAvatar: "https://i.pravatar.cc/150?img=8",
-          memberCount: 874,
-        ),
+        GroupSuggestionModel(
+            groupName: "Murata Hayranlar Grubu",
+            groupImage:
+                "https://images.pexels.com/photos/3931501/pexels-photo-3931501.jpeg?auto=compress&cs=tinysrgb&h=200&w=400",
+            groupAvatar: "https://i.pravatar.cc/150?img=5",
+            memberCount: 352,
+            description:
+                "Yapay zeka ve makine öğrenimi konularına ilgi duyanların bir araya geldiği aktif bir topluluk."),
+        GroupSuggestionModel(
+            groupName: "Flutter Developers",
+            groupImage:
+                "https://images.pexels.com/photos/6348129/pexels-photo-6348129.jpeg?auto=compress&cs=tinysrgb&h=200&w=400",
+            groupAvatar: "https://i.pravatar.cc/150?img=8",
+            memberCount: 874,
+            description:
+                "Yapay zeka ve makine öğrenimi konularına ilgi duyanların bir araya geldiği aktif bir topluluk."),
       ],
     );
   }

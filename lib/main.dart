@@ -7,14 +7,12 @@ import 'routes/app_routes.dart';
 void main() {
   Get.put(LoginController(), permanent: true);
   Get.put(NavigationController());
-   
-  
+
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(

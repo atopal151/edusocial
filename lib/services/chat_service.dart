@@ -1,5 +1,3 @@
-
-
 import '../models/chat_model.dart';
 
 class ChatServices {
@@ -32,7 +30,7 @@ class ChatServices {
         sender: UserModel(
           id: 1,
           name: "Alexander Rybak",
-        username: "@alexenderrybak",
+          username: "@alexenderrybak",
           profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
           isOnline: true,
         ),
@@ -44,7 +42,7 @@ class ChatServices {
         sender: UserModel(
           id: 2,
           name: "Sophia Moore",
-        username: "@sophiemorre",
+          username: "@sophiemorre",
           profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
           isOnline: false,
         ),

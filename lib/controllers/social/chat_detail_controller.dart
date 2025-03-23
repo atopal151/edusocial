@@ -25,14 +25,16 @@ class ChatDetailController extends GetxController {
       scrollToBottom();
   }
 
-  // 📌 En Alta Scroll Yapma Fonksiyonu
-  void scrollToBottom() {
+ void scrollToBottom() {
+  if (scrollController.hasClients) {
     scrollController.animateTo(
       scrollController.position.maxScrollExtent,
       duration: Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
   }
+}
+
 
   void simulateIncomingMessages() {
     Timer.periodic(Duration(seconds: 10), (timer) {

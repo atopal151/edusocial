@@ -77,12 +77,20 @@ class Routes {
       name: home,
       page: () => HomeScreen(),
     ),
-    GetPage(name: chat, page: () => ChatListScreen(), binding: ChatBinding()),
+    GetPage(
+      name: chat,
+      page: () => ChatListScreen(),
+      binding: ChatBinding(),
+    ),
     GetPage(
         name: chatDetail,
         page: () => ChatDetailScreen(),
         binding: ChatBinding()),
-    GetPage(name: event, page: () => EventScreen(), binding: EventBinding()),
+    GetPage(
+      name: event,
+      page: () => EventScreen(),
+      binding: EventBinding(),
+    ),
     GetPage(
       name: match,
       page: () => MatchScreen(),
@@ -113,7 +121,10 @@ class Routes {
       binding: SearchBinding(),
     ),
     GetPage(
-        name: profile, page: () => ProfileScreen(), binding: ProfileBinding()),
+      name: profile,
+      page: () => ProfileScreen(),
+      binding: ProfileBinding(),
+    ),
     GetPage(
       name: main,
       page: () => MainScreen(),
