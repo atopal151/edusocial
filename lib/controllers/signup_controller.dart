@@ -32,7 +32,7 @@ class SignupController extends GetxController {
     isSuLoading.value = false;
 
     Get.snackbar("Başarılı", "Kayıt başarılı! Giriş yapabilirsiniz.");
-    Get.offAllNamed('/login'); // Kullanıcıyı login ekranına yönlendir
+    Get.offAllNamed('/login'); 
   }
 
   @override

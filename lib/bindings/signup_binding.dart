@@ -1,4 +1,4 @@
-// lib/bindings/register_binding.dart
+
 import 'package:get/get.dart';
 import '../controllers/signup_controller.dart';
 

@@ -76,7 +76,7 @@ class LoginView extends StatelessWidget {
                         Text(
                           "EduSocial, Polonya’daki uluslararası okullarda eğitim gören öğrenciler için tasarlanmış yenilikçi bir sosyal platformdur.",
                           style: GoogleFonts.inter(
-                              fontSize: 12, color: Colors.white),
+                              fontSize: 12, color: Color(0xffffe4e4),fontWeight: FontWeight.w400),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 30),

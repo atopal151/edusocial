@@ -1,6 +1,7 @@
 // lib/views/register_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/costum_textfield.dart';
 import '../../controllers/signup_controller.dart';
@@ -33,17 +34,20 @@ class SignupView extends StatelessWidget {
                   children: [
                     Text(
                       "Benzer İlgi Alanlarına\nSahip Kişilerle Tanış! ",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xffffffff),
                       ),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 10),
                     Text(
                       "EduSocial, Polonya’daki uluslararası okullarda eğitim\ngören öğrenciler için tasarlanmış yenilikçi bir sosyal\nplatformdur.",
-                      style: TextStyle(fontSize: 12, color: Colors.white),
+                      style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Color(0xffffe4e4),
+                          fontWeight: FontWeight.w400),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 30),
@@ -58,7 +62,7 @@ class SignupView extends StatelessWidget {
                         children: [
                           Text(
                             "Kayıt Ol",
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                                 fontSize: 18.72,
                                 fontWeight: FontWeight.w700,
                                 color: const Color(0xff414751)),
@@ -95,8 +99,8 @@ class SignupView extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(5),
                                         color: controller.isAccepted.value
-                                            ? Color(0xFFE55050)
-                                            : Color(0xFFF3F4F6),
+                                            ? Color(0xFFe75454)
+                                            : Color(0xFFF5F5F5),
                                       ),
                                       child: controller.isAccepted.value
                                           ? Icon(Icons.check,
@@ -108,7 +112,10 @@ class SignupView extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   "Gizlilik politikası ve kullanım koşullarını okudum anladım ve kabul ediyorum.",
-                                  style: TextStyle(fontSize: 12),
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: Color(0xff414751),
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ),
                             ],
@@ -118,7 +125,7 @@ class SignupView extends StatelessWidget {
                               backgroundColor: Color(0xffE75454),
                               text: "Kayıt Ol",
                               isLoading: controller.isSuLoading,
-                    textColor: Colors.white,
+                              textColor: Colors.white,
                               onPressed: () {
                                 controller.signup();
                               }),
@@ -131,14 +138,18 @@ class SignupView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("Hesabınız var mı? ",
-                                    style: TextStyle(color: Color(0xFF414751))),
+                                    style: GoogleFonts.inter(
+                                        color: Color(0xFF414751),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13.28)),
                                 Text(
                                   "Giriş Yap.",
-                                  style: TextStyle(
-                                    color: Color(0xFFE55050),
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Color(0xFFE55050),
-                                  ),
+                                  style: GoogleFonts.inter(
+                                      color: Color(0xFFEf5050),
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Color(0xFFEf5050),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13.28),
                                 )
                               ],
                             ),
