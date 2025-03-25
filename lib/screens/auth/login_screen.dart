@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/costum_textfield.dart';
 import '../../controllers/login_controller.dart';
@@ -9,11 +10,12 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LoginController controller = Get.put(LoginController());
+    final LoginController controller = Get.find();
 
     return Scaffold(
       backgroundColor: Color(0xffffffff),
       body: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -31,7 +33,7 @@ class LoginView extends StatelessWidget {
                     child: Container(
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height *
-                          0.30, // Yükseklik biraz düşürüldü
+                          0.28, // Yükseklik biraz düşürüldü
 
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -46,7 +48,7 @@ class LoginView extends StatelessWidget {
                           bottomRight: Radius.circular(30),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 20.0),
+                          padding: const EdgeInsets.only(top: 50.0),
                           child: Image.asset(
                             'images/login_image.png',
                             width: double.infinity,
@@ -63,8 +65,8 @@ class LoginView extends StatelessWidget {
                       children: [
                         Text(
                           "Benzer İlgi Alanlarına\n Sahip Kişilerle Tanış!",
-                          style: TextStyle(
-                            fontSize: 20,
+                          style: GoogleFonts.inter(
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -73,7 +75,8 @@ class LoginView extends StatelessWidget {
                         SizedBox(height: 10),
                         Text(
                           "EduSocial, Polonya’daki uluslararası okullarda eğitim gören öğrenciler için tasarlanmış yenilikçi bir sosyal platformdur.",
-                          style: TextStyle(fontSize: 12, color: Colors.white),
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: Colors.white),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 30),
@@ -88,7 +91,7 @@ class LoginView extends StatelessWidget {
                             children: [
                               Text(
                                 "Giriş Yap",
-                                style: TextStyle(
+                                style: GoogleFonts.inter(
                                   fontSize: 18.72,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF414751),
@@ -115,9 +118,10 @@ class LoginView extends StatelessWidget {
                                   },
                                   child: Text(
                                     "Şifrenizi mi unuttunuz?",
-                                    style: TextStyle(
-                                      fontSize: 12,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13.28,
                                       color: Color(0xFF414751),
+                                      fontWeight: FontWeight.w600,
                                       decoration: TextDecoration.underline,
                                       decorationColor: Color(0xFF414751),
                                     ),
@@ -146,16 +150,20 @@ class LoginView extends StatelessWidget {
                                     children: [
                                       Text(
                                         "Hesabınız yok mu? ",
-                                        style:
-                                            TextStyle(color: Color(0xFF414751)),
+                                        style: GoogleFonts.inter(
+                                            color: Color(0xFF414751),
+                                            fontSize: 13.28,
+                                            fontWeight: FontWeight.w600),
                                       ),
                                       Text(
                                         "Kayıt Ol.",
-                                        style: TextStyle(
-                                          color: Color(0xFFE55050),
-                                          decoration: TextDecoration.underline,
-                                          decorationColor: Color(0xFFE55050),
-                                        ),
+                                        style: GoogleFonts.inter(
+                                            color: Color(0xFFE55050),
+                                            decoration:
+                                                TextDecoration.underline,
+                                            decorationColor: Color(0xFFE55050),
+                                            fontSize: 13.28,
+                                            fontWeight: FontWeight.w600),
                                       )
                                     ],
                                   ),
