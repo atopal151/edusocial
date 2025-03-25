@@ -13,8 +13,8 @@ class EntryController extends GetxController {
   void fetchEntries() {
     entryList.assignAll([
       EntryModel(
-        profileImage: "https://randomuser.me/api/portraits/men/32.jpg",
-        userName: "Alexander Rybak",
+       profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
+        userName: "Alara Christie",
         entryDate: "26.12.2010 16:56",
         entryTitle: "Geziciler dostoyevski'yi isviçre peyniri sanıyor",
         entryDescription:
@@ -24,8 +24,8 @@ class EntryController extends GetxController {
         isActive: false
       ),
       EntryModel(
-        profileImage: "https://randomuser.me/api/portraits/women/45.jpg",
-        userName: "Emily Johnson",
+       profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
+        userName: "Alara Christie",
         entryDate: "05.08.2015 12:30",
         entryTitle: "Kitap okumak neden önemli?",
         entryDescription:

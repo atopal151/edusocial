@@ -7,6 +7,7 @@ import 'group_suggestion_list.dart';
 import '../../controllers/group_controller.dart';
 import '../../controllers/home_controller.dart';
 import 'hot_topics_list.dart';
+import 'post_home_list.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
@@ -19,52 +20,55 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: UserAppBar(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Story alanı
-          SizedBox(
-            height: 120,
-            child: Obx(() {
-              return Container(
-                decoration: BoxDecoration(color: Color(0xffffffff)),
-                child: ListView.builder(
-                  padding: EdgeInsets.only(left: 8, top: 12),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: controller.storyController.storyList.length,
-                  itemBuilder: (context, index) {
-                    return StoryCard(
-                        story: controller.storyController.storyList[index]);
-                  },
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 120,
+              child: Obx(() {
+                return Container(
+                  decoration: BoxDecoration(color: Color(0xffffffff)),
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(left: 8, top: 12),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: controller.storyController.storyList.length,
+                    itemBuilder: (context, index) {
+                      return StoryCard(
+                        story: controller.storyController.storyList[index],
+                      );
+                    },
+                  ),
+                );
+              }),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
+              child: const Text(
+                "İlgini Çekebilecek Gruplar",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff1F1F1F),
                 ),
-              );
-            }),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left:16.0,top: 12,bottom: 12),
-            child: const Text(
-              "İlgini Çekebilecek Gruplar",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xff1F1F1F),
               ),
             ),
-          ),
-          GroupSuggestionListView(),
-          Padding(
-            padding: const EdgeInsets.only(left:16.0,top: 12,bottom: 12),
-            child: const Text(
-              "Gündemdeki Konular",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xff1F1F1F),
+            GroupSuggestionListView(),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
+              child: const Text(
+                "Gündemdeki Konular",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff1F1F1F),
+                ),
               ),
             ),
-          ),
-          HotTopicsListView()
-        ],
+            HotTopicsListView(),
+            PostHomeList(),
+          ],
+        ),
       ),
     );
   }
