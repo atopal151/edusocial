@@ -23,6 +23,10 @@ class AppBarController extends GetxController {
   }
 
   void navigateToNotifications() {
+    //Get.toNamed("/calendar");
+  }
+
+  void navigateToCalendar() {
     Get.toNamed("/calendar");
   }
 

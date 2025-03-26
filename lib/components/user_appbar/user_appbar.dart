@@ -27,88 +27,112 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    GestureDetector(
-                      onTap: controller.navigateToGroups,
-                      child: Container(
-                        height: 44,
-                        width: 44,
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: /*SvgPicture.asset(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              GestureDetector(
+                onTap: controller.navigateToGroups,
+                child: Container(
+                    height: 44,
+                    width: 44,
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: /*SvgPicture.asset(
                           'images/icons/group_icon.svg',
                           width: 20,
                           height: 17,
-                        ),*/Icon(Icons.group_outlined,size: 22,color: Color(0xff414751),)
-                      ),
+                        ),*/
+                        Icon(
+                      Icons.group_outlined,
+                      size: 22,
+                      color: Color(0xff414751),
+                    )),
+              ),
+              Positioned(
+                top: -5,
+                right: -5,
+                child: Container(
+                  height: 20,
+                  width: 20,
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '12',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Positioned(
-                      top: -5,
-                      right: -5,
-                      child: Container(
-                        height: 20,
-                        width: 20,
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '12',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ],
+      ),
       actions: [
         GestureDetector(
           onTap: controller.navigateToSearch,
           child: Container(
-            height: 44,
-            width: 44,
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: /*SvgPicture.asset(
+              height: 44,
+              width: 44,
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: /*SvgPicture.asset(
               'images/icons/search_icon.svg',
               width: 16,
               height: 16,
-            ),*/Icon(Icons.search,size: 22,color: Color(0xff414751))
-          ),
+            ),*/
+                  Icon(Icons.search, size: 22, color: Color(0xff414751))),
+        ),
+        SizedBox(width: 10),
+        GestureDetector(
+          onTap: controller.navigateToCalendar,
+          child: Container(
+              height: 44,
+              width: 44,
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: /*SvgPicture.asset(
+              'images/icons/notification_icon.svg',
+              width: 16,
+              height: 22.76,
+            ),*/
+                  Icon(Icons.calendar_month_outlined,
+                      size: 22, color: Color(0xff414751))),
         ),
         SizedBox(width: 10),
         GestureDetector(
           onTap: controller.navigateToNotifications,
           child: Container(
-            height: 44,
-            width: 44,
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: /*SvgPicture.asset(
+              height: 44,
+              width: 44,
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: /*SvgPicture.asset(
               'images/icons/notification_icon.svg',
               width: 16,
               height: 22.76,
-            ),*/Icon(Icons.notifications_outlined,size: 22,color: Color(0xff414751))
-          ),
+            ),*/
+                  Icon(Icons.notifications_outlined,
+                      size: 22, color: Color(0xff414751))),
         ),
         SizedBox(width: 10),
       ],
