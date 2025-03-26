@@ -1,3 +1,4 @@
+import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controllers/login_controller.dart';
@@ -5,8 +6,11 @@ import 'controllers/nav_bar_controller.dart';
 import 'routes/app_routes.dart'; 
 
 void main() {
+
+  WidgetsFlutterBinding.ensureInitialized(); // BU ŞART!
   Get.put(LoginController(), permanent: true);
   Get.put(NavigationController());
+  Get.put(OnboardingController());
 
   runApp(MyApp());
 }

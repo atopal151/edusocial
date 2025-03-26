@@ -5,10 +5,10 @@ packages:
     dependency: transitive
     description:
       name: args
-      sha256: bf9f5caeea8d8fe6721a9c358dd8a5c1947b27f1cfaa18b39c301273594919e6
+      sha256: d0481093c50b1da8910eb0bb301626d4d8eb7284aa739614d2b394ee09e3ea04
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.0"
+    version: "2.7.0"
   async:
     dependency: transitive
     description:
@@ -153,7 +153,7 @@ packages:
     source: hosted
     version: "6.2.1"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: fe7ab022b76f3034adc518fb6ea04a82387620e19977665ea18d30a1cf43442f
@@ -249,7 +249,7 @@ packages:
     source: hosted
     version: "1.1.0"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -332,10 +332,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_android
-      sha256: a768fc8ede5f0c8e6150476e14f38e2417c0864ca36bb4582be8e21925a03c22
+      sha256: "3ec7210872c4ba945e3244982918e502fa2bfb5230dff6832459ca0e1879b7ad"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.6"
+    version: "2.4.8"
   shared_preferences_foundation:
     dependency: transitive
     description:

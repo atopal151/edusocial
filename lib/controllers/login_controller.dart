@@ -1,3 +1,4 @@
+import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -5,7 +6,8 @@ class LoginController extends GetxController {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   var isLoading = false.obs;
-  var isFirstLogin = true.obs; // Kullanıcının ilk kez giriş yapıp yapmadığını kontrol et
+  var isFirstLogin =
+      true.obs; // Kullanıcının ilk kez giriş yapıp yapmadığını kontrol et
 
   @override
   void onInit() {
@@ -15,6 +17,8 @@ class LoginController extends GetxController {
   }
 
   void login() async {
+    //kullanıcı girişinin kontrol edileceği alan
+    
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar("Hata", "Lütfen tüm alanları doldurun.");
       return;
@@ -25,6 +29,10 @@ class LoginController extends GetxController {
     isLoading.value = false;
 
     Get.snackbar("Başarılı", "Giriş başarılı!");
+
+    final email = emailController.text;
+    final onboardingController = Get.find<OnboardingController>();
+    onboardingController.userEmail = email;
 
     // Eğer kullanıcı ilk kez giriş yapıyorsa onboarding sayfalarına yönlendir
     if (isFirstLogin.value) {

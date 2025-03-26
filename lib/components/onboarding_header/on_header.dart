@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OnboardingHeader extends StatelessWidget {
   final String title;
@@ -25,17 +26,17 @@ class OnboardingHeader extends StatelessWidget {
               SizedBox(height: 30), // Boşluk bırak, ikon aşağı taşınsın
               Text(
                 title,
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: Color(0xff414751),
                 ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 5),
               Text(
                 subtitle,
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: Color(0xff9CA3AE),
@@ -48,14 +49,14 @@ class OnboardingHeader extends StatelessWidget {
         Positioned(
           top: -30,
           child: Container(
-            width: 60,
-            height: 60,
+            width: 66,
+            height: 66,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(20)),
               gradient: LinearGradient(
                 colors: [Color(0xFFFF7743), Color(0xFFEF5050)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
             child: Center(

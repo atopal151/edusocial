@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class GroupCard extends StatelessWidget {
   final String imageUrl;
@@ -27,18 +28,18 @@ class GroupCard extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          /// **ARKA PLAN GÖRSELİ**
+          ///ARKA PLAN GÖRSELİ
           ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: Image.network(
               imageUrl,
               width: double.infinity,
-              height: 140, // Görselin yüksekliğini artırdım
+              height: 120, 
               fit: BoxFit.cover,
             ),
           ),
 
-          /// **ÜYE SAYISI BADGE**
+          ///ÜYE SAYISI BADGE
           Positioned(
             top: 8,
             right: 8,
@@ -55,7 +56,7 @@ class GroupCard extends StatelessWidget {
                   SizedBox(width: 4),
                   Text(
                     memberCount.toString(),
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Color(0xff414751),
@@ -66,11 +67,11 @@ class GroupCard extends StatelessWidget {
             ),
           ),
 
-          /// **BEYAZ İÇERİK KARTI (GÖRSELİN ÜZERİNE OTURTULDU)**
+          ///BEYAZ İÇERİK KARTI
           Positioned(
             left: 0,
             right: 0,
-            bottom: 0, // Görselin altına yasladık
+            bottom: 0, 
             child: Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -86,7 +87,7 @@ class GroupCard extends StatelessWidget {
                 children: [
                   Text(
                     groupName,
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       fontSize: 13.28,
                       fontWeight: FontWeight.w600,
                       color: Color(0xff414751),
@@ -95,9 +96,10 @@ class GroupCard extends StatelessWidget {
                   SizedBox(height: 5),
                   Text(
                     groupDescription,
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       fontSize: 10,
-                      color: Colors.grey,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff9ca3ae),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -105,22 +107,23 @@ class GroupCard extends StatelessWidget {
                   SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
-                      onJoinPressed(); // **joinGroup fonksiyonunu çalıştır**
-                    }, // **Butona tıklanınca çağrılacak fonksiyon**
+                      onJoinPressed(); // joinGroup fonksiyonunu çalıştır
+                    }, 
                     child: Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: Color(0xffFFF6F6), // **DOLU KIRMIZI BUTON**
+                        color: Color(0xffFFF6F6), 
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Center(
                         child: Text(
                           action,
-                          style: TextStyle(
-                            color: Color(0xffED7474), // **Beyaz yazı rengi**
+                          style: GoogleFonts.inter(
+                            color: Color(0xffED7474), 
                             fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
+                          
                           ),
                         ),
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomDropDown extends StatelessWidget {
   final String label;
@@ -21,7 +22,10 @@ class CustomDropDown extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 16,fontWeight: FontWeight.w400, color: Color(0xff9CA3AE)),
+          style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Color(0xff9CA3AE)),
         ),
         SizedBox(height: 5),
         Container(
@@ -39,7 +43,11 @@ class CustomDropDown extends StatelessWidget {
               items: items.map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value, style: TextStyle(fontSize: 13.28,fontWeight: FontWeight.w600, color: Colors.black)),
+                  child: Text(value,
+                      style: GoogleFonts.inter(
+                          fontSize: 13.28,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751))),
                 );
               }).toList(),
             ),

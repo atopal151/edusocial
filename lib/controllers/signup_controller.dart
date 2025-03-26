@@ -14,6 +14,8 @@ class SignupController extends GetxController {
   }
 
   void signup() async {
+    //kullanıcı kayıt alanı
+    
     if (!isAccepted.value) {
       Get.snackbar("Hata", "Lütfen gizlilik politikasını kabul edin.");
       return;

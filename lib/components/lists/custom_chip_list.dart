@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomChipList extends StatelessWidget {
   final List<String> items;
@@ -50,7 +51,7 @@ class CustomChipList extends StatelessWidget {
               Text(
                 item,
                 style:
-                    TextStyle(color: textColor, fontWeight: FontWeight.w600),
+                    GoogleFonts.inter(color: textColor, fontWeight: FontWeight.w600,fontSize: 13.28),
               ),
             ],
           ),

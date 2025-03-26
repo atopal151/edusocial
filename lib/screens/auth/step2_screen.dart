@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/dialogs/warning_box.dart';
 import '../../components/input_fields/custom_textfield_step2.dart';
@@ -17,63 +18,65 @@ class Step2View extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffFAFAFA),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 40),
-              OnboardingHeader(
-                imagePath: "images/icons/Group.png",
-                title: "Bilgilerinizi Tamamlayın",
-                subtitle:
-                    "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!",
-              ),
-              SizedBox(height: 30),
-              Text(
-                "Hangi dersleri alıyorsun?",
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff9CA3AE)),
-              ),
-              SizedBox(height: 10),
-              CustomTextFieldStep2(
-                controller: controller.courseController,
-                onAdd: controller.addCourse,
-              ),
-              SizedBox(height: 20),
-              Text(
-                "Kaydedilen Konular",
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff9CA3AE)),
-              ),
-              SizedBox(height: 10),
-              CustomChipList(
-                items: controller.courses,
-                onRemove: controller.removeCourse,
-                textColor: Color(0xff414751),
-                backgroundColor: Color(0xffFFFFFF),
-                iconColor: Color(0xffffffff),
-                iconbackColor: Color(0xff9CA3AE),
-              ),
-              SizedBox(height: 20),
-              WarningBox(
-                message:
-                    "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir.",
-              ),
-              SizedBox(height: 30),
-              CustomButton(
-                    text: "Devam Et",
-                    onPressed: controller.proceedToNextStep2,
-                    isLoading: controller.isLoading,
-                    backgroundColor: Color(0xFF414751),
-                    textColor: Colors.white,
-                  ),
-              SizedBox(height: 20),
-            ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 40),
+                OnboardingHeader(
+                  imagePath: "images/icons/Group.png",
+                  title: "Bilgilerinizi Tamamlayın",
+                  subtitle:
+                      "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!",
+                ),
+                SizedBox(height: 30),
+                Text(
+                  "Hangi dersleri alıyorsun?",
+                  style: GoogleFonts.inter(
+                      fontSize: 13.28,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff9CA3AE)),
+                ),
+                SizedBox(height: 10),
+                CustomTextFieldStep2(
+                  controller: controller.courseController,
+                  onAdd: controller.addCourse,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  "Kaydedilen Konular",
+                  style: GoogleFonts.inter(
+                      fontSize: 13.28,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff9CA3AE)),
+                ),
+                SizedBox(height: 10),
+                CustomChipList(
+                  items: controller.courses,
+                  onRemove: controller.removeCourse,
+                  textColor: Color(0xff414751),
+                  backgroundColor: Color(0xffFFFFFF),
+                  iconColor: Color(0xffffffff),
+                  iconbackColor: Color(0xff9CA3AE),
+                ),
+                SizedBox(height: 20),
+                WarningBox(
+                  message:
+                      "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir.",
+                ),
+                SizedBox(height: 30),
+                CustomButton(
+                      text: "Devam Et",
+                      onPressed: controller.proceedToNextStep2,
+                      isLoading: controller.isLoading,
+                      backgroundColor: Color(0xFF414751),
+                      textColor: Colors.white,
+                    ),
+              ],
+            ),
           ),
         ),
       ),

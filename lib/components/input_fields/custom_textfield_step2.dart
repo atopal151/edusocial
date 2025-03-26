@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomTextFieldStep2 extends StatelessWidget {
   final TextEditingController controller;
@@ -14,7 +15,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xffffffff),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
@@ -27,7 +28,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
                     EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 border: InputBorder.none,
                 hintText: "Ders adı giriniz",
-                hintStyle: TextStyle(
+                hintStyle: GoogleFonts.inter(
                     color: Color(0xff9CA3AE),
                     fontSize: 13.28,
                     fontWeight: FontWeight.w600),
@@ -41,7 +42,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
             child: Container(
                 margin: EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Color(0xFFE75454),
+                  color: Color(0xFFef5050),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Padding(
@@ -49,7 +50,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
                       left: 16.0, right: 16, top: 8, bottom: 8),
                   child: Text(
                     "Ekle",
-                    style: TextStyle(color: Colors.white),
+                    style: GoogleFonts.inter(color: Color(0xffffffff),fontWeight: FontWeight.w600,fontSize: 13.28),
                   ),
                 )),
           ),
