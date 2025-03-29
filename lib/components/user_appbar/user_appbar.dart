@@ -117,7 +117,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         SizedBox(width: 10),
         GestureDetector(
-          onTap: controller.navigateToNotifications,
+          onTap: controller.navigateToEvent,
           child: Container(
               height: 44,
               width: 44,

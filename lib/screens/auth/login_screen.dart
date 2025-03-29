@@ -76,7 +76,9 @@ class LoginView extends StatelessWidget {
                         Text(
                           "EduSocial, Polonya’daki uluslararası okullarda eğitim gören öğrenciler için tasarlanmış yenilikçi bir sosyal platformdur.",
                           style: GoogleFonts.inter(
-                              fontSize: 12, color: Color(0xffffe4e4),fontWeight: FontWeight.w400),
+                              fontSize: 12,
+                              color: Color(0xffffe4e4),
+                              fontWeight: FontWeight.w400),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 30),
@@ -99,16 +101,18 @@ class LoginView extends StatelessWidget {
                               ),
                               SizedBox(height: 10),
                               CustomTextField(
-                                hintText: "Kullanıcı adı veya e-posta",
-                                controller: controller
-                                    .emailController, // Controller dışarıdan verildi!
-                              ),
+                                  textColor: Color(0xFF9CA3AF),
+                                  hintText: "Kullanıcı adı veya e-posta",
+                                  controller: controller
+                                      .emailController, // Controller dışarıdan verildi!,
+                                  backgroundColor: Color(0xfff5f5f5)),
                               CustomTextField(
-                                hintText: "Şifre",
-                                isPassword: true,
-                                controller: controller
-                                    .passwordController, // Controller dışarıdan verildi!
-                              ),
+                                  textColor: Color(0xFF9CA3AF),
+                                  hintText: "Şifre",
+                                  isPassword: true,
+                                  controller: controller
+                                      .passwordController, // Controller dışarıdan verildi!,
+                                  backgroundColor: Color(0xfff5f5f5)),
                               SizedBox(height: 10),
                               Align(
                                 alignment: Alignment.centerRight,

@@ -6,11 +6,13 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final bool isPassword;
   final TextEditingController controller;
+  final Color backgroundColor;
+  final Color textColor;
 
   const CustomTextField({super.key, 
     required this.hintText,
     this.isPassword = false,
-    required this.controller,
+    required this.controller, required this.backgroundColor, required this.textColor,
   });
 
   @override
@@ -23,13 +25,13 @@ class CustomTextField extends StatelessWidget {
           style: TextStyle(
             fontSize: 13.28,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF9CA3AF), // Gri tonu
+            color: textColor, // Gri tonu
           ),
         ),
         SizedBox(height: 5),
         Container(
           decoration: BoxDecoration(
-            color: Color(0xFFF5F5F5), // Arka plan rengi
+            color: backgroundColor, // Arka plan rengi
             borderRadius: BorderRadius.circular(15),
           ),
           child: TextField(

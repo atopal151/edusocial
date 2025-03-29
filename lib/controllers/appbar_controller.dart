@@ -26,6 +26,9 @@ class AppBarController extends GetxController {
     //Get.toNamed("/calendar");
   }
 
+  void navigateToEvent() {
+    Get.toNamed("/event");
+  }
   void navigateToCalendar() {
     Get.toNamed("/calendar");
   }
@@ -34,7 +37,7 @@ class AppBarController extends GetxController {
     profileImagePath.value = newPath;
   }
 
-  void backToPage(){
+  void backToPage() {
     Get.back();
   }
 }

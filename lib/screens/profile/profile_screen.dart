@@ -164,16 +164,16 @@ class _ProfileScreenState extends State<ProfileScreen>
    /// **Entryler Sekmesi İçeriği**
   Widget _buildEntries() {
     return Obx(() {
-      if (entryController.entryList.isEmpty) {
+      if (entryController.entryPersonList.isEmpty) {
         return const Center(child: Text("Hiç entry bulunamadı."));
       }
 
       return ListView.builder(
         physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.zero,
-        itemCount: entryController.entryList.length,
+        itemCount: entryController.entryPersonList.length,
         itemBuilder: (context, index) {
-          final entry = entryController.entryList[index];
+          final entry = entryController.entryPersonList[index];
           return Container(
             color: Color(0xfffafafa),
             child: EntryCard(

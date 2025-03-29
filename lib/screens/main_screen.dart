@@ -1,13 +1,14 @@
 import 'package:edusocial/controllers/home_controller.dart';
+import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../controllers/entry_controller.dart';
 import '../controllers/event_controller.dart';
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/search_text_controller.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/chat/chat_list_screen.dart';
-import '../screens/event/event_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../utils/navbar_menu.dart';
 
@@ -22,6 +23,7 @@ class MainScreen extends StatelessWidget {
     Get.put(EventController());
     Get.put(SearchTextController());
     Get.put(HomeController());
+    Get.put(EntryController());
 
 
     return Scaffold(
@@ -31,7 +33,7 @@ class MainScreen extends StatelessWidget {
               HomeScreen(),
               ChatListScreen(),
               MatchResultScreen(),
-              EventScreen(),
+              EntryScreen(),
               ProfileScreen(),
             ],
           )),

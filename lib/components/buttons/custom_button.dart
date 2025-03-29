@@ -49,14 +49,14 @@ class CustomButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (icon != null) ...[
-                        Icon(icon, color: iconColor ?? textColor),
+                        Icon(icon, color: iconColor ?? textColor,size: 16,),
                         const SizedBox(width: 8), // İkon ile metin arasındaki boşluk
                       ],
                       Text(
                         text,
                         style: GoogleFonts.inter(
                           color: textColor,
-                          fontSize: 16,
+                          fontSize: 12,
                           fontWeight: FontWeight.w700,
                         ),
                       ),

@@ -12,9 +12,9 @@ class GroupServices {
       GroupSuggestionModel(
         groupName: "Yapay Zeka Topluluğu",
         groupImage:
-            "https://images.pexels.com/photos/1181357/pexels-photo-1181357.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         groupAvatar:
-            "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg",
+            "https://images.pexels.com/photos/30895959/pexels-photo-30895959/free-photo-of-belo-horizonte-de-kapali-alanda-elma-isiran-kadin.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load",
         memberCount: 120,
         description: "Yapay zeka ve makine öğrenimi konularına ilgi duyanların bir araya geldiği aktif bir topluluk."
       ), 
@@ -22,18 +22,18 @@ class GroupServices {
       GroupSuggestionModel(
         groupName: "Felsefe Kulübü",
         groupImage:
-            "https://images.pexels.com/photos/17485645/pexels-photo-17485645.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         groupAvatar:
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg",
+            "https://images.pexels.com/photos/30895959/pexels-photo-30895959/free-photo-of-belo-horizonte-de-kapali-alanda-elma-isiran-kadin.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load",
         memberCount: 88,
         description: "Antik çağdan günümüze felsefi akımları tartışan ve düşünce üretimini teşvik eden bir kulüp."
       ), 
       GroupSuggestionModel(
         groupName: "Mobil Geliştiriciler",
         groupImage:
-            "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         groupAvatar:
-            "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
+            "https://images.pexels.com/photos/30895959/pexels-photo-30895959/free-photo-of-belo-horizonte-de-kapali-alanda-elma-isiran-kadin.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load",
         memberCount: 230,
         description: "Flutter, React Native ve Android üzerine çalışan geliştiriciler için bilgi paylaşım grubu."
       ), 
@@ -41,9 +41,9 @@ class GroupServices {
       GroupSuggestionModel(
         groupName: "Edebiyat Sevenler",
         groupImage:
-            "https://images.pexels.com/photos/46274/pexels-photo-46274.jpeg",
-        groupAvatar:
-            "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+       groupAvatar:
+            "https://images.pexels.com/photos/30895959/pexels-photo-30895959/free-photo-of-belo-horizonte-de-kapali-alanda-elma-isiran-kadin.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load",
         memberCount: 145,
         description: "Roman, şiir ve kısa hikayeler üzerine kitap önerileri ve tartışmalar için oluşturulmuş bir grup."
       ), 
@@ -51,10 +51,10 @@ class GroupServices {
       GroupSuggestionModel(
         groupName: "Girişimcilik Atölyesi",
         groupImage:
-            "https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         groupAvatar:
-            "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-        memberCount: 198,
+            "https://images.pexels.com/photos/30895959/pexels-photo-30895959/free-photo-of-belo-horizonte-de-kapali-alanda-elma-isiran-kadin.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load",
+         memberCount: 198,
         description: "Roman, şiir ve kısa hikayeler üzerine kitap önerileri ve tartışmalar için oluşturulmuş bir grup."
       ),
     ];
@@ -68,7 +68,7 @@ class GroupServices {
         name: "Kimya Kulübü",
         description: "Kimya severlerin bir araya geldiği grup.",
         imageUrl:
-            "https://images.pexels.com/photos/2280549/pexels-photo-2280549.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         memberCount: 564,
         category: "Kimya",
         isJoined: true,
@@ -78,8 +78,8 @@ class GroupServices {
         name: "Fizikçiler Platformu",
         description: "Fizik üzerine tartışmalar.",
         imageUrl:
-            "https://images.pexels.com/photos/256369/pexels-photo-256369.jpeg",
-        memberCount: 443,
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+       memberCount: 443,
         category: "Fizik",
         isJoined: true,
       ),
@@ -88,8 +88,8 @@ class GroupServices {
         name: "Edebiyat Kulübü",
         description: "Edebiyat severlerin bir araya geldiği grup.",
         imageUrl:
-            "https://images.pexels.com/photos/2280549/pexels-photo-2280549.jpeg",
-        memberCount: 776,
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+       memberCount: 776,
         category: "Eğitim",
         isJoined: true,
       ),
@@ -104,8 +104,8 @@ class GroupServices {
         name: "Kimya Kulübü",
         description: "Kimya severlerin bir araya geldiği grup.",
         imageUrl:
-            "https://images.pexels.com/photos/2280549/pexels-photo-2280549.jpeg",
-        memberCount: 35,
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+       memberCount: 35,
         category: "Kimya",
         isJoined: true,
       ),
@@ -114,8 +114,8 @@ class GroupServices {
         name: "Teknoloji Dünyası",
         description: "Yeni teknolojiler ve haberler.",
         imageUrl:
-            "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg",
-        memberCount: 55,
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+       memberCount: 55,
         category: "Teknoloji",
         isJoined: false,
       ),
@@ -124,7 +124,7 @@ class GroupServices {
         name: "Eğitimde Yenilik",
         description: "Eğitim teknolojileri üzerine.",
         imageUrl:
-            "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         memberCount: 23,
         category: "Eğitim",
         isJoined: false,
@@ -164,7 +164,7 @@ class GroupServices {
         name: "Eğitimde Yenilik",
         description: "Eğitim teknolojileri üzerine.",
         imageUrl:
-            "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         memberCount: 410,
         category: "Eğitim",
         isJoined: false,

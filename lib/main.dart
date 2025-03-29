@@ -7,7 +7,7 @@ import 'routes/app_routes.dart';
 
 void main() {
 
-  WidgetsFlutterBinding.ensureInitialized(); // BU ŞART!
+  WidgetsFlutterBinding.ensureInitialized();
   Get.put(LoginController(), permanent: true);
   Get.put(NavigationController());
   Get.put(OnboardingController());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: Routes.login, 
+      initialRoute: Routes.main, 
       getPages: Routes.pages, 
     );
   }

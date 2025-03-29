@@ -1,6 +1,7 @@
 import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../controllers/search_text_controller.dart';
 import '../buttons/icon_button.dart';
@@ -82,7 +83,7 @@ class EventCard extends StatelessWidget {
                         width: 6,
                       ),
                       Text(eventDate,
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                               fontSize: 10, color: Color(0xff9ca3ae))),
                     ],
                   ),
@@ -90,10 +91,10 @@ class EventCard extends StatelessWidget {
                     height: 20,
                   ),
                   Text(eventTitle,
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                           fontSize: 13.28, fontWeight: FontWeight.w600)),
                   Text(eventDescription,
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                           fontSize: 10,
                           color: Color(0xff414751),
                           fontWeight: FontWeight.w500)),

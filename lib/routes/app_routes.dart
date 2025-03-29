@@ -1,5 +1,6 @@
 import 'package:edusocial/bindings/calendar_binding.dart';
 import 'package:edusocial/bindings/chat_binding.dart';
+import 'package:edusocial/bindings/entry_binding.dart';
 import 'package:edusocial/bindings/event_binding.dart';
 import 'package:edusocial/bindings/group_binding.dart';
 import 'package:edusocial/bindings/match_binding.dart';
@@ -9,6 +10,8 @@ import 'package:edusocial/bindings/settings_binding.dart';
 import 'package:edusocial/screens/calendar/calendar_screen.dart';
 import 'package:edusocial/screens/chat/chat_detail_screen.dart';
 import 'package:edusocial/screens/chat/chat_list_screen.dart';
+import 'package:edusocial/screens/entry/entry_screen.dart';
+import 'package:edusocial/screens/entry/entry_share_screen.dart';
 import 'package:edusocial/screens/event/event_screen.dart';
 import 'package:edusocial/screens/groups/group_list_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
@@ -46,6 +49,9 @@ class Routes {
   static const String calendar = "/calendar";
   static const String searchText = "/search_text";
   static const String groupList = "/group_list";
+  static const String entry = "/entry";
+  static const String entryShare = "/entryShare";
+  static const String entryDetail = "/entryDetail";
 
   static final List<GetPage> pages = [
     GetPage(
@@ -124,6 +130,16 @@ class Routes {
       name: profile,
       page: () => ProfileScreen(),
       binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: entry,
+      page: () => EntryScreen(),
+      binding: EntryBinding(),
+    ),
+    GetPage(
+      name: entryShare,
+      page: () => EntryShareScreen(),
+      binding: EntryBinding(),
     ),
     GetPage(
       name: main,

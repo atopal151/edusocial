@@ -85,14 +85,14 @@ Widget buildProfileDetails() {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Column(
                       children: [
                         _buildPersonalInfo(
                           icon: Icons.calendar_today,
                           label: "Doğum Tarihi",
                           value: profileData.birthDate,
                         ),
+                        SizedBox(height: 10,),
                         _buildPersonalInfo(
                           icon: Icons.email_outlined,
                           label: "E-posta Adresi",
@@ -144,7 +144,7 @@ Widget buildProfileDetails() {
                     const SizedBox(height: 0),
                     SizedBox(
                       height:
-                          120, // Kartların yüksekliği kadar bir alan belirlenmeli
+                          200, // Kartların yüksekliği kadar bir alan belirlenmeli
                       child: ListView.builder(
                         scrollDirection:
                             Axis.horizontal, // **Yana kaydırılabilir yapı**

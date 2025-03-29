@@ -21,7 +21,8 @@ class CalendarController extends GetxController {
     allReminders.addAll([
       Reminder(id: 1, title: "Tasarım Ödevi", dateTime: "14 Feb 2025, 16:34"),
       Reminder(id: 2, title: "Sunum Hazırlığı", dateTime: "20 Mar 2025, 10:00"),
-      Reminder(id: 3, title: "Doktor Randevusu", dateTime: "16 Mar 2025, 14:00"),
+      Reminder(
+          id: 3, title: "Doktor Randevusu", dateTime: "16 Mar 2025, 14:00"),
     ]);
   }
 
@@ -53,8 +54,8 @@ class CalendarController extends GetxController {
 
   void nextDay() {
     DateTime currentDate = DateFormat('dd MMM yyyy').parse(selectedDate.value);
-    selectedDate.value = DateFormat('dd MMM yyyy')
-        .format(currentDate.add(Duration(days: 1)));
+    selectedDate.value =
+        DateFormat('dd MMM yyyy').format(currentDate.add(Duration(days: 1)));
     filterReminders();
   }
 
@@ -76,15 +77,17 @@ class CalendarController extends GetxController {
             children: [
               SizedBox(height: 20),
               CustomTextField(
-                controller: titleController,
-                hintText: "Hatırlatma Başlığı",
-                isPassword: false,
-              ),
+                  textColor: Color(0xFF9CA3AF),
+                  controller: titleController,
+                  hintText: "Hatırlatma Başlığı",
+                  isPassword: false,
+                  backgroundColor: Color(0xfff5f5f5)),
               SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Tarih: ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
+                  Text(
+                      "Tarih: ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
                   SizedBox(
                     width: 120,
                     child: CustomButton(
@@ -147,7 +150,8 @@ class CalendarController extends GetxController {
                     allReminders.add(Reminder(
                       id: allReminders.length + 1,
                       title: titleController.text,
-                      dateTime: DateFormat('dd MMM yyyy, HH:mm').format(selectedDateTime),
+                      dateTime: DateFormat('dd MMM yyyy, HH:mm')
+                          .format(selectedDateTime),
                     ));
                     filterReminders();
                     Get.back();

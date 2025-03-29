@@ -24,7 +24,7 @@ class PostController extends GetxController {
         postDate: "31 Oca Cum",
         postDescription:
             "Çözmeye çalıştım ama iç içe türev alma kısmında kafam karıştı...",
-        postImage: "https://s3-alpha-sig.figma.com/img/614c/4772/ae89e0da6e3074c4679e33c95eb40629?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ZhvqwqhcnB2KgTdqiy4JUHUxwnhgHlI-12rx67EzIG-5UB6ll4Vp6An5fQj5PktmWRjXEdnvIISkK0UvHtGTQJzQb6P6L9-QGx9P4i1FgsVwTsv-jj8jQyVVX3YWO2Cz9BGCLxieo3jDZgnlrPG6hz6LoNIpffXWwxXE-Mm3Ag9RYHXfu2zqeLxrphDMfdxeGl3gwjP9R7X9zm2UdWsiadtuxwwShIbOdOA8rdtc7nWE28hUWg9Z3z3fDrFTe4R0nhvx90rosAjcaQ8dYuEUSq1Bwv9HFmy6FeJRo5~NQ6TSGsYL1jpSe5WRWVyQNMlz3as3vNuWGVUHMTE3yip8Ww__",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         likeCount: 253,
         commentCount: 8434,
       ),
@@ -68,7 +68,7 @@ class PostController extends GetxController {
         userName: "Mert Aslan",
         postDate: "15 Mar Cum",
         postDescription: "Bugünkü matematik sınavı gerçekten zordu.",
-        postImage: "https://images.pexels.com/photos/100000/pexels-photo-100000.jpeg",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         likeCount: 95,
         commentCount: 1527,
       ),
@@ -95,7 +95,8 @@ class PostController extends GetxController {
         userName: "Sude Yıldız",
         postDate: "19 Mar Cum",
         postDescription: "Uygulama geliştirme süreci harika ilerliyor.",
-        postImage: "https://images.pexels.com/photos/100003/pexels-photo-100003.jpeg",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        
         likeCount: 484,
         commentCount: 2106,
       ),
@@ -122,7 +123,8 @@ class PostController extends GetxController {
         userName: "Kerem Şahin",
         postDate: "1 Mar Cum",
         postDescription: "Zaman yönetimi konusunda hala gelişmem lazım.",
-        postImage: "https://images.pexels.com/photos/100006/pexels-photo-100006.jpeg",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        
         likeCount: 207,
         commentCount: 355,
       ),
@@ -149,7 +151,8 @@ class PostController extends GetxController {
         userName: "Ayşe Toprak",
         postDate: "12 Mar Cum",
         postDescription: "Kampüste güzel bir gün.",
-        postImage: "https://images.pexels.com/photos/100009/pexels-photo-100009.jpeg",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        
         likeCount: 400,
         commentCount: 314,
       ),
@@ -176,7 +179,8 @@ class PostController extends GetxController {
         userName: "Melis Arslan",
         postDate: "1 Mar Cum",
         postDescription: "Kütüphane bugünkü ofisim.",
-        postImage: "https://images.pexels.com/photos/100012/pexels-photo-100012.jpeg",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        
         likeCount: 433,
         commentCount: 334,
       ),
@@ -203,7 +207,8 @@ class PostController extends GetxController {
         userName: "Onur Polat",
         postDate: "3 Mar Cum",
         postDescription: "Dünya Kadınlar Günü kutlu olsun!",
-        postImage: "https://images.pexels.com/photos/100015/pexels-photo-100015.jpeg",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        
         likeCount: 87,
         commentCount: 1329,
       ),
@@ -230,7 +235,8 @@ class PostController extends GetxController {
         userName: "Duru Aydın",
         postDate: "16 Mar Cum",
         postDescription: "Zor bir gün ama bitti.",
-        postImage: "https://images.pexels.com/photos/100018/pexels-photo-100018.jpeg",
+        postImage: "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        
         likeCount: 66,
         commentCount: 626,
       ),

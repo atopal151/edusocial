@@ -71,23 +71,31 @@ class SignupView extends StatelessWidget {
                             height: 10,
                           ),
                           CustomTextField(
+                              textColor: Color(0xFF9CA3AF),
                               hintText: "Kullanıcı adı",
-                              controller: controller.usernameSuController),
+                              controller: controller.usernameSuController,
+                              backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
+                              textColor: Color(0xFF9CA3AF),
                               hintText: "E-posta",
-                              controller: controller.emailSuController),
+                              controller: controller.emailSuController,
+                              backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
+                              textColor: Color(0xFF9CA3AF),
                               hintText: "Şifre",
                               isPassword: true,
-                              controller: controller.passwordSuController),
+                              controller: controller.passwordSuController,
+                              backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
+                              textColor: Color(0xFF9CA3AF),
                               hintText: "Şifre Tekrar",
                               isPassword: true,
                               controller:
-                                  controller.confirmPasswordSuController),
+                                  controller.confirmPasswordSuController,
+                              backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           Row(
                             children: [
