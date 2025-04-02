@@ -6,11 +6,12 @@ class EntryController extends GetxController {
   var entryList = <EntryModel>[].obs;
   var entryPersonList = <EntryModel>[].obs;
 
+
   RxList<String> categoryEntry = <String>[].obs;
   RxString selectedCategory = "".obs;
   var isEntryLoading = false.obs;
-  final TextEditingController titleEntryController=TextEditingController();
-  final TextEditingController bodyEntryController=TextEditingController();
+  final TextEditingController titleEntryController = TextEditingController();
+  final TextEditingController bodyEntryController = TextEditingController();
 
   @override
   void onInit() {
@@ -18,6 +19,10 @@ class EntryController extends GetxController {
     categoryEntry.value = ["Genel", "Felsefe", "Spor", "Tarih"]; // örnek
     fetchEntries();
     fetchPersonEntries();
+  }
+
+  void shareEntryPost() {
+    Get.snackbar("Paylaşıldı", "Entry paylaşıldı");
   }
 
   void shareEntry() {

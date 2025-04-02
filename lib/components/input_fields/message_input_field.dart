@@ -55,10 +55,10 @@ Widget buildMessageInputField() {
             ),
             child: Center(
               child: SvgPicture.asset(
-                'images/icons/match.svg',
-                width: 20,
-                height: 20,
-              ),
+                          'images/icons/send_icon.svg',
+                          width: 18,
+                          height: 18,
+                        ),
             ),
           ),
           onPressed: () {

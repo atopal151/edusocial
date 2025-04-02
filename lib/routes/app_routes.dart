@@ -10,6 +10,7 @@ import 'package:edusocial/bindings/settings_binding.dart';
 import 'package:edusocial/screens/calendar/calendar_screen.dart';
 import 'package:edusocial/screens/chat/chat_detail_screen.dart';
 import 'package:edusocial/screens/chat/chat_list_screen.dart';
+import 'package:edusocial/screens/entry/entry_detail_screen.dart';
 import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/entry/entry_share_screen.dart';
 import 'package:edusocial/screens/event/event_screen.dart';
@@ -139,6 +140,10 @@ class Routes {
     GetPage(
       name: entryShare,
       page: () => EntryShareScreen(),
+      binding: EntryBinding(),
+    ),GetPage(
+      name: entryDetail,
+      page: () => EntryDetailScreen(),
       binding: EntryBinding(),
     ),
     GetPage(

@@ -98,6 +98,7 @@ flutter:
     - images/icons/calendar_icon.svg
     - images/icons/profile_tab_icon.svg
     - images/icons/grid_tab_icon.svg
+    - images/icons/send_icon.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png

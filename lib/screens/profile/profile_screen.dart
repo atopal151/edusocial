@@ -161,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     });
   }
 
-   /// **Entryler Sekmesi İçeriği**
+  /// **Entryler Sekmesi İçeriği**
   Widget _buildEntries() {
     return Obx(() {
       if (entryController.entryPersonList.isEmpty) {
@@ -177,6 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           return Container(
             color: Color(0xfffafafa),
             child: EntryCard(
+              onPressed: () {},
               entry: entry,
               onUpvote: () => entryController.upvoteEntry(index),
               onDownvote: () => entryController.downvoteEntry(index),

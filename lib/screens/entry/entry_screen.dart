@@ -56,7 +56,7 @@ class _EntryScreenState extends State<EntryScreen> {
             height: 10,
           ),
           Padding(
-            padding: const EdgeInsets.only(left:16.0,right: 16),
+            padding: const EdgeInsets.only(left: 16.0, right: 16),
             child: CustomButton(
                 text: "Yeni Konu Aç",
                 onPressed: () {
@@ -66,27 +66,42 @@ class _EntryScreenState extends State<EntryScreen> {
                 backgroundColor: Color(0xfffb535c),
                 textColor: Color(0xffffffff),
                 icon: Icons.add),
-                
           ),
           SizedBox(
             height: 10,
           ),
           Obx(() {
             return Expanded(
-              child: ListView.separated(
-                itemCount: filteredEntries.length,
-                separatorBuilder: (context, index) => SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final entry = filteredEntries[index];
-                  return EntryCard(
-                    entry: entry,
-                    onUpvote: () => entryController.upvoteEntry(index),
-                    onDownvote: () => entryController.downvoteEntry(index),
-                    onShare: () {
-                      //print("Entry paylaşıldı: ${entry.entryTitle}");
-                    },
-                  );
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  // entryController'dan verileri yeniden çek
+                  entryController.fetchEntries();
+
+                  // filtreleme varsa güncelle
+                  filteredEntries.assignAll(entryController.entryList
+                      .where((entry) =>
+                          entry.entryTitle.toLowerCase().contains(
+                              entrySearchController.text.toLowerCase()) ||
+                          entry.entryDescription.toLowerCase().contains(
+                              entrySearchController.text.toLowerCase()))
+                      .toList());
                 },
+                child: ListView.separated(
+                  itemCount: filteredEntries.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final entry = filteredEntries[index];
+                    return EntryCard(
+                      onPressed: () {
+                        Get.toNamed("/entryDetail", arguments: entry);
+                      },
+                      entry: entry,
+                      onUpvote: () => entryController.upvoteEntry(index),
+                      onDownvote: () => entryController.downvoteEntry(index),
+                      onShare: () {},
+                    );
+                  },
+                ),
               ),
             );
           }),

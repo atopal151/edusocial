@@ -15,7 +15,7 @@ class EntryShareScreen extends StatefulWidget {
 }
 
 class _EntryShareScreenState extends State<EntryShareScreen> {
-  final EntryController entryController = Get.find();
+  final EntryController entryController = Get.find<EntryController>();
   int currentCharCount = 0;
 
   @override
@@ -28,11 +28,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    entryController.bodyEntryController.dispose();
-    super.dispose();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +41,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomTextField(
-              textColor: Color(0xff414751),
+              textColor: Color(0xff9CA3AE),
               hintText: "Konu Başlığı",
               controller: entryController.titleEntryController,
               backgroundColor: Color(0xffffffff),
@@ -55,7 +51,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
             ),
             CustomMultilineTextField(
               count: entryController.bodyEntryController.text.length,
-              textColor: Color(0xff414751),
+              textColor: Color(0xff9CA3AE),
               hintText: "Entry",
               controller: entryController.bodyEntryController,
               backgroundColor: Color(0xffffffff),
@@ -85,7 +81,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
             CustomButton(
                 text: "Paylaş",
                 onPressed: () {
-                  entryController.shareEntry();
+                  entryController.shareEntryPost();
                 },
                 isLoading: entryController.isEntryLoading,
                 backgroundColor: Color(0xfffb535c),
