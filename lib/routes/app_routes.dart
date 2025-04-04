@@ -20,6 +20,7 @@ import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/profile/edit_profile_screen.dart';
 import 'package:edusocial/screens/profile/profile_screen.dart';
 import 'package:edusocial/screens/search/search_text_screen.dart';
+import 'package:edusocial/screens/settings/settings_screen.dart';
 import 'package:get/get.dart';
 import '../bindings/signup_binding.dart';
 import '../bindings/login_binding.dart';
@@ -31,6 +32,7 @@ import '../screens/auth/step2_screen.dart';
 import '../screens/auth/step3_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/main_screen.dart';
+import '../screens/profile/people_profile_screen.dart';
 
 class Routes {
   static const String login = '/login';
@@ -53,6 +55,8 @@ class Routes {
   static const String entry = "/entry";
   static const String entryShare = "/entryShare";
   static const String entryDetail = "/entryDetail";
+  static const String userSetting = "/userSettings";
+  static const String peopleProfile = "/peopleProfile";
 
   static final List<GetPage> pages = [
     GetPage(
@@ -141,10 +145,21 @@ class Routes {
       name: entryShare,
       page: () => EntryShareScreen(),
       binding: EntryBinding(),
-    ),GetPage(
+    ),
+    GetPage(
       name: entryDetail,
       page: () => EntryDetailScreen(),
       binding: EntryBinding(),
+    ),
+    GetPage(
+      name: userSetting,
+      page: () => UserSettingsScreen(),
+      binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: peopleProfile,
+      page: () => PeopleProfileScreen(),
+      binding: ProfileBinding(),
     ),
     GetPage(
       name: main,

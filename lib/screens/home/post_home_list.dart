@@ -13,7 +13,7 @@ class PostHomeList extends StatelessWidget {
     
     return  Obx(() {
         if (postController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center();
         }
         if (postController.postHomeList.isEmpty) {
           return const Center(child: Text("Hiç gönderi bulunamadı."));

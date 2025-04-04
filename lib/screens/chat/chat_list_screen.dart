@@ -1,3 +1,4 @@
+import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,6 +22,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              child: SearchTextField(
+                label: "Kişi ara",
+                controller: chatController.searchController,
+                onChanged: chatController.filterChatList,
+              )),
           const SizedBox(height: 10),
 
           /// **Online Arkadaşlar Alanı**
@@ -49,7 +59,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         itemBuilder: (context, index) {
                           final friend = chatController.onlineFriends[index];
                           return GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               chatController.getChatDetailPage();
                             },
                             child: Column(
@@ -71,7 +81,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           color: friend.isOnline
                                               ? Color(0xff65d384)
                                               : Color(0xffd9d9d9),
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
                                           border: Border.all(
                                               color: Colors.white, width: 2),
                                         ),
@@ -83,7 +94,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(friend.name,
-                                      style: TextStyle(fontSize: 10,color: Color(0xff414751))),
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Color(0xff414751))),
                                 ),
                               ],
                             ),
@@ -109,13 +122,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
           Expanded(
             child: Obx(() => ListView.builder(
-                  itemCount: chatController.chatList.length,
+                  itemCount: chatController.filteredChatList.length,
                   itemBuilder: (context, index) {
-                    final chat = chatController.chatList[index];
+                    final chat = chatController.filteredChatList[index];
                     return GestureDetector(
-                       onTap: (){
-                              chatController.getChatDetailPage();
-                            },
+                      onTap: () {
+                        chatController.getChatDetailPage();
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 4),
@@ -142,8 +155,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       height: 15,
                                       decoration: BoxDecoration(
                                         color: chat.sender.isOnline
-                                              ? Color(0xff65d384)
-                                              : Color(0xffd9d9d9),
+                                            ? Color(0xff65d384)
+                                            : Color(0xffd9d9d9),
                                         borderRadius: BorderRadius.circular(50),
                                         border: Border.all(
                                             color: Colors.white, width: 2),
@@ -181,7 +194,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                     style: const TextStyle(
                                         fontSize: 10, color: Colors.grey),
                                   ),
-                                  SizedBox(height: 10,),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
                                   if (chat.unreadCount > 0)
                                     CircleAvatar(
                                       radius: 10,

@@ -1,4 +1,4 @@
-import '../models/story_model.dart';
+/*import '../models/story_model.dart';
 
 class StoryService {
   static List<StoryModel> getMockStories() {
@@ -10,4 +10,11 @@ class StoryService {
       StoryModel(username: '@kale34', profileImage: 'https://i.pravatar.cc/150?img=5'),
     ];
   }
+
+   static List<StoryModel> getMockMyStories() {
+    return [
+      StoryModel(username: '@kale34', profileImage: 'https://i.pravatar.cc/150?img=1', isViewed: true),
+      ];
+  }
 }
+*/

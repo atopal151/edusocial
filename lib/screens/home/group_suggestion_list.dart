@@ -15,7 +15,7 @@ class GroupSuggestionListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (groupController.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center();
       }
 
       if (groupController.suggestionGroups.isEmpty) {

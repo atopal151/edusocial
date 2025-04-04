@@ -96,12 +96,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           color: Color(0xff9CA3AE)))),
 
               SizedBox(height: 40),
-              Text("Kişisel Bilgiler",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Color(0xff414751))),
-              SizedBox(height: 20),
+          
               // Username Field
               _buildTextField(
                   "Kullanıcı Adı", "@", controller.usernameController),

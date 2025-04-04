@@ -20,7 +20,7 @@ class SettingsController extends GetxController {
       isLoading.value = true;
       await Future.delayed(Duration(milliseconds: 500)); // API çağrısını simüle etme
       var mockData = {
-        "profileImage": "https://s3-alpha-sig.figma.com/img/e4bc/32cd/9b509d74c916eb0c3da9cb418e3d03ad?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=t83o2RSsZzHXwcmdcGEyBCgJRrlLv1Lf4mNGCXVBvwsooIktag5NS9TcjkJ1MqCIl7oZxsyUCr1NG~BguKzkUaqvhJe-c6hTrvPSV79DodR1bXBmatFyvsc-jCCjlQolEXfW4AjzZ6~35Swb5H563OqsdRVtWoy6GhfTy0gVC3h6FxZ~jhXN4AuaOdlL4PHT4MykIO2dwZOdgh-ZofLjvauwwxZRoftJyqHJq29YxzJ1nBKb7JCD6l-2t6h3fpp99mshq8PQHAHXBhKSRHWweW2iv2elJpTEOaIb8STqtIKh83ANjskepPbg54tomZXV8fu6Abcg0JVAH6UEnzl45A__",
+        "profileImage": "https://i.pravatar.cc/150?img=20",
         "username": "mockuser",
         "instagram": "mock_insta",
         "youtube": "mock_yt",
@@ -107,7 +107,7 @@ class UserProfile {
 
   static UserProfile empty() {
     return UserProfile(
-      profileImage: "https://s3-alpha-sig.figma.com/img/e4bc/32cd/9b509d74c916eb0c3da9cb418e3d03ad?Expires=1742774400&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=t83o2RSsZzHXwcmdcGEyBCgJRrlLv1Lf4mNGCXVBvwsooIktag5NS9TcjkJ1MqCIl7oZxsyUCr1NG~BguKzkUaqvhJe-c6hTrvPSV79DodR1bXBmatFyvsc-jCCjlQolEXfW4AjzZ6~35Swb5H563OqsdRVtWoy6GhfTy0gVC3h6FxZ~jhXN4AuaOdlL4PHT4MykIO2dwZOdgh-ZofLjvauwwxZRoftJyqHJq29YxzJ1nBKb7JCD6l-2t6h3fpp99mshq8PQHAHXBhKSRHWweW2iv2elJpTEOaIb8STqtIKh83ANjskepPbg54tomZXV8fu6Abcg0JVAH6UEnzl45A__",
+      profileImage: "https://i.pravatar.cc/150?img=20",
       username: "",
       instagram: "",
       youtube: "",

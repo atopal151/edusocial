@@ -41,6 +41,10 @@ class GroupController extends GetxController {
     isLoading.value = false;
   }
 
+  void getGrupDetail() {
+    Get.toNamed("/group_detail_screen");
+  }
+
   List<GroupModel> get filteredGroups => allGroups
       .where((group) => group.category == selectedCategory.value)
       .toList();

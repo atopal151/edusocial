@@ -30,7 +30,7 @@ class GroupListScreen extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               SizedBox(
-                height: 250,
+                height: 210,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: controller.userGroups.length,
@@ -44,7 +44,9 @@ class GroupListScreen extends StatelessWidget {
                         groupDescription: group.description,
                         memberCount: group.memberCount,
                         action: "Katıldınız",
-                        onJoinPressed: () {},
+                        onJoinPressed: () {
+                          
+                        },
                       ),
                     );
                   },

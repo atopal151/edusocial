@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../models/chat_model.dart';
@@ -6,6 +7,8 @@ class ChatController extends GetxController {
   var onlineFriends = <UserModel>[].obs;
   var chatList = <ChatModel>[].obs;
   var isLoading = false.obs;
+  var filteredChatList = <ChatModel>[].obs;
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void onInit() {
@@ -13,9 +16,24 @@ class ChatController extends GetxController {
     fetchOnlineFriends();
     fetchChatList();
   }
-  void getChatDetailPage(){
+
+  void getChatDetailPage() {
     Get.toNamed("/chat_detail");
   }
+
+ void filterChatList(String value) {
+    if (value.isEmpty) {
+      filteredChatList.assignAll(chatList);
+    } else {
+      filteredChatList.value = chatList
+          .where((chat) => chat.sender.name
+              .toLowerCase()
+              .contains(value.toLowerCase()))
+          .toList();
+    }
+  }
+
+
 
   /// **Online arkadaşları getir (Simüle veri)**
   void fetchOnlineFriends() {
@@ -40,7 +58,8 @@ class ChatController extends GetxController {
         username: "@danielsmith",
         profileImage: "https://randomuser.me/api/portraits/men/3.jpg",
         isOnline: true,
-      ), UserModel(
+      ),
+      UserModel(
         id: 2,
         name: "Sophia Moore",
         username: "@sophiamoore",
@@ -71,7 +90,7 @@ class ChatController extends GetxController {
         sender: UserModel(
           id: 1,
           name: "Alexander Rybak",
-        username: "@alexenderrybak",
+          username: "@alexenderrybak",
           profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
           isOnline: true,
         ),
@@ -83,7 +102,7 @@ class ChatController extends GetxController {
         sender: UserModel(
           id: 2,
           name: "Sophia Moore",
-        username: "@alexenderrybak",
+          username: "@alexenderrybak",
           profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
           isOnline: false,
         ),
@@ -95,18 +114,19 @@ class ChatController extends GetxController {
         sender: UserModel(
           id: 3,
           name: "Daniel Smith",
-        username: "@danielsmith",
+          username: "@danielsmith",
           profileImage: "https://randomuser.me/api/portraits/men/3.jpg",
           isOnline: true,
         ),
         lastMessage: "Yarın buluşuyor muyuz?",
         lastMessageTime: "21:30",
         unreadCount: 0,
-      ),ChatModel(
+      ),
+      ChatModel(
         sender: UserModel(
           id: 2,
           name: "Sophia Moore",
-        username: "@sophiamoore",
+          username: "@sophiamoore",
           profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
           isOnline: false,
         ),
@@ -118,18 +138,19 @@ class ChatController extends GetxController {
         sender: UserModel(
           id: 3,
           name: "Daniel Smith",
-        username: "@danielsmith",
+          username: "@danielsmith",
           profileImage: "https://randomuser.me/api/portraits/men/3.jpg",
           isOnline: true,
         ),
         lastMessage: "Yarın buluşuyor muyuz?",
         lastMessageTime: "21:30",
         unreadCount: 0,
-      ),ChatModel(
+      ),
+      ChatModel(
         sender: UserModel(
           id: 2,
           name: "Sophia Moore",
-        username: "@sophiamoore",
+          username: "@sophiamoore",
           profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
           isOnline: false,
         ),
@@ -141,7 +162,7 @@ class ChatController extends GetxController {
         sender: UserModel(
           id: 3,
           name: "Daniel Smith",
-        username: "@danielsmith",
+          username: "@danielsmith",
           profileImage: "https://randomuser.me/api/portraits/men/3.jpg",
           isOnline: true,
         ),
@@ -150,5 +171,6 @@ class ChatController extends GetxController {
         unreadCount: 0,
       ),
     ]);
+    filteredChatList.assignAll(chatList);
   }
 }

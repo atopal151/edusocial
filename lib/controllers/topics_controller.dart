@@ -8,6 +8,13 @@ class TopicsController extends GetxController {
 
   final HotTopicsService _service = HotTopicsService();
 
+  var selectedTopic = ''.obs;
+
+  void selectTopic(String topic) {
+    selectedTopic.value = topic;
+    // filtreleme, içerik çağırma vs. işlemler buraya eklenebilir
+  }
+
   @override
   void onInit() {
     super.onInit();

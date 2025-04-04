@@ -3,12 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class SearchTextField extends StatelessWidget {
   final TextEditingController controller;
+  final String label;
   final Function(String)? onChanged;
 
   const SearchTextField({
     super.key,
     required this.controller,
-    this.onChanged,
+    this.onChanged, required this.label,
   });
 
   @override
@@ -29,7 +30,7 @@ class SearchTextField extends StatelessWidget {
         ),
         decoration: InputDecoration(
           icon: Icon(Icons.search, color: Color(0xff9CA3AE), size: 19),
-          hintText: "Entry Ara",
+          hintText: label,
           hintStyle: GoogleFonts.inter(
             color: Color(0xff9CA3AE),
             fontSize: 12,

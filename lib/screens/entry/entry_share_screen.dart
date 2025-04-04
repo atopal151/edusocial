@@ -37,57 +37,59 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
       appBar: BackAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomTextField(
-              textColor: Color(0xff9CA3AE),
-              hintText: "Konu Başlığı",
-              controller: entryController.titleEntryController,
-              backgroundColor: Color(0xffffffff),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            CustomMultilineTextField(
-              count: entryController.bodyEntryController.text.length,
-              textColor: Color(0xff9CA3AE),
-              hintText: "Entry",
-              controller: entryController.bodyEntryController,
-              backgroundColor: Color(0xffffffff),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Obx(
-              () => CustomDropDown(
-                label: "Kategori",
-                items: entryController.categoryEntry,
-                selectedItem: entryController.categoryEntry.isNotEmpty
-                    ? (entryController.categoryEntry.contains(
-                                entryController.selectedCategory.value) &&
-                            entryController.selectedCategory.value.isNotEmpty
-                        ? entryController.selectedCategory.value
-                        : entryController.categoryEntry.first)
-                    : "",
-                onChanged: (value) {
-                  if (value != null) {
-                    entryController.selectedCategory.value = value;
-                  }
-                },
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextField(
+                textColor: Color(0xff9CA3AE),
+                hintText: "Konu Başlığı",
+                controller: entryController.titleEntryController,
+                backgroundColor: Color(0xffffffff),
               ),
-            ),
-            SizedBox(height: 20,),
-            CustomButton(
-                text: "Paylaş",
-                onPressed: () {
-                  entryController.shareEntryPost();
-                },
-                isLoading: entryController.isEntryLoading,
-                backgroundColor: Color(0xfffb535c),
-                textColor: Color(0xffffffff),
-                icon: Icons.share),
-          ],
+              SizedBox(
+                height: 20,
+              ),
+              CustomMultilineTextField(
+                count: entryController.bodyEntryController.text.length,
+                textColor: Color(0xff9CA3AE),
+                hintText: "Entry",
+                controller: entryController.bodyEntryController,
+                backgroundColor: Color(0xffffffff),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Obx(
+                () => CustomDropDown(
+                  label: "Kategori",
+                  items: entryController.categoryEntry,
+                  selectedItem: entryController.categoryEntry.isNotEmpty
+                      ? (entryController.categoryEntry.contains(
+                                  entryController.selectedCategory.value) &&
+                              entryController.selectedCategory.value.isNotEmpty
+                          ? entryController.selectedCategory.value
+                          : entryController.categoryEntry.first)
+                      : "",
+                  onChanged: (value) {
+                    if (value != null) {
+                      entryController.selectedCategory.value = value;
+                    }
+                  },
+                ),
+              ),
+              SizedBox(height: 20,),
+              CustomButton(
+                  text: "Paylaş",
+                  onPressed: () {
+                    entryController.shareEntryPost();
+                  },
+                  isLoading: entryController.isEntryLoading,
+                  backgroundColor: Color(0xfffb535c),
+                  textColor: Color(0xffffffff),
+                  icon: Icons.share),
+            ],
+          ),
         ),
       ),
     );

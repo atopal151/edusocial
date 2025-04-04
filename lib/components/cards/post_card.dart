@@ -1,4 +1,7 @@
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PostCard extends StatelessWidget {
   final String profileImage;
@@ -22,128 +25,171 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController profileController=Get.find<ProfileController>();
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xffffffff),
         borderRadius: BorderRadius.circular(20),
-        
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 🔹 Üst Kısım (Profil Bilgileri ve Menü İkonu)
-          Row(
-            children: [
-              // Profil Fotoğrafı
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(profileImage),
-              ),
-              const SizedBox(width: 10),
-              
-              // Kullanıcı Adı ve Tarih
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        color: Color(0xff414751)
-                      ),
-                      overflow: TextOverflow.ellipsis, // Uzun isimler taşmaz
-                    ),
-                    Text(
-                      postDate,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: Color(0xff9CA3AE),
+                    // Profil Fotoğrafı
+                    InkWell(
+                      onTap: () {
+                        profileController.getToPeopleProfileScreen();
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(profileImage),
                       ),
                     ),
+                    const SizedBox(width: 10),
+
+                    // Kullanıcı Adı ve Tarih
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userName,
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                                color: Color(0xff414751)),
+                            overflow:
+                                TextOverflow.ellipsis, // Uzun isimler taşmaz
+                          ),
+                          Text(
+                            postDate,
+                            style:  GoogleFonts.inter(
+                              fontSize: 10,
+                              color: Color(0xff9CA3AE),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Menü (Üç Nokta) İkonu
+                    const Icon(Icons.more_horiz, color: Color(0xff414751)),
                   ],
                 ),
-              ),
+                const SizedBox(height: 8),
 
-              // Menü (Üç Nokta) İkonu
-              const Icon(Icons.more_horiz, color: Color(0xff414751)),
-            ],
+                // 🔹 Gönderi Açıklaması
+                Text(
+                  postDescription,
+                  style:  GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff414751)),
+                  maxLines: 10, // Uzun açıklamaları sınırlandır
+                  overflow:
+                      TextOverflow.ellipsis, // Fazlasını "..." olarak göster
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-
-          // 🔹 Gönderi Açıklaması
-          Text(
-            postDescription,
-            style: const TextStyle(fontSize: 10,fontWeight: FontWeight.w400,color: Color(0xff414751)),
-            maxLines: 10, // Uzun açıklamaları sınırlandır
-            overflow: TextOverflow.ellipsis, // Fazlasını "..." olarak göster
-          ),
-          const SizedBox(height: 8),
 
           // 🔹 Gönderi Fotoğrafı (Eğer varsa göster)
           if (postImage != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                postImage!,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 200,
-                    width: double.infinity,
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                      child: Icon(Icons.broken_image, color: Colors.grey),
-                    ),
-                  );
-                },
-              ),
+            Image.network(
+              postImage!,
+              width: double.infinity,
+              height: 200,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 200,
+                  width: double.infinity,
+                  color: Colors.grey.shade200,
+                  child: const Center(
+                    child: Icon(Icons.broken_image, color: Colors.grey),
+                  ),
+                );
+              },
             ),
-          const SizedBox(height: 8),
 
-          // 🔹 Beğeni, Yorum, Paylaş
-          Row(
-            children: [
-              // Beğeni Butonu
-              IconButton(
-                icon: const Icon(Icons.favorite, color: Colors.red,size: 20,),
-                onPressed: () {},
-              ),
-              Text(
-                likeCount.toString(),
-                style: const TextStyle(fontSize: 12,fontWeight: FontWeight.w600,color: Color(0xff414751)),
-              ),
+          Container(
+            padding: const EdgeInsets.only(left: 12, right: 12,top: 12,bottom: 12),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    // Beğeni Butonu
+                    InkWell(
+                      onTap: () {},
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      likeCount.toString(),
+                      style:  GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751)),
+                    ),
 
-              const SizedBox(width: 16),
+                    const SizedBox(width: 16),
 
-              // Yorum Butonu
-              IconButton(
-                icon: const Icon(Icons.chat_bubble, color: Colors.grey,size: 20,),
-                onPressed: () {},
-              ),
-              Text(
-                commentCount.toString(),
-                style: const TextStyle(fontSize: 12,fontWeight: FontWeight.w600,color: Color(0xff414751)),
-              ),
+                    // Yorum Butonu
+                    InkWell(
+                      onTap: () {},
+                      child: Icon(
+                        Icons.chat,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      commentCount.toString(),
+                      style:  GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751)),
+                    ),
 
-              const Spacer(),
+                    const Spacer(),
 
-              // Paylaşım Butonu
-              IconButton(
-                icon: const Icon(Icons.share, color: Colors.grey),
-                onPressed: () {},
-              ),
-              const Text(
-                "Paylaş",
-                style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: Color(0xff414751)),
-              ),
-            ],
+                    // Paylaşım Butonu
+                    InkWell(
+                      onTap: () {},
+                      child: Icon(
+                        Icons.share,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                     Text(
+                      "Paylaş",
+                      style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+          // 🔹 Beğeni, Yorum, Paylaş
         ],
       ),
     );
