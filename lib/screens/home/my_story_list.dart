@@ -24,7 +24,7 @@ class _MyStoryListState extends State<MyStoryList> {
             Get.toNamed("/myStoryDetail", arguments: myStory);
           } else {
             // Yeni story paylaş
-            print("Yeni story ekle");
+           // print("Yeni story ekle");
           }
         },
         child: Column(

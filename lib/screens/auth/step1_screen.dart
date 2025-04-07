@@ -76,6 +76,9 @@ class Step1View extends StatelessWidget {
                       "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir."),
               SizedBox(height: 30),
               CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                 text: "Devam Et",
                 onPressed: controller.proceedToNextStep,
                 isLoading: controller.isLoading,

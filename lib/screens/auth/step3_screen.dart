@@ -60,6 +60,9 @@ class Step3View extends StatelessWidget {
             ),
             SizedBox(height: 30),
             CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
               text: "Hesabı Tamamla",
               onPressed: controller.completeOnboarding,
               isLoading: controller.isLoading,

@@ -149,6 +149,9 @@ class _MatchScreenState extends State<MatchScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                       text: "Uygun Eşleşmeleri Bul",
                       onPressed: controller.findMatches,
                       isLoading: controller.isLoading,

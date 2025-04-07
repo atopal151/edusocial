@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../components/input_fields/message_input_field.dart';
-import '../../components/widgets/image_message_widget.dart';
-import '../../components/widgets/link_messaje_widget.dart';
-import '../../components/widgets/text_message_widget.dart';
-import '../../controllers/social/chat_detail_controller.dart';
-import '../../models/chat_detail_model.dart';
+import '../../../components/input_fields/message_input_field.dart';
+import '../../../components/widgets/image_message_widget.dart';
+import '../../../components/widgets/link_messaje_widget.dart';
+import '../../../components/widgets/text_message_widget.dart';
+import '../../../controllers/social/chat_detail_controller.dart';
+import '../../../models/chat_detail_model.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key});

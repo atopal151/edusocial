@@ -151,6 +151,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               // Save Button
               CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                 text: "Kaydet",
                 onPressed: controller.saveProfile,
                 isLoading: controller.isLoading,

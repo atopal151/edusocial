@@ -60,6 +60,9 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                       SizedBox(
                         width: 140,
                         child: CustomButton(
+
+                        height: 40,
+                        borderRadius: 5,
                           text: "Takip Et",
                           onPressed: () {
                           },
@@ -72,6 +75,9 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                        SizedBox(
                         width: 140,
                         child: CustomButton(
+
+                        height: 40,
+                        borderRadius: 5,
                           text: "Mesaj Gönder",
                           onPressed: () {
                           },

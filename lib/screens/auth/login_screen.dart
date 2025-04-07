@@ -134,6 +134,9 @@ class LoginView extends StatelessWidget {
                               ),
                               SizedBox(height: 20),
                               CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                                 backgroundColor: Color(0xffE75454),
                                 text: "Giriş Yap",
                                 isLoading: controller.isLoading,

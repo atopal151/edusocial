@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final double? height;
+  final double? borderRadius;
   final RxBool isLoading;
   final Color backgroundColor;
   final Color textColor;
@@ -14,6 +16,8 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     super.key,
     required this.text,
+    required this.height,
+    required this.borderRadius,
     required this.onPressed,
     required this.isLoading,
     required this.backgroundColor,
@@ -27,11 +31,11 @@ class CustomButton extends StatelessWidget {
     return Obx(() => GestureDetector(
           onTap: isLoading.value ? null : onPressed,
           child: Container(
+            height: height,
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               color: isLoading.value ? Colors.grey : backgroundColor,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(borderRadius!),
             ),
             alignment: Alignment.center,
             child: isLoading.value

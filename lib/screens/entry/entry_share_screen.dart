@@ -80,6 +80,9 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
               ),
               SizedBox(height: 20,),
               CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                   text: "Paylaş",
                   onPressed: () {
                     entryController.shareEntryPost();

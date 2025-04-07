@@ -8,13 +8,15 @@ import 'package:edusocial/bindings/profile_binding.dart';
 import 'package:edusocial/bindings/search_binding.dart';
 import 'package:edusocial/bindings/settings_binding.dart';
 import 'package:edusocial/screens/calendar/calendar_screen.dart';
-import 'package:edusocial/screens/chat/chat_detail_screen.dart';
-import 'package:edusocial/screens/chat/chat_list_screen.dart';
+import 'package:edusocial/screens/chat/group_chat/group_chat_detail_screen.dart';
+import 'package:edusocial/screens/chat/user_chat/chat_detail_screen.dart';
+import 'package:edusocial/screens/chat/user_chat/chat_list_screen.dart';
 import 'package:edusocial/screens/entry/entry_detail_screen.dart';
 import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/entry/entry_share_screen.dart';
 import 'package:edusocial/screens/event/event_screen.dart';
 import 'package:edusocial/screens/groups/group_list_screen.dart';
+import 'package:edusocial/screens/groups/grup_detail_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/profile/edit_profile_screen.dart';
@@ -52,11 +54,13 @@ class Routes {
   static const String calendar = "/calendar";
   static const String searchText = "/search_text";
   static const String groupList = "/group_list";
+  static const String groupDetailScreen = "/groupDetailScreen";
   static const String entry = "/entry";
   static const String entryShare = "/entryShare";
   static const String entryDetail = "/entryDetail";
   static const String userSetting = "/userSettings";
   static const String peopleProfile = "/peopleProfile";
+  static const String groupChatDetail = '/group_chat_detail';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -94,9 +98,10 @@ class Routes {
       binding: ChatBinding(),
     ),
     GetPage(
-        name: chatDetail,
-        page: () => ChatDetailScreen(),
-        binding: ChatBinding()),
+      name: chatDetail,
+      page: () => ChatDetailScreen(),
+      binding: ChatBinding(),
+    ),
     GetPage(
       name: event,
       page: () => EventScreen(),
@@ -124,6 +129,10 @@ class Routes {
     GetPage(
       name: groupList,
       page: () => GroupListScreen(),
+      binding: GroupBinding(),
+    ),GetPage(
+      name: groupDetailScreen,
+      page: () => GroupDetailScreen(),
       binding: GroupBinding(),
     ),
     GetPage(
@@ -160,6 +169,10 @@ class Routes {
       name: peopleProfile,
       page: () => PeopleProfileScreen(),
       binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: groupChatDetail,
+      page: () => GroupChatDetailScreen(),
     ),
     GetPage(
       name: main,

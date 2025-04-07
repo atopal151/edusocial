@@ -1,0 +1,2 @@
+/Users/macbookair/Desktop/EduSocialProject/edusocial/android/app/.cxx/RelWithDebInfo/2o2p234a/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/macbookair/Desktop/EduSocialProject/edusocial/android/app/.cxx/RelWithDebInfo/2o2p234a/armeabi-v7a/CMakeFiles/rebuild_cache.dir

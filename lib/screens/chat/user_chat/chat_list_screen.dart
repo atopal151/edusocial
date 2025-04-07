@@ -2,8 +2,8 @@ import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../components/user_appbar/user_appbar.dart';
-import '../../controllers/social/chat_controller.dart';
+import '../../../components/user_appbar/user_appbar.dart';
+import '../../../controllers/social/chat_controller.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});

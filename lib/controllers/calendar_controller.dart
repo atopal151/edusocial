@@ -91,6 +91,9 @@ class CalendarController extends GetxController {
                   SizedBox(
                     width: 120,
                     child: CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                       text: "Tarih Seç",
                       onPressed: () async {
                         DateTime? pickedDate = await showDatePicker(
@@ -118,6 +121,9 @@ class CalendarController extends GetxController {
                   SizedBox(
                     width: 120,
                     child: CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                       text: "Saat Seç",
                       onPressed: () async {
                         TimeOfDay? pickedTime = await showTimePicker(
@@ -145,6 +151,9 @@ class CalendarController extends GetxController {
               SizedBox(
                 width: double.infinity,
                 child: CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                   text: "Kaydet",
                   onPressed: () {
                     allReminders.add(Reminder(

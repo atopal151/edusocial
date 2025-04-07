@@ -59,6 +59,9 @@ class _EntryScreenState extends State<EntryScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16),
             child: CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                 text: "Yeni Konu Aç",
                 onPressed: () {
                   entryController.shareEntry();

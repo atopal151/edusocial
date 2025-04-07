@@ -69,6 +69,9 @@ class Step2View extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
                 CustomButton(
+
+                        height: 50,
+                        borderRadius: 15,
                       text: "Devam Et",
                       onPressed: controller.proceedToNextStep2,
                       isLoading: controller.isLoading,

@@ -77,6 +77,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                   SizedBox(
                     width: 200,
                     child: CustomButton(
+
+                        height: 40,
+                        borderRadius: 5,
                       text: "Profili Düzenle",
                       onPressed: () {
                         controller.getToSettingScreen();

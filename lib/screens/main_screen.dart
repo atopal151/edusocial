@@ -9,7 +9,7 @@ import '../controllers/event_controller.dart';
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/search_text_controller.dart';
 import '../screens/home/home_screen.dart';
-import '../screens/chat/chat_list_screen.dart';
+import 'chat/user_chat/chat_list_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../utils/navbar_menu.dart';
 
