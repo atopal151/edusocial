@@ -7,23 +7,26 @@ class EntryCard extends StatelessWidget {
   final VoidCallback onDownvote;
   final VoidCallback onShare;
   final VoidCallback onPressed;
+  final VoidCallback? onPressedProfile;
 
   const EntryCard({
     super.key,
     required this.entry,
     required this.onUpvote,
     required this.onDownvote,
-    required this.onShare, required this.onPressed,
+    required this.onShare,
+    required this.onPressed,
+    this.onPressedProfile,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         onPressed();
       },
       child: Container(
-        margin: const EdgeInsets.symmetric( horizontal: 16),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -38,9 +41,13 @@ class EntryCard extends StatelessWidget {
                 // Profil Fotoğrafı + Çevrimiçi Durumu
                 Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundImage: NetworkImage(entry.profileImage),
+                    InkWell(
+                     onTap: onPressedProfile,
+
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(entry.profileImage),
+                      ),
                     ),
                     Positioned(
                       bottom: 0,
@@ -49,7 +56,7 @@ class EntryCard extends StatelessWidget {
                         width: 12,
                         height: 12,
                         decoration: BoxDecoration(
-                          color: entry.isActive ? Colors.green :Colors.grey ,
+                          color: entry.isActive ? Colors.green : Colors.grey,
                           borderRadius: BorderRadius.circular(50),
                           border: Border.all(color: Colors.white, width: 2),
                         ),
@@ -58,7 +65,7 @@ class EntryCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(width: 10),
-      
+
                 // Kullanıcı Adı ve Tarih
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +90,7 @@ class EntryCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-      
+
             //  Entry Başlığı
             Text(
               entry.entryTitle,
@@ -93,7 +100,7 @@ class EntryCard extends StatelessWidget {
                   color: Color(0xff414751)),
             ),
             const SizedBox(height: 6),
-      
+
             //  Entry Açıklaması
             Text(
               entry.entryDescription,
@@ -103,7 +110,7 @@ class EntryCard extends StatelessWidget {
                   fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 12),
-      
+
             //  Beğeni, Beğenmeme, Paylaş
             Row(
               children: [
@@ -151,7 +158,8 @@ class EntryCard extends StatelessWidget {
                     icon: Container(
                         decoration: BoxDecoration(
                             color: Color(0xfff6f6f6),
-                            borderRadius: BorderRadius.all(Radius.circular(50))),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(50))),
                         child: const Icon(Icons.share,
                             color: Colors.grey, size: 18)),
                     onPressed: onShare,
@@ -163,7 +171,7 @@ class EntryCard extends StatelessWidget {
                     style: TextStyle(fontSize: 10, color: Colors.grey),
                   ),
                 ),
-      
+
                 SizedBox(
                   width: 10,
                 ),

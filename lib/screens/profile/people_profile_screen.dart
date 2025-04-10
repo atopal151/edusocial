@@ -40,7 +40,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
-      appBar: BackAppBar(),
+      appBar: BackAppBar(backgroundColor: Color(0xffffffff),iconBackgroundColor: Color(0xfffafafa),),
       body: DefaultTabController(
         length: 2,
         child: NestedScrollView(

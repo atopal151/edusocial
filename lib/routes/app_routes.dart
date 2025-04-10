@@ -32,6 +32,7 @@ import '../screens/auth/signup_screen.dart';
 import '../screens/auth/step1_screen.dart';
 import '../screens/auth/step2_screen.dart';
 import '../screens/auth/step3_screen.dart';
+import '../screens/chat/user_chat/user_chat_detail_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/profile/people_profile_screen.dart';
@@ -61,6 +62,7 @@ class Routes {
   static const String userSetting = "/userSettings";
   static const String peopleProfile = "/peopleProfile";
   static const String groupChatDetail = '/group_chat_detail';
+  static const String userChatDetail = '/user_chat_detail';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -173,6 +175,10 @@ class Routes {
     GetPage(
       name: groupChatDetail,
       page: () => GroupChatDetailScreen(),
+    ),  
+    GetPage(
+      name: userChatDetail,
+      page: () => UserChatDetailScreen(),
     ),
     GetPage(
       name: main,

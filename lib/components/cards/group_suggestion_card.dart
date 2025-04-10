@@ -34,7 +34,7 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
 
         // 🔹 Grup Profili (Yuvarlak Avatar)
         Positioned(
-          top: 10,
+          top: 5,
           left: 10,
           child: CircleAvatar(
             radius: 20,
@@ -44,9 +44,9 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
 
         // 🔹 Grup İsmi (Alt kısımda, siyah degrade sayesinde okunaklı)
         Positioned(
-          bottom: 108,
-          left: 15,
-          right: 15,
+          bottom: 110,
+          left: 8,
+          right: 8,
           child: Text(
             group.groupName,
             style: const TextStyle(
@@ -57,9 +57,9 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
           ),
         ),
         Positioned(
-          bottom: 25,
-          left: 15,
-          right: 15,
+          bottom: 53,
+          left: 8,
+          right: 8,
           child: Text(
             group.description,
             style: const TextStyle(

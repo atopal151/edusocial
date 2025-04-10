@@ -1,24 +1,25 @@
-import 'package:edusocial/components/cards/event_card.dart';
-import 'package:edusocial/controllers/group_controller.dart';
+import 'package:edusocial/controllers/social/chat_detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../components/cards/members_avatar.dart';
+import '../../../components/cards/members_avatar.dart';
 
-class GroupDetailScreen extends StatefulWidget {
-  const GroupDetailScreen({super.key});
+class UserChatDetailScreen extends StatefulWidget {
+  const UserChatDetailScreen({super.key});
 
   @override
-  State<GroupDetailScreen> createState() => _GroupDetailScreenState();
+  State<UserChatDetailScreen> createState() => _UserChatDetailScreenState();
 }
 
-class _GroupDetailScreenState extends State<GroupDetailScreen> {
-  final GroupController groupController = Get.put(GroupController());
+class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
+  final ChatDetailController chatController = Get.put(ChatDetailController());
+
   late ScrollController documentsScrollController;
   late ScrollController linksScrollController;
   late ScrollController photosScrollController;
+
   @override
   void initState() {
     super.initState();
@@ -96,8 +97,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       ),
       body: Obx(
         () {
-          final group = groupController.groupDetail.value;
-          if (group == null) return Center(child: CircularProgressIndicator());
+          final chatUser = chatController.userChatDetail.value;
+          if (chatUser == null) return Center(child: CircularProgressIndicator());
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(16),
@@ -114,7 +115,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         width: 117,
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage: NetworkImage(group.imageUrl),
+                          backgroundImage: NetworkImage(chatUser.imageUrl),
                         ),
                       ),
                       SizedBox(height: 8),
@@ -122,7 +123,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            group.name,
+                            chatUser.name,
                             style: GoogleFonts.inter(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
@@ -143,22 +144,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 SizedBox(
                   width: 150, // genişlik ihtiyacına göre ayarlanabilir
                   child: Center(
-                    child: buildMemberAvatars(group.memberImageUrls),
+                    child: buildMemberAvatars(chatUser.memberImageUrls),
                   ),
                 ),
                 SizedBox(height: 10),
-                SizedBox(
-                  width: 300,
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    group.description,
-                    style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xff9ca3ae)),
-                  ),
-                ),
-                SizedBox(height: 12),
+               
 
                 // KURULUŞ TARİHİ VE ÜYE SAYISI
                 Row(
@@ -174,7 +164,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           child: Column(
                             children: [
                               Text(
-                                "Oluşturuldu",
+                                "Takipçi",
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 10,
@@ -182,8 +172,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 ),
                               ),
                               Text(
-                                DateFormat('dd.MM.yyyy')
-                                    .format(group.createdAt),
+                               chatUser.follower,
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13.28,
@@ -208,7 +197,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           child: Column(
                             children: [
                               Text(
-                                "Katılımcı Sayısı",
+                                "Takip Edilen",
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 10,
@@ -216,7 +205,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 ),
                               ),
                               Text(
-                                formatMemberCount(group.memberCount),
+                                chatUser.following,
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13.28,
@@ -273,9 +262,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 radius: Radius.circular(15),
                                 child: ListView.builder(
                                   controller: documentsScrollController,
-                                  itemCount: group.documents.length,
+                                  itemCount: chatUser.documents.length,
                                   itemBuilder: (context, index) {
-                                    final doc = group.documents[index];
+                                    final doc = chatUser.documents[index];
                                     return ListTile(
                                       leading: Container(
                                           padding: EdgeInsets.all(8),
@@ -315,9 +304,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 radius: Radius.circular(15),
                                 child: ListView.builder(
                                   controller: linksScrollController,
-                                  itemCount: group.links.length,
+                                  itemCount: chatUser.links.length,
                                   itemBuilder: (context, index) {
-                                    final link = group.links[index];
+                                    final link = chatUser.links[index];
                                     return ListTile(
                                       leading: Container(
                                           padding: EdgeInsets.all(8),
@@ -375,12 +364,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                             SliverGridDelegateWithFixedCrossAxisCount(
                                           crossAxisCount: 3,
                                         ),
-                                        itemCount: group.photoUrls.length,
+                                        itemCount: chatUser.photoUrls.length,
                                         itemBuilder: (context, index) {
                                           return Padding(
                                             padding: const EdgeInsets.all(0.6),
                                             child: Image.network(
-                                              group.photoUrls[index],
+                                              chatUser.photoUrls[index],
                                               fit: BoxFit.cover,
                                             ),
                                           );
@@ -396,34 +385,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       ],
                     ),
                   ),
-                ),
-
-                SizedBox(height: 24),
-
-                // ETKİNLİKLER
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Grup Etkinlikleri",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: group.events.length,
-                      itemBuilder: (context, index) {
-                        final event = group.events[index];
-                        return EventCard(
-                            eventTitle: event.title,
-                            eventDescription: event.title,
-                            eventDate: event.date,
-                            eventImage: event.image,
-                            onShare: () {},
-                            onLocation: () {});
-                      },
-                    ),
-                  ],
                 ),
               ],
             ),

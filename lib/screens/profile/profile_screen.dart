@@ -52,11 +52,11 @@ class _ProfileScreenState extends State<ProfileScreen>
               padding: const EdgeInsets.all(8.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xffFAFAFA),
+                  color: const Color(0xfffafafa),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Icon(Icons.settings, color: Colors.black),
                 ),
               ),
@@ -77,9 +77,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                   SizedBox(
                     width: 200,
                     child: CustomButton(
-
-                        height: 40,
-                        borderRadius: 5,
+                      height: 40,
+                      borderRadius: 5,
                       text: "Profili Düzenle",
                       onPressed: () {
                         controller.getToSettingScreen();
@@ -182,7 +181,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           return Container(
             color: Color(0xfffafafa),
             child: EntryCard(
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed("/entryDetail", arguments: entry);
+              },
               entry: entry,
               onUpvote: () => entryController.upvoteEntry(index),
               onDownvote: () => entryController.downvoteEntry(index),

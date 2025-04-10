@@ -6,16 +6,23 @@ import '../../controllers/appbar_controller.dart';
 class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBarController controller = Get.put(AppBarController());
 
-  BackAppBar({super.key});
+  final Color backgroundColor;
+  final Color iconBackgroundColor;
+
+  BackAppBar({
+    super.key,
+    this.backgroundColor = const Color(0xffFAFAFA),
+    this.iconBackgroundColor = const Color(0xffFAFAFA),
+  });
 
   @override
-  Size get preferredSize => Size.fromHeight(56);
+  Size get preferredSize => const Size.fromHeight(56);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Color(0xffFAFAFA),
-      surfaceTintColor: Color(0xffFAFAFA),
+      backgroundColor: backgroundColor,
+      surfaceTintColor: backgroundColor,
       elevation: 0,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -24,8 +31,10 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: Container(
             height: 44,
             width: 44,
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Color(0xffFAFAFA)),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: iconBackgroundColor,
+            ),
             child: Padding(
               padding: const EdgeInsets.all(13.0),
               child: SvgPicture.asset(

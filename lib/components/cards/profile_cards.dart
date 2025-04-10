@@ -141,7 +141,7 @@ Widget buildProfileDetails() {
                         color: Color(0xff1F1F1F),
                       ),
                     ),
-                    const SizedBox(height: 0),
+                    const SizedBox(height: 10),
                     SizedBox(
                       height:
                           200, // Kartların yüksekliği kadar bir alan belirlenmeli
@@ -150,10 +150,15 @@ Widget buildProfileDetails() {
                             Axis.horizontal, // **Yana kaydırılabilir yapı**
                         itemCount: profileData.joinedGroups.length,
                         itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child:
-                                buildGroupSuggestionCard(profileData.joinedGroups[index]),
+                          return InkWell(
+                            onTap: () {
+                              Get.toNamed("/group_chat_detail");
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child:
+                                  buildGroupSuggestionCard(profileData.joinedGroups[index]),
+                            ),
                           );
                         },
                       ),

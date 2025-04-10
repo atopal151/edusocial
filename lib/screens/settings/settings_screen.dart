@@ -18,7 +18,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
-      appBar: BackAppBar(),
+      appBar: BackAppBar(iconBackgroundColor: Color(0xffffffff),),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -44,6 +44,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
 
             SizedBox(height:6,),
              PrimaryButton(
+              
               text: "Bildirim Ayarları",
               onPressed: () {},
               backgroundColor: Color(0xffffffff),
@@ -53,7 +54,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
             ),
              SizedBox(height:6,),
              PrimaryButton(
-              text: "Profili Düzenle",
+              text: "Çıkış Yap",
               onPressed: () {},
               backgroundColor: Color(0xffffffff),
               textColor: Color(0xff414751),

@@ -96,6 +96,9 @@ class _EntryScreenState extends State<EntryScreen> {
                   itemBuilder: (context, index) {
                     final entry = filteredEntries[index];
                     return EntryCard(
+                      onPressedProfile: () {
+                        Get.toNamed("/peopleProfile");
+                      },
                       onPressed: () {
                         Get.toNamed("/entryDetail", arguments: entry);
                       },

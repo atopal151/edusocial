@@ -24,33 +24,43 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       appBar: AppBar(
         backgroundColor: Color(0xffffffff),
         surfaceTintColor: Color(0xffffffff),
-        title: Row(
-          children: [
-            CircleAvatar(
-                backgroundImage: NetworkImage(
-                    "https://randomuser.me/api/portraits/men/1.jpg")),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Roger Carscraad",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff414751))),
-                Text("Çevrimiçi",
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xff9ca3ae),
-                        fontWeight: FontWeight.w400)),
-              ],
-            ),
-          ],
+        title: InkWell(
+          onTap:() {
+            Get.toNamed("/peopleProfile");
+          },
+          child: Row(
+            children: [
+              CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      "https://randomuser.me/api/portraits/men/1.jpg")),
+              SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Roger Carscraad",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751))),
+                  Text("Çevrimiçi",
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xff9ca3ae),
+                          fontWeight: FontWeight.w400)),
+                ],
+              ),
+            ],
+          ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(Icons.more_horiz),
+          InkWell(
+            onTap:() {
+            Get.toNamed("/user_chat_detail");
+          },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.more_horiz),
+            ),
           ),
         ],
       ),
