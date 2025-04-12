@@ -83,14 +83,14 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
 
                         height: 50,
                         borderRadius: 15,
-                  text: "Paylaş",
+                  text: "Konuyu Aç",
                   onPressed: () {
                     entryController.shareEntryPost();
                   },
                   isLoading: entryController.isEntryLoading,
                   backgroundColor: Color(0xfffb535c),
                   textColor: Color(0xffffffff),
-                  icon: Icons.share),
+                  icon: Icons.add),
             ],
           ),
         ),

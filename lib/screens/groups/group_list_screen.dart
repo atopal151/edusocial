@@ -42,6 +42,7 @@ class GroupListScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GroupCard(
+                          chatNotification: 10,
                           imageUrl: group.imageUrl,
                           groupName: group.name,
                           groupDescription: group.description,
@@ -62,44 +63,47 @@ class GroupListScreen extends StatelessWidget {
                     Text("Tüm Gruplar",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    Obx(() => SizedBox(
-                          height: 36,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: controller.categories.length,
-                            itemBuilder: (context, index) {
-                              final category = controller.categories[index];
-                              final isSelected =
-                                  controller.selectedCategory.value == category;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: GestureDetector(
-                                  onTap: () => controller
-                                      .selectedCategory.value = category,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 6),
-                                    decoration: BoxDecoration(
+                    SizedBox(
+                      height: 30,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: controller.categories.length,
+                        itemBuilder: (context, index) {
+                          final category = controller.categories[index];
+                          return Obx(() {
+                            final isSelected =
+                                controller.selectedCategory.value == category;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: GestureDetector(
+                                onTap: () => controller.selectedCategory.value =
+                                    category,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Color(0xffef5050).withAlpha(20)
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    category,
+                                    style: TextStyle(
                                       color: isSelected
-                                          ? Color(0xffef5050).withAlpha(20)
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      category,
-                                      style: TextStyle(
-                                        color: isSelected
-                                            ? Color(0xffef5050)
-                                            : Color(0xff414751),
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                          ? Color(0xffef5050)
+                                          : Color(0xff414751),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                        ))
+                              ),
+                            );
+                          });
+                        },
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -112,6 +116,7 @@ class GroupListScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GroupCard(
+                          category: ["Flutter", "Mobil", "Yazılım"], // 👈 burası yeni
                           imageUrl: group.imageUrl,
                           groupName: group.name,
                           groupDescription: group.description,

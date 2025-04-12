@@ -19,7 +19,7 @@ class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          GestureDetector(
+          /*GestureDetector(
             onTap: controller.navigateToProfile,
             child: Padding(
               padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
@@ -30,7 +30,7 @@ class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
                   )),
             ),
           ),
-          
+          */
         ],
       ),
       actions: [
@@ -48,7 +48,8 @@ class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
               'images/icons/search_icon.svg',
               width: 16,
               height: 16,
-            ),*/Icon(Icons.search,size: 22,color: Color(0xff414751))
+            ),*/
+            Icon(Icons.search,size: 22,color: Color(0xff414751))
           ),
         ),
         SizedBox(width: 10),

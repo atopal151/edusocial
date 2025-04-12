@@ -15,6 +15,7 @@ class GroupController extends GetxController {
   var isLoading = false.obs;
   var selectedCategory = "Kimya".obs;
   var groupDetail = Rxn<GroupDetailModel>();
+  var filteredGroups = <GroupModel>[].obs;
 
   var categories = ["Kimya", "Fizik", "Teknoloji", "Eğitim"].obs;
 
@@ -27,6 +28,7 @@ class GroupController extends GetxController {
     fetchAllGroups();
     fetchSuggestionGroups();
     loadMockGroupData(); // backend yerine simule veri
+    ever(selectedCategory, (_) => updateFilteredGroups());
   }
 
   void loadMockGroupData() {
@@ -186,6 +188,7 @@ class GroupController extends GetxController {
   void fetchAllGroups() async {
     isLoading.value = true;
     allGroups.value = await _groupServices.fetchAllGroups();
+    updateFilteredGroups(); // ✅ burada tetikleniyor
     isLoading.value = false;
   }
 
@@ -197,9 +200,11 @@ class GroupController extends GetxController {
     Get.toNamed("/group_chat_detail");
   }
 
-  List<GroupModel> get filteredGroups => allGroups
-      .where((group) => group.category == selectedCategory.value)
-      .toList();
+  void updateFilteredGroups() {
+    filteredGroups.value = allGroups
+        .where((group) => group.category == selectedCategory.value)
+        .toList();
+  }
 
   void joinGroup(String id) {
     final index = allGroups.indexWhere((group) => group.id == id);
