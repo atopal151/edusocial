@@ -5,6 +5,7 @@ import 'package:edusocial/models/entry_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/user_appbar/user_appbar.dart';
+import '../../components/widgets/share_bottom_sheet.dart';
 import '../../controllers/entry_controller.dart';
 
 class EntryScreen extends StatefulWidget {
@@ -59,9 +60,8 @@ class _EntryScreenState extends State<EntryScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16),
             child: CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
+                height: 50,
+                borderRadius: 15,
                 text: "Yeni Konu Aç",
                 onPressed: () {
                   entryController.shareEntry();
@@ -105,7 +105,19 @@ class _EntryScreenState extends State<EntryScreen> {
                       entry: entry,
                       onUpvote: () => entryController.upvoteEntry(index),
                       onDownvote: () => entryController.downvoteEntry(index),
-                      onShare: () {},
+                      onShare: () {
+                        final String shareText =
+                            "${entry.userName} bir gönderi paylaştı: \n\n${entry.entryDescription}";
+                        showModalBottomSheet(
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(25)),
+                          ),
+                          builder: (_) =>
+                              ShareOptionsBottomSheet(postText: shareText),
+                        );
+                      },
                     );
                   },
                 ),

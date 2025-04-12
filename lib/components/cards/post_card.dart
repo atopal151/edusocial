@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../widgets/comment_botoom_sheet.dart';
+import '../widgets/share_bottom_sheet.dart';
+import '../widgets/tree_point_bottom_sheet.dart';
+
 class PostCard extends StatelessWidget {
   final String profileImage;
   final String userName;
@@ -25,7 +29,7 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController profileController=Get.find<ProfileController>();
+    final ProfileController profileController = Get.find<ProfileController>();
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
@@ -71,7 +75,7 @@ class PostCard extends StatelessWidget {
                           ),
                           Text(
                             postDate,
-                            style:  GoogleFonts.inter(
+                            style: GoogleFonts.inter(
                               fontSize: 10,
                               color: Color(0xff9CA3AE),
                             ),
@@ -81,7 +85,19 @@ class PostCard extends StatelessWidget {
                     ),
 
                     // Menü (Üç Nokta) İkonu
-                    const Icon(Icons.more_horiz, color: Color(0xff414751)),
+                    InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25)),
+                            ),
+                            builder: (context) => const TreePointBottomSheet(),
+                          );
+                        },
+                        child: const Icon(Icons.more_horiz,
+                            color: Color(0xff414751))),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -89,7 +105,7 @@ class PostCard extends StatelessWidget {
                 // 🔹 Gönderi Açıklaması
                 Text(
                   postDescription,
-                  style:  GoogleFonts.inter(
+                  style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w400,
                       color: Color(0xff414751)),
@@ -122,7 +138,8 @@ class PostCard extends StatelessWidget {
             ),
 
           Container(
-            padding: const EdgeInsets.only(left: 12, right: 12,top: 12,bottom: 12),
+            padding:
+                const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 12),
             child: Column(
               children: [
                 Row(
@@ -139,7 +156,7 @@ class PostCard extends StatelessWidget {
                     const SizedBox(width: 5),
                     Text(
                       likeCount.toString(),
-                      style:  GoogleFonts.inter(
+                      style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: Color(0xff414751)),
@@ -149,7 +166,20 @@ class PostCard extends StatelessWidget {
 
                     // Yorum Butonu
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true, // 🔥 Bu çok önemli
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => DraggableScrollableSheet(
+                            initialChildSize: 0.95,
+                            maxChildSize: 0.95,
+                            minChildSize: 0.95,
+                            expand: false,
+                            builder: (_, controller) => CommentBottomSheet(),
+                          ),
+                        );
+                      },
                       child: Icon(
                         Icons.chat,
                         color: Colors.grey,
@@ -159,7 +189,7 @@ class PostCard extends StatelessWidget {
                     const SizedBox(width: 5),
                     Text(
                       commentCount.toString(),
-                      style:  GoogleFonts.inter(
+                      style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: Color(0xff414751)),
@@ -169,7 +199,19 @@ class PostCard extends StatelessWidget {
 
                     // Paylaşım Butonu
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        final String shareText =
+                            "$userName bir gönderi paylaştı: \n\n$postDescription";
+                        showModalBottomSheet(
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(25)),
+                          ),
+                          builder: (_) =>
+                              ShareOptionsBottomSheet(postText: shareText),
+                        );
+                      },
                       child: Icon(
                         Icons.share,
                         color: Colors.grey,
@@ -177,7 +219,7 @@ class PostCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 5),
-                     Text(
+                    Text(
                       "Paylaş",
                       style: GoogleFonts.inter(
                           fontSize: 12,
