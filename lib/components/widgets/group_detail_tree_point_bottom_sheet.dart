@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class TreePointBottomSheet extends StatelessWidget {
-  const TreePointBottomSheet({super.key});
+class GroupDetailTreePointBottomSheet extends StatelessWidget {
+  const GroupDetailTreePointBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +23,9 @@ class TreePointBottomSheet extends StatelessWidget {
             ),
             ListTile(
               leading:
-                  const Icon(Icons.person, color: Color(0xfffb535c)),
+                  const Icon(Icons.outbond, color: Color(0xfffb535c)),
               title: const Text(
-                "Hakkında",
+                "Gruptan Ayrıl",
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,

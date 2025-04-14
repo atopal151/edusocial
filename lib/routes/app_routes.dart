@@ -20,6 +20,8 @@ import 'package:edusocial/screens/groups/grup_detail_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/profile/edit_profile_screen.dart';
+import 'package:edusocial/screens/profile/profile_follower_screen.dart';
+import 'package:edusocial/screens/profile/profile_following_screen.dart';
 import 'package:edusocial/screens/profile/profile_screen.dart';
 import 'package:edusocial/screens/search/search_text_screen.dart';
 import 'package:edusocial/screens/settings/settings_screen.dart';
@@ -63,6 +65,8 @@ class Routes {
   static const String peopleProfile = "/peopleProfile";
   static const String groupChatDetail = '/group_chat_detail';
   static const String userChatDetail = '/user_chat_detail';
+  static const String followers = '/followers';
+  static const String following = '/following';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -170,6 +174,14 @@ class Routes {
     GetPage(
       name: peopleProfile,
       page: () => PeopleProfileScreen(),
+      binding: ProfileBinding(),
+    ), GetPage(
+      name: followers,
+      page: () => ProfileFollowerScreen(),
+      binding: ProfileBinding(),
+    ), GetPage(
+      name: following,
+      page: () => ProfileFollowingScreen(),
       binding: ProfileBinding(),
     ),
     GetPage(

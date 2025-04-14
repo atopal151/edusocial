@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../controllers/search_text_controller.dart';
 import '../buttons/icon_button.dart';
+import '../widgets/share_bottom_sheet.dart';
+import '../widgets/tree_point_bottom_sheet.dart';
 
 class EventCard extends StatelessWidget {
   final String eventTitle;
@@ -32,7 +34,6 @@ class EventCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Column(
         children: [
-         
           Stack(
             children: [
               ClipRRect(
@@ -53,12 +54,19 @@ class EventCard extends StatelessWidget {
                 child: Row(
                   children: [
                     buildIconButton(Icons.notifications_rounded, onPressed: () {
-                      Get.snackbar(
-                          "Bildirim", "Etkinlik bildirimi ayarlandı.");
+                      Get.snackbar("Bildirim", "Etkinlik bildirimi ayarlandı.");
                     }),
                     SizedBox(width: 8),
                     buildIconButton(Icons.more_vert, onPressed: () {
-                      Get.snackbar("Aksiyon", "Daha fazla seçenek");
+                      showModalBottomSheet(
+                            backgroundColor: Colors.white,
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25)),
+                            ),
+                            builder: (context) => const TreePointBottomSheet(),
+                          );
                     }),
                   ],
                 ),
@@ -107,7 +115,20 @@ class EventCard extends StatelessWidget {
                         height: 40,
                         borderRadius: 15,
                         text: "Paylaş",
-                        onPressed: onShare,
+                        onPressed: () {
+                          final String shareText =
+                              "$eventTitle : \n\n$eventDescription";
+                          showModalBottomSheet(
+                            backgroundColor: Colors.white,
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25)),
+                            ),
+                            builder: (_) =>
+                                ShareOptionsBottomSheet(postText: shareText),
+                          );
+                        },
                         icon: Icons.share,
                         textColor: Color(0xffed7474),
                         iconColor: Color(0xffef8181),
@@ -120,8 +141,8 @@ class EventCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: CustomButton(
-                        height: 40,
-                        borderRadius: 15,
+                          height: 40,
+                          borderRadius: 15,
                           text: "Konumu Gör",
                           icon: Icons.location_pin,
                           iconColor: Color(0xfffff6f6),

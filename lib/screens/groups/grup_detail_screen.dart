@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../components/cards/members_avatar.dart';
+import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart' show GroupDetailTreePointBottomSheet;
 
 class GroupDetailScreen extends StatefulWidget {
   const GroupDetailScreen({super.key});
@@ -78,7 +79,16 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         ),
         actions: [
           InkWell(
-            onTap: () {},
+            onTap: () {
+               showModalBottomSheet(
+                backgroundColor: Colors.white,
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                ),
+                builder: (context) => const GroupDetailTreePointBottomSheet(),
+              );
+            },
             child: Container(
               decoration: BoxDecoration(
                   color: Color(0xffffffff),
@@ -140,10 +150,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 ),
                 SizedBox(height: 16),
 
-                SizedBox(
-                  width: 150, // genişlik ihtiyacına göre ayarlanabilir
-                  child: Center(
-                    child: buildMemberAvatars(group.memberImageUrls),
+                InkWell(
+                  onTap: () {
+                          Get.toNamed("/followers");
+                        },
+                  child: SizedBox(
+                    width: 150, // genişlik ihtiyacına göre ayarlanabilir
+                    child: Center(
+                      child: buildMemberAvatars(group.memberImageUrls),
+                    ),
                   ),
                 ),
                 SizedBox(height: 10),
@@ -199,31 +214,36 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       width: 10,
                     ),
                     Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Color(0xffffffff),
-                            borderRadius: BorderRadius.circular(15)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              Text(
-                                "Katılımcı Sayısı",
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 10,
-                                  color: Color(0xff9ca3ae),
+                      child: InkWell(
+                        onTap: () {
+                          Get.toNamed("/followers");
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Color(0xffffffff),
+                              borderRadius: BorderRadius.circular(15)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Katılımcı Sayısı",
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 10,
+                                    color: Color(0xff9ca3ae),
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                formatMemberCount(group.memberCount),
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13.28,
-                                  color: Color(0xff414751),
+                                Text(
+                                  formatMemberCount(group.memberCount),
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13.28,
+                                    color: Color(0xff414751),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),

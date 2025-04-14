@@ -88,6 +88,7 @@ class PostCard extends StatelessWidget {
                     InkWell(
                         onTap: () {
                           showModalBottomSheet(
+                            backgroundColor: Colors.white,
                             context: context,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
@@ -203,6 +204,7 @@ class PostCard extends StatelessWidget {
                         final String shareText =
                             "$userName bir gönderi paylaştı: \n\n$postDescription";
                         showModalBottomSheet(
+                          backgroundColor: Colors.white,
                           context: context,
                           shape: const RoundedRectangleBorder(
                             borderRadius:

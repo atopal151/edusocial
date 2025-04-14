@@ -22,6 +22,39 @@ class ProfileController extends GetxController {
   Rx<ProfileModel?> profile = Rx<ProfileModel?>(null);
   RxBool isLoading = true.obs;
 
+  // 📦 Takipçi listesi (Mock)
+  var followerList = [
+    {
+      "username": "alihanmatrak",
+      "fullName": "ALİ HAN MATRAK",
+      "avatarUrl": "https://randomuser.me/api/portraits/men/10.jpg",
+    },
+    {
+      "username": "srt_umt",
+      "fullName": "Ümit SERT",
+      "avatarUrl": "https://randomuser.me/api/portraits/men/12.jpg",
+    },
+    {
+      "username": "ismailysr20",
+      "fullName": "İsmail Yaşar",
+      "avatarUrl": "https://randomuser.me/api/portraits/men/14.jpg",
+    },
+  ].obs;
+
+  // 📦 Takip edilenler listesi (Mock)
+  var followingList = [
+    {
+      "username": "doganayvural",
+      "fullName": "Doğanay Vural",
+      "avatarUrl": "https://randomuser.me/api/portraits/men/1.jpg",
+    },
+    {
+      "username": "earaz__",
+      "fullName": "Erdal Araz",
+      "avatarUrl": "https://randomuser.me/api/portraits/men/3.jpg",
+    },
+  ].obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -48,9 +81,10 @@ class ProfileController extends GetxController {
     Get.toNamed("/userSettings");
   }
 
-void getToPeopleProfileScreen() async {
+  void getToPeopleProfileScreen() async {
     Get.toNamed("/peopleProfile");
   }
+
   void updateProfile(String name, String newBio) {
     fullName.value = name;
     bio.value = newBio;

@@ -4,6 +4,7 @@ import '../../../components/input_fields/message_input_field.dart';
 import '../../../components/widgets/image_message_widget.dart';
 import '../../../components/widgets/link_messaje_widget.dart';
 import '../../../components/widgets/text_message_widget.dart';
+import '../../../components/widgets/tree_point_bottom_sheet.dart';
 import '../../../controllers/social/group_chat_detail_controller.dart';
 import '../../../models/chat_detail_model.dart';
 
@@ -15,7 +16,8 @@ class GroupChatDetailScreen extends StatefulWidget {
 }
 
 class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
-  final GroupChatDetailController controller = Get.put(GroupChatDetailController());
+  final GroupChatDetailController controller =
+      Get.put(GroupChatDetailController());
 
   TextEditingController messageController = TextEditingController();
   @override
@@ -24,39 +26,57 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
       appBar: AppBar(
         backgroundColor: Color(0xffffffff),
         surfaceTintColor: Color(0xffffffff),
-        title: Row(
-          children: [
-            CircleAvatar(
-                backgroundImage: NetworkImage(
-                    "https://randomuser.me/api/portraits/men/7.jpg")),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Murata Hayranlar Grubu",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff414751))),
-                Row(
-                  children: [
-                    Icon(Icons.person,color: Colors.red,size: 15,),
-                    SizedBox(width: 3,),
-                    Text("223",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xff9ca3ae),
-                            fontWeight: FontWeight.w400)),
-                  ],
-                ),
-              ],
-            ),
-          ],
+        title: InkWell(
+          onTap: () {
+            controller.getToGrupDetailScreen();
+          },
+          child: Row(
+            children: [
+              CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      "https://randomuser.me/api/portraits/men/7.jpg")),
+              SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Murata Hayranlar Grubu",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751))),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person,
+                        color: Colors.red,
+                        size: 15,
+                      ),
+                      SizedBox(
+                        width: 3,
+                      ),
+                      Text("223",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xff9ca3ae),
+                              fontWeight: FontWeight.w400)),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         actions: [
           InkWell(
             onTap: () {
-              controller.getToGrupDetailScreen();
+              showModalBottomSheet(
+                backgroundColor: Colors.white,
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                ),
+                builder: (context) => const TreePointBottomSheet(),
+              );
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -71,8 +91,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           children: [
             Expanded(
               child: Obx(() => ListView.builder(
-                    controller: controller
-                        .scrollController,
+                    controller: controller.scrollController,
                     itemCount: controller.messages.length,
                     padding: EdgeInsets.only(bottom: 75),
                     itemBuilder: (context, index) {
