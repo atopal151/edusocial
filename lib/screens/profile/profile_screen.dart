@@ -100,10 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             controller: _tabController,
             physics: NeverScrollableScrollPhysics(),
             children: [
-              /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
-              buildProfileDetails(),
-
-              /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
+               /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
               Column(
                 children: [
                   Container(
@@ -124,6 +121,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ],
               ),
+              /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
+              buildProfileDetails(),
+
+             
             ],
           ),
         ),

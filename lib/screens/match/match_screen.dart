@@ -14,7 +14,7 @@ class MatchScreen extends StatefulWidget {
 }
 
 class _MatchScreenState extends State<MatchScreen> {
-  final MatchController controller = Get.put(MatchController());
+  final MatchController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {

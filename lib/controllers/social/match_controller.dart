@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../screens/main_screen.dart';
+import '../../models/match_model.dart';
 import '../nav_bar_controller.dart';
 
 class MatchController extends GetxController {
@@ -11,8 +11,7 @@ class MatchController extends GetxController {
   var matches = <MatchModel>[].obs;
   var currentIndex = 0.obs;
 
-  final NavigationController navigationController =
-      Get.put(NavigationController());
+  final NavigationController navigationController = Get.find();
 
   MatchModel get currentMatch => matches[currentIndex.value];
 
@@ -206,40 +205,52 @@ class MatchController extends GetxController {
 
   void findMatches() {
     isLoading.value = true;
-    Future.delayed(Duration(seconds: 2), () {
+
+    Future.delayed(Duration(seconds: 1), () {
       isLoading.value = false;
+
+      // Verileri buraya ekle
+      matches.assignAll([
+        MatchModel(
+          name: "Merve Gökçen",
+          age: 24,
+          about: "Tıpta uzmanlık alanım nöroloji. Bilimsel makale yazıyorum.",
+          profileImage:
+              "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg",
+          isOnline: true,
+          schoolName: "Hacettepe Üniversitesi",
+          schoolLogo:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvoc1IJGlYmyiG6XEhiO7YKCs9Rf2HZzBuNw&s",
+          department: "Medicine",
+          grade: 5,
+          matchedTopics: ["Nöroloji", "Genetik Araştırmalar"],
+        ),
+        MatchModel(
+          name: "Ayşe Nur Kaya",
+          age: 21,
+          about: "Psikoloji alanında gözlem yapmayı ve yazmayı seviyorum.",
+          profileImage:
+              "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
+          isOnline: true,
+          schoolName: "Boğaziçi Üniversitesi",
+          schoolLogo:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReiTPY4lDPjzgH1SWoUQRPcZhED7fAqT5eRQ&s",
+          department: "Psychology",
+          grade: 2,
+          matchedTopics: ["Davranış Bilimleri", "Toplum Psikolojisi"],
+        ),
+        // ... devamındaki tüm MatchModel verilerini buraya ekle ...
+      ]);
+      print(matches);
+      print('MATCH controller hash: ${navigationController.hashCode}');
+
       Get.snackbar("Eşleşme", "Uygun eşleşmeler bulundu!",
           backgroundColor: Colors.white);
 
-      // Yeni yönlendirme
       navigationController.changeIndex(2);
-      Get.offAll(() => MainScreen()); // Sayfanın tamamen yenilenmesini sağlar
+      //Get.toNamed("/match_result");
+      
+    print("Index set edildi: ${navigationController.selectedIndex.value}");
     });
   }
-}
-
-class MatchModel {
-  String name;
-  int age;
-  String profileImage;
-  bool isOnline;
-  String schoolName;
-  String schoolLogo;
-  String department;
-  String about;
-  int grade;
-  List<String> matchedTopics;
-
-  MatchModel({
-    required this.name,
-    required this.age,
-    required this.profileImage,
-    required this.isOnline,
-    required this.schoolName,
-    required this.schoolLogo,
-    required this.department,
-    required this.about,
-    required this.grade,
-    required this.matchedTopics,
-  });
 }

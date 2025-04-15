@@ -6,6 +6,7 @@ class StoryModel {
   final bool isMyStory;
   final bool hasStory;
   final List<String> storyUrls;
+  final DateTime createdAt;
 
   final bool isViewed;
 
@@ -18,5 +19,6 @@ class StoryModel {
     required this.hasStory,
     required this.storyUrls,
     this.isViewed = false,
+    required this.createdAt,
   });
 }

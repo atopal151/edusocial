@@ -1,7 +1,9 @@
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controllers/story_controller.dart';
 import '../../models/story_model.dart';
+import '../../screens/home/story/story_viewer_page.dart';
 
 class StoryCard extends StatelessWidget {
   final StoryModel story;
@@ -11,6 +13,10 @@ class StoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ProfileController profileController=Get.find<ProfileController>();
+    final StoryController storyController = Get.find<StoryController>();
+
+    // Şu anki story'nin index'ini buluyoruz
+    final index = storyController.getOtherStories().indexOf(story);
     return Column(
       children: [
         Padding(
@@ -26,7 +32,7 @@ class StoryCard extends StatelessWidget {
             ),
             child: InkWell(
               onTap: () {
-                Get.snackbar("Uyarı", "Story Görüntüleniyor");
+                Get.to(() => StoryViewerPage(initialIndex: index));
               },
               onLongPress: () {
                 profileController.getToPeopleProfileScreen();

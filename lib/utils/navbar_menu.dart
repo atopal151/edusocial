@@ -11,7 +11,7 @@ class NavbarMenu extends StatefulWidget {
 }
 
 class _NavbarMenuState extends State<NavbarMenu> {
-  final NavigationController controller = Get.put(NavigationController());
+  final NavigationController controller = Get.find();
 
   final List<String> icons = ["post", "chat", "match", "event", "profile"];
 
@@ -67,7 +67,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
         ),
         Positioned(
           bottom: 50, // Navbarın üstüne çıkmasını sağlar
-          left: MediaQuery.of(context).size.width / 2 - 35, // Ortalar
+          left: MediaQuery.of(context).size.width / 2 - 18, // Ortalar
           child: GestureDetector(
             onTap: () {
               controller.changeIndex(2);

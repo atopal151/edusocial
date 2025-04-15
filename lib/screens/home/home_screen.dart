@@ -7,7 +7,7 @@ import 'group_suggestion_list.dart';
 import '../../controllers/group_controller.dart';
 import '../../controllers/home_controller.dart';
 import 'hot_topics_list.dart';
-import 'my_story_list.dart';
+import 'story/my_story_list.dart';
 import 'post_home_list.dart';
 
 class HomeScreen extends StatelessWidget {

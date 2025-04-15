@@ -40,7 +40,10 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
-      appBar: BackAppBar(backgroundColor: Color(0xffffffff),iconBackgroundColor: Color(0xfffafafa),),
+      appBar: BackAppBar(
+        backgroundColor: Color(0xffffffff),
+        iconBackgroundColor: Color(0xfffafafa),
+      ),
       body: DefaultTabController(
         length: 2,
         child: NestedScrollView(
@@ -49,7 +52,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-
                   const SizedBox(height: 10),
                   buildProfileHeader(),
                   const SizedBox(height: 10),
@@ -60,27 +62,25 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                       SizedBox(
                         width: 140,
                         child: CustomButton(
-
-                        height: 40,
-                        borderRadius: 5,
+                          height: 40,
+                          borderRadius: 5,
                           text: "Takip Et",
-                          onPressed: () {
-                          },
+                          onPressed: () {},
                           backgroundColor: const Color(0xfff4f4f5),
                           textColor: const Color(0xff414751),
                           isLoading: controller.isPrLoading,
                         ),
                       ),
-                      SizedBox(width: 10,),
-                       SizedBox(
+                      SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
                         width: 140,
                         child: CustomButton(
-
-                        height: 40,
-                        borderRadius: 5,
+                          height: 40,
+                          borderRadius: 5,
                           text: "Mesaj Gönder",
-                          onPressed: () {
-                          },
+                          onPressed: () {},
                           backgroundColor: const Color(0xff1f1f1f),
                           textColor: const Color(0xffffffff),
                           icon: Icons.chat,
@@ -101,9 +101,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
             controller: _tabController,
             physics: NeverScrollableScrollPhysics(),
             children: [
-              /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
-              buildProfileDetails(),
-
               /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
               Column(
                 children: [
@@ -125,6 +122,9 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                   ),
                 ],
               ),
+
+              /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
+              buildProfileDetails(),
             ],
           ),
         ),

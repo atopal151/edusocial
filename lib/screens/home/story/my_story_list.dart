@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/story_controller.dart';
+import '../../../controllers/story_controller.dart';
 
 class MyStoryList extends StatefulWidget {
   const MyStoryList({super.key});

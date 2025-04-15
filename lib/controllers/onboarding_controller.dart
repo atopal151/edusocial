@@ -16,8 +16,7 @@ class OnboardingController extends GetxController {
 
   RxList<Map<String, dynamic>> groups = <Map<String, dynamic>>[].obs;
 
-
-  String userEmail = ""; 
+  String userEmail = "";
 
   @override
   void onInit() {
@@ -50,13 +49,10 @@ class OnboardingController extends GetxController {
     //gruba katılma isteği gönderilecek alan
     int index = groups.indexWhere((group) => group["name"] == groupName);
     if (index != -1) {
-      groups[index]["action"] =
-          "Katılım Bekleniyor"; 
+      groups[index]["action"] = "Katılım Bekleniyor";
       groups.refresh();
     }
   }
-
-
 
   void fetchSchoolAndDepartmentsByEmail(String email) async {
     //mail adresine göre okul bilgisinin otomatik alınıp o okula uygun bölümlerin listeleneceği alan
@@ -64,7 +60,7 @@ class OnboardingController extends GetxController {
     try {
       final data = await OnboardingServices.fetchSchoolAndDepartments(email);
       selectedSchool.value = data.school;
-      schools.value = [data.school]; 
+      schools.value = [data.school];
 
       departments.value = data.departments;
       if (departments.isNotEmpty) {
@@ -86,7 +82,7 @@ class OnboardingController extends GetxController {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         "members": 352,
         "image":
-            "https://s3-alpha-sig.figma.com/img/8c4e/4ff3/89ac8c2d58aba07e899bb77bd953856d?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qGQa5IiGNaEeF13SE8zztRLAbCWiYwTvO7Bdk773NHK9cqXSO4GMViNXpOfFanoCYsdTlZuufkHrT1MFnLZf0t33qOmpMVXJ~TkpTegCig5Mh6GkSTKM5-~Qezza0rXNdSo99avvl35tEfVJXJYwCegZx63EObwtv94-Q-NGyIusKSpPUwMh4~CLg~mzKqD54gjnP~Kh5zZPbNvTnwppuNiArOOuqgOtyXGKtgAO4z6iSssGpNBsCtZkisnZ~fWkH3V4FHHIwL2Jlue2vSRvNUxu~QDt~XU341Dt59zu7pb3K8KUyPtlcWp3antWhvKlDT61aehR~b6NRKemvkjTyA__",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         "action": "Katılma İsteği Gönder"
       },
       {
@@ -95,7 +91,7 @@ class OnboardingController extends GetxController {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         "members": 500,
         "image":
-            "https://s3-alpha-sig.figma.com/img/8c4e/4ff3/89ac8c2d58aba07e899bb77bd953856d?Expires=1743379200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qGQa5IiGNaEeF13SE8zztRLAbCWiYwTvO7Bdk773NHK9cqXSO4GMViNXpOfFanoCYsdTlZuufkHrT1MFnLZf0t33qOmpMVXJ~TkpTegCig5Mh6GkSTKM5-~Qezza0rXNdSo99avvl35tEfVJXJYwCegZx63EObwtv94-Q-NGyIusKSpPUwMh4~CLg~mzKqD54gjnP~Kh5zZPbNvTnwppuNiArOOuqgOtyXGKtgAO4z6iSssGpNBsCtZkisnZ~fWkH3V4FHHIwL2Jlue2vSRvNUxu~QDt~XU341Dt59zu7pb3K8KUyPtlcWp3antWhvKlDT61aehR~b6NRKemvkjTyA__",
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         "action": "Gruba Katıl"
       }
     ];

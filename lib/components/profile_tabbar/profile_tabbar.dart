@@ -16,8 +16,8 @@ class ProfileTabBar extends StatelessWidget {
         labelColor: Colors.red,
         unselectedLabelColor: Colors.grey,
         tabs: const [
-          Tab(icon: Icon(Icons.person_search_sharp)),
           Tab(icon: Icon(Icons.grid_view)),
+          Tab(icon: Icon(Icons.person_search_sharp)),
         ],
       ),
     );

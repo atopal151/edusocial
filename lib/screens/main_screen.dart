@@ -20,13 +20,12 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final NavigationController navigationController = Get.find();
 
-
     Get.put(EventController());
     Get.put(EntryDetailController());
     Get.put(SearchTextController());
     Get.put(HomeController());
     Get.put(EntryController());
-
+    print('MAIN controller hash: ${navigationController.hashCode}');
 
     return Scaffold(
       body: Obx(() => IndexedStack(
