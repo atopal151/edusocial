@@ -33,7 +33,7 @@ class _ChatListScreenState extends State<ChatListScreen>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SearchTextField(
-              label: "Kişi ara",
+              label: "Ara",
               controller: chatController.searchController,
               onChanged: chatController.filterChatList,
             ),
@@ -57,7 +57,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                         color: Color(0xff414751)),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 5),
                 Obx(() => SizedBox(
                       height: 100,
                       child: ListView.builder(
@@ -97,7 +97,6 @@ class _ChatListScreenState extends State<ChatListScreen>
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(friend.name,
@@ -118,7 +117,7 @@ class _ChatListScreenState extends State<ChatListScreen>
 
           /// ✅ TabBar (Kişisel & Grup)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 90),
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
@@ -252,9 +251,9 @@ class _ChatListScreenState extends State<ChatListScreen>
   /// 👥 Grup Mesajları Listesi
   Widget _buildGroupMessages() {
     return Obx(() => ListView.builder(
-          itemCount: chatController.groupChatList.length,
+          itemCount: chatController.filteredGroupChatList.length,
           itemBuilder: (context, index) {
-            final group = chatController.groupChatList[index];
+            final group = chatController.filteredGroupChatList[index];
             return GestureDetector(
               onTap: () {
                 chatController.getGroupChatPage();

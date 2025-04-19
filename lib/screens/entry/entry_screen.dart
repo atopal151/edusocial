@@ -60,16 +60,16 @@ class _EntryScreenState extends State<EntryScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16),
             child: CustomButton(
-                height: 50,
+                height: 45,
                 borderRadius: 15,
-                text: "Yeni Konu Aç",
+                text: "+ Yeni Konu Aç",
                 onPressed: () {
                   entryController.shareEntry();
                 },
                 isLoading: entryController.isEntryLoading,
                 backgroundColor: Color(0xfffb535c),
                 textColor: Color(0xffffffff),
-                icon: Icons.add),
+               ),
           ),
           SizedBox(
             height: 10,

@@ -1,5 +1,6 @@
 import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -53,20 +54,34 @@ class EventCard extends StatelessWidget {
                 right: 10,
                 child: Row(
                   children: [
-                    buildIconButton(Icons.notifications_rounded, onPressed: () {
+                    buildIconButton(
+                        SvgPicture.asset(
+                          "images/icons/notification_group.svg",
+                          colorFilter: ColorFilter.mode(
+                            Color(0xff9ca3ae),
+                            BlendMode.srcIn,
+                          ),
+                        ), onPressed: () {
                       Get.snackbar("Bildirim", "Etkinlik bildirimi ayarlandı.");
                     }),
                     SizedBox(width: 8),
-                    buildIconButton(Icons.more_vert, onPressed: () {
+                    buildIconButton(
+                        SvgPicture.asset(
+                          "images/icons/tree_dot_column.svg",
+                          colorFilter: ColorFilter.mode(
+                            Color(0xff9ca3ae),
+                            BlendMode.srcIn,
+                          ),
+                        ), onPressed: () {
                       showModalBottomSheet(
-                            backgroundColor: Colors.white,
-                            context: context,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(25)),
-                            ),
-                            builder: (context) => const TreePointBottomSheet(),
-                          );
+                        backgroundColor: Colors.white,
+                        context: context,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(25)),
+                        ),
+                        builder: (context) => const TreePointBottomSheet(),
+                      );
                     }),
                   ],
                 ),
@@ -80,11 +95,13 @@ class EventCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 10,
-                      color: Colors.grey,
-                    ),
+                   SvgPicture.asset(
+                          "images/icons/calendar_icon.svg",
+                          colorFilter: ColorFilter.mode(
+                            Color(0xff9ca3ae),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                     SizedBox(
                       width: 6,
                     ),
@@ -129,7 +146,13 @@ class EventCard extends StatelessWidget {
                                 ShareOptionsBottomSheet(postText: shareText),
                           );
                         },
-                        icon: Icons.share,
+                        icon: SvgPicture.asset(
+                          "images/icons/share.svg",
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xffed7474),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                         textColor: Color(0xffed7474),
                         iconColor: Color(0xffef8181),
                         isLoading: controller.isSeLoading,
@@ -144,7 +167,13 @@ class EventCard extends StatelessWidget {
                           height: 40,
                           borderRadius: 15,
                           text: "Konumu Gör",
-                          icon: Icons.location_pin,
+                          icon: SvgPicture.asset(
+                            "images/icons/location.svg",
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xfffff6f6),
+                              BlendMode.srcIn,
+                            ),
+                          ),
                           iconColor: Color(0xfffff6f6),
                           onPressed: onLocation,
                           isLoading: controller.isSeLoading,

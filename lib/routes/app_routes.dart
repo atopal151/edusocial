@@ -19,6 +19,7 @@ import 'package:edusocial/screens/groups/group_list_screen.dart';
 import 'package:edusocial/screens/groups/grup_detail_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
+import 'package:edusocial/screens/notifications/notifications_screen.dart';
 import 'package:edusocial/screens/profile/edit_profile_screen.dart';
 import 'package:edusocial/screens/profile/profile_follower_screen.dart';
 import 'package:edusocial/screens/profile/profile_following_screen.dart';
@@ -36,6 +37,7 @@ import '../screens/auth/step2_screen.dart';
 import '../screens/auth/step3_screen.dart';
 import '../screens/chat/user_chat/user_chat_detail_screen.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/home/story/add_story_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/profile/people_profile_screen.dart';
 
@@ -67,6 +69,8 @@ class Routes {
   static const String userChatDetail = '/user_chat_detail';
   static const String followers = '/followers';
   static const String following = '/following';
+  static const String addStory = '/addStory';
+  static const String notifications = '/notifications';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -136,7 +140,8 @@ class Routes {
       name: groupList,
       page: () => GroupListScreen(),
       binding: GroupBinding(),
-    ),GetPage(
+    ),
+    GetPage(
       name: groupDetailScreen,
       page: () => GroupDetailScreen(),
       binding: GroupBinding(),
@@ -175,11 +180,13 @@ class Routes {
       name: peopleProfile,
       page: () => PeopleProfileScreen(),
       binding: ProfileBinding(),
-    ), GetPage(
+    ),
+    GetPage(
       name: followers,
       page: () => ProfileFollowerScreen(),
       binding: ProfileBinding(),
-    ), GetPage(
+    ),
+    GetPage(
       name: following,
       page: () => ProfileFollowingScreen(),
       binding: ProfileBinding(),
@@ -187,14 +194,19 @@ class Routes {
     GetPage(
       name: groupChatDetail,
       page: () => GroupChatDetailScreen(),
-    ),  
+    ),
     GetPage(
       name: userChatDetail,
       page: () => UserChatDetailScreen(),
     ),
     GetPage(
+      name: notifications,
+      page: () => NotificationScreen(),
+    ),
+    GetPage(
       name: main,
       page: () => MainScreen(),
     ),
+    GetPage(name: addStory, page: () => AddStoryScreen()),
   ];
 }

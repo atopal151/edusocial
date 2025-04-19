@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/cards/story_card.dart';
 import '../../../controllers/story_controller.dart';
 
 class MyStoryList extends StatefulWidget {
@@ -12,49 +13,37 @@ class MyStoryList extends StatefulWidget {
 
 class _MyStoryListState extends State<MyStoryList> {
   final StoryController storyController = Get.find<StoryController>();
-  @override
+   @override
   Widget build(BuildContext context) {
     return Obx(() {
       final myStory = storyController.getMyStory();
       if (myStory == null) return SizedBox.shrink();
 
-      return GestureDetector(
-        onTap: () {
-          if (myStory.hasStory) {
-            Get.toNamed("/myStoryDetail", arguments: myStory);
-          } else {
-            // Yeni story paylaş
-           // print("Yeni story ekle");
-          }
-        },
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: myStory.hasStory
-                        ? const LinearGradient(
-                            colors: [
-                              Color(0xfffb535c),
-                              Color.fromARGB(255, 211, 156, 55)
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          )
-                        : LinearGradient(
-                            colors: [Color(0xffd3d2d2), Color(0xffd3d2d2)],
-                          ),
-                    image: DecorationImage(
-                      image: NetworkImage(myStory.profileImage),
-                      fit: BoxFit.cover,
+      if (myStory.hasStory) {
+        // Story mevcutsa diğerleri gibi göster
+        return StoryCard(story: myStory);
+      } else {
+        // Story yoksa paylaşım arayüzü
+        return GestureDetector(
+          onTap: () {
+            Get.toNamed('/addStory'); // paylaşım sayfasına yönlendirme
+          },
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    width: 65,
+                    height: 65,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[300],
+                      image: DecorationImage(
+                        image: NetworkImage(myStory.profileImage),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                if (!myStory.hasStory)
                   Positioned(
                     bottom: 0,
                     right: 0,
@@ -68,16 +57,14 @@ class _MyStoryListState extends State<MyStoryList> {
                       child: Icon(Icons.add_circle_rounded, size: 18, color: Colors.black),
                     ),
                   ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '@${myStory.username}',
-              style: TextStyle(fontSize: 12),
-            ),
-          ],
-        ),
-      );
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text('@${myStory.username}', style: TextStyle(fontSize: 12)),
+            ],
+          ),
+        );
+      }
     });
   }
 }

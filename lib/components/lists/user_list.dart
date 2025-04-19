@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../controllers/search_text_controller.dart';
 import 'package:get/get.dart';
 
+import '../../models/user_search_model.dart';
+
 class UserListItem extends StatelessWidget {
-  final UserModel user;
+  final UserSearchModel user;
 
   const UserListItem({super.key, required this.user});
 

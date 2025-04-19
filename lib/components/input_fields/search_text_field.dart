@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SearchTextField extends StatelessWidget {
@@ -29,7 +30,13 @@ class SearchTextField extends StatelessWidget {
           color: Color(0xff414751),
         ),
         decoration: InputDecoration(
-          icon: Icon(Icons.search, color: Color(0xff9CA3AE), size: 19),
+          icon: SvgPicture.asset(
+                        "images/icons/search_icon.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xff9ca3ae),
+                          BlendMode.srcIn,
+                        ),
+                      ),
           hintText: label,
           hintStyle: GoogleFonts.inter(
             color: Color(0xff9CA3AE),

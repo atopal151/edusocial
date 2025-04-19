@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/cards/entry_card.dart';
@@ -57,7 +58,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.settings, color: Colors.black),
+                  child: SvgPicture.asset(
+                    "images/icons/settings_icon.svg",
+                    colorFilter: ColorFilter.mode(
+                      Color(0xff414751),
+                      BlendMode.srcIn,
+                    ),
+                    width: 20,
+                    height: 20,
+                  ),
                 ),
               ),
             ),
@@ -85,9 +94,20 @@ class _ProfileScreenState extends State<ProfileScreen>
                       },
                       backgroundColor: const Color(0xfff4f4f5),
                       textColor: const Color(0xff414751),
-                      icon: Icons.person,
+                      icon: SvgPicture.asset(
+                        "images/icons/profile_edit_icon.svg",
+                        colorFilter: const ColorFilter.mode(
+                          Color(0xff414751),
+                          BlendMode.srcIn,
+                        ),
+                        width: 20,
+                        height: 20,
+                      ),
                       isLoading: controller.isPrLoading,
                     ),
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
 
                   /// **✅ Üst TabBar (İkonlu)**
@@ -100,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             controller: _tabController,
             physics: NeverScrollableScrollPhysics(),
             children: [
-               /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
+              /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
               Column(
                 children: [
                   Container(
@@ -121,10 +141,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ],
               ),
+
               /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
               buildProfileDetails(),
-
-             
             ],
           ),
         ),

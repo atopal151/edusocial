@@ -6,7 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../components/cards/members_avatar.dart';
-import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart' show GroupDetailTreePointBottomSheet;
+import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
+    show GroupDetailTreePointBottomSheet;
 
 class GroupDetailScreen extends StatefulWidget {
   const GroupDetailScreen({super.key});
@@ -80,7 +81,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         actions: [
           InkWell(
             onTap: () {
-               showModalBottomSheet(
+              showModalBottomSheet(
                 backgroundColor: Colors.white,
                 context: context,
                 shape: const RoundedRectangleBorder(
@@ -119,32 +120,56 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 Center(
                   child: Column(
                     children: [
-                      SizedBox(
-                        height: 117,
-                        width: 117,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(group.imageUrl),
-                        ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          /// Kapak fotoğrafı
+                          Container(
+                            height: 150,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              image: DecorationImage(
+                                image: NetworkImage(group.coverImageUrl),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+
+                          /// Profil fotoğrafı
+                          Positioned(
+                            bottom: -30,
+                            left: MediaQuery.of(context).size.width / 2 - 55,
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: 36,
+                                backgroundImage: NetworkImage(group.imageUrl),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 48),
+
+                      /// Grup adı + doğrulama
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             group.name,
                             style: GoogleFonts.inter(
-                                fontSize: 16, fontWeight: FontWeight.w600),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Icon(
-                            Icons.check_circle,
-                            color: Color(0xff2c96ff),
-                          )
+                          const SizedBox(width: 6),
+                          const Icon(Icons.check_circle,
+                              color: Color(0xff2c96ff), size: 18),
                         ],
                       ),
+                      const SizedBox(height: 12),
                     ],
                   ),
                 ),
@@ -152,8 +177,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
 
                 InkWell(
                   onTap: () {
-                          Get.toNamed("/followers");
-                        },
+                    Get.toNamed("/followers");
+                  },
                   child: SizedBox(
                     width: 150, // genişlik ihtiyacına göre ayarlanabilir
                     child: Center(

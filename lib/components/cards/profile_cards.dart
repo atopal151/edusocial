@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../controllers/profile_controller.dart';
 import 'group_suggestion_card.dart';
@@ -88,13 +89,31 @@ Widget buildProfileDetails() {
                     Column(
                       children: [
                         _buildPersonalInfo(
-                          icon: Icons.calendar_today,
+                          icon: SvgPicture.asset(
+                            "images/icons/calendar_icon.svg",
+                            colorFilter: ColorFilter.mode(
+                              Color(0xff414751),
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
                           label: "Doğum Tarihi",
                           value: profileData.birthDate,
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(
+                          height: 10,
+                        ),
                         _buildPersonalInfo(
-                          icon: Icons.email_outlined,
+                          icon: SvgPicture.asset(
+                            "images/icons/profile_tab_icon.svg",
+                            colorFilter: ColorFilter.mode(
+                              Color(0xff414751),
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
                           label: "E-posta Adresi",
                           value: profileData.email,
                         ),
@@ -156,8 +175,8 @@ Widget buildProfileDetails() {
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(right: 10),
-                              child:
-                                  buildGroupSuggestionCard(profileData.joinedGroups[index]),
+                              child: buildGroupSuggestionCard(
+                                  profileData.joinedGroups[index]),
                             ),
                           );
                         },
@@ -176,7 +195,7 @@ Widget buildProfileDetails() {
 
 /// **Kişisel Bilgi Kartı**
 Widget _buildPersonalInfo(
-    {required IconData icon, required String label, required String value}) {
+    {required Widget? icon, required String label, required String value}) {
   return Row(
     children: [
       Container(
@@ -185,7 +204,7 @@ Widget _buildPersonalInfo(
           color: const Color(0xFFFAFAFA),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, color: Colors.grey, size: 20),
+        child: icon,
       ),
       const SizedBox(width: 10),
       Column(

@@ -11,7 +11,8 @@ class CustomButton extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final Color? iconColor;
-  final IconData? icon;
+  final Widget? icon;
+
 
   const CustomButton({
     super.key,
@@ -53,7 +54,7 @@ class CustomButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (icon != null) ...[
-                        Icon(icon, color: iconColor ?? textColor,size: 16,),
+                        icon!,
                         const SizedBox(width: 8), // İkon ile metin arasındaki boşluk
                       ],
                       Text(

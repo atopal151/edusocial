@@ -10,6 +10,8 @@ class ChatController extends GetxController {
   var groupChatList = <GroupChatModel>[].obs; // ✅ Grup mesajları listesi
   var isLoading = false.obs;
   var filteredChatList = <ChatModel>[].obs;
+  var filteredGroupChatList = <GroupChatModel>[].obs;
+
   final TextEditingController searchController = TextEditingController();
 
   @override
@@ -32,11 +34,16 @@ class ChatController extends GetxController {
   void filterChatList(String value) {
     if (value.isEmpty) {
       filteredChatList.assignAll(chatList);
+      filteredGroupChatList.assignAll(groupChatList);
     } else {
+      final query = value.toLowerCase();
       filteredChatList.value = chatList
-          .where((chat) => chat.sender.name
-              .toLowerCase()
-              .contains(value.toLowerCase()))
+          .where((chat) =>
+              chat.sender.name.toLowerCase().contains(value.toLowerCase()))
+          .toList();
+
+      filteredGroupChatList.value = groupChatList
+          .where((group) => group.groupName.toLowerCase().contains(query))
           .toList();
     }
   }
@@ -131,5 +138,7 @@ class ChatController extends GetxController {
         unreadCount: 6,
       ),
     ]);
+
+    filteredGroupChatList.assignAll(groupChatList);
   }
 }

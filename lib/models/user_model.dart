@@ -1,40 +1,19 @@
-import 'grup_suggestion_model.dart';
 
-class ProfileModel {
-  final String schoolLogo;
-  final String schoolName;
-  final String schoolDepartment;
-  final String schoolGrade;
-  final String birthDate;
-  final String email;
-  final List<String> courses;
- final List<GroupSuggestionModel> joinedGroups; // Katıldığı gruplar
+class UserModel {
+  final String name;
+  final String university;
+  final String degree;
+  final String department;
+  final String profileImage;
+  final bool isOnline;
 
-  ProfileModel({
-    required this.schoolLogo,
-    required this.schoolName,
-    required this.schoolDepartment,
-    required this.schoolGrade,
-    required this.birthDate,
-    required this.email,
-    required this.courses,
-    required this.joinedGroups, // Katıldığı gruplar
-  });
-
-  /// JSON'dan model nesnesine çevirme
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    return ProfileModel(
-      schoolLogo: json['schoolLogo'],
-      schoolName: json['schoolName'],
-      schoolDepartment: json['schoolDepartment'],
-      schoolGrade: json['schoolGrade'],
-      birthDate: json['birthDate'],
-      email: json['email'],
-      courses: List<String>.from(json['courses']),
-         joinedGroups: (json['joinedGroups'] as List)
-          .map((group) => GroupSuggestionModel.fromJson(group))
-          .toList(), // Katıldığı gruplar
-    );
-  }
+  UserModel(
+      {required this.name,
+      required this.university,
+      required this.degree,
+      required this.department,
+      required this.profileImage,
+      required this.isOnline});
 }
+
 

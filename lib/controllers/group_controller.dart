@@ -38,6 +38,7 @@ class GroupController extends GetxController {
       description:
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
       imageUrl: "https://randomuser.me/api/portraits/men/9.jpg",
+      coverImageUrl: "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", // örnek kapak
       memberImageUrls: [
         "https://randomuser.me/api/portraits/men/1.jpg",
         "https://randomuser.me/api/portraits/men/2.jpg",

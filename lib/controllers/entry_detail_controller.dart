@@ -13,7 +13,6 @@ class EntryDetailController extends GetxController {
     selectedEntry = entry;
   }
 
-  // Örnek yorumları yükle
   void fetchEntryComments() {
     // Dummy örnek yorumlar
     entryComments.assignAll([

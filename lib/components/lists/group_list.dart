@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../controllers/search_text_controller.dart';
 import 'package:get/get.dart';
 
+import '../../models/group_model.dart';
+
 class GroupListItem extends StatelessWidget {
-  final GroupModel group;
+  final GroupSearchModel group;
 
   const GroupListItem({super.key, required this.group});
 

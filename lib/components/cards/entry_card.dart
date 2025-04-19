@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../models/entry_model.dart';
 
 class EntryCard extends StatelessWidget {
@@ -42,8 +43,7 @@ class EntryCard extends StatelessWidget {
                 Stack(
                   children: [
                     InkWell(
-                     onTap: onPressedProfile,
-
+                      onTap: onPressedProfile,
                       child: CircleAvatar(
                         radius: 20,
                         backgroundImage: NetworkImage(entry.profileImage),
@@ -156,12 +156,19 @@ class EntryCard extends StatelessWidget {
                 Expanded(
                   child: IconButton(
                     icon: Container(
-                        decoration: BoxDecoration(
-                            color: Color(0xfff6f6f6),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(50))),
-                        child: const Icon(Icons.share,
-                            color: Colors.grey, size: 18)),
+                      decoration: BoxDecoration(
+                          color: Color(0xfff6f6f6),
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                      child: SvgPicture.asset(
+                        "images/icons/share.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xff9ca3ae),
+                          BlendMode.srcIn,
+                        ),
+                        height: 10,
+                        width: 10,
+                      ),
+                    ),
                     onPressed: onShare,
                   ),
                 ),

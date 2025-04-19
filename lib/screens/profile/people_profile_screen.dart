@@ -1,5 +1,6 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/cards/entry_card.dart';
@@ -83,12 +84,23 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                           onPressed: () {},
                           backgroundColor: const Color(0xff1f1f1f),
                           textColor: const Color(0xffffffff),
-                          icon: Icons.chat,
+                          icon: SvgPicture.asset(
+                            "images/icons/post_chat.svg",
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xffffffff),
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
                           iconColor: Color(0xffffffff),
                           isLoading: controller.isPrLoading,
                         ),
                       ),
                     ],
+                  ),
+                  SizedBox(
+                    height: 20,
                   ),
 
                   /// **✅ Üst TabBar (İkonlu)**
@@ -113,6 +125,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                       },
                     ),
                   ),
+                  
                   Expanded(
                     child: Obx(() {
                       return selectedTabIndex.value == 0
@@ -125,6 +138,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 
               /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
               buildProfileDetails(),
+              
             ],
           ),
         ),

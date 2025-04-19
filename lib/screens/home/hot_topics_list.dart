@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../controllers/topics_controller.dart';
 import 'package:get/get.dart';
 
@@ -57,15 +58,39 @@ class HotTopicsListView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star,
-                        color: isSelected ? Color(0xfffffce6) : Color(0xffffab1b),
-                        size: 18),
+                    isSelected
+                        ? ShaderMask(
+                            shaderCallback: (bounds) => LinearGradient(
+                              colors: [Color(0xFFfffce6), Color(0xFFffefd8)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ).createShader(bounds),
+                            blendMode: BlendMode.srcIn,
+                            child: SvgPicture.asset(
+                              "images/icons/selected_star.svg",
+                             
+                            ),
+                          )
+                        : ShaderMask(
+                            shaderCallback: (bounds) => LinearGradient(
+                              colors: [Color(0xFFffe61c), Color(0xFFffa929)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ).createShader(bounds),
+                            blendMode: BlendMode.srcIn,
+                            child: SvgPicture.asset(
+                              "images/icons/selected_star.svg",
+                             
+                            ),
+                          ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         topic.title,
                         style: TextStyle(
-                          color: isSelected ? Color(0xffffffff) : Color(0xff414751),
+                          color: isSelected
+                              ? Color(0xffffffff)
+                              : Color(0xff414751),
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),

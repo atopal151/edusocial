@@ -10,6 +10,10 @@
 	<string>Galeriye erişim gerekiyor</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Uygulama fotoğraf galerisine erişmek istiyor</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Uygulama kamera kullanım izni istiyor</string>	
 	<key>CFBundleDisplayName</key>
 	<string>Edusocial</string>
 	<key>CFBundleExecutable</key>

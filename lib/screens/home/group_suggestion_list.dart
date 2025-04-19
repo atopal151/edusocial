@@ -41,15 +41,16 @@ class GroupSuggestionListView extends StatelessWidget {
                   bottom: 8,
                   right: 10,
                   left: 10,
-                  child: Container(padding: EdgeInsets.all(5),
+                  child: Container( padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Color(0xffef5050),
-                        borderRadius: BorderRadius.circular(10)
+                        color: Colors.white.withAlpha(70),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: InkWell(
                         child: Center(
                             child: Text(
-                          "Katılma İsteği Gönder",
+                          "Katıl",
                           style: GoogleFonts.inter(color: Color(0xffffffff),fontSize: 10,fontWeight: FontWeight.w400),
                         )),
                       )),

@@ -3,6 +3,7 @@ import 'package:edusocial/components/input_fields/costum_textfield.dart';
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/controllers/entry_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_multiline_textfield.dart';
@@ -90,7 +91,15 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
                   isLoading: entryController.isEntryLoading,
                   backgroundColor: Color(0xfffb535c),
                   textColor: Color(0xffffffff),
-                  icon: Icons.add),
+                  icon: SvgPicture.asset(
+                        "images/icons/settings_icon.svg",
+                        colorFilter: const ColorFilter.mode(
+                          Color(0xff414751),
+                          BlendMode.srcIn,
+                        ),
+                        width: 20,
+                        height: 20,
+                      ),),
             ],
           ),
         ),

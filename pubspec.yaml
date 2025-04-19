@@ -46,6 +46,7 @@ dependencies:
   http: ^1.3.0
   path_provider: ^2.1.5
   share_plus: ^10.1.4
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -99,7 +100,18 @@ flutter:
     - images/icons/calendar_icon.svg
     - images/icons/profile_tab_icon.svg
     - images/icons/grid_tab_icon.svg
+    - images/icons/profile_edit_icon.svg
+    - images/icons/location.svg
     - images/icons/send_icon.svg
+    - images/icons/tree_dot.svg
+    - images/icons/post_like.svg
+    - images/icons/post_chat.svg
+    - images/icons/selected_star.svg
+    - images/icons/unselected_star.svg
+    - images/icons/share.svg
+    - images/icons/join_person.svg
+    - images/icons/notification_group.svg
+    - images/icons/tree_dot_column.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png

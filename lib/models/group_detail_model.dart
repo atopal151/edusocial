@@ -14,6 +14,7 @@ class GroupDetailModel {
   final List<LinkModel> links;
   final List<String> photoUrls;
   final List<EventModel> events;
+  final String coverImageUrl;
 
   GroupDetailModel({
     required this.id,
@@ -27,5 +28,6 @@ class GroupDetailModel {
     required this.links,
     required this.photoUrls,
     required this.events,
+    required this.coverImageUrl,
   });
 }

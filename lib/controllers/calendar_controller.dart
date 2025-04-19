@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../components/buttons/custom_button.dart';
 import '../components/input_fields/costum_textfield.dart';
+import '../models/calendar_model.dart';
 
 class CalendarController extends GetxController {
   var selectedDate = DateFormat('dd MMM yyyy').format(DateTime.now()).obs;
@@ -179,17 +180,9 @@ class CalendarController extends GetxController {
       isScrollControlled: true,
     );
   }
-
+  
   void deleteReminder(int id) {
     allReminders.removeWhere((reminder) => reminder.id == id);
     filterReminders();
   }
-}
-
-class Reminder {
-  final int id;
-  final String title;
-  final String dateTime;
-
-  Reminder({required this.id, required this.title, required this.dateTime});
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../models/grup_suggestion_model.dart';
 
@@ -75,7 +76,15 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
           right: 10,
           child: Row(
             children: [
-              const Icon(Icons.group, color: Color(0xffEF5050), size: 16),
+              SvgPicture.asset(
+                "images/icons/join_person.svg",
+                colorFilter: ColorFilter.mode(
+                  Color(0xffef5050),
+                  BlendMode.srcIn,
+                ),
+                height: 13,
+                width: 13,
+              ),
               const SizedBox(width: 3),
               Text(
                 group.memberCount.toString(),

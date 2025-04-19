@@ -1,5 +1,5 @@
 
-// 4. group_binding.dart
+
 import 'package:get/get.dart';
 import '../controllers/group_controller.dart';
 

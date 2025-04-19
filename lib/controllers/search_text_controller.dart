@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../models/event_model.dart';
+import '../models/group_model.dart';
+import '../models/user_search_model.dart';
+
 class SearchTextController extends GetxController {
   var searchTextController = TextEditingController();
   var searchQuery = "".obs;
   var selectedTab = 0.obs;
   var isSeLoading = false.obs;
 
-  var allUsers = <UserModel>[
-    UserModel(
+  var allUsers = <UserSearchModel>[
+    UserSearchModel(
         name: "Roger Carscraad",
         university: "Pamukkale Üniversitesi (PAÜ)",
         degree: "Lisans Derecesi",
         department: "Bilgisayar Mühendisliği",
         profileImage: "images/user2.png",
         isOnline: true),
-    UserModel(
+    UserSearchModel(
         name: "Elena Smith",
         university: "Boğaziçi Üniversitesi",
         degree: "Yüksek Lisans",
@@ -24,14 +28,14 @@ class SearchTextController extends GetxController {
         isOnline: false),
   ].obs;
 
-  var allGroups = <GroupModel>[
-    GroupModel(
+  var allGroups = <GroupSearchModel>[
+    GroupSearchModel(
         name: "Murata Hayranlar Grubu",
         description:
             "Flutter geliştiricileri için özel grup.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         memberCount: 352,
         image: "images/user2.png"),
-    GroupModel(
+    GroupSearchModel(
         name: "Flutter Türkiye",
         description:
             "Flutter geliştiricileri için özel grup.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -45,17 +49,18 @@ class SearchTextController extends GetxController {
         date: "31 Ocak Cuma 16:33",
         description:
             "Lise buluşması için etkinlik yapıyoruz.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        image: "https://images.pexels.com/photos/3184394/pexels-photo-3184394.jpeg"),
+        image: "https://images.pexels.com/photos/3184394/pexels-photo-3184394.jpeg",location: "Denizli"),
+        
     EventModel(
         title: "Teknoloji Zirvesi",
         date: "5 Nisan 2025 10:00",
         description:
             "Yapay zeka ve yazılım alanındaki son gelişmeler konuşulacak.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        image: "https://images.pexels.com/photos/3184394/pexels-photo-3184394.jpeg"),
+        image: "https://images.pexels.com/photos/3184394/pexels-photo-3184394.jpeg",location: "Denizli"),
   ].obs;
 
-  var filteredUsers = <UserModel>[].obs;
-  var filteredGroups = <GroupModel>[].obs;
+  var filteredUsers = <UserSearchModel>[].obs;
+  var filteredGroups = <GroupSearchModel>[].obs;
   var filteredEvents = <EventModel>[].obs;
 
   @override
@@ -85,45 +90,3 @@ class SearchTextController extends GetxController {
   }
 }
 
-class UserModel {
-  final String name;
-  final String university;
-  final String degree;
-  final String department;
-  final String profileImage;
-  final bool isOnline;
-
-  UserModel(
-      {required this.name,
-      required this.university,
-      required this.degree,
-      required this.department,
-      required this.profileImage,
-      required this.isOnline});
-}
-
-class GroupModel {
-  final String name;
-  final String description;
-  final int memberCount;
-  final String image;
-
-  GroupModel(
-      {required this.name,
-      required this.description,
-      required this.memberCount,
-      required this.image});
-}
-
-class EventModel {
-  final String title;
-  final String date;
-  final String description;
-  final String image;
-
-  EventModel(
-      {required this.title,
-      required this.date,
-      required this.description,
-      required this.image});
-}

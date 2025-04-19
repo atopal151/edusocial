@@ -4,11 +4,13 @@ class StoryModel {
   final String username;
   final String profileImage;
   final bool isMyStory;
-  final bool hasStory;
-  final List<String> storyUrls;
-  final DateTime createdAt;
 
   final bool isViewed;
+
+    /// Değiştirilebilir alanlar
+  List<String> storyUrls;
+  bool hasStory;
+  DateTime createdAt;
 
   StoryModel({
     required this.id,

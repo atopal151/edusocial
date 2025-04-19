@@ -187,6 +187,18 @@ class StoryController extends GetxController {
       ),
     ]);
   }
+  void updateMyStory(List<String> imagePaths) {
+  final myStory = getMyStory();
+  if (myStory != null) {
+    myStory.storyUrls = imagePaths;
+    myStory.hasStory = true;
+    myStory.createdAt = DateTime.now();
+
+    // listeyi tetiklemek için yeniden ata
+    storyList.refresh();
+  }
+}
+
 
   StoryModel? getMyStory() {
     return storyList.firstWhereOrNull((story) => story.isMyStory);

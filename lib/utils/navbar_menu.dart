@@ -14,7 +14,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
   final NavigationController controller = Get.find();
 
   final List<String> icons = ["post", "chat", "match", "event", "profile"];
-
+  static const double centerButtonWidth = 57;
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -23,7 +23,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
         // ALT NAVBAR
         Obx(
           () => Container(
-            padding: EdgeInsets.only(top: 15, bottom: 25),
+            padding: EdgeInsets.only(top: 15, bottom: 30, left: 15, right: 15),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -36,27 +36,26 @@ class _NavbarMenuState extends State<NavbarMenu> {
               children: List.generate(5, (index) {
                 bool isSelected = controller.selectedIndex.value == index;
 
+                /// Orta butonu (index 2) Row’dan kaldır, sadece boşluk bırak
+                if (index == 2) {
+                  return const SizedBox(width: centerButtonWidth);
+                }
+
                 return GestureDetector(
                   onTap: () {
-                    if (index != 2) {
-                      controller.changeIndex(index);
-                    }
+                    controller.changeIndex(index);
                   },
-                  child: Stack(
-                    clipBehavior: Clip.none,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            isSelected
-                                ? "images/icons/${icons[index]}_selected.svg"
-                                : "images/icons/${icons[index]}.svg",
-                            width: isSelected ? 35 : 22,
-                            height: isSelected ? 35 : 22,
-                            theme: SvgTheme(currentColor: Color(0xEF505061)),
-                          )
-                        ],
+                      SvgPicture.asset(
+                        "images/icons/${icons[index]}.svg",
+                        colorFilter: ColorFilter.mode(
+                          isSelected
+                              ? const Color(0xFFEF5050)
+                              : const Color(0xFF9CA3AE),
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ],
                   ),
@@ -66,8 +65,8 @@ class _NavbarMenuState extends State<NavbarMenu> {
           ),
         ),
         Positioned(
-          bottom: 50, // Navbarın üstüne çıkmasını sağlar
-          left: MediaQuery.of(context).size.width / 2 - 18, // Ortalar
+          bottom: 35, // Navbarın üstüne çıkmasını sağlar
+          left: MediaQuery.of(context).size.width / 2 - 25, // Ortalar
           child: GestureDetector(
             onTap: () {
               controller.changeIndex(2);

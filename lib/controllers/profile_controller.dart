@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../models/user_model.dart';
+import '../models/profile_model.dart';
 import '../services/user_service.dart';
 
 class ProfileController extends GetxController {
@@ -44,9 +44,9 @@ class ProfileController extends GetxController {
   // 📦 Takip edilenler listesi (Mock)
   var followingList = [
     {
-      "username": "doganayvural",
-      "fullName": "Doğanay Vural",
-      "avatarUrl": "https://randomuser.me/api/portraits/men/1.jpg",
+      "username": "srt_umt",
+      "fullName": "Ümit SERT",
+      "avatarUrl": "https://randomuser.me/api/portraits/men/12.jpg",
     },
     {
       "username": "earaz__",

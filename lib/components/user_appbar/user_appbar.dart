@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../controllers/appbar_controller.dart';
 
@@ -35,23 +36,21 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
               GestureDetector(
                 onTap: controller.navigateToGroups,
                 child: Container(
-                    height: 44,
-                    width: 44,
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
+                  height: 44,
+                  width: 44,
+                  padding: EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(
+                    "images/icons/group_icon.svg",
+                    colorFilter: ColorFilter.mode(
+                      Color(0xff414751),
+                      BlendMode.srcIn,
                     ),
-                    child: /*SvgPicture.asset(
-                          'images/icons/group_icon.svg',
-                          width: 20,
-                          height: 17,
-                        ),*/
-                        Icon(
-                      Icons.group_outlined,
-                      size: 22,
-                      color: Color(0xff414751),
-                    )),
+                  ),
+                ),
               ),
               Positioned(
                 top: -5,
@@ -82,57 +81,81 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
         GestureDetector(
           onTap: controller.navigateToSearch,
           child: Container(
-              height: 44,
-              width: 44,
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
+            height: 44,
+            width: 44,
+            padding: EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: SvgPicture.asset(
+              "images/icons/search_icon.svg",
+              colorFilter: ColorFilter.mode(
+                Color(0xff414751),
+                BlendMode.srcIn,
               ),
-              child: /*SvgPicture.asset(
-              'images/icons/search_icon.svg',
-              width: 16,
-              height: 16,
-            ),*/
-                  Icon(Icons.search, size: 22, color: Color(0xff414751))),
+            ),
+          ),
         ),
         SizedBox(width: 10),
         GestureDetector(
           onTap: controller.navigateToCalendar,
           child: Container(
-              height: 44,
-              width: 44,
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
+            height: 44,
+            width: 44,
+            padding: EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: SvgPicture.asset(
+              "images/icons/calendar_icon.svg",
+              colorFilter: ColorFilter.mode(
+                Color(0xff414751),
+                BlendMode.srcIn,
               ),
-              child: /*SvgPicture.asset(
-              'images/icons/notification_icon.svg',
-              width: 16,
-              height: 22.76,
-            ),*/
-                  Icon(Icons.calendar_month_outlined,
-                      size: 22, color: Color(0xff414751))),
+            ),
+          ),
         ),
         SizedBox(width: 10),
         GestureDetector(
           onTap: controller.navigateToEvent,
           child: Container(
-              height: 44,
-              width: 44,
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
+            height: 44,
+            width: 44,
+            padding: EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: SvgPicture.asset(
+              "images/icons/event.svg",
+              colorFilter: ColorFilter.mode(
+                Color(0xff414751),
+                BlendMode.srcIn,
               ),
-              child: /*SvgPicture.asset(
-              'images/icons/notification_icon.svg',
-              width: 16,
-              height: 22.76,
-            ),*/
-                  Icon(Icons.notifications_outlined,
-                      size: 22, color: Color(0xff414751))),
+            ),
+          ),
+        ),
+        SizedBox(width: 10),
+        GestureDetector(
+          onTap: controller.navigateToNotifications,
+          child: Container(
+            height: 44,
+            width: 44,
+            padding: EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: SvgPicture.asset(
+                    "images/icons/notification_icon.svg",
+                    colorFilter: ColorFilter.mode(
+                      Color(0xff414751),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+          ),
         ),
         SizedBox(width: 10),
       ],

@@ -160,7 +160,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             ),
                             alignment: Alignment.centerRight,
                             padding: EdgeInsets.only(right: 16),
-                            child: Icon(Icons.delete, color: Colors.white),
+                            child: SvgPicture.asset(
+                          "images/icons/delete_icon.svg",
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xffffffff),
+                            BlendMode.srcIn,
+                          ),
+                        ),
                           ),
                           onDismissed: (direction) {
                             controller.deleteReminder(reminder.id);

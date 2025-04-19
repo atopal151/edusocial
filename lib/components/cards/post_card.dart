@@ -1,9 +1,10 @@
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../widgets/comment_botoom_sheet.dart';
+import '../widgets/comment_bottom_sheet.dart';
 import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 
@@ -97,8 +98,13 @@ class PostCard extends StatelessWidget {
                             builder: (context) => const TreePointBottomSheet(),
                           );
                         },
-                        child: const Icon(Icons.more_horiz,
-                            color: Color(0xff414751))),
+                        child: SvgPicture.asset(
+                          "images/icons/tree_dot.svg",
+                          colorFilter: ColorFilter.mode(
+                            Color(0xff414751),
+                            BlendMode.srcIn,
+                          ),
+                        )),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -148,10 +154,12 @@ class PostCard extends StatelessWidget {
                     // Beğeni Butonu
                     InkWell(
                       onTap: () {},
-                      child: Icon(
-                        Icons.favorite,
-                        color: Colors.red,
-                        size: 20,
+                      child: SvgPicture.asset(
+                        "images/icons/post_like.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xff9ca3ae),
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -181,10 +189,12 @@ class PostCard extends StatelessWidget {
                           ),
                         );
                       },
-                      child: Icon(
-                        Icons.chat,
-                        color: Colors.grey,
-                        size: 20,
+                      child: SvgPicture.asset(
+                        "images/icons/post_chat.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xff9ca3ae),
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -214,10 +224,12 @@ class PostCard extends StatelessWidget {
                               ShareOptionsBottomSheet(postText: shareText),
                         );
                       },
-                      child: Icon(
-                        Icons.share,
-                        color: Colors.grey,
-                        size: 20,
+                      child: SvgPicture.asset(
+                        "images/icons/share.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xff9ca3ae),
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 5),
