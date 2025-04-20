@@ -1,6 +1,9 @@
 // group_controller.dart
+import 'dart:io';
+
 import 'package:edusocial/models/group_detail_model.dart';
 import 'package:edusocial/models/grup_suggestion_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/document_model.dart';
 import '../models/event_model.dart';
@@ -13,11 +16,20 @@ class GroupController extends GetxController {
   var allGroups = <GroupModel>[].obs;
   var suggestionGroups = <GroupSuggestionModel>[].obs;
   var isLoading = false.obs;
+  var isGroupLoading = false.obs;
   var selectedCategory = "Kimya".obs;
   var groupDetail = Rxn<GroupDetailModel>();
   var filteredGroups = <GroupModel>[].obs;
 
   var categories = ["Kimya", "Fizik", "Teknoloji", "Eğitim"].obs;
+
+  Rx<File?> coverImageFile = Rx<File?>(null);
+  Rx<File?> profileImageFile = Rx<File?>(null);
+  var selectedRequest = false.obs;
+  RxList<String> categoryGroup = <String>[].obs;
+  final TextEditingController nameGroupController = TextEditingController();
+  final TextEditingController descriptionGroupController =
+      TextEditingController();
 
   final GroupServices _groupServices = GroupServices();
 
@@ -27,8 +39,22 @@ class GroupController extends GetxController {
     fetchUserGroups();
     fetchAllGroups();
     fetchSuggestionGroups();
+
+    categoryGroup.value = ["Genel", "Felsefe", "Spor", "Tarih"]; // örnek
     loadMockGroupData(); // backend yerine simule veri
     ever(selectedCategory, (_) => updateFilteredGroups());
+  }
+
+  void getCreateGroup() {
+    Get.toNamed("/createGroup");
+  }
+
+  void createGroup() {
+    Get.snackbar("Grup Oluşturma", "Grup Oluşturuldu");
+  }
+
+  void toggleNotification(bool value) {
+    selectedRequest.value = value;
   }
 
   void loadMockGroupData() {
@@ -38,7 +64,8 @@ class GroupController extends GetxController {
       description:
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
       imageUrl: "https://randomuser.me/api/portraits/men/9.jpg",
-      coverImageUrl: "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", // örnek kapak
+      coverImageUrl:
+          "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", // örnek kapak
       memberImageUrls: [
         "https://randomuser.me/api/portraits/men/1.jpg",
         "https://randomuser.me/api/portraits/men/2.jpg",

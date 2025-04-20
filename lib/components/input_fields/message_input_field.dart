@@ -15,11 +15,21 @@ Widget buildMessageInputField() {
         borderRadius: BorderRadius.all(Radius.circular(15))),
     child: Row(
       children: [
-        IconButton(
-            icon: Icon(Icons.attach_file),
-            iconSize: 18,
-            color: Color(0xff9ca3ae),
-            onPressed: () {}),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: InkWell(
+            onTap: () {
+              controller.pickDocument();
+            },
+            child: SvgPicture.asset(
+              "images/icons/selected_document.svg",
+              colorFilter: const ColorFilter.mode(
+                Color(0xffc9c9c9),
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ),
         Expanded(
           child: TextField(
             controller: messageController,
@@ -30,17 +40,41 @@ Widget buildMessageInputField() {
             ),
           ),
         ),
-        IconButton(
-            icon: Icon(Icons.document_scanner,
-                size: 18, color: Color(0xff9ca3ae)),
-            onPressed: () {}),
-        IconButton(
-            icon: Icon(Icons.camera_alt, color: Color(0xff9ca3ae), size: 18),
-            onPressed: () {}),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: InkWell(
+            onTap: () {
+              controller
+                  .sendPoll("En sevdiğin renk?", ["Kırmızı", "Mavi", "Siyah"]);
+            },
+            child: SvgPicture.asset(
+              "images/icons/poll_icon.svg",
+              colorFilter: const ColorFilter.mode(
+                Color(0xffc9c9c9),
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: InkWell(
+            onTap: () {
+              controller.pickImageFromGallery();
+            },
+            child: SvgPicture.asset(
+              "images/icons/camera.svg",
+              colorFilter: const ColorFilter.mode(
+                Color(0xffc9c9c9),
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ),
         IconButton(
           icon: Container(
             width: 40,
-            height:40,
+            height: 40,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -55,10 +89,10 @@ Widget buildMessageInputField() {
             ),
             child: Center(
               child: SvgPicture.asset(
-                          'images/icons/send_icon.svg',
-                          width: 18,
-                          height: 18,
-                        ),
+                'images/icons/send_icon.svg',
+                width: 18,
+                height: 18,
+              ),
             ),
           ),
           onPressed: () {

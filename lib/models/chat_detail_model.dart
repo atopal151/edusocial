@@ -1,6 +1,6 @@
 
 
-enum MessageType { text, image, link, poll }
+enum MessageType { text, image, link, poll, document }
 
 class MessageModel {
   final String id;
@@ -10,6 +10,7 @@ class MessageModel {
   final MessageType messageType;
   final DateTime timestamp;
   final bool isSentByMe;
+  final List<String>? pollOptions; // ✅ Eklenen alan
 
   MessageModel({
     required this.id,
@@ -19,5 +20,6 @@ class MessageModel {
     required this.messageType,
     required this.timestamp,
     required this.isSentByMe,
+    this.pollOptions,
   });
 }

@@ -125,7 +125,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         children: [
                           /// Kapak fotoğrafı
                           Container(
-                            height: 150,
+                            height: 95,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),

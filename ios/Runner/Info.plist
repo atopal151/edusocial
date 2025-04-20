@@ -4,6 +4,13 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Kamera erişimi gerekiyor</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Bu uygulama dosya seçmek için galeriye erişmek istiyor.</string>
+	<key>NSDocumentTypes</key>
+	<array>
+ 	 	<string>public.content</string>
+ 		 <string>public.data</string>
+	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Konum bilgisine ihtiyacımız var</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -47,6 +47,7 @@ dependencies:
   path_provider: ^2.1.5
   share_plus: ^10.1.4
   image_picker: ^1.1.2
+  file_picker: ^10.1.2
 
 dev_dependencies:
   flutter_test:
@@ -112,6 +113,9 @@ flutter:
     - images/icons/join_person.svg
     - images/icons/notification_group.svg
     - images/icons/tree_dot_column.svg
+    - images/icons/camera.svg
+    - images/icons/poll_icon.svg
+    - images/icons/selected_document.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png

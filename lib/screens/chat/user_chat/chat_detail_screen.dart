@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/message_input_field.dart';
+import '../../../components/widgets/document_message_widget.dart';
 import '../../../components/widgets/image_message_widget.dart';
 import '../../../components/widgets/link_messaje_widget.dart';
+import '../../../components/widgets/poll_message_widget.dart';
 import '../../../components/widgets/text_message_widget.dart';
 import '../../../controllers/social/chat_detail_controller.dart';
 import '../../../models/chat_detail_model.dart';
@@ -25,7 +27,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         backgroundColor: Color(0xffffffff),
         surfaceTintColor: Color(0xffffffff),
         title: InkWell(
-          onTap:() {
+          onTap: () {
             Get.toNamed("/peopleProfile");
           },
           child: Row(
@@ -54,9 +56,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         ),
         actions: [
           InkWell(
-            onTap:() {
-            Get.toNamed("/user_chat_detail");
-          },
+            onTap: () {
+              Get.toNamed("/user_chat_detail");
+            },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(Icons.more_horiz),
@@ -70,18 +72,21 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           children: [
             Expanded(
               child: Obx(() => ListView.builder(
-                    controller: controller
-                        .scrollController,
+                    controller: controller.scrollController,
                     itemCount: controller.messages.length,
                     padding: EdgeInsets.only(bottom: 75),
                     itemBuilder: (context, index) {
                       final message = controller.messages[index];
                       if (message.messageType == MessageType.text) {
                         return TextMessageWidget(message: message);
+                      } else if (message.messageType == MessageType.document) {
+                        return DocumentMessageWidget(message: message);
                       } else if (message.messageType == MessageType.image) {
                         return ImageMessageWidget(message: message);
                       } else if (message.messageType == MessageType.link) {
                         return LinkMessageWidget(message: message);
+                      } else if (message.messageType == MessageType.poll) {
+                        return PollMessageWidget(message: message);
                       } else {
                         return Container();
                       }
@@ -92,7 +97,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               decoration: BoxDecoration(color: Color(0xffffffff)),
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 12.0, right: 12, top: 8, bottom: 20),
+                    left: 16.0, right: 16, top: 8, bottom: 20),
                 child: buildMessageInputField(),
               ),
             ),

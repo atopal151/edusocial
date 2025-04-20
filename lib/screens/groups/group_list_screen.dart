@@ -1,6 +1,7 @@
 import 'package:edusocial/components/user_appbar/group_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../components/buttons/custom_button.dart';
 import '../../controllers/group_controller.dart';
 import '../../components/cards/group_card.dart';
 
@@ -23,6 +24,26 @@ class GroupListScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+               SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16),
+            child: CustomButton(
+                height: 45,
+                borderRadius: 15,
+                text: "Yeni Grup Oluştur",
+                onPressed: () {
+                  controller.getCreateGroup();
+                },
+                isLoading: controller.isGroupLoading,
+                backgroundColor: Color(0xfffb535c),
+                textColor: Color(0xffffffff),
+               ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Text("Bulunduğun Gruplar",

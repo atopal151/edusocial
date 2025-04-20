@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/chat_detail_model.dart';
 import '../../models/document_model.dart';
 import '../../models/link_model.dart';
@@ -121,6 +123,67 @@ class ChatDetailController extends GetxController {
       following: '459'
     );
   }
+
+void sendPoll(String question, List<String> options) {
+  messages.add(MessageModel(
+    id: DateTime.now().millisecondsSinceEpoch.toString(),
+    senderId: "me",
+    receiverId: "user123",
+    content: question,
+    messageType: MessageType.poll,
+    timestamp: DateTime.now(),
+    isSentByMe: true,
+    pollOptions: options,
+  ));
+  scrollToBottom();
+}
+
+
+void pickImageFromGallery() async {
+  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  if (pickedFile != null) {
+    messages.add(MessageModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      senderId: "me",
+      receiverId: "user123",
+      content: pickedFile.path,
+      messageType: MessageType.image,
+      timestamp: DateTime.now(),
+      isSentByMe: true,
+    ));
+    scrollToBottom();
+  }
+}
+
+
+
+Future<void> pickDocument() async {
+  try {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
+    );
+
+    if (result != null && result.files.single.path != null) {
+      final filePath = result.files.single.path!;
+      print("Seçilen dosya: $filePath");
+
+      messages.add(MessageModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        senderId: "me",
+        receiverId: "user123",
+        content: filePath,
+        messageType: MessageType.document,
+        timestamp: DateTime.now(),
+        isSentByMe: true,
+      ));
+
+      scrollToBottom();
+    }
+  } catch (e) {
+    print("Belge seçme hatası: $e");
+  }
+}
 
   void sendMessage(String text) {
     messages.add(MessageModel(

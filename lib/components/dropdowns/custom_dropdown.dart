@@ -6,13 +6,14 @@ class CustomDropDown extends StatelessWidget {
   final List<String> items;
   final String selectedItem;
   final ValueChanged<String?> onChanged;
+  final Color? color;
 
   const CustomDropDown({
     super.key,
     required this.label,
     required this.items,
     required this.selectedItem,
-    required this.onChanged,
+    required this.onChanged,  this.color,
   });
 
   @override
@@ -25,7 +26,7 @@ class CustomDropDown extends StatelessWidget {
           style: GoogleFonts.inter(
               fontSize: 13.28,
               fontWeight: FontWeight.w400,
-              color: Color(0xff9CA3AE)),
+              color: color ?? Color(0xff9CA3AE)),
         ),
         SizedBox(height: 5),
         Container(
