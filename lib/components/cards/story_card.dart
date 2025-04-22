@@ -28,7 +28,7 @@ class StoryCard extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: story.isViewed
                   ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade200])
-                  : const LinearGradient(colors: [Color(0xfffb535c), Colors.orange]),
+                  : const LinearGradient(colors: [Color(0xfffb535c), Color(0xfffb535c)]),
             ),
             child: InkWell(
               onTap: () {

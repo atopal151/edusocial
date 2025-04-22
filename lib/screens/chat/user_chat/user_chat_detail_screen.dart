@@ -1,5 +1,6 @@
 import 'package:edusocial/controllers/social/chat_detail_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -98,7 +99,9 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
       body: Obx(
         () {
           final chatUser = chatController.userChatDetail.value;
-          if (chatUser == null) return Center(child: CircularProgressIndicator());
+          if (chatUser == null) {
+            return Center(child: CircularProgressIndicator());
+          }
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(16),
@@ -148,7 +151,6 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
-               
 
                 // KURULUŞ TARİHİ VE ÜYE SAYISI
                 Row(
@@ -172,7 +174,7 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
                                 ),
                               ),
                               Text(
-                               chatUser.follower,
+                                chatUser.follower,
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13.28,
@@ -267,15 +269,19 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
                                     final doc = chatUser.documents[index];
                                     return ListTile(
                                       leading: Container(
-                                          padding: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                              color: Color(0xfff5f6f7),
-                                              borderRadius:
-                                                  BorderRadius.circular(50)),
-                                          child: Icon(
-                                            Icons.insert_drive_file,
-                                            color: Color(0xff9ca3ae),
-                                          )),
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                            color: Color(0xfff5f6f7),
+                                            borderRadius:
+                                                BorderRadius.circular(50)),
+                                        child: SvgPicture.asset(
+                                          "images/icons/document_icon.svg",
+                                          colorFilter: ColorFilter.mode(
+                                            Color(0xff9ca3ae),
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                      ),
                                       title: Text(
                                         doc.name,
                                         style: GoogleFonts.inter(

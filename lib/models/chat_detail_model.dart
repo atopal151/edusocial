@@ -11,6 +11,7 @@ class MessageModel {
   final DateTime timestamp;
   final bool isSentByMe;
   final List<String>? pollOptions; // ✅ Eklenen alan
+  final String? additionalText; // 🆕 açıklama
 
   MessageModel({
     required this.id,
@@ -21,5 +22,6 @@ class MessageModel {
     required this.timestamp,
     required this.isSentByMe,
     this.pollOptions,
+    this.additionalText,
   });
 }

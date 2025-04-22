@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,13 @@ class ChatDetailController extends GetxController {
   final ScrollController scrollController = ScrollController();
 
   var userChatDetail = Rxn<UserChatDetailModel>();
+  var isLoading = false.obs;
+  RxString pollQuestion = ''.obs;
+  RxList<String> pollOptions = <String>[].obs;
+  RxMap<String, int> pollVotes = <String, int>{}.obs;
+  RxString selectedPollOption = ''.obs;
 
+  TextEditingController pollTitleController = TextEditingController();
   @override
   void onInit() {
     super.onInit();
@@ -21,169 +28,285 @@ class ChatDetailController extends GetxController {
     loadMockGroupData();
   }
 
-  void loadMockGroupData() {
-    userChatDetail.value = UserChatDetailModel(
-      id: "user_001",
-      name: "Roger Carscraad",
-      imageUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-      memberImageUrls: [
-        "https://randomuser.me/api/portraits/men/1.jpg",
-        "https://randomuser.me/api/portraits/men/2.jpg",
-        "https://randomuser.me/api/portraits/men/3.jpg",
-        "https://randomuser.me/api/portraits/men/4.jpg",
-        "https://randomuser.me/api/portraits/men/5.jpg",
-        "https://randomuser.me/api/portraits/men/7.jpg",
-        "https://randomuser.me/api/portraits/men/6.jpg",
-        "https://randomuser.me/api/portraits/men/2.jpg",
-        "https://randomuser.me/api/portraits/men/8.jpg",
-        "https://randomuser.me/api/portraits/men/9.jpg",
-        "https://randomuser.me/api/portraits/men/10.jpg",
-        "https://randomuser.me/api/portraits/men/13.jpg",
-      ],
-       documents: [
-        DocumentModel(
-          name: "Edusocial.png",
-          sizeMb: 3.72,
-          date: DateTime(2025, 1, 27),
-          url: "https://randomuser.me/api/portraits/men/4.jpg",
+  void openPollBottomSheet() {
+    pollQuestion.value = '';
+    pollOptions.assignAll(['', '']);
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        DocumentModel(
-          name: "Edusocial.png",
-          sizeMb: 3.72,
-          date: DateTime(2025, 1, 27),
-          url: "https://randomuser.me/api/portraits/men/4.jpg",
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+              TextField(
+                style: TextStyle(fontSize: 12),
+                controller: pollTitleController,
+                decoration: InputDecoration(
+                  hintText: "Anket Başlığı",
+                  filled: true,
+                  fillColor: const Color(0xfff5f5f5),
+                  hintStyle: const TextStyle(color: Color(0xFF9CA3AF),fontSize: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onChanged: (val) => pollQuestion.value = val,
+              ),
+              const SizedBox(height: 30),
+              Obx(() => Column(
+                    children: List.generate(pollOptions.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+
+                style: TextStyle(fontSize: 12),
+                                decoration: InputDecoration(
+                                  hintText: "+ Seçenek Ekle",
+                                  filled: true,
+                                  fillColor: const Color(0xfff5f5f5),
+                                  hintStyle:
+                                      const TextStyle(color: Color(0xFF9CA3AF),fontSize: 12),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 14),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                onChanged: (val) => pollOptions[index] = val,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (pollOptions.length > 2)
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle),
+                                onPressed: () => pollOptions.removeAt(index),
+                              ),
+                          ],
+                        ),
+                      );
+                    }),
+                  )),
+              TextButton.icon(
+                onPressed: () => pollOptions.add(''),
+                icon: const Icon(Icons.add,color: Color(0xffED7474),size: 15,),
+                label: const Text('Seçenek Ekle',style: TextStyle(color: Color(0xffED7474),fontSize: 12),),
+              ),
+              const SizedBox(height: 30),
+
+              /**
+               *  backgroundColor: const Color(0xffFFF6F6),
+                    foregroundColor: const Color(0xffED7474),
+               */
+              CustomButton(
+                  text: "Gönder",
+                  height: 45,
+                  borderRadius: 15,
+                  onPressed: () {
+                     final filledOptions = pollOptions
+                          .where((e) => e.trim().isNotEmpty)
+                          .toList();
+                      if (pollTitleController.text.trim().isNotEmpty &&
+                          filledOptions.length >= 2) {
+                        sendPoll(pollTitleController.text, filledOptions);
+                        Get.back();
+                      }
+                  },
+                  isLoading: isLoading,
+                  backgroundColor: Color(0xffFFF6F6),
+                  textColor: Color(0xffED7474)),
+            
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
-        DocumentModel(
-          name: "Edusocial.png",
-          sizeMb: 3.72,
-          date: DateTime(2025, 1, 27),
-          url: "https://randomuser.me/api/portraits/men/4.jpg",
-        ),
-        DocumentModel(
-          name: "Edusocial.png",
-          sizeMb: 3.72,
-          date: DateTime(2025, 1, 27),
-          url: "https://randomuser.me/api/portraits/men/4.jpg",
-        ),
-        DocumentModel(
-          name: "Edusocial.png",
-          sizeMb: 3.72,
-          date: DateTime(2025, 1, 27),
-          url: "https://randomuser.me/api/portraits/men/4.jpg",
-        ),
-        DocumentModel(
-          name: "Edusocial.png",
-          sizeMb: 3.72,
-          date: DateTime(2025, 1, 27),
-          url: "https://randomuser.me/api/portraits/men/4.jpg",
-        ),
-      ],
-      links: [
-        LinkModel(
-          title: "github.com",
-          url: "https://github.com/monegonllc",
-        ),
-        LinkModel(
-          title: "github.com",
-          url: "https://github.com/monegonllc",
-        ),
-        LinkModel(
-          title: "github.com",
-          url: "https://github.com/monegonllc",
-        ),
-        LinkModel(
-          title: "github.com",
-          url: "https://github.com/monegonllc",
-        ),
-        LinkModel(
-          title: "github.com",
-          url: "https://github.com/monegonllc",
-        ),
-        LinkModel(
-          title: "github.com",
-          url: "https://github.com/monegonllc",
-        ),
-      ],
-      photoUrls: [
-        "https://randomuser.me/api/portraits/men/1.jpg",
-        "https://randomuser.me/api/portraits/men/2.jpg",
-        "https://randomuser.me/api/portraits/men/3.jpg",
-        "https://randomuser.me/api/portraits/men/4.jpg",
-        "https://randomuser.me/api/portraits/men/5.jpg",
-        "https://randomuser.me/api/portraits/men/6.jpg",
-        "https://randomuser.me/api/portraits/men/7.jpg",
-        "https://randomuser.me/api/portraits/men/8.jpg",
-        "https://randomuser.me/api/portraits/men/9.jpg",
-        "https://randomuser.me/api/portraits/men/10.jpg",
-        "https://randomuser.me/api/portraits/men/11.jpg",
-        "https://randomuser.me/api/portraits/men/12.jpg",
-        "https://randomuser.me/api/portraits/men/13.jpg",
-        "https://randomuser.me/api/portraits/men/14.jpg",
-      ], follower: '500',
-      following: '459'
+      ),
+      isScrollControlled: true,
     );
   }
 
-void sendPoll(String question, List<String> options) {
-  messages.add(MessageModel(
-    id: DateTime.now().millisecondsSinceEpoch.toString(),
-    senderId: "me",
-    receiverId: "user123",
-    content: question,
-    messageType: MessageType.poll,
-    timestamp: DateTime.now(),
-    isSentByMe: true,
-    pollOptions: options,
-  ));
-  scrollToBottom();
-}
+  void votePoll(String option) {
+    if (!pollVotes.containsKey(option)) {
+      pollVotes[option] = 1;
+    } else {
+      pollVotes[option] = pollVotes[option]! + 1;
+    }
+    selectedPollOption.value = option;
+  }
 
+  void loadMockGroupData() {
+    userChatDetail.value = UserChatDetailModel(
+        id: "user_001",
+        name: "Roger Carscraad",
+        imageUrl: "https://randomuser.me/api/portraits/men/1.jpg",
+        memberImageUrls: [
+          "https://randomuser.me/api/portraits/men/1.jpg",
+          "https://randomuser.me/api/portraits/men/2.jpg",
+          "https://randomuser.me/api/portraits/men/3.jpg",
+          "https://randomuser.me/api/portraits/men/4.jpg",
+          "https://randomuser.me/api/portraits/men/5.jpg",
+          "https://randomuser.me/api/portraits/men/7.jpg",
+          "https://randomuser.me/api/portraits/men/6.jpg",
+          "https://randomuser.me/api/portraits/men/2.jpg",
+          "https://randomuser.me/api/portraits/men/8.jpg",
+          "https://randomuser.me/api/portraits/men/9.jpg",
+          "https://randomuser.me/api/portraits/men/10.jpg",
+          "https://randomuser.me/api/portraits/men/13.jpg",
+        ],
+        documents: [
+          DocumentModel(
+            name: "Edusocial.png",
+            sizeMb: 3.72,
+            date: DateTime(2025, 1, 27),
+            url: "https://randomuser.me/api/portraits/men/4.jpg",
+          ),
+          DocumentModel(
+            name: "Edusocial.png",
+            sizeMb: 3.72,
+            date: DateTime(2025, 1, 27),
+            url: "https://randomuser.me/api/portraits/men/4.jpg",
+          ),
+          DocumentModel(
+            name: "Edusocial.png",
+            sizeMb: 3.72,
+            date: DateTime(2025, 1, 27),
+            url: "https://randomuser.me/api/portraits/men/4.jpg",
+          ),
+          DocumentModel(
+            name: "Edusocial.png",
+            sizeMb: 3.72,
+            date: DateTime(2025, 1, 27),
+            url: "https://randomuser.me/api/portraits/men/4.jpg",
+          ),
+          DocumentModel(
+            name: "Edusocial.png",
+            sizeMb: 3.72,
+            date: DateTime(2025, 1, 27),
+            url: "https://randomuser.me/api/portraits/men/4.jpg",
+          ),
+          DocumentModel(
+            name: "Edusocial.png",
+            sizeMb: 3.72,
+            date: DateTime(2025, 1, 27),
+            url: "https://randomuser.me/api/portraits/men/4.jpg",
+          ),
+        ],
+        links: [
+          LinkModel(
+            title: "github.com",
+            url: "https://github.com/monegonllc",
+          ),
+          LinkModel(
+            title: "github.com",
+            url: "https://github.com/monegonllc",
+          ),
+          LinkModel(
+            title: "github.com",
+            url: "https://github.com/monegonllc",
+          ),
+          LinkModel(
+            title: "github.com",
+            url: "https://github.com/monegonllc",
+          ),
+          LinkModel(
+            title: "github.com",
+            url: "https://github.com/monegonllc",
+          ),
+          LinkModel(
+            title: "github.com",
+            url: "https://github.com/monegonllc",
+          ),
+        ],
+        photoUrls: [
+          "https://randomuser.me/api/portraits/men/1.jpg",
+          "https://randomuser.me/api/portraits/men/2.jpg",
+          "https://randomuser.me/api/portraits/men/3.jpg",
+          "https://randomuser.me/api/portraits/men/4.jpg",
+          "https://randomuser.me/api/portraits/men/5.jpg",
+          "https://randomuser.me/api/portraits/men/6.jpg",
+          "https://randomuser.me/api/portraits/men/7.jpg",
+          "https://randomuser.me/api/portraits/men/8.jpg",
+          "https://randomuser.me/api/portraits/men/9.jpg",
+          "https://randomuser.me/api/portraits/men/10.jpg",
+          "https://randomuser.me/api/portraits/men/11.jpg",
+          "https://randomuser.me/api/portraits/men/12.jpg",
+          "https://randomuser.me/api/portraits/men/13.jpg",
+          "https://randomuser.me/api/portraits/men/14.jpg",
+        ],
+        follower: '500',
+        following: '459');
+  }
 
-void pickImageFromGallery() async {
-  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-  if (pickedFile != null) {
+  void sendPoll(String question, List<String> options) {
     messages.add(MessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: "me",
       receiverId: "user123",
-      content: pickedFile.path,
-      messageType: MessageType.image,
+      content: question,
+      messageType: MessageType.poll,
       timestamp: DateTime.now(),
       isSentByMe: true,
+      pollOptions: options,
     ));
     scrollToBottom();
   }
-}
 
-
-
-Future<void> pickDocument() async {
-  try {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
-    );
-
-    if (result != null && result.files.single.path != null) {
-      final filePath = result.files.single.path!;
-      print("Seçilen dosya: $filePath");
-
+  void pickImageFromGallery() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       messages.add(MessageModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         senderId: "me",
         receiverId: "user123",
-        content: filePath,
-        messageType: MessageType.document,
+        content: pickedFile.path,
+        messageType: MessageType.image,
         timestamp: DateTime.now(),
         isSentByMe: true,
       ));
-
       scrollToBottom();
     }
-  } catch (e) {
-    print("Belge seçme hatası: $e");
   }
-}
+
+  Future<void> pickDocument() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final filePath = result.files.single.path!;
+        print("Seçilen dosya: $filePath");
+
+        messages.add(MessageModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          senderId: "me",
+          receiverId: "user123",
+          content: filePath,
+          messageType: MessageType.document,
+          timestamp: DateTime.now(),
+          isSentByMe: true,
+        ));
+
+        scrollToBottom();
+      }
+    } catch (e) {
+      print("Belge seçme hatası: $e");
+    }
+  }
 
   void sendMessage(String text) {
     messages.add(MessageModel(

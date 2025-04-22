@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import '../../controllers/social/group_chat_detail_controller.dart';
 
-import '../../controllers/social/chat_detail_controller.dart';
+final GroupChatDetailController controller = Get.find();
 
-final ChatDetailController controller = Get.put(ChatDetailController());
-
-Widget buildMessageInputField() {
+Widget buildGroupMessageInputField() {
   TextEditingController messageController = TextEditingController();
 
   return Container(
@@ -44,8 +43,7 @@ Widget buildMessageInputField() {
           padding: const EdgeInsets.all(8.0),
           child: InkWell(
             onTap: () {
-               controller
-                  .openPollBottomSheet();
+              controller.openPollBottomSheet();
             },
             child: SvgPicture.asset(
               "images/icons/poll_icon.svg",
@@ -60,7 +58,6 @@ Widget buildMessageInputField() {
           padding: const EdgeInsets.all(8.0),
           child: InkWell(
             onTap: () {
-              
               controller.pickImageFromGallery();
             },
             child: SvgPicture.asset(
@@ -72,7 +69,6 @@ Widget buildMessageInputField() {
             ),
           ),
         ),
-       
         IconButton(
           icon: Container(
             width: 40,

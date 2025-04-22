@@ -86,8 +86,20 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       } else if (message.messageType == MessageType.link) {
                         return LinkMessageWidget(message: message);
                       } else if (message.messageType == MessageType.poll) {
+                        return PollMessageWidget(
+                          message: message,
+                          pollVotes: controller.pollVotes,
+                          selectedOption: controller.selectedPollOption,
+                          onVote: controller.votePoll,
+                        );
+                      }
+
+                      /*
+                      else if (message.messageType == MessageType.poll) {
                         return PollMessageWidget(message: message);
-                      } else {
+                      } */
+
+                      else {
                         return Container();
                       }
                     },

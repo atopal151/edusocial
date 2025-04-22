@@ -116,6 +116,7 @@ flutter:
     - images/icons/camera.svg
     - images/icons/poll_icon.svg
     - images/icons/selected_document.svg
+    - images/icons/document_icon.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png

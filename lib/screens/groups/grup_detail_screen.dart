@@ -1,6 +1,7 @@
 import 'package:edusocial/components/cards/event_card.dart';
 import 'package:edusocial/controllers/group_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -328,10 +329,13 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                               color: Color(0xfff5f6f7),
                                               borderRadius:
                                                   BorderRadius.circular(50)),
-                                          child: Icon(
-                                            Icons.insert_drive_file,
-                                            color: Color(0xff9ca3ae),
-                                          )),
+                                          child: SvgPicture.asset(
+                                          "images/icons/document_icon.svg",
+                                          colorFilter: ColorFilter.mode(
+                                            Color(0xff9ca3ae),
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),),
                                       title: Text(
                                         doc.name,
                                         style: GoogleFonts.inter(
