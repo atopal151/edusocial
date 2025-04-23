@@ -204,7 +204,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         "Gruba girmek için katılım isteği\ngöndermek gereksin.",
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 13.28,
+                            fontSize: 12,
                             color: Color(0xff414751))),
                     Obx(() => Switch(
                           value: groupController.selectedRequest.value,

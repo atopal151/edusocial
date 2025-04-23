@@ -7,7 +7,7 @@ class PrimaryButton extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final Color? iconColor;
-  final IconData? icon;
+  final Widget? icon;
 
   const PrimaryButton({
     super.key,
@@ -37,11 +37,7 @@ class PrimaryButton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (icon != null) ...[
-                Icon(
-                  icon,
-                  color: iconColor ?? textColor,
-                  size: 18,
-                ),
+                icon!,
                 const SizedBox(width: 8), // İkon ile metin arasındaki boşluk
               ],
               Text(

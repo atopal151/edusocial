@@ -33,7 +33,7 @@ class Step3View extends StatelessWidget {
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xff9CA3AE)),
+                  color: Color(0xff272727)),
             ),
             SizedBox(height: 10),
             SingleChildScrollView(
@@ -49,8 +49,6 @@ class Step3View extends StatelessWidget {
                       groupDescription: group["description"] ?? "Açıklama yok",
                       memberCount: group["members"] ?? 0,
                       onJoinPressed: () {
-                       /* print(
-                            "Gruba katılma isteği gönderildi: ${group["name"]}");*/
                         controller.joinGroup(group["name"] ?? "");
                       },
                     ),

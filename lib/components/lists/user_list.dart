@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/user_search_model.dart';
 
@@ -50,9 +51,9 @@ class UserListItem extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.name, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,color:Color(0xff414751))),
+                    Text(user.name, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold,color:Color(0xff414751))),
                     Text("${user.university} - ${user.degree}", style: TextStyle(fontSize: 12,color:Color(0xff9CA3AE))),
-                    Text(user.department, style: TextStyle(fontSize: 12,color:Color(0xff9CA3AE))),
+                    Text(user.department, style: GoogleFonts.inter(fontSize: 12,color:Color(0xff9CA3AE))),
                   ],
                 )
               ],

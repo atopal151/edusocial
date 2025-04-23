@@ -3,7 +3,6 @@ import 'package:edusocial/components/input_fields/costum_textfield.dart';
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/controllers/entry_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_multiline_textfield.dart';
@@ -28,8 +27,6 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
       });
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -79,27 +76,20 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
                   },
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
               CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
-                  text: "Konuyu Aç",
-                  onPressed: () {
-                    entryController.shareEntryPost();
-                  },
-                  isLoading: entryController.isEntryLoading,
-                  backgroundColor: Color(0xfffb535c),
-                  textColor: Color(0xffffffff),
-                  icon: SvgPicture.asset(
-                        "images/icons/settings_icon.svg",
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xff414751),
-                          BlendMode.srcIn,
-                        ),
-                        width: 20,
-                        height: 20,
-                      ),),
+                height: 50,
+                borderRadius: 15,
+                text: "+ Konuyu Aç",
+                onPressed: () {
+                  entryController.shareEntryPost();
+                },
+                isLoading: entryController.isEntryLoading,
+                backgroundColor: Color(0xfffb535c),
+                textColor: Color(0xffffffff),
+              ),
             ],
           ),
         ),

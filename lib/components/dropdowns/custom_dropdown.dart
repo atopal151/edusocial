@@ -37,6 +37,8 @@ class CustomDropDown extends StatelessWidget {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
+              dropdownColor: Color(0xffffffff),
+              borderRadius: BorderRadius.circular(15),
               value: selectedItem,
               isExpanded: true,
               icon: Icon(Icons.keyboard_arrow_down, color: Color(0xff414751)),

@@ -26,6 +26,7 @@ class MatchController extends GetxController {
   }
 
   void _loadMockData() {
+    /*
     matches.addAll([
       MatchModel(
         name: "Merve Gökçen",
@@ -171,7 +172,7 @@ class MatchController extends GetxController {
         grade: 2,
         matchedTopics: ["Dijital Medya", "Yaratıcı Kodlama"],
       ),
-    ]);
+    ]);*/
   }
 
   void followUser() {
@@ -180,8 +181,8 @@ class MatchController extends GetxController {
   }
 
   void startChat() {
-    Get.snackbar("Mesaj", "${currentMatch.name} ile mesajlaşma başlatılıyor...",
-        snackPosition: SnackPosition.BOTTOM);
+    Get.toNamed("/chat_detail");
+
   }
 
   void nextMatch() {
@@ -239,18 +240,53 @@ class MatchController extends GetxController {
           grade: 2,
           matchedTopics: ["Davranış Bilimleri", "Toplum Psikolojisi"],
         ),
+         MatchModel(
+        name: "Marco Esposito",
+        age: 26,
+        about:
+            "Girişimcilik ve teknoloji tabanlı iş modelleri üzerine çalışıyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg",
+        isOnline: false,
+        schoolName: "Politecnico di Milano",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Business Innovation",
+        grade: 4,
+        matchedTopics: ["Startup Kültürü", "Yatırım Altyapısı"],
+      ),
+      MatchModel(
+        name: "Elif Demir",
+        age: 22,
+        about: "Yazılım mühendisliği okuyorum. Mobil uygulama geliştiriyorum.",
+        profileImage:
+            "https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg",
+        isOnline: true,
+        schoolName: "İstanbul Teknik Üniversitesi",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Software Engineering",
+        grade: 3,
+        matchedTopics: ["Flutter", "Siber Güvenlik"],
+      ),
+      MatchModel(
+        name: "David Wilson",
+        age: 27,
+        about: "Veri bilimi ve istatistiksel modelleme üzerine uzmanlaştım.",
+        profileImage:
+            "https://images.pexels.com/photos/1704487/pexels-photo-1704487.jpeg",
+        isOnline: false,
+        schoolName: "MIT",
+        schoolLogo:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7Tioo73anZDRZ2DK90mLk1nUcsUfY1ga8Cg&s",
+        department: "Data Science",
+        grade: 4,
+        matchedTopics: ["İstatistiksel Modelleme", "Makine Öğrenmesi"],
+      ),
         // ... devamındaki tüm MatchModel verilerini buraya ekle ...
       ]);
-      print(matches);
-      print('MATCH controller hash: ${navigationController.hashCode}');
-
-      Get.snackbar("Eşleşme", "Uygun eşleşmeler bulundu!",
-          backgroundColor: Colors.white);
-
+      Get.back();
       navigationController.changeIndex(2);
-      //Get.toNamed("/match_result");
-      
-    print("Index set edildi: ${navigationController.selectedIndex.value}");
     });
   }
 }

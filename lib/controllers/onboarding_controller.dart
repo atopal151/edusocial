@@ -93,6 +93,30 @@ class OnboardingController extends GetxController {
         "image":
             "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         "action": "Gruba Katıl"
+      }, {
+        "name": "Teknoloji Severler",
+        "description":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "members": 500,
+        "image":
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "action": "Gruba Katıl"
+      }, {
+        "name": "Teknoloji Severler",
+        "description":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "members": 500,
+        "image":
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "action": "Gruba Katıl"
+      }, {
+        "name": "Teknoloji Severler",
+        "description":
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "members": 500,
+        "image":
+            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "action": "Gruba Katıl"
       }
     ];
   }

@@ -29,7 +29,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
                 border: InputBorder.none,
                 hintText: "Ders adı giriniz",
                 hintStyle: GoogleFonts.inter(
-                    color: Color(0xff9CA3AE),
+                    color: Color(0xff414751),
                     fontSize: 13.28,
                     fontWeight: FontWeight.w600),
               ),
@@ -40,17 +40,17 @@ class CustomTextFieldStep2 extends StatelessWidget {
               onAdd();
             },
             child: Container(
-                margin: EdgeInsets.all(6),
+                margin: EdgeInsets.only(right:12),
                 decoration: BoxDecoration(
                   color: Color(0xFFef5050),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 16.0, right: 16, top: 8, bottom: 8),
                   child: Text(
                     "Ekle",
-                    style: GoogleFonts.inter(color: Color(0xffffffff),fontWeight: FontWeight.w600,fontSize: 13.28),
+                    style: GoogleFonts.inter(color: Color(0xffffffff),fontWeight: FontWeight.w600,fontSize: 10),
                   ),
                 )),
           ),

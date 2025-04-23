@@ -33,7 +33,7 @@ class LoginView extends StatelessWidget {
                     child: Container(
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height *
-                          0.28, // Yükseklik biraz düşürüldü
+                          0.28,
 
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -67,8 +67,8 @@ class LoginView extends StatelessWidget {
                           "Benzer İlgi Alanlarına\n Sahip Kişilerle Tanış!",
                           style: GoogleFonts.inter(
                             fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xffffffff),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -95,7 +95,7 @@ class LoginView extends StatelessWidget {
                                 "Giriş Yap",
                                 style: GoogleFonts.inter(
                                   fontSize: 18.72,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w700,
                                   color: Color(0xFF414751),
                                 ),
                               ),
@@ -104,14 +104,14 @@ class LoginView extends StatelessWidget {
                                   textColor: Color(0xFF9CA3AF),
                                   hintText: "Kullanıcı adı veya e-posta",
                                   controller: controller
-                                      .emailController, // Controller dışarıdan verildi!,
+                                      .emailController, 
                                   backgroundColor: Color(0xfff5f5f5)),
                               CustomTextField(
                                   textColor: Color(0xFF9CA3AF),
                                   hintText: "Şifre",
                                   isPassword: true,
                                   controller: controller
-                                      .passwordController, // Controller dışarıdan verildi!,
+                                      .passwordController, 
                                   backgroundColor: Color(0xfff5f5f5)),
                               SizedBox(height: 10),
                               Align(
@@ -134,13 +134,12 @@ class LoginView extends StatelessWidget {
                               ),
                               SizedBox(height: 20),
                               CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
+                                height: 45,
+                                borderRadius: 15,
                                 backgroundColor: Color(0xffE75454),
                                 text: "Giriş Yap",
                                 isLoading: controller.isLoading,
-                                textColor: Colors.white,
+                                textColor: Color(0xffffffff),
                                 onPressed: () {
                                   controller.login();
                                 },

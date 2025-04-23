@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/group_model.dart';
 
@@ -17,7 +18,7 @@ class GroupListItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16),
         margin: EdgeInsets.symmetric(vertical: 6),
-        height: 106, // Yüksekliği artırdım
+        height: 106, 
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -26,7 +27,7 @@ class GroupListItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
-              clipBehavior: Clip.none, // Taşmaları kontrol etmek için
+              clipBehavior: Clip.none, 
               alignment: Alignment.bottomCenter,
               children: [
                 CircleAvatar(
@@ -34,7 +35,7 @@ class GroupListItem extends StatelessWidget {
                   radius: 30,
                 ),
                 Positioned(
-                  bottom: -20, // Daha görünür olması için yukarı kaydırdım
+                  bottom: -20, 
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -42,7 +43,7 @@ class GroupListItem extends StatelessWidget {
                       SizedBox(width: 4),
                       Text(
                         "${group.memberCount}",
-                        style: TextStyle(color: Color(0xff414751), fontSize: 13.28,fontWeight: FontWeight.w600),
+                        style: GoogleFonts.inter(color: Color(0xff414751), fontSize: 13.28,fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -53,17 +54,17 @@ class GroupListItem extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start, // Ortaya hizaladım
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
                     group.name,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,color:Color(0xff414751)),
+                    style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold,color:Color(0xff414751)),
                   ),
                   SizedBox(height: 4), // Boşluk ekledim
                   Text(
                     group.description,
                     
-                    style: TextStyle(fontSize: 12,color: Color(0xff9CA3AE)),
+                    style: GoogleFonts.inter(fontSize: 12,color: Color(0xff9CA3AE)),
                     maxLines: 2, // Çok uzun açıklamalarda taşmayı önlemek için
                     overflow: TextOverflow.ellipsis,
                   ),

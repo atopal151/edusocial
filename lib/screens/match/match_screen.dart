@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_textfield_step2.dart';
@@ -84,8 +85,8 @@ class _MatchScreenState extends State<MatchScreen> {
                       Text(
                         "Benzer İlgi Alanlarına \n Sahip Kişilerle Tanış!",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Colors.white,
+                        style: GoogleFonts.inter(
+                            color: Color(0xffffffff),
                             fontSize: 24,
                             fontWeight: FontWeight.w700),
                       ),
@@ -93,8 +94,8 @@ class _MatchScreenState extends State<MatchScreen> {
                       Text(
                         "EduSocial, Polonya’daki uluslararası okullarda eğitim \n gören öğrenciler için tasarlanmış yenilikçi bir sosyal \n platformdur.",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Colors.white,
+                        style: GoogleFonts.inter(
+                            color: Color(0xffffffff),
                             fontSize: 12,
                             fontWeight: FontWeight.w400),
                       ),
@@ -107,8 +108,8 @@ class _MatchScreenState extends State<MatchScreen> {
                   child: Text(
                     "Hangi Konuyu Çalışacaksın?",
                     textAlign: TextAlign.start,
-                    style: TextStyle(
-                        color: Colors.white,
+                    style: GoogleFonts.inter(
+                        color: Color(0xffffffff),
                         fontSize: 13.28,
                         fontWeight: FontWeight.w400),
                   ),
@@ -125,7 +126,7 @@ class _MatchScreenState extends State<MatchScreen> {
                 Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: Text(
-                        "Hangi Konuyu Çalışacaksın?",
+                        "Kaydedilen Konular",
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Colors.white,

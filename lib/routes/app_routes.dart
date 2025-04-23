@@ -18,6 +18,7 @@ import 'package:edusocial/screens/event/event_screen.dart';
 import 'package:edusocial/screens/groups/create_group_screen.dart';
 import 'package:edusocial/screens/groups/group_list_screen.dart';
 import 'package:edusocial/screens/groups/grup_detail_screen.dart';
+import 'package:edusocial/screens/home/post/create_post_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/notifications/notifications_screen.dart';
@@ -73,6 +74,7 @@ class Routes {
   static const String addStory = '/addStory';
   static const String notifications = '/notifications';
   static const String createGroup = '/createGroup';
+  static const String createPost = '/create_post';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -205,9 +207,13 @@ class Routes {
       name: notifications,
       page: () => NotificationScreen(),
     ),
-     GetPage(
+    GetPage(
       name: createGroup,
       page: () => CreateGroupScreen(),
+    ),
+    GetPage(
+      name: createPost,
+      page: () => CreatePostScreen(),
     ),
     GetPage(
       name: main,

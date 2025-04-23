@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/search_text_controller.dart';
 import '../../components/lists/user_list.dart';
 import '../../components/lists/group_list.dart';
@@ -59,6 +60,8 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                 child: Padding(
                   padding: const EdgeInsets.only(left: 16.0),
                   child: TextField(
+                    style: GoogleFonts.inter(
+                        fontSize: 13.28, fontWeight: FontWeight.w600),
                     controller: controller.searchTextController,
                     onChanged: (value) => controller.filterResults(value),
                     decoration: InputDecoration(
@@ -89,8 +92,8 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                     borderRadius: BorderRadius.all(Radius.circular(30)),
                     color: Color(0xffffffff)),
                 dividerColor: Colors.transparent,
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey,
+                labelColor: Color(0xff414751),
+                unselectedLabelColor: Color(0xffd9d9d9),
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorPadding:
                     EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -99,11 +102,19 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.person, size: 18),
-                        SizedBox(width: 6),
+                        SvgPicture.asset(
+                          "images/icons/profile_icon_settings.svg",
+                          colorFilter: ColorFilter.mode(
+                            Color(0xffd9d9d9),
+                            BlendMode.srcIn,
+                          ),
+                          height: 18,
+                          width: 18,
+                        ),
+                        SizedBox(width: 8),
                         Text("Kişiler",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500)),
+                            style: GoogleFonts.inter(
+                                fontSize: 13.28, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -111,11 +122,19 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.group_outlined, size: 18),
-                        SizedBox(width: 6),
+                        SvgPicture.asset(
+                          "images/icons/group_icon.svg",
+                          colorFilter: ColorFilter.mode(
+                            Color(0xffd9d9d9),
+                            BlendMode.srcIn,
+                          ),
+                          height: 18,
+                          width: 18,
+                        ),
+                        SizedBox(width: 8),
                         Text("Gruplar",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500)),
+                            style: GoogleFonts.inter(
+                                fontSize: 13.28, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -123,11 +142,19 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.event, size: 18),
-                        SizedBox(width: 6),
+                        SvgPicture.asset(
+                          "images/icons/event.svg",
+                          colorFilter: ColorFilter.mode(
+                            Color(0xffd9d9d9),
+                            BlendMode.srcIn,
+                          ),
+                          height: 18,
+                          width: 18,
+                        ),
+                        SizedBox(width: 8),
                         Text("Etkinlikler",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500)),
+                            style: GoogleFonts.inter(
+                                fontSize: 13.28, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -152,7 +179,6 @@ class _SearchTextScreenState extends State<SearchTextScreen>
 
                 // Gruplar Listesi
                 Obx(() => ListView.builder(
-
                       padding: EdgeInsets.all(12),
                       itemCount: controller.filteredGroups.length,
                       itemBuilder: (context, index) {
@@ -163,7 +189,6 @@ class _SearchTextScreenState extends State<SearchTextScreen>
 
                 // Etkinlikler Listesi
                 Obx(() => ListView.builder(
-
                       padding: EdgeInsets.all(12),
                       itemCount: controller.filteredEvents.length,
                       itemBuilder: (context, index) {

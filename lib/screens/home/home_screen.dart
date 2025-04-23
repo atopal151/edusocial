@@ -9,6 +9,7 @@ import '../../controllers/home_controller.dart';
 import 'hot_topics_list.dart';
 import 'story/my_story_list.dart';
 import 'post_home_list.dart';
+import 'story/story_viewer_page.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
@@ -21,23 +22,51 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: UserAppBar(),
+      floatingActionButton: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: [Color(0xFFEF5050), Color(0xFFFF7743)],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topRight,
+          ),
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            Get.toNamed("/create_post");
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 25,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          
           children: [
             Container(
               color: Colors.white,
               height: 110,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8, top: 10,),
-                    child: MyStoryList(),
-                  ), // İlk eleman: kendi story
-                  const SizedBox(width: 10),
+                  InkWell(
+                      onTap: () {
+                        final myIndex = storyController.storyList
+                            .indexWhere((e) => e.isMyStory);
+                        if (myIndex != -1) {
+                          Get.to(() => StoryViewerPage(initialIndex: myIndex));
+                        }
+                      },
+                      child: MyStoryList()), // İlk eleman: kendi story
+                  SizedBox(width: 5),
                   ...storyController
                       .getOtherStories()
                       .map((story) => StoryCard(story: story)),

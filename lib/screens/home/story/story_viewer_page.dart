@@ -126,129 +126,128 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   top: true,
   bottom: false,
   minimum: EdgeInsets.only(top: 12),
-      child: Container(
-        child: Scaffold(
-          backgroundColor: Colors.black,
-          body: PageView.builder(
-            controller: _pageController,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: stories.length,
-            itemBuilder: (context, index) {
-              final story = stories[index];
-              final isCurrentStory = index == _currentIndex;
-        
-              return GestureDetector(
-                onLongPressStart: (_) => _pauseStory(),
-                onLongPressEnd: (_) => _resumeStory(),
-                onHorizontalDragEnd: (details) {
-                  if (details.primaryVelocity != null) {
-                    if (details.primaryVelocity! > 0) {
-                      if (_currentIndex > 0) {
-                        setState(() {
-                          _currentIndex--;
-                          _storyIndex = 0;
-                        });
-                        _pageController.jumpToPage(_currentIndex);
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _startStory();
-                        });
-                      }
-                    } else {
-                      if (_currentIndex < stories.length - 1) {
-                        setState(() {
-                          _currentIndex++;
-                          _storyIndex = 0;
-                        });
-                        _pageController.jumpToPage(_currentIndex);
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _startStory();
-                        });
-                      }
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: PageView.builder(
+          controller: _pageController,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: stories.length,
+          itemBuilder: (context, index) {
+            final story = stories[index];
+            final isCurrentStory = index == _currentIndex;
+      
+            return GestureDetector(
+              onLongPressStart: (_) => _pauseStory(),
+              onLongPressEnd: (_) => _resumeStory(),
+              onHorizontalDragEnd: (details) {
+                if (details.primaryVelocity != null) {
+                  if (details.primaryVelocity! > 0) {
+                    if (_currentIndex > 0) {
+                      setState(() {
+                        _currentIndex--;
+                        _storyIndex = 0;
+                      });
+                      _pageController.jumpToPage(_currentIndex);
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _startStory();
+                      });
+                    }
+                  } else {
+                    if (_currentIndex < stories.length - 1) {
+                      setState(() {
+                        _currentIndex++;
+                        _storyIndex = 0;
+                      });
+                      _pageController.jumpToPage(_currentIndex);
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _startStory();
+                      });
                     }
                   }
-                },
-                onTapDown: (details) {
-                  final width = MediaQuery.of(context).size.width;
-                  if (details.globalPosition.dx < width / 2) {
-                    previousStory();
-                  } else {
-                    nextStory();
-                  }
-                },
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: story.storyUrls.isNotEmpty
-                          ? Image.network(
-                              story.storyUrls[_storyIndex],
-                              fit: BoxFit.cover,
-                            )
-                          : Container(color: Colors.black),
-                    ),
-                    if (isCurrentStory)
-                      Positioned(
-                        top: 10,
-                        left: 10,
-                        right: 10,
-                        child: Row(
-                          children: List.generate(
-                            story.storyUrls.length,
-                            (i) => Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 2),
-                                child: LinearProgressIndicator(
-                                  value: i < _storyIndex
-                                      ? 1
-                                      : i == _storyIndex
-                                          ? _animationController?.value ?? 0
-                                          : 0,
-                                  backgroundColor: Colors.white38,
-                                  valueColor:
-                                      AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
+                }
+              },
+              onTapDown: (details) {
+                final width = MediaQuery.of(context).size.width;
+                if (details.globalPosition.dx < width / 2) {
+                  previousStory();
+                } else {
+                  nextStory();
+                }
+              },
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: story.storyUrls.isNotEmpty
+                        ? Image.network(
+                            story.storyUrls[_storyIndex],
+                            fit: BoxFit.cover,
+                          )
+                        : Container(color: Colors.black),
+                  ),
+                  if (isCurrentStory)
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      right: 10,
+                      child: Row(
+                        children: List.generate(
+                          story.storyUrls.length,
+                          (i) => Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 2),
+                              child: LinearProgressIndicator(
+                                borderRadius: BorderRadius.circular(50),
+                                value: i < _storyIndex
+                                    ? 1
+                                    : i == _storyIndex
+                                        ? _animationController?.value ?? 0
+                                        : 0,
+                                backgroundColor: Colors.white38,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    Positioned(
-                      top: 25,
-                      left: 16,
-                      right: 16,
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(story.profileImage),
-                          ),
-                          SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                story.username,
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 16),
-                              ),
-                              Text(
-                                timeAgo(story.createdAt),
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 12),
-                              ),
-                            ],
-                          ),
-                          Spacer(),
-                          IconButton(
-                            icon: Icon(Icons.close, color: Colors.white),
-                            onPressed: () => Get.back(),
-                          )
-                        ],
-                      ),
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  Positioned(
+                    top: 25,
+                    left: 16,
+                    right: 16,
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(story.profileImage),
+                        ),
+                        SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              story.username,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                            Text(
+                              timeAgo(story.createdAt),
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        Spacer(),
+                        IconButton(
+                          icon: Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Get.back(),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

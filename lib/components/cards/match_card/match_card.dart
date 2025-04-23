@@ -140,7 +140,7 @@ class _MatchCardState extends State<MatchCard> {
                     radius: 5,
                     backgroundColor: Color(0xff4DD64B),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(width: 4),
                   const Text("Çevrimiçi",
                       style: TextStyle(
                           color: Colors.white,
