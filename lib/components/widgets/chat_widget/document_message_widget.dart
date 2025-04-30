@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/chat_detail_model.dart';
+import '../../../models/chat_detail_model.dart';
 
 class DocumentMessageWidget extends StatelessWidget {
   final MessageModel message;

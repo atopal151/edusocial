@@ -331,18 +331,85 @@ class ChatDetailController extends GetxController {
     }
   }
 
-  void simulateIncomingMessages() {
-    Timer.periodic(Duration(seconds: 10), (timer) {
-      messages.add(MessageModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        senderId: "user123",
-        receiverId: "me",
-        content: "Bu otomatik gelen bir mesajdır.",
-        messageType: MessageType.text,
-        timestamp: DateTime.now(),
-        isSentByMe: false,
-      ));
-      scrollToBottom();
-    });
-  }
+ void simulateIncomingMessages() {
+  Timer.periodic(Duration(seconds: 1), (timer) {
+    final now = DateTime.now();
+    final randomIndex = now.second % 5; // 5 farklı mesaj tipi
+
+    MessageModel newMessage;
+
+    switch (randomIndex) {
+      case 0: // Text mesaj
+        newMessage = MessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user123",
+          receiverId: "me",
+          content: "Nasılsın? Bugün ne yapıyorsun?",
+          messageType: MessageType.text,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 1: // Image mesaj
+        newMessage = MessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user124",
+          receiverId: "me",
+          content: "https://picsum.photos/200/300", // Sahte resim linki
+          messageType: MessageType.image,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 2: // Document mesaj
+        newMessage = MessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user125",
+          receiverId: "me",
+          content: "/documents/sample_file.pdf",
+          messageType: MessageType.document,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 3: // Link mesaj
+        newMessage = MessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user126",
+          receiverId: "me",
+          content: "https://flutter.dev",
+          messageType: MessageType.link,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 4: // Poll mesaj
+        newMessage = MessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user127",
+          receiverId: "me",
+          content: "En sevdiğin tatil türü hangisi? 🏖️⛷️",
+          messageType: MessageType.poll,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      default: // Fallback - Text
+        newMessage = MessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user123",
+          receiverId: "me",
+          content: "Varsayılan mesaj...",
+          messageType: MessageType.text,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+    }
+
+    messages.add(newMessage);
+    scrollToBottom();
+  });
+}
+
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../models/chat_detail_model.dart';
+import '../../../models/chat_detail_model.dart';
 
 class LinkMessageWidget extends StatelessWidget {
   final MessageModel message;

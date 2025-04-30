@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
-import '../../models/chat_detail_model.dart';
+import '../../models/group_message_model.dart';
 
 class GroupChatDetailController extends GetxController {
-  RxList<MessageModel> groupmessages = <MessageModel>[].obs;
+  RxList<GroupMessageModel> groupmessages = <GroupMessageModel>[].obs;
   final ScrollController scrollController = ScrollController();
 
   RxString pollQuestion = ''.obs;
@@ -147,12 +147,14 @@ class GroupChatDetailController extends GetxController {
   }
 
   void sendPoll(String question, List<String> options) {
-    groupmessages.add(MessageModel(
+    groupmessages.add(GroupMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: "me",
       receiverId: "user123",
-      content: question,
-      messageType: MessageType.poll,
+      content: question,name: "Ali",
+    surname: "Yılmaz",
+    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
+      messageType: GroupMessageType.poll,
       timestamp: DateTime.now(),
       isSentByMe: true,
       pollOptions: options,
@@ -164,12 +166,14 @@ class GroupChatDetailController extends GetxController {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      groupmessages.add(MessageModel(
+      groupmessages.add(GroupMessageModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         senderId: "me",
-        receiverId: "user123",
+        receiverId: "user123",name: "Ali",
+    surname: "Yılmaz",
+    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
         content: pickedFile.path,
-        messageType: MessageType.image,
+        messageType: GroupMessageType.image,
         timestamp: DateTime.now(),
         isSentByMe: true,
       ));
@@ -188,12 +192,14 @@ class GroupChatDetailController extends GetxController {
         final filePath = result.files.single.path!;
         print("Seçilen dosya: $filePath");
 
-        groupmessages.add(MessageModel(
+        groupmessages.add(GroupMessageModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           senderId: "me",
           receiverId: "user123",
-          content: filePath,
-          messageType: MessageType.document,
+          content: filePath,name: "Ali",
+    surname: "Yılmaz",
+    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
+          messageType: GroupMessageType.document,
           timestamp: DateTime.now(),
           isSentByMe: true,
         ));
@@ -206,12 +212,15 @@ class GroupChatDetailController extends GetxController {
   }
 
   void sendMessage(String text) {
-    groupmessages.add(MessageModel(
+    groupmessages.add(GroupMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: "me",
       receiverId: "user123",
       content: text,
-      messageType: MessageType.text,
+      name: "Ali",
+    surname: "Yılmaz",
+    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
+      messageType: GroupMessageType.text,
       timestamp: DateTime.now(),
       isSentByMe: true,
     ));
@@ -233,17 +242,103 @@ class GroupChatDetailController extends GetxController {
   }
 
   void simulateIncomingMessages() {
-    Timer.periodic(Duration(seconds: 10), (timer) {
-      groupmessages.add(MessageModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        senderId: "user123",
-        receiverId: "me",
-        content: "Bu otomatik gelen bir mesajdır.",
-        messageType: MessageType.text,
-        timestamp: DateTime.now(),
-        isSentByMe: false,
-      ));
-      scrollToBottom();
-    });
-  }
+  Timer.periodic(Duration(seconds: 1), (timer) {
+    final now = DateTime.now();
+    final randomIndex = now.second % 5; // 5 tip var, saniyeye göre değişsin
+
+    GroupMessageModel newMessage;
+
+    switch (randomIndex) {
+      case 0: // Text mesaj
+        newMessage = GroupMessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user123",
+          receiverId: "me",
+          name: "Ayşe",
+          surname: "Demir",
+          profileImage: "https://randomuser.me/api/portraits/women/10.jpg",
+          content: "Selam! Ne yapıyorsun?",
+          messageType: GroupMessageType.text,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 1: // Image mesaj
+        newMessage = GroupMessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user124",
+          receiverId: "me",
+          name: "Mehmet",
+          surname: "Kaya",
+          profileImage: "https://randomuser.me/api/portraits/men/15.jpg",
+          content: "https://picsum.photos/200/300", // Simülasyon görseli
+          messageType: GroupMessageType.image,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 2: // Document mesaj
+        newMessage = GroupMessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user125",
+          receiverId: "me",
+          name: "Fatma",
+          surname: "Koç",
+          profileImage: "https://randomuser.me/api/portraits/women/20.jpg",
+          content: "/documents/example_doc.pdf", // Sahte dosya yolu
+          messageType: GroupMessageType.document,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 3: // Link mesaj
+        newMessage = GroupMessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user126",
+          receiverId: "me",
+          name: "Ahmet",
+          surname: "Şahin",
+          profileImage: "https://randomuser.me/api/portraits/men/25.jpg",
+          content: "https://flutter.dev",
+          messageType: GroupMessageType.link,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+      case 4: // Poll mesaj
+        newMessage = GroupMessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user127",
+          receiverId: "me",
+          name: "Elif",
+          surname: "Yıldız",
+          profileImage: "https://randomuser.me/api/portraits/women/30.jpg",
+          content: "En sevdiğin mevsim hangisi?",
+          messageType: GroupMessageType.poll,
+          timestamp: now,
+          isSentByMe: false,
+          pollOptions: ["Yaz", "Kış", "İlkbahar", "Sonbahar"],
+        );
+        break;
+      default: // Fallback - Text
+        newMessage = GroupMessageModel(
+          id: now.millisecondsSinceEpoch.toString(),
+          senderId: "user123",
+          receiverId: "me",
+          name: "Ayşe",
+          surname: "Demir",
+          profileImage: "https://randomuser.me/api/portraits/women/10.jpg",
+          content: "Default mesaj.",
+          messageType: GroupMessageType.text,
+          timestamp: now,
+          isSentByMe: false,
+        );
+        break;
+    }
+
+    groupmessages.add(newMessage);
+    scrollToBottom();
+  });
+}
+
 }

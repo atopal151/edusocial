@@ -36,15 +36,13 @@ class Step1View extends StatelessWidget {
                 }
                 return CustomDropDown(
                   label: "Okul",
-                  items: controller.schools,
-                  selectedItem: controller.schools
-                              .contains(controller.selectedSchool.value) &&
-                          controller.selectedSchool.value.isNotEmpty
-                      ? controller.selectedSchool.value
-                      : controller.schools.first, // Varsayılan olarak ilk öğe
+                  items: controller.schools
+                      .map((e) => e['name'].toString())
+                      .toList(),
+                  selectedItem: controller.selectedSchool.value,
                   onChanged: (value) {
                     if (value != null) {
-                      controller.selectedSchool.value = value;
+                      controller.onSchoolChanged(value);
                     }
                   },
                 );
@@ -57,12 +55,7 @@ class Step1View extends StatelessWidget {
                 return CustomDropDown(
                   label: "Bölüm",
                   items: controller.departments,
-                  selectedItem: controller.departments
-                              .contains(controller.selectedDepartment.value) &&
-                          controller.selectedDepartment.value.isNotEmpty
-                      ? controller.selectedDepartment.value
-                      : controller
-                          .departments.first, // Varsayılan olarak ilk öğe 
+                  selectedItem: controller.selectedDepartment.value,
                   onChanged: (value) {
                     if (value != null) {
                       controller.selectedDepartment.value = value;
@@ -76,9 +69,8 @@ class Step1View extends StatelessWidget {
                       "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir."),
               SizedBox(height: 30),
               CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
+                height: 50,
+                borderRadius: 15,
                 text: "Devam Et",
                 onPressed: controller.proceedToNextStep,
                 isLoading: controller.isLoading,

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../models/chat_detail_model.dart';
+import '../../../models/chat_detail_model.dart';
 
 class ImageMessageWidget extends StatelessWidget {
   final MessageModel message;

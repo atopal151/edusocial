@@ -12,7 +12,10 @@ class ProfileController extends GetxController {
   var bio =
       "Lise buluşması için etkinlik yapıyoruz katılmak isteyen tüm arkadaşları bu güzel etkinliğe bekliyoruz.."
           .obs;
-
+  var coverImage =
+      "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+          .obs;
+  var username="@ckara".obs;
   var postCount = 352.obs;
   var followers = 2352.obs;
   var following = 532.obs;

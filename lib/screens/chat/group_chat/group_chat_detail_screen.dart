@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/group_message_input_field.dart';
-import '../../../components/widgets/document_message_widget.dart';
-import '../../../components/widgets/image_message_widget.dart';
-import '../../../components/widgets/link_messaje_widget.dart';
-import '../../../components/widgets/poll_message_widget.dart';
-import '../../../components/widgets/text_message_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_document_message_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_image_message_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_link_messaje_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_text_message_widget.dart';
 import '../../../components/widgets/tree_point_bottom_sheet.dart';
 import '../../../controllers/social/group_chat_detail_controller.dart';
-import '../../../models/chat_detail_model.dart';
+import '../../../models/group_message_model.dart';
 
 class GroupChatDetailScreen extends StatefulWidget {
   const GroupChatDetailScreen({super.key});
@@ -98,16 +98,16 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                     padding: EdgeInsets.only(bottom: 75),
                     itemBuilder: (context, index) {
                       final message = controller.groupmessages[index];
-                      if (message.messageType == MessageType.text) {
-                        return TextMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.document) {
-                        return DocumentMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.image) {
-                        return ImageMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.link) {
-                        return LinkMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.poll) {
-                        return PollMessageWidget(
+                      if (message.messageType == GroupMessageType.text) {
+                        return GroupTextMessageWidget(message: message);
+                      } else if (message.messageType == GroupMessageType.document) {
+                        return GroupDocumentMessageWidget(message: message);
+                      } else if (message.messageType == GroupMessageType.image) {
+                        return GroupImageMessageWidget(message: message);
+                      } else if (message.messageType == GroupMessageType.link) {
+                        return GroupLinkMessageWidget(message: message);
+                      } else if (message.messageType == GroupMessageType.poll) {
+                        return GroupPollMessageWidget(
                           message: message,
                           pollVotes: controller.pollVotes,
                           selectedOption: controller.selectedPollOption,

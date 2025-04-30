@@ -2,12 +2,17 @@ import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../components/widgets/edusocial_dialog.dart';
+import '../services/auth_service.dart';
+
 class LoginController extends GetxController {
   late TextEditingController emailController;
   late TextEditingController passwordController;
   var isLoading = false.obs;
   var isFirstLogin =
       true.obs; // Kullanıcının ilk kez giriş yapıp yapmadığını kontrol et
+
+  final AuthService _authService = AuthService();
 
   @override
   void onInit() {
@@ -17,32 +22,40 @@ class LoginController extends GetxController {
   }
 
   void login() async {
-    //kullanıcı girişinin kontrol edileceği alan
-    
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      Get.snackbar("Hata", "Lütfen tüm alanları doldurun.");
+      EduSocialDialogs.showError(
+        title: "Uyarı!",
+        message: "Lütfen tüm alanları doldurun.",
+      );
       return;
     }
 
     isLoading.value = true;
-    await Future.delayed(Duration(seconds: 2)); // Mock API simülasyonu
+    final success =
+        await _authService.login(emailController.text, passwordController.text);
     isLoading.value = false;
 
-    Get.snackbar("Başarılı", "Giriş başarılı!");
+    if (success) {
+      final email = emailController.text;
+      final onboardingController = Get.find<OnboardingController>();
+      
 
-    final email = emailController.text;
-    final onboardingController = Get.find<OnboardingController>();
-    onboardingController.userEmail = email;
-
-    // Eğer kullanıcı ilk kez giriş yapıyorsa onboarding sayfalarına yönlendir
-    if (isFirstLogin.value) {
-      Future.delayed(Duration(milliseconds: 200), () {
-        Get.offAllNamed('/step1');
-      });
+      if (isFirstLogin.value) {
+        onboardingController.userEmail = email;
+        onboardingController.loadSchoolList();
+        Future.delayed(Duration(milliseconds: 200), () {
+          Get.offAllNamed('/step1');
+        });
+      } else {
+        Future.delayed(Duration(milliseconds: 200), () {
+          Get.offAllNamed('/home');
+        });
+      }
     } else {
-      Future.delayed(Duration(milliseconds: 200), () {
-        Get.offAllNamed('/home');
-      });
+       EduSocialDialogs.showError(
+        title: "Uyarı!",
+        message: "Giriş işlemi başarısız. Lütfen bilgilerinizi kontrol edin.",
+      );
     }
   }
 

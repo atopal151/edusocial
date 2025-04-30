@@ -1,3 +1,4 @@
+import 'package:edusocial/services/post_service.dart';
 import 'package:get/get.dart';
 import '../models/post_model.dart';
 
@@ -59,6 +60,21 @@ class PostController extends GetxController {
     isLoading.value = false;
   }
 
+
+void fetchHomePosts() async {
+  isHomeLoading.value = true;
+  try {
+    final posts = await PostServices.fetchHomePosts();
+    postHomeList.assignAll(posts);
+    print(posts);
+  } catch (e) {
+    print("❗ Post çekme hatası: $e");
+  } finally {
+    isHomeLoading.value = false;
+  }
+}
+
+/*
     void fetchHomePosts() async {
     await Future.delayed(Duration(seconds: 2)); // API çağrısı simülasyonu
 
@@ -254,5 +270,5 @@ class PostController extends GetxController {
 
     postHomeList.assignAll(fetchedHomePosts);
     isHomeLoading.value = false;
-  }
+  }*/
 }

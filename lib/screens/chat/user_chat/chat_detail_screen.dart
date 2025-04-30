@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/message_input_field.dart';
-import '../../../components/widgets/document_message_widget.dart';
-import '../../../components/widgets/image_message_widget.dart';
-import '../../../components/widgets/link_messaje_widget.dart';
-import '../../../components/widgets/poll_message_widget.dart';
-import '../../../components/widgets/text_message_widget.dart';
+import '../../../components/widgets/chat_widget/document_message_widget.dart';
+import '../../../components/widgets/chat_widget/image_message_widget.dart';
+import '../../../components/widgets/chat_widget/link_messaje_widget.dart';
+import '../../../components/widgets/chat_widget/poll_message_widget.dart';
+import '../../../components/widgets/chat_widget/text_message_widget.dart';
 import '../../../controllers/social/chat_detail_controller.dart';
 import '../../../models/chat_detail_model.dart';
 

@@ -3,14 +3,11 @@ class StoryModel {
   final String userId;
   final String username;
   final String profileImage;
-  final bool isMyStory;
-
+  late final bool isMyStory;
   final bool isViewed;
-
-    /// Değiştirilebilir alanlar
   List<String> storyUrls;
-  bool hasStory;
   DateTime createdAt;
+  bool hasStory;
 
   StoryModel({
     required this.id,
@@ -18,9 +15,26 @@ class StoryModel {
     required this.username,
     required this.profileImage,
     required this.isMyStory,
-    required this.hasStory,
+    required this.isViewed,
     required this.storyUrls,
-    this.isViewed = false,
     required this.createdAt,
+    required this.hasStory,
   });
+
+  factory StoryModel.fromJson(Map<String, dynamic> json) {
+    final stories = json["stories"] ?? [];
+    return StoryModel(
+      id: json["id"].toString(),
+      userId: json["user_id"].toString(),
+      username: json["username"] ?? "",
+      profileImage: json["profile_image"] ?? "",
+      isMyStory: false,
+      hasStory: false,
+      isViewed: false,
+      storyUrls: List<String>.from(stories.map((e) => e["url"])),
+      createdAt: stories.isNotEmpty
+          ? DateTime.parse(stories[0]["created_at"])
+          : DateTime.now(),
+    );
+  }
 }

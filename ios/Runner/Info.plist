@@ -11,6 +11,12 @@
  	 	<string>public.content</string>
  		 <string>public.data</string>
 	</array>
+	<key>NSAppTransportSecurity</key>
+		<dict>
+  			<key>NSAllowsArbitraryLoads</key>
+  			<true/>
+		</dict>
+
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Konum bilgisine ihtiyacımız var</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -120,12 +120,21 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   @override
   Widget build(BuildContext context) {
     final stories = storyController.getOtherStories();
-
+    if (stories.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Text(
+            "Story bulunamadı",
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ),
+      );
+    }
     return SafeArea(
-
-  top: true,
-  bottom: false,
-  minimum: EdgeInsets.only(top: 12),
+      top: true,
+      bottom: false,
+      minimum: EdgeInsets.only(top: 12),
       child: Scaffold(
         backgroundColor: Colors.black,
         body: PageView.builder(
@@ -135,7 +144,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
           itemBuilder: (context, index) {
             final story = stories[index];
             final isCurrentStory = index == _currentIndex;
-      
+
             return GestureDetector(
               onLongPressStart: (_) => _pauseStory(),
               onLongPressEnd: (_) => _resumeStory(),

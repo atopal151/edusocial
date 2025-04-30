@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../models/chat_detail_model.dart';
+import '../../../models/chat_detail_model.dart';
 
 
 class TextMessageWidget extends StatelessWidget {

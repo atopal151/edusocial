@@ -1,14 +1,39 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:get_storage/get_storage.dart';
 import '../models/hot_topics_model.dart';
 
 class HotTopicsService {
+
+  static final String baseUrl = "https://stageapi.edusocial.pl/mobile";
   Future<List<HotTopicsModel>> fetchHotTopics() async {
-    await Future.delayed(Duration(seconds: 1)); // Simülasyon
-    return [
-      HotTopicsModel(title: "Arkadaşların seri bir şekilde evlenmesi"),
-      HotTopicsModel(title: "Vizeden önce kampüste sabahlama planları"),
-      HotTopicsModel(title: "KYK yemek menüsüne isyanlar"),
-      HotTopicsModel(title: "Not ortalaması vs sosyal hayat"),
-      HotTopicsModel(title: "LinkedIn'de staj paylaşımları"),
-    ];
+    try {
+      final box = GetStorage();
+      final token = box.read("token");
+
+      final response = await http.get(
+        Uri.parse("$baseUrl/timeline/topics"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
+
+      print("📥 Topics Response: ${response.statusCode}");
+      print("📥 Topics Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final dataList = jsonData['data'] as List;
+        return dataList
+            .map((json) => HotTopicsModel.fromJson(json))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("❗ Topics alınırken hata: $e");
+      return [];
+    }
   }
 }

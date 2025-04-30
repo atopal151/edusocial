@@ -32,7 +32,7 @@ class _MyStoryListState extends State<MyStoryList> {
             padding: const EdgeInsets.only(top: 10.0),
             child: Column(
               children: [
-                Stack(
+                Stack( 
                   children: [
                     Container(
                       width: 65,
