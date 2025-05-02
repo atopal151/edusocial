@@ -1,15 +1,15 @@
 import 'dart:convert';
+import 'package:edusocial/utils/constants.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
   static final GetStorage _box = GetStorage();
-  static final String baseUrl = "https://stageapi.edusocial.pl/mobile";
 
   String? lastErrorMessage; // 🌟 Hata mesajını buraya kaydediyoruz
   Future<bool> login(String email, String password) async {
     try {
-      final url = Uri.parse('$baseUrl/login');
+      final url = Uri.parse('${AppConstants.baseUrl}/login');
       final response = await http.post(
         url,
         headers: {
@@ -50,7 +50,7 @@ class AuthService {
     required String confirmPassword,
   }) async {
     try {
-      final url = Uri.parse('$baseUrl/register');
+      final url = Uri.parse('${AppConstants.baseUrl}/register');
       final response = await http.post(
         url,
         headers: {

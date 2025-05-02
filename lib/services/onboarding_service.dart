@@ -1,15 +1,16 @@
 import 'dart:convert';
+import 'package:edusocial/utils/constants.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class OnboardingServices {
   static final _box = GetStorage();
-  static final String baseUrl = "https://stageapi.edusocial.pl/mobile";
 
   //-------------------------------------------------------------//
+
+  /// Okulları ve bölümleri birlikte getirir
   static Future<List<Map<String, dynamic>>> fetchSchools() async {
     final token = _box.read('token');
-
     if (token == null) {
       print("❗ Token bulunamadı! Okul listesi çekilemedi.");
       return [];
@@ -17,7 +18,7 @@ class OnboardingServices {
 
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/schools'),
+        Uri.parse('${AppConstants.baseUrl}/schools'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -33,6 +34,7 @@ class OnboardingServices {
             .map<Map<String, dynamic>>((school) => {
                   "id": school['id'],
                   "name": school['name'],
+                  "departments": school['departments'] ?? [],
                 })
             .toList();
       } else {
@@ -45,28 +47,36 @@ class OnboardingServices {
     }
   }
 
-  //-------------------------------------------------------------//
-  static Future<List<String>> fetchDepartments(int schoolId) async {
+  /// Okul ve bölüm seçimi kaydetme (PUT /school)
+  static Future<bool> updateSchool(
+      {required int schoolId, required int departmentId}) async {
     final token = _box.read('token');
+    if (token == null) {
+      print("❗ Token bulunamadı! Okul güncelleme işlemi yapılamadı.");
+      return false;
+    }
+
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/schools/school_departments'),
+      final response = await http.put(
+        Uri.parse('${AppConstants.baseUrl}/schools'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
+        body: jsonEncode({
+          "school_id": schoolId,
+          "school_department_id": departmentId,
+        }),
       );
 
-      if (response.statusCode == 200) {
-        final List departments = jsonDecode(response.body)['data'];
-        return departments.map<String>((e) => e['name'].toString()).toList();
-      } else {
-        print("❗ Bölüm listesi alınamadı: ${response.body}");
-        return [];
-      }
+      print("📤 Update School Response: ${response.statusCode}");
+      print("📤 Update School Body: ${response.body}");
+
+      return response.statusCode == 200;
     } catch (e) {
-      print("❗ Bölüm listesi yükleme hatası: $e");
-      return [];
+      print("❗ Okul güncelleme hatası: $e");
+      return false;
     }
   }
 
@@ -80,7 +90,7 @@ class OnboardingServices {
 
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/school/lesson'),
+        Uri.parse('${AppConstants.baseUrl}/schools/lesson'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -109,7 +119,7 @@ class OnboardingServices {
     final token = _box.read('token');
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/groups/join'),
+        Uri.parse('${AppConstants.baseUrl}/groups/join'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
@@ -133,7 +143,7 @@ class OnboardingServices {
     final token = _box.read('token');
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/groups'),
+        Uri.parse('${AppConstants.baseUrl}/groups'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',

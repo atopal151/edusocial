@@ -41,9 +41,16 @@ class GroupController extends GetxController {
     fetchSuggestionGroups();
 
     categoryGroup.value = ["Genel", "Felsefe", "Spor", "Tarih"]; // örnek
-    loadMockGroupData(); // backend yerine simule veri
+    //loadMockGroupData(); // backend yerine simule veri
     ever(selectedCategory, (_) => updateFilteredGroups());
   }
+
+void joinSuggestionGroup(String id) {
+  final index = suggestionGroups.indexWhere((group) => group.id == id);
+  if (index != -1) {
+    Get.snackbar("Katıldın", "${suggestionGroups[index].groupName} grubuna katıldın");
+  }
+}
 
   void getCreateGroup() {
     Get.toNamed("/createGroup");

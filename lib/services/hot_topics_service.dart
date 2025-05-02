@@ -1,18 +1,18 @@
 import 'dart:convert';
+import 'package:edusocial/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import '../models/hot_topics_model.dart';
 
 class HotTopicsService {
 
-  static final String baseUrl = "https://stageapi.edusocial.pl/mobile";
   Future<List<HotTopicsModel>> fetchHotTopics() async {
     try {
       final box = GetStorage();
       final token = box.read("token");
 
       final response = await http.get(
-        Uri.parse("$baseUrl/timeline/topics"),
+        Uri.parse("${AppConstants.baseUrl}/timeline/topics"),
         headers: {
           "Authorization": "Bearer $token",
           "Accept": "application/json",

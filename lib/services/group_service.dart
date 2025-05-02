@@ -1,12 +1,42 @@
 // group_services.dart
+import 'dart:convert';
+
 import 'package:edusocial/models/grup_suggestion_model.dart';
+import 'package:edusocial/utils/constants.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/group_model.dart';
 
 class GroupServices {
   // group_services.dart
 
+
   Future<List<GroupSuggestionModel>> fetchSuggestionGroups() async {
+    final box = GetStorage();
+    try {
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/timeline/groups"),
+        headers: {
+          'Authorization': 'Bearer ${box.read('token')}',
+        },
+      );
+      print("📥 Group Suggestion Response: ${response.statusCode}");
+      print("📥 Group Suggestion Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        final List<dynamic> data = jsonBody['data'] ?? [];
+
+        return data.map((item) => GroupSuggestionModel.fromJson(item)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("❗ Group Suggestion error: $e");
+      return [];
+    }
+    /*
     await Future.delayed(Duration(seconds: 1));
     return [
       GroupSuggestionModel(
@@ -57,7 +87,7 @@ class GroupServices {
          memberCount: 198,
         description: "Roman, şiir ve kısa hikayeler üzerine kitap önerileri ve tartışmalar için oluşturulmuş bir grup."
       ),
-    ];
+    ];*/
   }
 
   Future<List<GroupModel>> fetchUserGroups() async {
@@ -79,7 +109,7 @@ class GroupServices {
         description: "Fizik üzerine tartışmalar.",
         imageUrl:
             "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-       memberCount: 443,
+        memberCount: 443,
         category: "Fizik",
         isJoined: true,
       ),
@@ -89,7 +119,7 @@ class GroupServices {
         description: "Edebiyat severlerin bir araya geldiği grup.",
         imageUrl:
             "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-       memberCount: 776,
+        memberCount: 776,
         category: "Eğitim",
         isJoined: true,
       ),
@@ -105,7 +135,7 @@ class GroupServices {
         description: "Kimya severlerin bir araya geldiği grup.",
         imageUrl:
             "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-       memberCount: 35,
+        memberCount: 35,
         category: "Kimya",
         isJoined: true,
       ),
@@ -115,7 +145,7 @@ class GroupServices {
         description: "Yeni teknolojiler ve haberler.",
         imageUrl:
             "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-       memberCount: 55,
+        memberCount: 55,
         category: "Teknoloji",
         isJoined: false,
       ),

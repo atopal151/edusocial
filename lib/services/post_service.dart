@@ -1,18 +1,18 @@
 import 'dart:convert';
+import 'package:edusocial/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import '../models/post_model.dart';
 
 class PostServices {
   static final _box = GetStorage();
-  static final String baseUrl = "https://stageapi.edusocial.pl/mobile";
 
   static Future<List<PostModel>> fetchHomePosts() async {
     final token = _box.read('token');
 
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/timeline/posts'),
+        Uri.parse('${AppConstants.baseUrl}/timeline/posts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',

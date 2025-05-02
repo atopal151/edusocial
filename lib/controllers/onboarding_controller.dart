@@ -1,3 +1,4 @@
+import 'package:edusocial/components/widgets/edusocial_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../services/onboarding_service.dart';
@@ -5,11 +6,13 @@ import '../services/onboarding_service.dart';
 class OnboardingController extends GetxController {
   RxString selectedSchool = "".obs;
   RxString selectedDepartment = "".obs;
+  int? selectedSchoolId;
+  int? selectedDepartmentId;
+  RxString warningMessage = ''.obs;
   RxBool isLoading = false.obs;
 
-  RxList<Map<String, dynamic>> schools =
-      <Map<String, dynamic>>[].obs; // ✅ id ve name
-  RxList<String> departments = <String>[].obs;
+  RxList<Map<String, dynamic>> schools = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> departments = <Map<String, dynamic>>[].obs;
 
   TextEditingController courseController = TextEditingController();
   RxList<String> courses = <String>[].obs;
@@ -17,7 +20,6 @@ class OnboardingController extends GetxController {
   RxList<Map<String, dynamic>> groups = <Map<String, dynamic>>[].obs;
 
   String userEmail = "";
-  int? selectedSchoolId;
 
   @override
   void onInit() {
@@ -28,7 +30,14 @@ class OnboardingController extends GetxController {
   //-------------------------------------------------------------//
   void addCourse() {
     if (courseController.text.isNotEmpty) {
-      courses.add(courseController.text);
+      if (!courses.contains(courseController.text)) {
+        courses.add(courseController.text);
+      } else {
+        EduSocialDialogs.showError(
+          title: "Uyarı",
+          message: "Bu dersi zaten eklediniz.",
+        );
+      }
       courseController.clear();
     }
   }
@@ -43,18 +52,21 @@ class OnboardingController extends GetxController {
     isLoading.value = true;
 
     try {
-      // Dersleri sırayla kaydet
       for (var course in courses) {
         bool success = await OnboardingServices.addLesson(course);
         if (!success) {
-          print("❗ Ders eklenemedi: $course");
+          EduSocialDialogs.showError(
+            title: "Ders Zaten Eklenmiş",
+            message: "'$course' dersi daha önce eklenmiş.",
+          );
+
+          isLoading.value = false;
+        } else {
+          await fetchGroupsFromApi();
+          isLoading.value = false;
+          Get.toNamed("/step3");
         }
       }
-
-      // Tüm dersler eklenince Step3'e geç
-      await fetchGroupsFromApi();
-      isLoading.value = false;
-      Get.toNamed("/step3");
     } catch (e) {
       print("❗ Ders ekleme işlemlerinde hata: $e");
       isLoading.value = false;
@@ -77,107 +89,91 @@ class OnboardingController extends GetxController {
   }
 
   //-------------------------------------------------------------//
-  void loadSchoolList() async {
+  /// Okul listesini yükle
+  Future<void> loadSchoolList() async {
     print("🌟 loadSchoolList çağrıldı.");
     isLoading.value = true;
     try {
       final data = await OnboardingServices.fetchSchools();
       print("🌟 fetchSchools tamamlandı, data: $data");
       schools.assignAll(data);
+
       if (schools.isNotEmpty) {
         selectedSchool.value = schools.first['name'];
         selectedSchoolId = schools.first['id'];
-        loadDepartments(selectedSchoolId!);
+        _loadDepartmentsForSelectedSchool();
       }
     } catch (e) {
-      print("Okul listesi yüklenirken hata: $e");
+      print("❗ Okul listesi yüklenirken hata: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-  //-------------------------------------------------------------//
-  Future<void> loadDepartments(int schoolId) async {
-    isLoading.value = true;
-    try {
-      final data = await OnboardingServices.fetchDepartments(schoolId);
-      departments.assignAll(data);
-      if (departments.isNotEmpty) {
-        selectedDepartment.value = departments.first;
-      }
-    } catch (e) {
-      print("Bölüm listesi yüklenirken hata: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  //-------------------------------------------------------------//
+  /// Seçilen okul değişince bölümleri yükle
   Future<void> onSchoolChanged(String schoolName) async {
     final selected =
         schools.firstWhereOrNull((school) => school['name'] == schoolName);
+
     if (selected != null) {
       selectedSchool.value = selected['name'];
       selectedSchoolId = selected['id'];
+      _loadDepartmentsForSelectedSchool();
+    }
+  }
 
-      isLoading.value = true;
-      await loadDepartments(selectedSchoolId!);
-      isLoading.value = false;
+  /// Seçilen okulun bölümlerini yükler
+  void _loadDepartmentsForSelectedSchool() {
+    final selected =
+        schools.firstWhereOrNull((school) => school['id'] == selectedSchoolId);
+    if (selected != null && selected['departments'] != null) {
+      departments.assignAll(
+        (selected['departments'] as List)
+            .map<Map<String, dynamic>>((d) => {
+                  "id": d['id'],
+                  "title": d['title'],
+                })
+            .toList(),
+      );
+
+      if (departments.isNotEmpty) {
+        selectedDepartment.value = departments.first['title'];
+        selectedDepartmentId = departments.first['id'];
+      }
+    }
+  }
+
+  /// Bölüm seçildiğinde çalışır
+  void onDepartmentChanged(String departmentName) {
+    final selected =
+        departments.firstWhereOrNull((d) => d['title'] == departmentName);
+
+    if (selected != null) {
+      selectedDepartment.value = selected['title'];
+      selectedDepartmentId = selected['id'];
+    }
+  }
+
+  /// Okul ve bölümü backend'e kaydet
+  Future<bool> submitSchoolAndDepartment() async {
+    if (selectedSchoolId != null && selectedDepartmentId != null) {
+      print("📤 Okul ve Bölüm Gönderiliyor:");
+      print("📚 School ID: ${selectedSchoolId}");
+      print("🏛️ Department ID: ${selectedDepartmentId}");
+
+      final success = await OnboardingServices.updateSchool(
+        schoolId: selectedSchoolId!,
+        departmentId: selectedDepartmentId!,
+      );
+
+      return success;
+    } else {
+      return false;
     }
   }
 
   //-------------------------------------------------------------//
-  /*
-  void fetchMockGroups() {
-    //tavsiye edilen grupların getireleceği alan
-    groups.value = [
-      {
-        "name": "Murata hayranlar Grubu",
-        "description":
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "members": 352,
-        "image":
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        "action": "Katılma İsteği Gönder"
-      },
-      {
-        "name": "Teknoloji Severler",
-        "description":
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "members": 500,
-        "image":
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        "action": "Gruba Katıl"
-      },
-      {
-        "name": "Teknoloji Severler",
-        "description":
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "members": 500,
-        "image":
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        "action": "Gruba Katıl"
-      },
-      {
-        "name": "Teknoloji Severler",
-        "description":
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "members": 500,
-        "image":
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        "action": "Gruba Katıl"
-      },
-      {
-        "name": "Teknoloji Severler",
-        "description":
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        "members": 500,
-        "image":
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        "action": "Gruba Katıl"
-      }
-    ];
-  }*/
+
   Future<void> fetchGroupsFromApi() async {
     isLoading.value = true;
     try {
@@ -191,13 +187,26 @@ class OnboardingController extends GetxController {
   }
 
   //-------------------------------------------------------------//
-  void proceedToNextStep() {
-    //okul-ders alanının seçilip gönderileceği alan
-    isLoading.value = true;
-    Future.delayed(Duration(seconds: 2), () {
+  void proceedToNextStep() async {
+    if (selectedSchoolId != null && selectedDepartmentId != null) {
+      isLoading.value = true;
+
+      // 🔥 Önce submit işlemini yap
+      final success = await submitSchoolAndDepartment();
+
+      if (success) {
+        // ✅ Eğer kayıt başarılıysa Step2'ye geç
+        Get.toNamed("/step2");
+      } else {
+        // ❌ Başarısızsa ekrana mesaj bas (isteğe bağlı)
+        Get.snackbar("Hata", "Okul ve bölüm bilgileri kaydedilemedi.");
+      }
+
       isLoading.value = false;
-      Get.toNamed("/step2");
-    });
+    } else {
+      Get.snackbar(
+          "Eksik Bilgi", "Lütfen okul ve bölüm seçimini tamamlayınız.");
+    }
   }
 
   //-------------------------------------------------------------//

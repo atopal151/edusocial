@@ -54,11 +54,13 @@ class Step1View extends StatelessWidget {
                 }
                 return CustomDropDown(
                   label: "Bölüm",
-                  items: controller.departments,
+                  items: controller.departments
+                      .map((e) => e['title'].toString())
+                      .toList(),
                   selectedItem: controller.selectedDepartment.value,
                   onChanged: (value) {
                     if (value != null) {
-                      controller.selectedDepartment.value = value;
+                      controller.onDepartmentChanged(value);
                     }
                   },
                 );
