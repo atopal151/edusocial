@@ -1,8 +1,6 @@
 import 'package:edusocial/components/buttons/primary_button.dart';
-import 'package:edusocial/controllers/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import '../../components/dialogs/logout_dialog.dart';
 import '../../components/user_appbar/back_appbar.dart';
 
@@ -14,7 +12,6 @@ class UserSettingsScreen extends StatefulWidget {
 }
 
 class _UserSettingsScreenState extends State<UserSettingsScreen> {
-  final SettingsController controller = Get.find<SettingsController>();
 
   @override
   Widget build(BuildContext context) {

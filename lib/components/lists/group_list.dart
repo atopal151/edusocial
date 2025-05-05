@@ -1,8 +1,8 @@
+import 'package:edusocial/models/group_search_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../models/group_model.dart';
 
 class GroupListItem extends StatelessWidget {
   final GroupSearchModel group;

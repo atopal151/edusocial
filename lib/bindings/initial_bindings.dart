@@ -13,7 +13,7 @@ import 'package:edusocial/controllers/group_controller.dart';
 import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/topics_controller.dart';
 import 'package:edusocial/controllers/post_controller.dart';
-import 'package:edusocial/controllers/settings_controller.dart';
+import 'package:edusocial/controllers/profile_update_controller.dart';
 
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/social/chat_controller.dart';
@@ -42,6 +42,6 @@ class InitialBindings extends Bindings {
     Get.lazyPut(() => TopicsController());
     Get.lazyPut(() => PostController());
     Get.lazyPut(() => ChatController());
-    Get.lazyPut(() => SettingsController());
+    Get.lazyPut(() => ProfileUpdateController());
   }
 }

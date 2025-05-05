@@ -1,4 +1,3 @@
-// 1. event_model.dart
 class EventModel {
   final String title;
   final String description;
@@ -13,5 +12,14 @@ class EventModel {
     required this.image,
     required this.location,
   });
-}
 
+  factory EventModel.fromJson(Map<String, dynamic> json) {
+    return EventModel(
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      date: json['date'] ?? '',
+      image: json['image'] ?? '',
+      location: json['location'] ?? '',
+    );
+  }
+}
