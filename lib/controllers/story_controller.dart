@@ -10,7 +10,7 @@ class StoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchStories(); // simülasyon
+    //fetchStories(); // simülasyon
   }
 
 //----------------------------------------------------------------------------//

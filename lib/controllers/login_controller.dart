@@ -1,4 +1,5 @@
 import 'package:edusocial/controllers/onboarding_controller.dart';
+import 'package:edusocial/controllers/story_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -51,6 +52,9 @@ class LoginController extends GetxController {
       } else {
         /// Zaten onboarding tamamlamış, ana ekrana
         Future.delayed(Duration(milliseconds: 200), () {
+
+        final storyController = Get.find<StoryController>();
+        storyController.fetchStories();
           Get.offAllNamed('/home');
         });
       }
