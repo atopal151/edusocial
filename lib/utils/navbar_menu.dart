@@ -29,10 +29,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
             padding: EdgeInsets.only(top: 15, bottom: 30, left: 15, right: 15),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black12, blurRadius: 10, spreadRadius: 2),
-              ],
+           
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

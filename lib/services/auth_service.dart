@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:edusocial/utils/constants.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -7,14 +8,14 @@ class AuthService {
   static final GetStorage _box = GetStorage();
 
   String? lastErrorMessage; // 🌟 Hata mesajını buraya kaydediyoruz
-  Future<bool> login(String email, String password) async {
+  Future<Map<String, dynamic>?> login(String email, String password) async {
     try {
       final url = Uri.parse('${AppConstants.baseUrl}/login');
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json', // BURAYI DA EKLEDİK
+          'Accept': 'application/json',
         },
         body: jsonEncode({
           'login': email,
@@ -29,15 +30,14 @@ class AuthService {
         if (token != null) {
           _box.write('token', token);
           print("Token başarıyla kaydedildi: $token");
-          return true;
+          return data['data']['user']; // 🛑 Kullanıcı bilgilerini döndür
         }
       }
       lastErrorMessage = data["message"] ?? "Giriş başarısız.";
-      print("Login failed: ${data["message"] ?? response.body}");
-      return false;
+      return null;
     } catch (e) {
       print("Login error: $e");
-      return false;
+      return null;
     }
   }
 
@@ -86,5 +86,10 @@ class AuthService {
       print("Register error: $e");
       return false;
     }
+  }
+
+  static void logout() {
+    _box.erase(); // Tüm kayıtlı verileri temizler
+    Get.offAllNamed("/login"); // Kullanıcıyı login ekranına atar
   }
 }

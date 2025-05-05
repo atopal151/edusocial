@@ -31,28 +31,31 @@ class LoginController extends GetxController {
     }
 
     isLoading.value = true;
-    final success =
+    final user =
         await _authService.login(emailController.text, passwordController.text);
     isLoading.value = false;
 
-    if (success) {
-      final email = emailController.text;
-      final onboardingController = Get.find<OnboardingController>();
-      
+    if (user != null) {
+      final schoolId = user['school_id'];
+      final departmentId = user['school_department_id'];
 
-      if (isFirstLogin.value) {
-        onboardingController.userEmail = email;
+      if (schoolId == null || departmentId == null) {
+        /// İlk giriş, onboarding'e git
+        final onboardingController = Get.find<OnboardingController>();
+        onboardingController.userEmail = emailController.text;
         onboardingController.loadSchoolList();
+
         Future.delayed(Duration(milliseconds: 200), () {
           Get.offAllNamed('/step1');
         });
       } else {
+        /// Zaten onboarding tamamlamış, ana ekrana
         Future.delayed(Duration(milliseconds: 200), () {
           Get.offAllNamed('/home');
         });
       }
     } else {
-       EduSocialDialogs.showError(
+      EduSocialDialogs.showError(
         title: "Uyarı!",
         message: "Giriş işlemi başarısız. Lütfen bilgilerinizi kontrol edin.",
       );
