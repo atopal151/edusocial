@@ -2,19 +2,23 @@ import '../utils/constants.dart'; // AppConstants.baseUrl buradaysa
 
 class UserSearchModel {
   final String name;
+  final String surname;
+  final String username;
   final String university;
   final String degree;
   final String department;
   final String profileImage;
-  final bool isOnline;
+  final bool isActive;
 
   UserSearchModel({
     required this.name,
+    required this.surname,
+    required this.username,
     required this.university,
     required this.degree,
     required this.department,
     required this.profileImage,
-    required this.isOnline,
+    required this.isActive,
   });
 
   factory UserSearchModel.fromJson(Map<String, dynamic> json) {
@@ -25,11 +29,13 @@ class UserSearchModel {
 
     return UserSearchModel(
       name: json['name'] ?? '',
+      surname: json['surname'] ?? '',
+      username: json['username'] ?? '',
       university: json['university'] ?? '',
       degree: json['degree'] ?? '',
       department: json['department'] ?? '',
       profileImage: fullAvatarUrl,
-      isOnline: json['is_online'] ?? false,
+      isActive: json['is_active'] ?? false,
     );
   }
 }

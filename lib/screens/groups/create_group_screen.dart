@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/controllers/group_controller/create_group_controller.dart';
+import 'package:edusocial/services/group_services/create_group_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -34,6 +35,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             createGroupController.descriptionGroupController.text.length;
       });
     });
+
+    // 🔽 Sadece test için bir kez çağır
+    CreateGroupService().testCreateGroupWithDemoData();
   }
 
   @override
@@ -172,19 +176,21 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 backgroundColor: Color(0xffffffff),
               ),
               SizedBox(height: 20),
-              
               Obx(() => CustomDropDown(
                     color: Color(0xff414751),
                     label: "Grup Alanı",
-                    items:
-                        createGroupController.groupAreas.map((e) => e.name).toList(),
+                    items: createGroupController.groupAreas
+                        .map((e) => e.name)
+                        .toList(),
                     selectedItem:
-                        createGroupController.selectedGroupArea.value?.name ?? "",
+                        createGroupController.selectedGroupArea.value?.name ??
+                            "",
                     onChanged: (value) {
                       final selected = createGroupController.groupAreas
                           .firstWhereOrNull((e) => e.name == value);
                       if (selected != null) {
-                        createGroupController.selectedGroupArea.value = selected;
+                        createGroupController.selectedGroupArea.value =
+                            selected;
                       }
                     },
                   )),
@@ -232,7 +238,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       height: 40,
                       borderRadius: 15,
                       onPressed: () => createGroupController.createGroup(),
-                     isLoading: createGroupController.isLoading,
+                      isLoading: createGroupController.isLoading,
                       backgroundColor: Color(0xfffb535c),
                       textColor: Color(0xffffffff),
                     ),

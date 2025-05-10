@@ -34,8 +34,7 @@ class UserListItem extends StatelessWidget {
                       radius: 24,
                       backgroundImage: user.profileImage.isNotEmpty
                           ? NetworkImage(getFullAvatarUrl(user.profileImage))
-                          : AssetImage('images/user1.png')
-                              as ImageProvider,
+                          : AssetImage('images/user1.png') as ImageProvider,
                     ),
                     Positioned(
                       bottom: 0,
@@ -44,7 +43,7 @@ class UserListItem extends StatelessWidget {
                         width: 15,
                         height: 15,
                         decoration: BoxDecoration(
-                          color: user.isOnline
+                          color: user.isActive
                               ? Color(0xff4DD64B)
                               : Color(0xffd9d9d9),
                           shape: BoxShape.circle,
@@ -58,17 +57,20 @@ class UserListItem extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.name,
+                    Text('${user.name} ${user.surname}',
                         style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Color(0xff414751))),
-                    Text("${user.university} - ${user.degree}",
+                    Text('@${user.username}',
+                        style:
+                            TextStyle(fontSize: 12, color: Color(0xff9CA3AE))),
+                    /*Text("${user.university} - ${user.degree}",
                         style:
                             TextStyle(fontSize: 12, color: Color(0xff9CA3AE))),
                     Text(user.department,
                         style: GoogleFonts.inter(
-                            fontSize: 12, color: Color(0xff9CA3AE))),
+                            fontSize: 12, color: Color(0xff9CA3AE))),*/
                   ],
                 )
               ],

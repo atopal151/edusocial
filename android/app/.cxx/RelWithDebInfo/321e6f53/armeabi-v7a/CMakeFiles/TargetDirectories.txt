@@ -1,0 +1,2 @@
+/Users/alaettintopal/Desktop/Projects/edusocial/android/app/.cxx/RelWithDebInfo/321e6f53/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/alaettintopal/Desktop/Projects/edusocial/android/app/.cxx/RelWithDebInfo/321e6f53/armeabi-v7a/CMakeFiles/rebuild_cache.dir

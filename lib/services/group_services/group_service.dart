@@ -121,78 +121,61 @@ class GroupServices {
   }
 
   Future<List<GroupModel>> fetchAllGroups() async {
-    await Future.delayed(Duration(seconds: 1));
-    return [
-      GroupModel(
-        id: "1",
-        name: "Kimya Kulübü",
-        description: "Kimya severlerin bir araya geldiği grup.",
-        imageUrl:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        memberCount: 35,
-        category: "Kimya",
-        isJoined: true,
-      ),
-      GroupModel(
-        id: "3",
-        name: "Teknoloji Dünyası",
-        description: "Yeni teknolojiler ve haberler.",
-        imageUrl:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        memberCount: 55,
-        category: "Teknoloji",
-        isJoined: false,
-      ),
-      GroupModel(
-        id: "4",
-        name: "Eğitimde Yenilik",
-        description: "Eğitim teknolojileri üzerine.",
-        imageUrl:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        memberCount: 23,
-        category: "Eğitim",
-        isJoined: false,
-      ),
-      GroupModel(
-        id: "3",
-        name: "Teknoloji Dünyası",
-        description: "Yeni teknolojiler ve haberler.",
-        imageUrl:
-            "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg",
-        memberCount: 800,
-        category: "Teknoloji",
-        isJoined: false,
-      ),
-      GroupModel(
-        id: "4",
-        name: "Eğitimde Yenilik",
-        description: "Eğitim teknolojileri üzerine.",
-        imageUrl:
-            "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg",
-        memberCount: 440,
-        category: "Eğitim",
-        isJoined: false,
-      ),
-      GroupModel(
-        id: "3",
-        name: "Teknoloji Dünyası",
-        description: "Yeni teknolojiler ve haberler.",
-        imageUrl:
-            "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg",
-        memberCount: 657,
-        category: "Teknoloji",
-        isJoined: false,
-      ),
-      GroupModel(
-        id: "4",
-        name: "Eğitimde Yenilik",
-        description: "Eğitim teknolojileri üzerine.",
-        imageUrl:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        memberCount: 410,
-        category: "Eğitim",
-        isJoined: false,
-      ),
-    ];
+    final box = GetStorage();
+    final token = box.read('token');
+
+    print("🚀 fetchAllGroups() çağrıldı");
+    print("🔑 Token: $token");
+
+    try {
+      final uri = Uri.parse("${AppConstants.baseUrl}/groups");
+      print("🌐 İstek Atılıyor: $uri");
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      print("📥 HTTP Status Code: ${response.statusCode}");
+
+      // 🔽 Dönen cevabı aynen gösteriyoruz
+      print("📦 RAW Response Body:");
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        final List<dynamic> data = jsonBody['data'] ?? [];
+
+        print("📦 Gelen Grup Sayısı: ${data.length}");
+
+        final groupList = data.map((item) {
+          final group = GroupModel(
+            id: item['id'].toString(),
+            name: item['name'] ?? '',
+            description: item['description'] ?? '',
+            imageUrl: item['image'] != null
+                ? "${AppConstants.baseUrl}/${item['image']}"
+                : '',
+            memberCount: item['member_count'] ?? 0,
+            category: item['category'] ?? 'Genel',
+            isJoined: item['is_member'] ?? false,
+          );
+          print("✅ Grup Eklendi: ${group.name} (${group.id})");
+          return group;
+        }).toList();
+
+        print("🎯 Toplam ${groupList.length} grup modele dönüştürüldü.");
+        return groupList;
+      } else {
+        print("❌ Sunucudan beklenmeyen yanıt alındı.");
+        return [];
+      }
+    } catch (e) {
+      print("💥 Hata oluştu: $e");
+      return [];
+    }
   }
 }
