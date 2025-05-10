@@ -73,7 +73,7 @@ class ProfileUpdateService {
           contentType: mimeType,
         ),
       );
-      print("Dosya yolu: ${avatarFile?.path}");
+      print("Dosya yolu: ${avatarFile.path}");
       print("Dosya var mı?: ${await File(avatarFile!.path).exists()}");
       print("Yüklenen dosya boyutu: ${await avatarFile.length()} bytes");
     }

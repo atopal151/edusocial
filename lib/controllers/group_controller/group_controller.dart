@@ -5,11 +5,11 @@ import 'package:edusocial/models/group_detail_model.dart';
 import 'package:edusocial/models/grup_suggestion_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/document_model.dart';
-import '../models/event_model.dart';
-import '../models/group_model.dart';
-import '../models/link_model.dart';
-import '../services/group_service.dart';
+import '../../models/document_model.dart';
+import '../../models/event_model.dart';
+import '../../models/group_model.dart';
+import '../../models/link_model.dart';
+import '../../services/group_services/group_service.dart';
 
 class GroupController extends GetxController {
   var userGroups = <GroupModel>[].obs;

@@ -1,5 +1,5 @@
 import 'package:edusocial/components/cards/event_card.dart';
-import 'package:edusocial/controllers/group_controller.dart';
+import 'package:edusocial/controllers/group_controller/group_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';

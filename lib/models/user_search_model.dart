@@ -1,3 +1,5 @@
+import '../utils/constants.dart'; // AppConstants.baseUrl buradaysa
+
 class UserSearchModel {
   final String name;
   final String university;
@@ -16,12 +18,17 @@ class UserSearchModel {
   });
 
   factory UserSearchModel.fromJson(Map<String, dynamic> json) {
+    final avatarPath = json['avatar'];
+    final fullAvatarUrl = (avatarPath != null && avatarPath != "")
+        ? "${AppConstants.baseUrl}/$avatarPath"
+        : ""; // boşsa varsayılan olarak ""
+
     return UserSearchModel(
       name: json['name'] ?? '',
       university: json['university'] ?? '',
       degree: json['degree'] ?? '',
       department: json['department'] ?? '',
-      profileImage: json['profile_image'] ?? '',
+      profileImage: fullAvatarUrl,
       isOnline: json['is_online'] ?? false,
     );
   }

@@ -2,7 +2,7 @@ import 'package:edusocial/components/user_appbar/group_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
-import '../../controllers/group_controller.dart';
+import '../../controllers/group_controller/group_controller.dart';
 import '../../components/cards/group_card.dart';
 
 class GroupListScreen extends StatelessWidget {

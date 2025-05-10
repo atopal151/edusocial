@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../components/cards/story_card.dart';
 import '../../controllers/story_controller.dart';
 import 'group_suggestion_list.dart';
-import '../../controllers/group_controller.dart';
+import '../../controllers/group_controller/group_controller.dart';
 import '../../controllers/home_controller.dart';
 import 'hot_topics_list.dart';
 import 'story/my_story_list.dart';

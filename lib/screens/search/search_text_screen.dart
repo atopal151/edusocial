@@ -63,7 +63,12 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                     style: GoogleFonts.inter(
                         fontSize: 13.28, fontWeight: FontWeight.w600),
                     controller: controller.searchTextController,
-                    onChanged: (value) => controller.filterResults(value),
+                    onChanged: (value) {
+                      controller
+                          .fetchSearchResults(value); // backend'den veri getir
+                      controller
+                          .filterResults(value); // gelen verilerde filtrele
+                    },
                     decoration: InputDecoration(
                       hintText: "Ara...",
                       border: InputBorder.none,

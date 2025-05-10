@@ -1,7 +1,7 @@
 
 
 import 'package:get/get.dart';
-import '../controllers/group_controller.dart';
+import '../controllers/group_controller/group_controller.dart';
 
 class GroupBinding extends Bindings {
   @override

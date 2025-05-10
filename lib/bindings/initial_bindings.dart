@@ -9,7 +9,7 @@ import 'package:edusocial/controllers/search_text_controller.dart';
 import 'package:edusocial/controllers/home_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/controllers/entry_controller.dart';
-import 'package:edusocial/controllers/group_controller.dart';
+import 'package:edusocial/controllers/group_controller/group_controller.dart';
 import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/topics_controller.dart';
 import 'package:edusocial/controllers/post_controller.dart';

@@ -1,3 +1,4 @@
+import 'package:edusocial/utils/image_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +14,8 @@ class UserListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.snackbar("Kullanıcı Seçildi", "${user.name} profiline yönlendiriliyor.");
+        Get.snackbar(
+            "Kullanıcı Seçildi", "${user.name} profiline yönlendiriliyor.");
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -29,8 +31,11 @@ class UserListItem extends StatelessWidget {
                 Stack(
                   children: [
                     CircleAvatar(
-                      backgroundImage: AssetImage(user.profileImage),
                       radius: 24,
+                      backgroundImage: user.profileImage.isNotEmpty
+                          ? NetworkImage(getFullAvatarUrl(user.profileImage))
+                          : AssetImage('images/user1.png')
+                              as ImageProvider,
                     ),
                     Positioned(
                       bottom: 0,
@@ -39,7 +44,9 @@ class UserListItem extends StatelessWidget {
                         width: 15,
                         height: 15,
                         decoration: BoxDecoration(
-                          color: user.isOnline ? Color(0xff4DD64B) : Color(0xffd9d9d9),
+                          color: user.isOnline
+                              ? Color(0xff4DD64B)
+                              : Color(0xffd9d9d9),
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
@@ -51,9 +58,17 @@ class UserListItem extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.name, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold,color:Color(0xff414751))),
-                    Text("${user.university} - ${user.degree}", style: TextStyle(fontSize: 12,color:Color(0xff9CA3AE))),
-                    Text(user.department, style: GoogleFonts.inter(fontSize: 12,color:Color(0xff9CA3AE))),
+                    Text(user.name,
+                        style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff414751))),
+                    Text("${user.university} - ${user.degree}",
+                        style:
+                            TextStyle(fontSize: 12, color: Color(0xff9CA3AE))),
+                    Text(user.department,
+                        style: GoogleFonts.inter(
+                            fontSize: 12, color: Color(0xff9CA3AE))),
                   ],
                 )
               ],
