@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../models/group_message_model.dart';
+import '../../../models/group_models/group_message_model.dart';
 
 class GroupTextMessageWidget extends StatelessWidget {
   final GroupMessageModel message;

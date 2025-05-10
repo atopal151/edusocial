@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../models/grup_suggestion_model.dart';
+import '../../models/group_models/grup_suggestion_model.dart';
 
 Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
   return Container(

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
-import '../../models/group_message_model.dart';
+import '../../models/group_models/group_message_model.dart';
 
 class GroupChatDetailController extends GetxController {
   RxList<GroupMessageModel> groupmessages = <GroupMessageModel>[].obs;

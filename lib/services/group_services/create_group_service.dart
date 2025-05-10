@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:edusocial/models/group_area_model.dart';
+import 'package:edusocial/models/group_models/group_area_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;

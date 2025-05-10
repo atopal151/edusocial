@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../models/chat_model.dart';
-import '../../models/group_chat_model.dart';
+import '../../models/group_models/group_chat_model.dart';
 
 class ChatController extends GetxController {
   var onlineFriends = <UserModel>[].obs;

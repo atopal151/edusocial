@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:edusocial/models/group_area_model.dart';
+import 'package:edusocial/models/group_models/group_area_model.dart';
 import 'package:edusocial/services/group_services/create_group_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

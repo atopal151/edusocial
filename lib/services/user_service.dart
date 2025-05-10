@@ -1,4 +1,4 @@
-import '../models/grup_suggestion_model.dart';
+import '../models/group_models/grup_suggestion_model.dart';
 import '../models/profile_model.dart';
 
 class ProfileService {

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../models/grouped_notification_model.dart';
+import '../models/group_models/grouped_notification_model.dart';
 import '../models/notification_model.dart';
 
 class NotificationController extends GetxController {

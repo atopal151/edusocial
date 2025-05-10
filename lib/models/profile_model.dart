@@ -1,4 +1,4 @@
-import 'grup_suggestion_model.dart';
+import 'group_models/grup_suggestion_model.dart';
 
 class ProfileModel {
   final String schoolLogo;

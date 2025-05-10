@@ -1,6 +1,6 @@
-import 'document_model.dart';
-import 'event_model.dart';
-import 'link_model.dart';
+import '../document_model.dart';
+import '../event_model.dart';
+import '../link_model.dart';
 
 class GroupDetailModel {
   final String id;

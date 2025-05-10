@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 
 import '../models/user_search_model.dart';
-import '../models/group_search_model.dart';
+import '../models/group_models/group_search_model.dart';
 import '../models/event_model.dart';
 import '../utils/constants.dart'; // AppConstants.baseUrl buradan
 

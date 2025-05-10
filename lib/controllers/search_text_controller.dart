@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/event_model.dart';
-import '../models/group_search_model.dart';
+import '../models/group_models/group_search_model.dart';
 import '../models/user_search_model.dart';
 import '../services/search_services.dart'; // Yeni ekledik ✅
 

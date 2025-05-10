@@ -1,4 +1,4 @@
-import 'notification_model.dart';
+import '../notification_model.dart';
 
 class GroupedNotifications {
   final String label; // "Bugün", "Dün" vs

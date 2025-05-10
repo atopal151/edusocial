@@ -2,12 +2,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:edusocial/models/grup_suggestion_model.dart';
+import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import '../../models/group_model.dart';
+import '../../models/group_models/group_model.dart';
 
 class GroupServices {
   // group_services.dart
