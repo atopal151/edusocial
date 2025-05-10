@@ -52,9 +52,8 @@ class LoginController extends GetxController {
       } else {
         /// Zaten onboarding tamamlamış, ana ekrana
         Future.delayed(Duration(milliseconds: 200), () {
-
-        final storyController = Get.find<StoryController>();
-        storyController.fetchStories();
+          final storyController = Get.find<StoryController>();
+          storyController.fetchStories();
           Get.offAllNamed('/home');
         });
       }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
@@ -62,13 +63,19 @@ class ProfileUpdateService {
 
     // Avatar dosyası (varsa)
     if (avatarFile != null) {
+      final mimeType = avatarFile.path.endsWith('.png')
+          ? MediaType('image', 'png')
+          : MediaType('image', 'jpeg');
       request.files.add(
         await http.MultipartFile.fromPath(
           'avatar',
           avatarFile.path,
-          contentType: MediaType('image', 'jpeg'), // (isteğe göre png yapabilirsin)
+          contentType: mimeType,
         ),
       );
+      print("Dosya yolu: ${avatarFile?.path}");
+      print("Dosya var mı?: ${await File(avatarFile!.path).exists()}");
+      print("Yüklenen dosya boyutu: ${await avatarFile.length()} bytes");
     }
 
     try {
@@ -86,6 +93,32 @@ class ProfileUpdateService {
     } catch (e) {
       print('❗ Profil güncelleme isteği başarısız: $e');
       rethrow;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> fetchUserProfile() async {
+    final token = _box.read('token');
+    final uri = Uri.parse('${AppConstants.baseUrl}/profile');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data'];
+      } else {
+        print("❗ Kullanıcı profili alınamadı: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("❗ Kullanıcı profil çekme hatası: $e");
+      return null;
     }
   }
 }

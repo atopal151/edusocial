@@ -50,38 +50,23 @@ class ProfileUpdateController extends GetxController {
     }
   }
 
-  Future<void> fetchUserProfile() async {
-    try {
-      isLoading.value = true;
-      await Future.delayed(
-          Duration(milliseconds: 500)); // Mock veriyi simüle ediyoruz
-      var mockData = {
-        "avatar": "https://i.pravatar.cc/150?img=20",
-        "username": "mockuser",
-        "name": "Mock",
-        "surname": "User",
-        "email": "mockuser@example.com",
-        "phone": "+905555555555",
-        "birthday": "2000-01-01",
-        "instagram": "mock_insta",
-        "twitter": "mock_tw",
-        "facebook": "mock_fb",
-        "linkedin": "mock_ln",
-        "notification_email": 1,
-        "notification_mobile": 1,
-        "account_type": "private",
-        "school_id": "1",
-        "school_department_id": "2",
-        "lessons": ["Math", "Physics"],
-      };
-      userProfile.value = UserProfile.fromJson(mockData);
+Future<void> fetchUserProfile() async {
+  isLoading.value = true;
+  try {
+    final data = await ProfileUpdateService.fetchUserProfile();
+    if (data != null) {
+      userProfile.value = UserProfile.fromJson(data);
       loadUserData();
-    } catch (e) {
-      Get.snackbar("Hata", "Bağlantı hatası: $e");
-    } finally {
-      isLoading.value = false;
+    } else {
+      Get.snackbar("Hata", "Profil bilgisi alınamadı.");
     }
+  } catch (e) {
+    Get.snackbar("Hata", "Profil verisi alınırken hata oluştu: $e");
+  } finally {
+    isLoading.value = false;
   }
+}
+
 
   void loadUserData() {
     usernameController.text = userProfile.value.username;

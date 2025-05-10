@@ -132,16 +132,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           CircleAvatar(
             radius: 50,
             backgroundImage: controller.selectedAvatar != null
-                ? FileImage(controller.selectedAvatar!) as ImageProvider
-                : NetworkImage(controller.userProfile.value.profileImage),
+                ? FileImage(controller.selectedAvatar!)
+                : (controller.userProfile.value.profileImage.startsWith('http')
+                    ? NetworkImage(controller.userProfile.value.profileImage)
+                    : AssetImage('images/user1.png')) as ImageProvider,
           ),
           Positioned(
             bottom: 0,
             right: 0,
             child: GestureDetector(
               onTap: () async {
-                final picked =
-                    await _picker.pickImage(source: ImageSource.gallery,imageQuality: 85);
+                final picked = await _picker.pickImage(
+                    source: ImageSource.gallery, imageQuality: 50);
                 if (picked != null) {
                   controller.selectedAvatar =
                       File(picked.path); // ✅ doğru dosya seçiliyor
