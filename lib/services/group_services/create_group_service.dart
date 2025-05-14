@@ -9,24 +9,6 @@ import 'package:http_parser/http_parser.dart';
 class CreateGroupService {
   final _box = GetStorage();
 
-  void testCreateGroupWithDemoData() async {
-    final service = CreateGroupService();
-
-    final success = await service.createGroup(
-      name: "Test Grubu",
-      description: "Bu bir demo grup açıklamasıdır.",
-      groupAreaId: "1", // gerçek bir ID olmalı
-      isPrivate: false,
-      avatar: null,
-      banner: null,
-    );
-
-    if (success) {
-      print("✅ Demo grup başarıyla oluşturuldu.");
-    } else {
-      print("❌ Demo grup oluşturulamadı.");
-    }
-  }
 
   Future<List<GroupAreaModel>> fetchGroupAreas() async {
     try {

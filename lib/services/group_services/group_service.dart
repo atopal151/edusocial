@@ -84,41 +84,61 @@ class GroupServices {
     return response.statusCode == 200 || response.statusCode == 201;
   }
 
-  Future<List<GroupModel>> fetchUserGroups() async {
-    await Future.delayed(Duration(seconds: 1));
-    return [
-      GroupModel(
-        id: "1",
-        name: "Kimya Kulübü",
-        description: "Kimya severlerin bir araya geldiği grup.",
-        imageUrl:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        memberCount: 564,
-        category: "Kimya",
-        isJoined: true,
-      ),
-      GroupModel(
-        id: "2",
-        name: "Fizikçiler Platformu",
-        description: "Fizik üzerine tartışmalar.",
-        imageUrl:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        memberCount: 443,
-        category: "Fizik",
-        isJoined: true,
-      ),
-      GroupModel(
-        id: "1",
-        name: "Edebiyat Kulübü",
-        description: "Edebiyat severlerin bir araya geldiği grup.",
-        imageUrl:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        memberCount: 776,
-        category: "Eğitim",
-        isJoined: true,
-      ),
-    ];
+Future<List<GroupModel>> fetchUserGroups() async {
+  final box = GetStorage();
+  final token = box.read('token');
+
+  print("🚀 fetchUserGroups() çağrıldı");
+  print("🔑 Token: $token");
+
+  try {
+    final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
+    print("🌐 İstek Atılıyor: $uri");
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+
+    print("📥 Kullanıcı Grupları Status: ${response.statusCode}");
+    print("📥 Kullanıcı Grupları Body:\n${response.body}");
+
+    if (response.statusCode == 200) {
+      final jsonBody = json.decode(response.body);
+      final List<dynamic> data = jsonBody['data'] ?? [];
+
+      print("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}");
+
+      final userGroupList = data.map((item) {
+        final group = GroupModel(
+          id: item['id'].toString(),
+          name: item['name'] ?? '',
+          description: item['description'] ?? '',
+          imageUrl: item['image'] != null
+              ? "${AppConstants.baseUrl}/${item['image']}"
+              : '',
+          memberCount: item['member_count'] ?? 0,
+          category: item['category'] ?? 'Genel',
+          isJoined: true, // Kullanıcı zaten bu gruplara üye
+        );
+        print("✅ Kullanıcı Grubu: ${group.name} (${group.id})");
+        return group;
+      }).toList();
+
+      return userGroupList;
+    } else {
+      print("❌ Sunucudan beklenmeyen yanıt.");
+      return [];
+    }
+  } catch (e) {
+    print("💥 Kullanıcı grupları alınırken hata oluştu: $e");
+    return [];
   }
+}
+
 
   Future<List<GroupModel>> fetchAllGroups() async {
     final box = GetStorage();

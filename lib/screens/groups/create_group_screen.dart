@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/controllers/group_controller/create_group_controller.dart';
-import 'package:edusocial/services/group_services/create_group_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -36,8 +35,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       });
     });
 
-    // 🔽 Sadece test için bir kez çağır
-    CreateGroupService().testCreateGroupWithDemoData();
   }
 
   @override
