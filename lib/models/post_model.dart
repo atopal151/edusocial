@@ -1,3 +1,5 @@
+import 'package:edusocial/utils/constants.dart';
+
 class PostModel {
   final String profileImage;
   final String userName;
@@ -19,14 +21,15 @@ class PostModel {
 
   // JSON'dan Model'e dönüştürme fonksiyonu
   factory PostModel.fromJson(Map<String, dynamic> json) {
+    final user = json['user'] ?? {};
     return PostModel(
-      profileImage: json["profileImage"],
-      userName: json["userName"],
-      postDate: json["postDate"],
-      postDescription: json["postDescription"],
-      postImage: json["postImage"], // Opsiyonel alan olabilir
-      likeCount: json["likeCount"],
-      commentCount: json["commentCount"],
+      profileImage: "${AppConstants.baseUrl}/${user['avatar'] ?? ''}",
+      userName: "${user['name'] ?? ''} ${user['surname'] ?? ''}",
+      postDate: json['created_at'] ?? '',
+      postDescription: json['content'] ?? '',
+      postImage: json['image'], // varsa image
+      likeCount: json['like_count'] ?? 0,
+      commentCount: json['comment_count'] ?? 0,
     );
   }
 }

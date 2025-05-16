@@ -153,37 +153,29 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   /// **Gönderiler Sekmesi İçeriği**
   Widget _buildPosts() {
-    return Obx(() {
-      if (postController.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
+  return Obx(() {
+    if (controller.profilePosts.isEmpty) {
+      return const Center(child: Text("Hiç gönderi bulunamadı."));
+    }
 
-      if (postController.postList.isEmpty) {
-        return const Center(child: Text("Hiç gönderi bulunamadı."));
-      }
+    return ListView.builder(
+      itemCount: controller.profilePosts.length,
+      itemBuilder: (context, index) {
+        final post = controller.profilePosts[index];
+        return PostCard(
+          profileImage: post.profileImage,
+          userName: post.userName,
+          postDate: post.postDate,
+          postDescription: post.postDescription,
+          postImage: post.postImage,
+          likeCount: post.likeCount,
+          commentCount: post.commentCount,
+        );
+      },
+    );
+  });
+}
 
-      return ListView.builder(
-        physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.zero,
-        itemCount: postController.postList.length,
-        itemBuilder: (context, index) {
-          final post = postController.postList[index];
-          return Container(
-            color: Color(0xfffafafa),
-            child: PostCard(
-              profileImage: post.profileImage,
-              userName: post.userName,
-              postDate: post.postDate,
-              postDescription: post.postDescription,
-              postImage: post.postImage,
-              likeCount: post.likeCount,
-              commentCount: post.commentCount,
-            ),
-          );
-        },
-      );
-    });
-  }
 
   /// **Entryler Sekmesi İçeriği**
   Widget _buildEntries() {

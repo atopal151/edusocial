@@ -31,7 +31,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Container(
               height: 44,
               width: 44,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
               ),
@@ -43,59 +43,59 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
       ),
-      backgroundColor: Color(0xffFAFAFA),
+      backgroundColor: const Color(0xffFAFAFA),
       body: Obx(() => controller.isLoading.value
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildProfilePicture(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _buildTextField(
                         "Kullanıcı Adı", "@", controller.usernameController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField("Ad", "", controller.nameController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField("Soyad", "", controller.surnameController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField("E-posta", "", controller.emailController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField("Telefon", "", controller.phoneController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField(
                         "Doğum Tarihi", "", controller.birthdayController),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _sectionTitle("Sosyal Medya Hesapları"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField(
                         "Instagram", "@", controller.instagramController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField(
                         "Twitter", "@", controller.twitterController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField(
                         "Facebook", "/", controller.facebookController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField(
                         "LinkedIn", "/", controller.linkedinController),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _sectionTitle("Okul ve Bölüm Bilgisi"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField(
                         "Okul ID", "", controller.schoolIdController),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildTextField(
                         "Bölüm ID", "", controller.departmentIdController),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _sectionTitle("Dersler"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildLessonChips(),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _sectionTitle("Bildirim Ayarları"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildSwitchTile(
                         "E-posta Bildirimi",
                         controller.emailNotification,
@@ -104,20 +104,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         "Mobil Bildirimi",
                         controller.mobileNotification,
                         controller.toggleMobileNotification),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     _sectionTitle("Hesap Tipi"),
                     _buildAccountTypeSelector(),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     CustomButton(
                       height: 50,
                       borderRadius: 15,
                       text: "Kaydet",
                       onPressed: controller.saveProfile,
                       isLoading: controller.isLoading,
-                      backgroundColor: Color(0xFFEF5050),
+                      backgroundColor: const Color(0xFFEF5050),
                       textColor: Colors.white,
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -133,9 +133,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             radius: 50,
             backgroundImage: controller.selectedAvatar != null
                 ? FileImage(controller.selectedAvatar!)
-                : (controller.userProfile.value.profileImage.startsWith('http')
-                    ? NetworkImage(controller.userProfile.value.profileImage)
+                : (controller.userProfileModel.value?.avatar
+                            .startsWith('http') ==
+                        true
+                    ? NetworkImage(controller.userProfileModel.value!.avatar)
                     : AssetImage('images/user1.png')) as ImageProvider,
+            onBackgroundImageError: (_, __) {
+              debugPrint(
+                  "⚠️ Avatar yüklenemedi, varsayılan resim gösteriliyor.");
+            },
           ),
           Positioned(
             bottom: 0,
@@ -143,21 +149,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: GestureDetector(
               onTap: () async {
                 final picked = await _picker.pickImage(
-                    source: ImageSource.gallery, imageQuality: 50);
+                  source: ImageSource.gallery,
+                  imageQuality: 50,
+                );
                 if (picked != null) {
-                  controller.selectedAvatar =
-                      File(picked.path); // ✅ doğru dosya seçiliyor
-                  controller.userProfile.update((val) {
-                    val?.profileImage = picked.path; // ✅ görünümü güncelle
-                  });
-                  Get.snackbar("Başarılı",
-                      "Profil fotoğrafı seçildi."); // (isteğe bağlı)
+                  controller.selectedAvatar = File(picked.path);
+                  Get.snackbar("Başarılı", "Profil fotoğrafı seçildi.");
                 }
               },
               child: Container(
                 width: 26,
                 height: 26,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFFEF5050),
                   shape: BoxShape.circle,
                 ),
@@ -180,11 +183,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: TextStyle(
+            style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 13.28,
                 color: Color(0xff414751))),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -194,7 +197,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             controller: controller,
             decoration: InputDecoration(
               prefixText: prefix.isNotEmpty ? "$prefix " : null,
-              prefixStyle: TextStyle(color: Color(0xffd0d4db)),
+              prefixStyle: const TextStyle(color: Color(0xffd0d4db)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(50),
                 borderSide: BorderSide.none,
@@ -212,13 +215,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       String title, RxBool value, Function(bool) onChanged) {
     return Obx(() => SwitchListTile(
           title: Text(title,
-              style: TextStyle(
+              style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13.28,
                   color: Color(0xff414751))),
           value: value.value,
           onChanged: onChanged,
-          activeColor: Color(0xFFEF5050),
+          activeColor: const Color(0xFFEF5050),
         ));
   }
 
@@ -229,7 +232,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             return Chip(
               label: Text(lesson),
               onDeleted: () => controller.removeLesson(lesson),
-              deleteIcon: Icon(Icons.close, size: 18),
+              deleteIcon: const Icon(Icons.close, size: 18),
             );
           }).toList(),
         ));
@@ -240,13 +243,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ChoiceChip(
-              label: Text("Public"),
+              label: const Text("Public"),
               selected: controller.accountType.value == 'public',
               onSelected: (_) => controller.changeAccountType('public'),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             ChoiceChip(
-              label: Text("Private"),
+              label: const Text("Private"),
               selected: controller.accountType.value == 'private',
               onSelected: (_) => controller.changeAccountType('private'),
             ),
@@ -257,7 +260,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget _sectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
           fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xff414751)),
     );
   }

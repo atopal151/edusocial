@@ -1,13 +1,14 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter/foundation.dart';
 import '../utils/constants.dart';
 
 class ProfileUpdateService {
   static final _box = GetStorage();
 
+  /// 📤 Profil bilgilerini güncelle
   static Future<void> updateProfile({
     required String username,
     required String name,
@@ -37,7 +38,7 @@ class ProfileUpdateService {
       'Accept': 'application/json',
     });
 
-    // Form alanları
+    // 📄 Normal form alanları
     request.fields.addAll({
       'username': username,
       'name': name,
@@ -56,12 +57,12 @@ class ProfileUpdateService {
       'school_department_id': departmentId,
     });
 
-    // Ders listesi
+    // 📚 Ders bilgileri (array formatı)
     for (int i = 0; i < lessons.length; i++) {
       request.fields['lessons[$i]'] = lessons[i];
     }
 
-    // Avatar dosyası (varsa)
+    // 🖼️ Avatar resmi eklenmişse
     if (avatarFile != null) {
       final mimeType = avatarFile.path.endsWith('.png')
           ? MediaType('image', 'png')
@@ -73,52 +74,23 @@ class ProfileUpdateService {
           contentType: mimeType,
         ),
       );
-      print("Dosya yolu: ${avatarFile.path}");
-      print("Dosya var mı?: ${await File(avatarFile.path).exists()}");
-      print("Yüklenen dosya boyutu: ${await avatarFile.length()} bytes");
     }
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('🔵 Profil Güncelleme Status Code: ${response.statusCode}');
-      print('📩 Profil Güncelleme Body: ${response.body}');
+      debugPrint('🔄 Profil Güncelleme Status Code: ${response.statusCode}');
+      debugPrint('📩 Güncelleme Yanıtı:\n${response.body}', wrapWidth: 1024);
 
       if (response.statusCode == 200) {
-        print("✅ Profil başarıyla güncellendi.");
+        debugPrint("✅ Profil başarıyla güncellendi.");
       } else {
-        throw Exception('❗ Profil güncelleme hatası: ${response.body}');
+        throw Exception('❗ Sunucu hatası: ${response.body}');
       }
     } catch (e) {
-      print('❗ Profil güncelleme isteği başarısız: $e');
+      debugPrint('❗ Profil güncelleme isteği başarısız: $e');
       rethrow;
-    }
-  }
-
-  static Future<Map<String, dynamic>?> fetchUserProfile() async {
-    final token = _box.read('token');
-    final uri = Uri.parse('${AppConstants.baseUrl}/profile');
-
-    try {
-      final response = await http.get(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['data'];
-      } else {
-        print("❗ Kullanıcı profili alınamadı: ${response.statusCode}");
-        return null;
-      }
-    } catch (e) {
-      print("❗ Kullanıcı profil çekme hatası: $e");
-      return null;
     }
   }
 }

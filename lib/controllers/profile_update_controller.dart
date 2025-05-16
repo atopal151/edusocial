@@ -1,16 +1,24 @@
 import 'dart:io';
-
+import 'package:edusocial/models/profile_model.dart';
+import 'package:edusocial/services/profile_service.dart';
 import 'package:edusocial/services/profile_update_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import '../models/user_profile_model.dart';
 
 class ProfileUpdateController extends GetxController {
-  var userProfile = UserProfile.empty().obs;
+  final _profileService = ProfileService();
+
+  // Ana model (backend'den gelen tüm veriler burada tutulur)
+  Rx<ProfileModel?> userProfileModel = Rx<ProfileModel?>(null);
+
+  // Yüklenme durumu
   var isLoading = false.obs;
 
-  // TextEditingControllers
+  // Seçilen avatar dosyası
+  File? selectedAvatar;
+
+  // Form controller'ları
   final usernameController = TextEditingController();
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
@@ -24,12 +32,11 @@ class ProfileUpdateController extends GetxController {
   final schoolIdController = TextEditingController();
   final departmentIdController = TextEditingController();
 
-  // Ekstra Ayarlar
-  var accountType = 'private'.obs; // private ya da public
+  // Ekstra seçenekler
+  var accountType = 'private'.obs; // "private" veya "public"
   var emailNotification = true.obs;
   var mobileNotification = true.obs;
   var selectedLessons = <String>[].obs;
-  File? selectedAvatar;
 
   @override
   void onInit() {
@@ -37,56 +44,55 @@ class ProfileUpdateController extends GetxController {
     fetchUserProfile();
   }
 
+  /// 📸 Galeriden resim seçme
   Future<void> pickImageFromGallery() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       selectedAvatar = File(pickedFile.path);
-      userProfile.update((val) {
-        if (val != null) {
-          val.profileImage = pickedFile.path; // Localde görüntü için
-        }
-      });
     }
   }
 
-Future<void> fetchUserProfile() async {
-  isLoading.value = true;
-  try {
-    final data = await ProfileUpdateService.fetchUserProfile();
-    if (data != null) {
-      userProfile.value = UserProfile.fromJson(data);
-      loadUserData();
-    } else {
-      Get.snackbar("Hata", "Profil bilgisi alınamadı.");
+  /// 🔄 Profil verisini API'den çek
+  Future<void> fetchUserProfile() async {
+    isLoading.value = true;
+    try {
+      final profileData = await _profileService.fetchProfileData();
+      userProfileModel.value = profileData;
+      loadUserData(); // TextField'lara aktar
+    } catch (e) {
+      Get.snackbar("Hata", "Profil verisi alınamadı: $e");
+    } finally {
+      isLoading.value = false;
     }
-  } catch (e) {
-    Get.snackbar("Hata", "Profil verisi alınırken hata oluştu: $e");
-  } finally {
-    isLoading.value = false;
   }
-}
 
-
+  /// 🧠 Gelen verileri formlara yerleştir
   void loadUserData() {
-    usernameController.text = userProfile.value.username;
-    nameController.text = userProfile.value.name;
-    surnameController.text = userProfile.value.surname;
-    emailController.text = userProfile.value.email;
-    phoneController.text = userProfile.value.phone;
-    birthdayController.text = userProfile.value.birthday;
-    instagramController.text = userProfile.value.instagram;
-    twitterController.text = userProfile.value.twitter;
-    facebookController.text = userProfile.value.facebook;
-    linkedinController.text = userProfile.value.linkedin;
-    schoolIdController.text = userProfile.value.schoolId;
-    departmentIdController.text = userProfile.value.departmentId;
-    accountType.value = userProfile.value.accountType;
-    emailNotification.value = userProfile.value.emailNotification;
-    mobileNotification.value = userProfile.value.mobileNotification;
-    selectedLessons.value = userProfile.value.lessons;
+    final data = userProfileModel.value;
+    if (data == null) return;
+
+    debugPrint("📥 Profil form verileri yükleniyor...", wrapWidth: 1024);
+
+    usernameController.text = data.username;
+    nameController.text = data.name;
+    surnameController.text = data.surname;
+    emailController.text = data.email;
+    birthdayController.text = data.birthDate;
+    phoneController.text = data.phone; // null olabilir
+    instagramController.text = data.instagram;
+    twitterController.text = data.twitter;
+    facebookController.text = data.facebook;
+    linkedinController.text = data.linkedin;
+    schoolIdController.text = data.schoolId;
+    departmentIdController.text = data.schoolDepartmentId;
+    accountType.value = data.accountType;
+    emailNotification.value = data.notificationEmail;
+    mobileNotification.value = data.notificationMobile;
+    selectedLessons.value = data.courses;
   }
 
+  /// 🎛️ Switch kontroller
   void toggleEmailNotification(bool value) {
     emailNotification.value = value;
   }
@@ -99,6 +105,7 @@ Future<void> fetchUserProfile() async {
     accountType.value = type;
   }
 
+  /// 📚 Ders işlemleri
   void addLesson(String lesson) {
     if (!selectedLessons.contains(lesson)) {
       selectedLessons.add(lesson);
@@ -109,15 +116,18 @@ Future<void> fetchUserProfile() async {
     selectedLessons.remove(lesson);
   }
 
+  /// ⬅️ Geri dön
   void goBack() {
     Get.back();
   }
 
+  /// 💾 Kaydetme işlemi
   Future<void> saveProfile() async {
     isLoading.value = true;
-    
+
     if (usernameController.text.isEmpty || emailController.text.isEmpty) {
       Get.snackbar("Hata", "Kullanıcı adı ve e-posta boş olamaz.");
+      isLoading.value = false;
       return;
     }
 
@@ -139,10 +149,11 @@ Future<void> fetchUserProfile() async {
         schoolId: schoolIdController.text,
         departmentId: departmentIdController.text,
         lessons: selectedLessons,
-        avatarFile: selectedAvatar, // ✅ artık doğru dosyayı gönderiyoruz
+        avatarFile: selectedAvatar,
       );
 
       Get.snackbar("Başarılı", "Profil bilgileri güncellendi!");
+      await fetchUserProfile(); // Güncel verileri tekrar çek
     } catch (e) {
       Get.snackbar("Hata", "Profil güncellenemedi: $e");
     } finally {
@@ -150,93 +161,3 @@ Future<void> fetchUserProfile() async {
     }
   }
 }
-
-
-
-/*
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
-import '../models/user_profile_model.dart';
-
-
-
-class ProfileUpdateController extends GetxController {
-  var userProfile = UserProfile.empty().obs;
-  var usernameController = TextEditingController();
-  var instagramController = TextEditingController();
-  var youtubeController = TextEditingController();
-  var demoNotification = false.obs;
-  var isLoading = false.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchUserProfile();
-  }
-
-  Future<void> fetchUserProfile() async {
-    try {
-      isLoading.value = true;
-      await Future.delayed(Duration(milliseconds: 500)); // API çağrısını simüle etme
-      var mockData = {
-        "profileImage": "https://i.pravatar.cc/150?img=20",
-        "username": "mockuser",
-        "instagram": "mock_insta",
-        "youtube": "mock_yt",
-        "demoNotification": true,
-      };
-      userProfile.value = UserProfile.fromJson(mockData);
-      loadUserData();
-    } catch (e) {
-      Get.snackbar("Hata", "Bağlantı hatası: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void loadUserData() {
-    usernameController.text = userProfile.value.username;
-    instagramController.text = userProfile.value.instagram;
-    youtubeController.text = userProfile.value.youtube;
-    demoNotification.value = userProfile.value.demoNotification;
-  }
-
-  void goBack() {
-    Get.back();
-  }
-
-  void changeProfilePicture() {
-    //print("Profil fotoğrafı değiştirildi");
-  }
-
-  void toggleNotification(bool value) {
-    demoNotification.value = value;
-    userProfile.update((val) {
-      if (val != null) {
-        val.demoNotification = value;
-      }
-    });
-  }
-
-  Future<void> saveProfile() async {
-    isLoading.value = true;
-    try {
-      await Future.delayed(Duration(milliseconds: 500)); // API güncellemesini simüle etme
-      userProfile.update((val) {
-        if (val != null) {
-          val.username = usernameController.text;
-          val.instagram = instagramController.text;
-          val.youtube = youtubeController.text;
-          val.demoNotification = demoNotification.value;
-        }
-      });
-      Get.snackbar("Başarılı", "Profil bilgileri kaydedildi");
-    } catch (e) {
-      Get.snackbar("Hata", "Bağlantı hatası: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-}
-*/
