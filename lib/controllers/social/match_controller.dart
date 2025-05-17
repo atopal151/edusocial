@@ -59,24 +59,23 @@ class MatchController extends GetxController {
   void findMatches() async {
     isLoading.value = true;
 
-
     final fetchedMatches = await MatchServices.fetchMatches();
 
     if (fetchedMatches.isNotEmpty) {
       matches.assignAll(fetchedMatches);
-      currentIndex.value = 0; // Her seferinde baştan başla
-      Get.toNamed("/match_result"); // Eşleşme kartları ekranına yönlendir
+      currentIndex.value = 0;
+
+      Get.back(); // önce eşleşme ekranından çık
+      navigationController.changeIndex(2); // navbar indexini eşleşmeye ayarla
     } else {
       Get.snackbar(
         "Hata",
         "Eşleşecek kullanıcı bulunamadı.",
         snackPosition: SnackPosition.BOTTOM,
       );
+      Get.back(); // başarısızsa sadece geri dön
     }
 
     isLoading.value = false;
-
-    Get.back();
-    navigationController.changeIndex(2);
   }
 }

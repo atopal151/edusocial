@@ -55,7 +55,7 @@ class Routes {
   static const String event = '/event';
   static const String profile = '/profile';
   static const String match = '/match';
-  static const String matchResult = '/math_result';
+  static const String matchResult = '/match_result';
   static const String main = '/main';
   static const String editProfile = "/settings";
   static const String calendar = "/calendar";

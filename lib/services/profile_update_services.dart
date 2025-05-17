@@ -27,6 +27,7 @@ class ProfileUpdateService {
     required String departmentId,
     required List<String> lessons,
     File? avatarFile,
+    File? coverFile, // Yeni parametre olarak al
   }) async {
     final token = _box.read('token');
     final uri = Uri.parse('${AppConstants.baseUrl}/profile');
@@ -71,6 +72,18 @@ class ProfileUpdateService {
         await http.MultipartFile.fromPath(
           'avatar',
           avatarFile.path,
+          contentType: mimeType,
+        ),
+      );
+    }
+    if (coverFile != null) {
+      final mimeType = coverFile.path.endsWith('.png')
+          ? MediaType('image', 'png')
+          : MediaType('image', 'jpeg');
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'cover_photo',
+          coverFile.path,
           contentType: mimeType,
         ),
       );

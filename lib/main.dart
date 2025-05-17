@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,6 +32,8 @@ void main() async {
   Get.put(LoginController(), permanent: true);
   Get.put(NavigationController(), permanent: true);
   Get.put(MatchController(), permanent: true);
+
+  Get.put(AppBarController());
   Get.put(ProfileController(), permanent: true);
   Get.put(OnboardingController());
 

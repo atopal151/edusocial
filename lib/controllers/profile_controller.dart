@@ -1,10 +1,14 @@
+import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/models/post_model.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../models/profile_model.dart';
 import '../services/profile_service.dart';
 
 class ProfileController extends GetxController {
+  final AppBarController appBarController = Get.find<AppBarController>();
+
   // Mock Kullanıcı Verileri
   var isPrLoading = false.obs; // Yüklenme durumu
 
@@ -26,7 +30,6 @@ class ProfileController extends GetxController {
   var schoolGrade = ''.obs;
   var lessons = <String>[].obs;
   var profilePosts = <PostModel>[].obs;
-
 
   final ProfileService _profileService = ProfileService();
 
@@ -72,6 +75,15 @@ class ProfileController extends GetxController {
     loadProfile();
   }
 
+  String formatBirthday(String isoString) {
+    try {
+      DateTime parsed = DateTime.parse(isoString);
+      return DateFormat('dd.MM.yyyy').format(parsed);
+    } catch (e) {
+      return '';
+    }
+  }
+
   Future<void> loadProfile() async {
     try {
       isLoading.value = true;
@@ -82,18 +94,20 @@ class ProfileController extends GetxController {
       fullName.value = "${data.name} ${data.surname}";
       username.value = "@${data.username}";
       profileImage.value = data.avatar;
+      print("👤 Avatar URL: ${data.avatar}");
+
       coverImage.value = data.coverPhoto;
       bio.value = data.bio;
       followers.value = data.followers;
       following.value = data.following;
       postCount.value = data.postCount;
-      birthDate.value = data.birthDate;
+      birthDate.value = formatBirthday(data.birthDate);
       schoolName.value = data.schoolName;
       schoolDepartment.value = data.schoolDepartment;
       schoolGrade.value = data.schoolGrade;
       lessons.value = data.courses;
       profilePosts.assignAll(data.posts);
-
+      appBarController.updateProfileImage(profileImage.value);
     } catch (e) {
       print("Profil verisi yüklenemedi: $e");
     } finally {

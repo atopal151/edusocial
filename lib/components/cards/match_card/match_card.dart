@@ -43,57 +43,50 @@ class _MatchCardState extends State<MatchCard> {
           });
         },
         child: Transform.translate(
-  offset: _dragOffset,
-  child: Transform.rotate(
-    angle: rotationAngle * -1.5, // eğim
-    child: Stack(
-      children: [
-        /// 🟦 Match kartı
-        _buildMatchCard(match),
-
-        /// 🟥 Overlay: Takip Et / Geç
-        if (_dragOffset.dx.abs() > 20)
-          Positioned.fill(
-            child: Align(
-              alignment: _dragOffset.dx > 0
-                  ? Alignment.topLeft
-                  : Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                child: Transform.rotate(
-                  angle: _dragOffset.dx > 0 ? 0 : -0,
-                  child: Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      color: _dragOffset.dx > 0
-                          ? const Color(0xff65D384).withAlpha(150)
-                          : const Color(0xffEF5050).withAlpha(150),
-                      borderRadius: BorderRadius.circular(32),
-                    ),
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        _dragOffset.dx > 0 ? "Takip Et" : "Geç",
-                        style: GoogleFonts.inter(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          letterSpacing: 1.2,
+          offset: _dragOffset,
+          child: Transform.rotate(
+            angle: rotationAngle * -1.5,
+            child: Stack(
+              children: [
+                _buildMatchCard(match),
+                if (_dragOffset.dx.abs() > 20)
+                  Positioned.fill(
+                    child: Align(
+                      alignment: _dragOffset.dx > 0
+                          ? Alignment.topLeft
+                          : Alignment.topRight,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        child: Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          decoration: BoxDecoration(
+                            color: _dragOffset.dx > 0
+                                ? const Color(0xff65D384).withAlpha(150)
+                                : const Color(0xffEF5050).withAlpha(150),
+                            borderRadius: BorderRadius.circular(32),
+                          ),
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              _dragOffset.dx > 0 ? "Takip Et" : "Geç",
+                              style: GoogleFonts.inter(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
+              ],
             ),
           ),
-      ],
-    ),
-  ),
-),
-
+        ),
       );
     });
   }
@@ -105,7 +98,9 @@ class _MatchCardState extends State<MatchCard> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
         image: DecorationImage(
-          image: NetworkImage(match.profileImage),
+          image: match.profileImage.isNotEmpty
+              ? NetworkImage(match.profileImage)
+              : const AssetImage("images/default_user.jpg") as ImageProvider,
           fit: BoxFit.cover,
         ),
       ),
@@ -127,7 +122,8 @@ class _MatchCardState extends State<MatchCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${match.name}, ${match.age}",
+              "${match.name}, ${match.age ?? '-'}",
+
               style: const TextStyle(
                   fontSize: 18.72,
                   fontWeight: FontWeight.bold,
@@ -166,11 +162,9 @@ class _MatchCardState extends State<MatchCard> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Image.network(
-                      match.schoolLogo,
-                      width: 21,
-                      height: 21,
-                    ),
+                    child: match.schoolLogo.isNotEmpty
+                        ? Image.network(match.schoolLogo, width: 21, height: 21)
+                        : const Icon(Icons.school, size: 18, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -178,7 +172,7 @@ class _MatchCardState extends State<MatchCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      match.schoolName,
+                      match.schoolName.isNotEmpty ? match.schoolName : 'Okul bilgisi yok',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -186,7 +180,7 @@ class _MatchCardState extends State<MatchCard> {
                       ),
                     ),
                     Text(
-                      "${match.department} • Grade ${match.grade}",
+                      "${match.department.isNotEmpty ? match.department : 'Bölüm yok'} • Grade ${match.grade}",
                       style: const TextStyle(
                         color: Color(0xffffffff),
                         fontSize: 10,
@@ -205,7 +199,7 @@ class _MatchCardState extends State<MatchCard> {
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             Text(
-              match.about,
+              match.about.isNotEmpty ? match.about : 'Henüz bilgi yok',
               style: const TextStyle(
                   color: Color(0xffffffff),
                   fontSize: 10,
@@ -223,8 +217,7 @@ class _MatchCardState extends State<MatchCard> {
               children: match.matchedTopics
                   .map<Widget>(
                     (topic) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white.withAlpha(70),
                         borderRadius: BorderRadius.circular(16),

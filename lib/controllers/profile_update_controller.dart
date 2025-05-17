@@ -5,6 +5,7 @@ import 'package:edusocial/services/profile_update_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class ProfileUpdateController extends GetxController {
   final _profileService = ProfileService();
@@ -17,7 +18,7 @@ class ProfileUpdateController extends GetxController {
 
   // Seçilen avatar dosyası
   File? selectedAvatar;
-
+  File? selectedCoverPhoto; // Yeni alan
   // Form controller'ları
   final usernameController = TextEditingController();
   final nameController = TextEditingController();
@@ -44,12 +45,29 @@ class ProfileUpdateController extends GetxController {
     fetchUserProfile();
   }
 
+  String formatBirthday(String isoString) {
+    try {
+      DateTime parsed = DateTime.parse(isoString);
+      return DateFormat('dd.MM.yyyy').format(parsed);
+    } catch (e) {
+      return '';
+    }
+  }
+
   /// 📸 Galeriden resim seçme
   Future<void> pickImageFromGallery() async {
+    final pickedProfileFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedProfileFile != null) {
+      selectedAvatar = File(pickedProfileFile.path);
+    }
+  }
+
+  Future<void> pickCoverPhotoFromGallery() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      selectedAvatar = File(pickedFile.path);
+      selectedCoverPhoto = File(pickedFile.path);
     }
   }
 
@@ -78,7 +96,7 @@ class ProfileUpdateController extends GetxController {
     nameController.text = data.name;
     surnameController.text = data.surname;
     emailController.text = data.email;
-    birthdayController.text = data.birthDate;
+    birthdayController.text = formatBirthday(data.birthDate);
     phoneController.text = data.phone; // null olabilir
     instagramController.text = data.instagram;
     twitterController.text = data.twitter;
@@ -150,6 +168,7 @@ class ProfileUpdateController extends GetxController {
         departmentId: departmentIdController.text,
         lessons: selectedLessons,
         avatarFile: selectedAvatar,
+        coverFile: selectedCoverPhoto,
       );
 
       Get.snackbar("Başarılı", "Profil bilgileri güncellendi!");

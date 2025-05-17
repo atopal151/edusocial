@@ -23,8 +23,9 @@ class MatchServices {
       print("📥 Match Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body)['data'] as List;
-        return data.map((item) => MatchModel.fromJson(item)).toList();
+        final Map<String, dynamic> data = jsonDecode(response.body)['data'];
+        final MatchModel match = MatchModel.fromJson(data);
+        return [match];
       } else {
         return [];
       }

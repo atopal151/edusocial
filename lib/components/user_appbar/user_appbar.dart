@@ -20,12 +20,40 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: GestureDetector(
         onTap: controller.navigateToProfile,
         child: Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
-          child: Obx(() => CircleAvatar(
-                backgroundImage: AssetImage(controller.profileImagePath.value),
+            padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+            child: Obx(() {
+              final imagePath = controller.profileImagePath.value;
+              final isNetworkImage = imagePath.startsWith('http');
+
+              return CircleAvatar(
                 radius: 20,
-              )),
-        ),
+                backgroundColor: Colors.grey.shade200,
+                child: ClipOval(
+                  child: isNetworkImage
+                      ? Image.network(
+                          imagePath,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            print("⚠️ Görsel yüklenemedi: $error");
+                            return Image.asset(
+                              'images/user1.png',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          imagePath.isNotEmpty ? imagePath : 'images/user1.png',
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+              );
+            })),
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -149,12 +177,12 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
               shape: BoxShape.circle,
             ),
             child: SvgPicture.asset(
-                    "images/icons/notification_icon.svg",
-                    colorFilter: ColorFilter.mode(
-                      Color(0xff414751),
-                      BlendMode.srcIn,
-                    ),
-                  ),
+              "images/icons/notification_icon.svg",
+              colorFilter: ColorFilter.mode(
+                Color(0xff414751),
+                BlendMode.srcIn,
+              ),
+            ),
           ),
         ),
         SizedBox(width: 10),

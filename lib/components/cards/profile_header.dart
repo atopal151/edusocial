@@ -21,33 +21,56 @@ Widget buildProfileHeader() {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        controller.coverImage.value.trim().isNotEmpty
-                            ? controller.coverImage.value
-                            : "https://i.pravatar.cc/150?img=20",
-                      ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      controller.coverImage.value.trim().isNotEmpty
+                          ? controller.coverImage.value
+                          : "https://i.pravatar.cc/150?img=20",
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        print("⚠️ Kapak görseli yüklenemedi: $error");
+                        return Image.asset(
+                          'images/user1.jpg',
+                          fit: BoxFit.cover,
+                        );
+                      },
                     ),
                   ),
                 ),
               )),
 
           Positioned(
-            bottom: -35,
-            left: Get.width / 2 - 45, 
-            child: Obx(() => CircleAvatar(
-                  radius: 42,
-                  backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                    radius: 38,
-                    backgroundImage: NetworkImage(
-                        controller.profileImage.value.isNotEmpty
-                            ? controller.profileImage.value
-                            : 'https://via.placeholder.com/150'),
-                  ),
-                )),
-          ),
+              bottom: -35,
+              left: Get.width / 2 - 45,
+              child: Obx(() => CircleAvatar(
+                    radius: 42,
+                    backgroundColor: Colors.white,
+                    child: CircleAvatar(
+                      radius: 38,
+                      backgroundColor: Colors.grey.shade200,
+                      child: ClipOval(
+                        child: controller.profileImage.value.trim().isNotEmpty
+                            ? Image.network(
+                                controller.profileImage.value,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  print("⚠️ Profil resmi yüklenemedi: $error");
+                                  return Image.asset(
+                                    'images/user1.png',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                'images/user1.png',
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                    ),
+                  ))),
         ],
       ),
       const SizedBox(height: 50),
@@ -63,7 +86,7 @@ Widget buildProfileHeader() {
 
       Obx(() => Text(
             controller.username.value,
-            style:  GoogleFonts.inter(
+            style: GoogleFonts.inter(
                 fontSize: 12.78,
                 fontWeight: FontWeight.w400,
                 color: Color(0xff9ca3ae)),
