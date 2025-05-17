@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 
@@ -23,8 +24,8 @@ class SearchServices {
         },
       );
 
-      print("🔎 Search Response: ${response.statusCode}");
-      print("🔎 Search Body: ${response.body}");
+      debugPrint("🔎 Search Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("🔎 Search Body: ${response.body}",wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body)['data'];
@@ -46,7 +47,7 @@ class SearchServices {
         return SearchResult.empty();
       }
     } catch (e) {
-      print("❗ Search error: $e");
+      debugPrint("❗ Search error: $e",wrapWidth: 1024);
       return SearchResult.empty();
     }
   }

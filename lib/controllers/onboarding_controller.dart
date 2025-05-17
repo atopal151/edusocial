@@ -21,11 +21,6 @@ class OnboardingController extends GetxController {
 
   String userEmail = "";
 
-  @override
-  void onInit() {
-    super.onInit();
-    //fetchGroupsFromApi();
-  }
 
   //-------------------------------------------------------------//
   void addCourse() {
@@ -68,7 +63,7 @@ class OnboardingController extends GetxController {
         }
       }
     } catch (e) {
-      print("❗ Ders ekleme işlemlerinde hata: $e");
+      debugPrint("❗ Ders ekleme işlemlerinde hata: $e",wrapWidth: 1024);
       isLoading.value = false;
     }
   }
@@ -91,11 +86,11 @@ class OnboardingController extends GetxController {
   //-------------------------------------------------------------//
   /// Okul listesini yükle
   Future<void> loadSchoolList() async {
-    print("🌟 loadSchoolList çağrıldı.");
+    debugPrint("🌟 loadSchoolList çağrıldı.");
     isLoading.value = true;
     try {
       final data = await OnboardingServices.fetchSchools();
-      print("🌟 fetchSchools tamamlandı, data: $data");
+      debugPrint("🌟 fetchSchools tamamlandı, data: $data",wrapWidth: 1024);
       schools.assignAll(data);
 
       if (schools.isNotEmpty) {
@@ -104,7 +99,7 @@ class OnboardingController extends GetxController {
         _loadDepartmentsForSelectedSchool();
       }
     } catch (e) {
-      print("❗ Okul listesi yüklenirken hata: $e");
+      debugPrint("❗ Okul listesi yüklenirken hata: $e",wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }
@@ -157,9 +152,9 @@ class OnboardingController extends GetxController {
   /// Okul ve bölümü backend'e kaydet
   Future<bool> submitSchoolAndDepartment() async {
     if (selectedSchoolId != null && selectedDepartmentId != null) {
-      print("📤 Okul ve Bölüm Gönderiliyor:");
-      print("📚 School ID: ${selectedSchoolId}");
-      print("🏛️ Department ID: ${selectedDepartmentId}");
+      debugPrint("📤 Okul ve Bölüm Gönderiliyor:");
+      debugPrint("📚 School ID: $selectedSchoolId");
+      debugPrint("🏛️ Department ID: $selectedDepartmentId");
 
       final success = await OnboardingServices.updateSchool(
         schoolId: selectedSchoolId!,
@@ -180,7 +175,7 @@ class OnboardingController extends GetxController {
       final data = await OnboardingServices.fetchAllGroups();
       groups.assignAll(data);
     } catch (e) {
-      print("❗ Grup verileri alınamadı: $e");
+      debugPrint("❗ Grup verileri alınamadı: $e",wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }

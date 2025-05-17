@@ -34,7 +34,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         }
       }
     } catch (e) {
-      print("Hata: $e");
+      debugPrint("Hata: $e",wrapWidth: 1024);
     }
   }
 
@@ -54,7 +54,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     final StoryController storyController = Get.find<StoryController>();
     storyController.updateMyStory(paths);
 
-    print("Story paylaşıldı ve kaydedildi ✅");
+    debugPrint("Story paylaşıldı ve kaydedildi ✅");
     Get.back();
   }
 }

@@ -26,19 +26,17 @@ void main() async {
 
   await GetStorage.init();
 
-  final _box = GetStorage();
-  final token = _box.read('token');
+  final box = GetStorage();
+  final token = box.read('token');
 
   Get.put(LoginController(), permanent: true);
   Get.put(NavigationController(), permanent: true);
   Get.put(MatchController(), permanent: true);
-
   Get.put(AppBarController());
   Get.put(ProfileController(), permanent: true);
   Get.put(OnboardingController());
 
   HttpOverrides.global = MyHttpOverrides();
-
   runApp(MyApp(initialRoute: token != null ? Routes.main : Routes.login));
 }
 

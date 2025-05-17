@@ -7,11 +7,6 @@ class StoryController extends GetxController {
   final isLoading = false.obs;
   final RxList<StoryModel> storyList = <StoryModel>[].obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    //fetchStories(); // simülasyon
-  }
 
 //----------------------------------------------------------------------------//
   Future<void> fetchStories() async {

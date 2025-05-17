@@ -1,9 +1,9 @@
 // group_services.dart
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -21,8 +21,9 @@ class GroupServices {
           'Authorization': 'Bearer ${box.read('token')}',
         },
       );
-      print("📥 Group Suggestion Response: ${response.statusCode}");
-      print("📥 Group Suggestion Body: ${response.body}");
+      debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
+          wrapWidth: 1024);
+      debugPrint("📥 Group Suggestion Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -33,7 +34,7 @@ class GroupServices {
         return [];
       }
     } catch (e) {
-      print("❗ Group Suggestion error: $e");
+      debugPrint("❗ Group Suggestion error: $e", wrapWidth: 1024);
       return [];
     }
   }
@@ -78,78 +79,23 @@ class GroupServices {
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
-    print("📤 Grup Oluşturma Response: ${response.statusCode}");
-    print("📤 Grup Oluşturma Body: ${response.body}");
+    debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",
+        wrapWidth: 1024);
+    debugPrint("📤 Grup Oluşturma Body: ${response.body}", wrapWidth: 1024);
 
     return response.statusCode == 200 || response.statusCode == 201;
   }
 
-Future<List<GroupModel>> fetchUserGroups() async {
-  final box = GetStorage();
-  final token = box.read('token');
-
-  print("🚀 fetchUserGroups() çağrıldı");
-  print("🔑 Token: $token");
-
-  try {
-    final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
-    print("🌐 İstek Atılıyor: $uri");
-
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
-    );
-
-    print("📥 Kullanıcı Grupları Status: ${response.statusCode}");
-    print("📥 Kullanıcı Grupları Body:\n${response.body}");
-
-    if (response.statusCode == 200) {
-      final jsonBody = json.decode(response.body);
-      final List<dynamic> data = jsonBody['data'] ?? [];
-
-      print("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}");
-
-      final userGroupList = data.map((item) {
-        final group = GroupModel(
-          id: item['id'].toString(),
-          name: item['name'] ?? '',
-          description: item['description'] ?? '',
-          imageUrl: item['image'] != null
-              ? "${AppConstants.baseUrl}/${item['image']}"
-              : '',
-          memberCount: item['member_count'] ?? 0,
-          category: item['category'] ?? 'Genel',
-          isJoined: true, // Kullanıcı zaten bu gruplara üye
-        );
-        print("✅ Kullanıcı Grubu: ${group.name} (${group.id})");
-        return group;
-      }).toList();
-
-      return userGroupList;
-    } else {
-      print("❌ Sunucudan beklenmeyen yanıt.");
-      return [];
-    }
-  } catch (e) {
-    print("💥 Kullanıcı grupları alınırken hata oluştu: $e");
-    return [];
-  }
-}
-
-
-  Future<List<GroupModel>> fetchAllGroups() async {
+  Future<List<GroupModel>> fetchUserGroups() async {
     final box = GetStorage();
     final token = box.read('token');
 
-    print("🚀 fetchAllGroups() çağrıldı");
-    print("🔑 Token: $token");
+    debugPrint("🚀 fetchUserGroups() çağrıldı");
+    debugPrint("🔑 Token: $token");
 
     try {
-      final uri = Uri.parse("${AppConstants.baseUrl}/groups");
-      print("🌐 İstek Atılıyor: $uri");
+      final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
+      debugPrint("🌐 İstek Atılıyor: $uri");
 
       final response = await http.get(
         uri,
@@ -159,18 +105,78 @@ Future<List<GroupModel>> fetchUserGroups() async {
         },
       );
 
-      print("📥 HTTP Status Code: ${response.statusCode}");
-
-      // 🔽 Dönen cevabı aynen gösteriyoruz
-      print("📦 RAW Response Body:");
-      print(response.body);
+      debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
+          wrapWidth: 1024);
+      debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
+          wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        print("📦 Gelen Grup Sayısı: ${data.length}");
+        debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
+            wrapWidth: 1024);
 
+        final userGroupList = data.map((item) {
+          final group = GroupModel(
+            id: item['id'].toString(),
+            name: item['name'] ?? '',
+            description: item['description'] ?? '',
+            imageUrl: item['image'] != null
+                ? "${AppConstants.baseUrl}/${item['image']}"
+                : '',
+            memberCount: item['member_count'] ?? 0,
+            category: item['category'] ?? 'Genel',
+            isJoined: true, // Kullanıcı zaten bu gruplara üye
+          );
+          debugPrint("✅ Kullanıcı Grubu: ${group.name} (${group.id})",
+              wrapWidth: 1024);
+          return group;
+        }).toList();
+
+        return userGroupList;
+      } else {
+        debugPrint("❌ Sunucudan beklenmeyen yanıt.");
+        return [];
+      }
+    } catch (e) {
+      debugPrint("💥 Kullanıcı grupları alınırken hata oluştu: $e",
+          wrapWidth: 1024);
+      return [];
+    }
+  }
+
+  Future<List<GroupModel>> fetchAllGroups() async {
+    final box = GetStorage();
+    final token = box.read('token');
+
+    debugPrint("🚀 fetchAllGroups() çağrıldı");
+    debugPrint("🔑 Token: $token", wrapWidth: 1024);
+
+    try {
+      final uri = Uri.parse("${AppConstants.baseUrl}/groups");
+      debugPrint("🌐 İstek Atılıyor: $uri", wrapWidth: 1024);
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      debugPrint("📥 HTTP Status Code: ${response.statusCode}",
+          wrapWidth: 1024);
+
+      // 🔽 Dönen cevabı aynen gösteriyoruz
+      debugPrint("📦 RAW Response Body:", wrapWidth: 1024);
+      debugPrint(response.body, wrapWidth: 1024);
+
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        final List<dynamic> data = jsonBody['data'] ?? [];
+
+        debugPrint("📦 Gelen Grup Sayısı: ${data.length}", wrapWidth: 1024);
         final groupList = data.map((item) {
           final group = GroupModel(
             id: item['id'].toString(),
@@ -183,18 +189,20 @@ Future<List<GroupModel>> fetchUserGroups() async {
             category: item['category'] ?? 'Genel',
             isJoined: item['is_member'] ?? false,
           );
-          print("✅ Grup Eklendi: ${group.name} (${group.id})");
+          debugPrint("✅ Grup Eklendi: ${group.name} (${group.id})",
+              wrapWidth: 1024);
           return group;
         }).toList();
 
-        print("🎯 Toplam ${groupList.length} grup modele dönüştürüldü.");
+        debugPrint("🎯 Toplam ${groupList.length} grup modele dönüştürüldü.",
+            wrapWidth: 1024);
         return groupList;
       } else {
-        print("❌ Sunucudan beklenmeyen yanıt alındı.");
+        debugPrint("❌ Sunucudan beklenmeyen yanıt alındı.", wrapWidth: 1024);
         return [];
       }
     } catch (e) {
-      print("💥 Hata oluştu: $e");
+      debugPrint("💥 Hata oluştu: $e", wrapWidth: 1024);
       return [];
     }
   }

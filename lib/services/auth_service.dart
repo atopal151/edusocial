@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -29,14 +30,14 @@ class AuthService {
         final token = data['data']['token'];
         if (token != null) {
           _box.write('token', token);
-          print("Token başarıyla kaydedildi: $token");
+          debugPrint("Token başarıyla kaydedildi: $token",wrapWidth: 1024);
           return data['data']['user']; // 🛑 Kullanıcı bilgilerini döndür
         }
       }
       lastErrorMessage = data["message"] ?? "Giriş başarısız.";
       return null;
     } catch (e) {
-      print("Login error: $e");
+      debugPrint("Login error: $e",wrapWidth: 1024);
       return null;
     }
   }
@@ -71,19 +72,19 @@ class AuthService {
 
       if (response.statusCode == 200 && data["status"] == true) {
         final token = data['data']['token']; // 🔥 BURAYI DÜZELTTİK
-        print("buradayız1");
+        debugPrint("buradayız1");
         if (token != null) {
-          print("buradayız2");
+          debugPrint("buradayız2");
           _box.write('token', token);
           return true;
         }
       }
       lastErrorMessage = data["message"] ?? "Bilinmeyen bir hata oluştu.";
       // Eğer status false ise, mesajı döndür.
-      print("Register failed: ${data["message"] ?? response.body}");
+      debugPrint("Register failed: ${data["message"] ?? response.body}",wrapWidth: 1024);
       return false;
     } catch (e) {
-      print("Register error: $e");
+      debugPrint("Register error: $e",wrapWidth: 1024);
       return false;
     }
   }

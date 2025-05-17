@@ -36,7 +36,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                           height: 40,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            print("⚠️ Görsel yüklenemedi: $error");
+                            debugPrint("⚠️ Görsel yüklenemedi: $error",wrapWidth: 1024);
                             return Image.asset(
                               'images/user1.png',
                               width: 40,

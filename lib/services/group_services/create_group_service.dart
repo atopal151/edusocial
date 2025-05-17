@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:edusocial/models/group_models/group_area_model.dart';
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -29,7 +30,7 @@ class CreateGroupService {
         return [];
       }
     } catch (e) {
-      print("❗ Grup alanları alınamadı: $e");
+      debugPrint("❗ Grup alanları alınamadı: $e",wrapWidth: 1024);
       return [];
     }
   }
@@ -72,12 +73,12 @@ class CreateGroupService {
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
 
-      print("📤 Grup Oluşturma Response: ${response.statusCode}");
-      print("📤 Grup Oluşturma Body: ${response.body}");
+      debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📤 Grup Oluşturma Body: ${response.body}",wrapWidth: 1024);
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      print("❗ Grup oluşturma hatası: $e");
+      debugPrint("❗ Grup oluşturma hatası: $e",wrapWidth: 1024);
       return false;
     }
   }

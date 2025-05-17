@@ -10,9 +10,10 @@ class LinkMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => launch(message.content),
+      onTap: () => launchUrl(Uri.parse(message.content)),
       child: Align(
-        alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+        alignment:
+            message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           padding: EdgeInsets.all(12),
@@ -22,7 +23,8 @@ class LinkMessageWidget extends StatelessWidget {
           ),
           child: Text(
             message.content,
-            style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
           ),
         ),
       ),

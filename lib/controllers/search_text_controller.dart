@@ -19,11 +19,6 @@ class SearchTextController extends GetxController {
   var filteredGroups = <GroupSearchModel>[].obs;
   var filteredEvents = <EventModel>[].obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    // Uygulama açılırken boş arama yapmayacağız, kullanıcı yazdıkça fetch olacak
-  }
 
   // Kullanıcı her arama yaptığında çağrılacak
   Future<void> fetchSearchResults(String query) async {
@@ -49,7 +44,7 @@ class SearchTextController extends GetxController {
       filteredGroups.assignAll(response.groups);
       filteredEvents.assignAll(response.events);
     } catch (e) {
-      print("❗ Arama hatası: $e");
+      debugPrint("❗ Arama hatası: $e",wrapWidth: 1024);
       clearResults();
     } finally {
       isSeLoading.value = false;

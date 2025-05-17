@@ -1,5 +1,6 @@
 import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/models/post_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -94,7 +95,7 @@ class ProfileController extends GetxController {
       fullName.value = "${data.name} ${data.surname}";
       username.value = "@${data.username}";
       profileImage.value = data.avatar;
-      print("👤 Avatar URL: ${data.avatar}");
+      debugPrint("👤 Avatar URL: ${data.avatar}");
 
       coverImage.value = data.coverPhoto;
       bio.value = data.bio;
@@ -109,7 +110,7 @@ class ProfileController extends GetxController {
       profilePosts.assignAll(data.posts);
       appBarController.updateProfileImage(profileImage.value);
     } catch (e) {
-      print("Profil verisi yüklenemedi: $e");
+      debugPrint("Profil verisi yüklenemedi: $e",wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }

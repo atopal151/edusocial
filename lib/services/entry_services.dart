@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:edusocial/models/entry_model.dart';
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -17,8 +18,8 @@ class EntryServices {
         },
       );
 
-      print("📥 Entry Response: ${response.statusCode}");
-      print("📥 Entry Body: ${response.body}");
+      debugPrint("📥 Entry Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📥 Entry Body: ${response.body}",wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
@@ -29,7 +30,7 @@ class EntryServices {
         return [];
       }
     } catch (e) {
-      print("❗ Entry API error: $e");
+      debugPrint("❗ Entry API error: $e",wrapWidth: 1024);
       return [];
     }
   }

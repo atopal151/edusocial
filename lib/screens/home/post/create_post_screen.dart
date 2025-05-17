@@ -44,9 +44,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   void sharePost() {
     if (textController.text.isNotEmpty) {
-      print("Yeni post: ${textController.text}");
+      debugPrint("Yeni post: ${textController.text}");
       for (var img in _selectedImages) {
-        print("Görsel: ${img.path}");
+        debugPrint("Görsel: ${img.path}");
       }
       Get.back();
       Get.snackbar("Başarılı", "Gönderi paylaşıldı");

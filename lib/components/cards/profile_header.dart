@@ -31,7 +31,7 @@ Widget buildProfileHeader() {
                           : "https://i.pravatar.cc/150?img=20",
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        print("⚠️ Kapak görseli yüklenemedi: $error");
+                        debugPrint("⚠️ Kapak görseli yüklenemedi: $error",wrapWidth: 1024);
                         return Image.asset(
                           'images/user1.jpg',
                           fit: BoxFit.cover,
@@ -57,7 +57,7 @@ Widget buildProfileHeader() {
                                 controller.profileImage.value,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
-                                  print("⚠️ Profil resmi yüklenemedi: $error");
+                                  debugPrint("⚠️ Profil resmi yüklenemedi: $error",wrapWidth: 1024);
                                   return Image.asset(
                                     'images/user1.png',
                                     fit: BoxFit.cover,

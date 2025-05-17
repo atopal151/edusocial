@@ -190,7 +190,7 @@ class GroupChatDetailController extends GetxController {
 
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
-        print("Seçilen dosya: $filePath");
+        debugPrint("Seçilen dosya: $filePath");
 
         groupmessages.add(GroupMessageModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -207,7 +207,7 @@ class GroupChatDetailController extends GetxController {
         scrollToBottom();
       }
     } catch (e) {
-      print("Belge seçme hatası: $e");
+      debugPrint("Belge seçme hatası: $e",wrapWidth: 1024);
     }
   }
 

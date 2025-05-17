@@ -289,7 +289,7 @@ class ChatDetailController extends GetxController {
 
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
-        print("Seçilen dosya: $filePath");
+        debugPrint("Seçilen dosya: $filePath",wrapWidth: 1024);
 
         messages.add(MessageModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -304,7 +304,7 @@ class ChatDetailController extends GetxController {
         scrollToBottom();
       }
     } catch (e) {
-      print("Belge seçme hatası: $e");
+      debugPrint("Belge seçme hatası: $e",wrapWidth: 1024);
     }
   }
 

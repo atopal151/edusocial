@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import '../../models/story_model.dart';
@@ -17,8 +18,8 @@ class StoryService {
         },
       );
 
-      print("📥 Story Response: ${response.statusCode}");
-      print("📥 Story Body: ${response.body}");
+      debugPrint("📥 Story Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📥 Story Body: ${response.body}",wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -28,7 +29,7 @@ class StoryService {
         return [];
       }
     } catch (e) {
-      print("❗ Story çekilirken hata: $e");
+      debugPrint("❗ Story çekilirken hata: $e",wrapWidth: 1024);
       return [];
     }
   }

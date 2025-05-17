@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import '../models/post_model.dart';
@@ -19,8 +20,8 @@ class PostServices {
         },
       );
 
-      print("📥 Postlar Response: ${response.statusCode}");
-      print("📥 Postlar Body: ${response.body}");
+      debugPrint("📥 Postlar Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📥 Postlar Body: ${response.body}",wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'] as List;
@@ -29,7 +30,7 @@ class PostServices {
           userName: item['user']['username'] ?? '',
           postDate: item['created_at'] ?? '',
           postDescription: item['description'] ?? '',
-          postImage: item['image'] ?? null,
+          postImage: item['image'] ?? '',
           likeCount: item['like_count'] ?? 0,
           commentCount: item['comment_count'] ?? 0,
         )).toList();
@@ -37,7 +38,7 @@ class PostServices {
         return [];
       }
     } catch (e) {
-      print("❗ Postlar alınamadı: $e");
+      debugPrint("❗ Postlar alınamadı: $e",wrapWidth: 1024);
       return [];
     }
   }
