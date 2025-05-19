@@ -45,7 +45,7 @@ Widget buildProfileDetails() {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Row(
+                    /*Row(
                       children: [
                         CircleAvatar(
                           radius: 20,
@@ -74,7 +74,7 @@ Widget buildProfileDetails() {
                           ],
                         ),
                       ],
-                    ),
+                    ),*/
                     const SizedBox(height: 20),
 
                     /// **Kişisel Bilgiler**
@@ -135,7 +135,7 @@ Widget buildProfileDetails() {
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: profileData.courses.map((course) {
+                      children: profileData.lessons.map((course) {
                         return buildCourseChip(course);
                       }).toList(),
                     ),
@@ -168,7 +168,7 @@ Widget buildProfileDetails() {
                       child: ListView.builder(
                         scrollDirection:
                             Axis.horizontal, // **Yana kaydırılabilir yapı**
-                        itemCount: profileData.joinedGroups.length,
+                        itemCount: profileData.approvedGroups.length,
                         itemBuilder: (context, index) {
                           return InkWell(
                             onTap: () {
@@ -177,7 +177,7 @@ Widget buildProfileDetails() {
                             child: Padding(
                               padding: const EdgeInsets.only(right: 10),
                               child: buildGroupSuggestionCard(
-                                  profileData.joinedGroups[index]),
+                                  profileData.approvedGroups[index]),
                             ),
                           );
                         },

@@ -1,3 +1,5 @@
+import 'package:edusocial/controllers/people_profile_controller.dart';
+import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:edusocial/utils/image_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,8 +16,11 @@ class UserListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.snackbar(
-            "Kullanıcı Seçildi", "${user.name} profiline yönlendiriliyor.");
+        final userId = user.userId;
+        final controller = Get.put(PeopleProfileController());
+        controller.loadUserProfile(userId);
+        Get.to(() =>
+            PeopleProfileScreen(userId: userId)); // ✅ burada userId eklenmeli
       },
       child: Container(
         padding: EdgeInsets.all(12),
@@ -32,9 +37,23 @@ class UserListItem extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundImage: user.profileImage.isNotEmpty
-                          ? NetworkImage(getFullAvatarUrl(user.profileImage))
-                          : AssetImage('images/user1.png') as ImageProvider,
+                      backgroundColor: Colors.grey[200],
+                      child: ClipOval(
+                        child: Image.network(
+                          getFullAvatarUrl(user.profileImage),
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'images/user2.png',
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                      ),
                     ),
                     Positioned(
                       bottom: 0,

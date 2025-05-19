@@ -41,7 +41,6 @@ import '../screens/chat/user_chat/user_chat_detail_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/home/story/add_story_screen.dart';
 import '../screens/main_screen.dart';
-import '../screens/profile/people_profile_screen.dart';
 
 class Routes {
   static const String login = '/login';
@@ -180,11 +179,7 @@ class Routes {
       page: () => UserSettingsScreen(),
       binding: SettingsBinding(),
     ),
-    GetPage(
-      name: peopleProfile,
-      page: () => PeopleProfileScreen(),
-      binding: ProfileBinding(),
-    ),
+   
     GetPage(
       name: followers,
       page: () => ProfileFollowerScreen(),

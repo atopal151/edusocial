@@ -26,6 +26,10 @@ class ProfileUpdateService {
     required String schoolId,
     required String departmentId,
     required List<String> lessons,
+    required String description,
+    required String tiktok,
+    required String languageId,
+
     File? avatarFile,
     File? coverFile, // Yeni parametre olarak al
   }) async {
@@ -56,6 +60,10 @@ class ProfileUpdateService {
       'notification_mobile': mobileNotification ? '1' : '0',
       'school_id': schoolId,
       'school_department_id': departmentId,
+      'description': description,
+      'tiktok': tiktok,
+      'language_id': languageId,
+
     });
 
     // 📚 Ders bilgileri (array formatı)

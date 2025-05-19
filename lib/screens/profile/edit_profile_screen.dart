@@ -68,6 +68,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 10),
                     _buildTextField(
                         "Doğum Tarihi", "", controller.birthdayController),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                        "Biyografi", "", controller.descriptionController),
                     const SizedBox(height: 20),
                     _sectionTitle("Sosyal Medya Hesapları"),
                     const SizedBox(height: 10),
@@ -82,7 +85,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 10),
                     _buildTextField(
                         "LinkedIn", "/", controller.linkedinController),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    _buildTextField("Tiktok", "@", controller.tiktokController),
+
                     /*
                     _sectionTitle("Okul ve Bölüm Bilgisi"),
                     const SizedBox(height: 10),
@@ -102,12 +107,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         "E-posta Bildirimi",
                         controller.emailNotification,
                         controller.toggleEmailNotification),
-
                     const SizedBox(height: 20),
                     _buildSwitchTile(
                         "Mobil Bildirimi",
                         controller.mobileNotification,
                         controller.toggleMobileNotification),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                        "Dil ID", "", controller.languageIdController),
                     const SizedBox(height: 20),
                     _sectionTitle("Hesap Tipi"),
                     _buildAccountTypeSelector(),
@@ -156,11 +163,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               fit: BoxFit.cover,
               image: controller.selectedCoverPhoto != null
                   ? FileImage(controller.selectedCoverPhoto!)
-                  : (controller.userProfileModel.value?.coverPhoto
+                  : (controller.userProfileModel.value?.bannerUrl
                                   .startsWith('http') ==
                               true
                           ? NetworkImage(
-                              controller.userProfileModel.value!.coverPhoto)
+                              controller.userProfileModel.value!.bannerUrl)
                           : const AssetImage('images/card_car.png'))
                       as ImageProvider,
             ),
@@ -260,7 +267,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             style: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
                 fontSize: 13.28,
-                color: Color(0xff414751))),
+                color: Color(0xff9ca3ae))),
         const SizedBox(height: 5),
         Container(
           decoration: BoxDecoration(
@@ -285,49 +292,47 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-Widget _buildSwitchTile(
-    String title, RxBool value, Function(bool) onChanged) {
-  return Obx(() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w600,
-              fontSize: 13.28,
-              color: Color(0xff414751),
-            ),
-          ),
-          GestureDetector(
-            onTap: () => onChanged(!value.value),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 36,
-              height: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              alignment:
-                  value.value ? Alignment.centerRight : Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.white, // track arka planı tamamen kaldırıldı
-                borderRadius: BorderRadius.circular(20),
+  Widget _buildSwitchTile(
+      String title, RxBool value, Function(bool) onChanged) {
+    return Obx(() => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 13.28,
+                color: Color(0xff9ca3ae),
               ),
-              child: Container(
-                width: 14,
-                height: 14,
+            ),
+            GestureDetector(
+              onTap: () => onChanged(!value.value),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 36,
+                height: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                alignment:
+                    value.value ? Alignment.centerRight : Alignment.centerLeft,
                 decoration: BoxDecoration(
-                  color: value.value
-                      ? const Color(0xFFEF5050) // açıkken kırmızı
-                      : const Color(0xFFD3D3D3), // kapalıda gri
-                  shape: BoxShape.circle,
+                  color: Colors.white, // track arka planı tamamen kaldırıldı
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: value.value
+                        ? const Color(0xFFEF5050) // açıkken kırmızı
+                        : const Color(0xFFD3D3D3), // kapalıda gri
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ));
-}
-
-
+          ],
+        ));
+  }
 
   Widget _buildLessonChips() {
     return Obx(() => Wrap(
@@ -379,38 +384,36 @@ Widget _buildSwitchTile(
         ));
   }
 
-Widget _buildAccountTypeBox(String type) {
-  final isSelected = controller.accountType.value == type;
-  return GestureDetector(
-    onTap: () => controller.changeAccountType(type),
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFE7E7E7) : Colors.white,
-        borderRadius: BorderRadius.circular(15),
-       
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            type.capitalizeFirst ?? '',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.black : const Color(0xFF1F1F1F),
+  Widget _buildAccountTypeBox(String type) {
+    final isSelected = controller.accountType.value == type;
+    return GestureDetector(
+      onTap: () => controller.changeAccountType(type),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFE7E7E7) : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              type.capitalizeFirst ?? '',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? Colors.black : const Color(0xFF1F1F1F),
+              ),
             ),
-          ),
-          if (isSelected) ...[
-            const SizedBox(width: 6),
-            const Icon(Icons.check, size: 16, color: Colors.black),
+            if (isSelected) ...[
+              const SizedBox(width: 6),
+              const Icon(Icons.check, size: 16, color: Colors.black),
+            ],
           ],
-        ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _sectionTitle(String title) {
     return Text(

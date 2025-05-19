@@ -31,7 +31,8 @@ Widget buildProfileHeader() {
                           : "https://i.pravatar.cc/150?img=20",
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        debugPrint("⚠️ Kapak görseli yüklenemedi: $error",wrapWidth: 1024);
+                        debugPrint("⚠️ Kapak görseli yüklenemedi: $error",
+                            wrapWidth: 1024);
                         return Image.asset(
                           'images/user1.jpg',
                           fit: BoxFit.cover,
@@ -43,34 +44,30 @@ Widget buildProfileHeader() {
               )),
 
           Positioned(
-              bottom: -35,
-              left: Get.width / 2 - 45,
-              child: Obx(() => CircleAvatar(
-                    radius: 42,
-                    backgroundColor: Colors.white,
-                    child: CircleAvatar(
-                      radius: 38,
-                      backgroundColor: Colors.grey.shade200,
-                      child: ClipOval(
-                        child: controller.profileImage.value.trim().isNotEmpty
-                            ? Image.network(
-                                controller.profileImage.value,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  debugPrint("⚠️ Profil resmi yüklenemedi: $error",wrapWidth: 1024);
-                                  return Image.asset(
-                                    'images/user1.png',
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
-                            : Image.asset(
-                                'images/user1.png',
-                                fit: BoxFit.cover,
-                              ),
-                      ),
-                    ),
-                  ))),
+            bottom: -35,
+            left: Get.width / 2 - 45,
+            child: Obx(
+              () {
+                final imageUrl = controller.profileImage.value.trim();
+                return CircleAvatar(
+                  radius: 42,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 38,
+                    backgroundColor: const Color(0xfffafafa),
+                    backgroundImage:
+                        imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+                    child: imageUrl.isEmpty
+                        ? Image.asset(
+                            'images/user1.png',
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
       const SizedBox(height: 50),

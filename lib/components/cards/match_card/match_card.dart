@@ -56,7 +56,8 @@ class _MatchCardState extends State<MatchCard> {
                           ? Alignment.topLeft
                           : Alignment.topRight,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 20),
                         child: Container(
                           width: double.infinity,
                           height: double.infinity,
@@ -123,7 +124,6 @@ class _MatchCardState extends State<MatchCard> {
           children: [
             Text(
               "${match.name}, ${match.age ?? '-'}",
-
               style: const TextStyle(
                   fontSize: 18.72,
                   fontWeight: FontWeight.bold,
@@ -164,7 +164,8 @@ class _MatchCardState extends State<MatchCard> {
                     padding: const EdgeInsets.all(8.0),
                     child: match.schoolLogo.isNotEmpty
                         ? Image.network(match.schoolLogo, width: 21, height: 21)
-                        : const Icon(Icons.school, size: 18, color: Colors.grey),
+                        : const Icon(Icons.school,
+                            size: 18, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -172,7 +173,9 @@ class _MatchCardState extends State<MatchCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      match.schoolName.isNotEmpty ? match.schoolName : 'Okul bilgisi yok',
+                      match.schoolName.isNotEmpty
+                          ? match.schoolName
+                          : 'Okul bilgisi yok',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -217,7 +220,8 @@ class _MatchCardState extends State<MatchCard> {
               children: match.matchedTopics
                   .map<Widget>(
                     (topic) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white.withAlpha(70),
                         borderRadius: BorderRadius.circular(16),
@@ -239,7 +243,7 @@ class _MatchCardState extends State<MatchCard> {
               children: [
                 _buildActionButton(
                   iconPath: 'images/icons/match_user_add_icon.svg',
-                  label: 'Takip Et',
+                  label: match.isFollowing ? 'Takip Ediliyor' : 'Takip Et',
                   color: const Color(0xff65D384),
                   onTap: controller.followUser,
                 ),

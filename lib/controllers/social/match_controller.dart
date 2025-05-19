@@ -22,16 +22,28 @@ class MatchController extends GetxController {
     _loadMockData();
   }
 
+  void followUser() async {
+    final userId = currentMatch.userId;
+
+    final success = await MatchServices.followUser(userId);
+    if (success) {
+      Get.snackbar("Takip", "${currentMatch.name} takip edildi!",
+          snackPosition: SnackPosition.BOTTOM);
+
+      // Match modelini güncelle
+      matches[currentIndex.value] =
+          matches[currentIndex.value].copyWith(isFollowing: true);
+    } else {
+      Get.snackbar("Hata", "Takip işlemi başarısız.",
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
   void findMatch() {
     Get.toNamed("/match");
   }
 
   void _loadMockData() {}
-
-  void followUser() {
-    Get.snackbar("Takip", "${currentMatch.name} takip edildi!",
-        snackPosition: SnackPosition.BOTTOM);
-  }
 
   void startChat() {
     Get.toNamed("/chat_detail");
@@ -61,19 +73,23 @@ class MatchController extends GetxController {
 
     final fetchedMatches = await MatchServices.fetchMatches();
 
-    if (fetchedMatches.isNotEmpty) {
-      matches.assignAll(fetchedMatches);
+    // ✅ sadece takip ETMEDİĞİ kullanıcıları al
+    final filteredMatches =
+        fetchedMatches.where((match) => !match.isFollowing).toList();
+
+    if (filteredMatches.isNotEmpty) {
+      matches.assignAll(filteredMatches);
       currentIndex.value = 0;
 
-      Get.back(); // önce eşleşme ekranından çık
-      navigationController.changeIndex(2); // navbar indexini eşleşmeye ayarla
+      Get.back();
+      navigationController.changeIndex(2);
     } else {
       Get.snackbar(
-        "Hata",
-        "Eşleşecek kullanıcı bulunamadı.",
+        "Bilgi",
+        "Takip etmediğin yeni bir eşleşme bulunamadı.",
         snackPosition: SnackPosition.BOTTOM,
       );
-      Get.back(); // başarısızsa sadece geri dön
+      Get.back();
     }
 
     isLoading.value = false;

@@ -42,11 +42,39 @@ class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
           GestureDetector(
             child: Padding(
               padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-              child: Obx(() => CircleAvatar(
-                    backgroundImage:
-                        AssetImage(controller.profileImagePath.value),
-                    radius: 20,
-                  )),
+              child: Obx(() {
+              final imagePath = controller.profileImagePath.value;
+              final isNetworkImage = imagePath.startsWith('http');
+
+              return CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.grey.shade200,
+                child: ClipOval(
+                  child: isNetworkImage
+                      ? Image.network(
+                          imagePath,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            debugPrint("⚠️ Görsel yüklenemedi: $error",wrapWidth: 1024);
+                            return Image.asset(
+                              'images/user1.png',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          imagePath.isNotEmpty ? imagePath : 'images/user1.png',
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+              );
+            })
             ),
           ),
         ],

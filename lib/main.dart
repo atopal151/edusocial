@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:flutter/material.dart';

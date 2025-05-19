@@ -1,20 +1,20 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
+import 'package:edusocial/components/widgets/build_people_profile_details.dart';
+import 'package:edusocial/controllers/people_profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/cards/entry_card.dart';
 import '../../components/cards/post_card.dart';
-import '../../components/cards/profile_cards.dart';
-import '../../components/cards/profile_header.dart';
 import '../../components/profile_tabbar/profile_tabbar.dart';
 import '../../components/profile_tabbar/toggle_tab_bar.dart';
 import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
-import '../../controllers/profile_controller.dart';
 
 class PeopleProfileScreen extends StatefulWidget {
-  const PeopleProfileScreen({super.key});
+  final int userId;
+  const PeopleProfileScreen({super.key, required this.userId});
 
   @override
   State<PeopleProfileScreen> createState() => _PeopleProfileScreenState();
@@ -22,19 +22,18 @@ class PeopleProfileScreen extends StatefulWidget {
 
 class _PeopleProfileScreenState extends State<PeopleProfileScreen>
     with SingleTickerProviderStateMixin {
-  final ProfileController controller = Get.put(ProfileController());
+  final PeopleProfileController controller = Get.put(PeopleProfileController());
   final PostController postController = Get.put(PostController());
   final EntryController entryController = Get.put(EntryController());
-  // TabController
-  late TabController _tabController;
 
-  // Seçili ToggleTabBar'ı kontrol eden değişken
+  late TabController _tabController;
   final RxInt selectedTabIndex = 0.obs;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    controller.loadUserProfile(widget.userId);
   }
 
   @override
@@ -50,74 +49,121 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
             SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 10),
-                  buildProfileHeader(),
-                  const SizedBox(height: 10),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 140,
-                        child: CustomButton(
-                          height: 40,
-                          borderRadius: 5,
-                          text: "Takip Et",
-                          onPressed: () {},
-                          backgroundColor: const Color(0xfff4f4f5),
-                          textColor: const Color(0xff414751),
-                          isLoading: controller.isPrLoading,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      SizedBox(
-                        width: 140,
-                        child: CustomButton(
-                          height: 40,
-                          borderRadius: 5,
-                          text: "Mesaj Gönder",
-                          onPressed: () {},
-                          backgroundColor: const Color(0xff1f1f1f),
-                          textColor: const Color(0xffffffff),
-                          icon: SvgPicture.asset(
-                            "images/icons/post_chat.svg",
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xffffffff),
-                              BlendMode.srcIn,
-                            ),
-                            width: 20,
-                            height: 20,
-                          ),
-                          iconColor: Color(0xffffffff),
-                          isLoading: controller.isPrLoading,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
+              child: Obx(() {
+                final profile = controller.profile.value;
 
-                  /// **✅ Üst TabBar (İkonlu)**
-                  ProfileTabBar(tabController: _tabController),
-                ],
-              ),
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (profile == null) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text("Kullanıcı profili yüklenemedi."),
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 10),
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey[200],
+                      child: ClipOval(
+                        child: Image.network(
+                          profile.avatar,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'images/user2.png', // 📌 local asset yolu
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "${profile.name} ${profile.surname}",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    Text("@${profile.username}",
+                        style: TextStyle(color: Colors.grey[600])),
+                    const SizedBox(height: 8),
+                    Text(profile.description ?? '',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14)),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Obx(() => SizedBox(
+                              width: 140,
+                              child: CustomButton(
+                                height: 40,
+                                borderRadius: 5,
+                                text: controller.isFollowing.value
+                                    ? "Takibi Bırak"
+                                    : "Takip Et",
+                                onPressed: () {
+                                  controller.isFollowing.value
+                                      ? controller.unfollowUser(widget.userId)
+                                      : controller.followUser(widget.userId);
+                                },
+                                backgroundColor: const Color(0xfff4f4f5),
+                                textColor: const Color(0xff414751),
+                                isLoading: controller
+                                    .isFollowLoading, // 👈 burası değişti
+                              ),
+                            )),
+                        const SizedBox(width: 10),
+                        SizedBox(
+                          width: 140,
+                          child: CustomButton(
+                            height: 40,
+                            borderRadius: 5,
+                            text: "Mesaj Gönder",
+                            onPressed: () {
+                              // mesaj gönder ekranına yönlendirme yapılabilir
+                            },
+                            backgroundColor: const Color(0xff1f1f1f),
+                            textColor: const Color(0xffffffff),
+                            icon: SvgPicture.asset(
+                              "images/icons/post_chat.svg",
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xffffffff),
+                                BlendMode.srcIn,
+                              ),
+                              width: 20,
+                              height: 20,
+                            ),
+                            iconColor: Color(0xffffffff),
+                            isLoading: false.obs,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    ProfileTabBar(tabController: _tabController),
+                  ],
+                );
+              }),
             ),
           ],
           body: TabBarView(
             controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             children: [
-              /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
               Column(
                 children: [
                   Container(
-                    color: Color(0xfffafafa),
+                    color: const Color(0xfffafafa),
                     child: ToggleTabBar(
                       selectedIndex: selectedTabIndex,
                       onTabChanged: (index) {
@@ -125,7 +171,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                       },
                     ),
                   ),
-                  
                   Expanded(
                     child: Obx(() {
                       return selectedTabIndex.value == 0
@@ -135,10 +180,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                   ),
                 ],
               ),
-
-              /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
-              buildProfileDetails(),
-              
+              _buildProfileDetails(),
             ],
           ),
         ),
@@ -146,7 +188,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
     );
   }
 
-  /// **Gönderiler Sekmesi İçeriği**
   Widget _buildPosts() {
     return Obx(() {
       if (postController.isLoading.value) {
@@ -158,13 +199,12 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
       }
 
       return ListView.builder(
-        physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: postController.postList.length,
         itemBuilder: (context, index) {
           final post = postController.postList[index];
           return Container(
-            color: Color(0xfffafafa),
+            color: const Color(0xfffafafa),
             child: PostCard(
               profileImage: post.profileImage,
               userName: post.userName,
@@ -180,7 +220,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
     });
   }
 
-  /// **Entryler Sekmesi İçeriği**
   Widget _buildEntries() {
     return Obx(() {
       if (entryController.entryPersonList.isEmpty) {
@@ -188,13 +227,12 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
       }
 
       return ListView.builder(
-        physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: entryController.entryPersonList.length,
         itemBuilder: (context, index) {
           final entry = entryController.entryPersonList[index];
           return Container(
-            color: Color(0xfffafafa),
+            color: const Color(0xfffafafa),
             child: EntryCard(
               onPressed: () {},
               entry: entry,
@@ -205,6 +243,14 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
           );
         },
       );
+    });
+  }
+
+  Widget _buildProfileDetails() {
+    return Obx(() {
+      final profile = controller.profile.value;
+      if (profile == null) return const SizedBox();
+      return buildPeopleProfileDetails(profile);
     });
   }
 }

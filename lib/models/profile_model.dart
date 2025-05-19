@@ -1,113 +1,153 @@
-import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/models/post_model.dart';
 
 class ProfileModel {
+  final int id;
+  final String accountType;
+  final String? languageId;
+  final String avatar;
+  final String banner;
+  final String? description;
+  final String? schoolId;
+  final String? schoolDepartmentId;
   final String name;
   final String surname;
+  final String? phone;
   final String username;
   final String email;
-  final String phone;
-  final String avatar;
-  final String coverPhoto;
-  final String bio;
-  final String instagram;
-  final String twitter;
-  final String facebook;
-  final String linkedin;
-  final String accountType;
+  final String? emailVerifiedAt;
+  final String birthDate;
+  final String? instagram;
+  final String? tiktok;
+  final String? twitter;
+  final String? facebook;
+  final String? linkedin;
   final bool notificationEmail;
   final bool notificationMobile;
-  final String schoolId;
-  final String schoolDepartmentId;
-
-  final int followers;
-  final int following;
-  final int postCount;
-
-  final String schoolName;
-  final String schoolLogo;
-  final String schoolDepartment;
-  final String schoolGrade;
-  final String birthDate;
-
-  final List<String> courses;
-  final List<GroupSuggestionModel> joinedGroups;
+  final bool isActive;
+  final bool isOnline;
+  final String? deletedAt;
+  final String createdAt;
+  final String updatedAt;
+  final bool isFollowing;
+  final bool isFollowingPending;
+  final String avatarUrl;
+  final String bannerUrl;
+  final int unreadMessagesTotalCount;
+  final int followingCount;
+  final int followerCount;
+  final bool isSelf;
   final List<PostModel> posts;
+  final dynamic language;
+  final List<dynamic> approvedGroups;
+  final dynamic school;
+  final dynamic schoolDepartment;
+  final List<String> lessons;
+  final List<dynamic> followings;
+  final List<dynamic> followers;
+  final List<dynamic> approvedFollowings;
+  final List<dynamic> approvedFollowers;
+  final List<dynamic> stories;
+  final List<dynamic> followingStories;
 
   ProfileModel({
+    required this.id,
+    required this.accountType,
+    required this.languageId,
+    required this.avatar,
+    required this.banner,
+    required this.description,
+    required this.schoolId,
+    required this.schoolDepartmentId,
     required this.name,
     required this.surname,
+    required this.phone,
     required this.username,
     required this.email,
-    required this.phone,
-    required this.avatar,
-    required this.coverPhoto,
-    required this.bio,
+    required this.emailVerifiedAt,
+    required this.birthDate,
     required this.instagram,
+    required this.tiktok,
     required this.twitter,
     required this.facebook,
     required this.linkedin,
-    required this.accountType,
     required this.notificationEmail,
     required this.notificationMobile,
-    required this.schoolId,
-    required this.schoolDepartmentId,
-    required this.followers,
-    required this.following,
-    required this.postCount,
-    required this.schoolName,
-    required this.schoolLogo,
-    required this.schoolDepartment,
-    required this.schoolGrade,
-    required this.birthDate,
-    required this.courses,
-    required this.joinedGroups,
+    required this.isActive,
+    required this.isOnline,
+    required this.deletedAt,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.isFollowing,
+    required this.isFollowingPending,
+    required this.avatarUrl,
+    required this.bannerUrl,
+    required this.unreadMessagesTotalCount,
+    required this.followingCount,
+    required this.followerCount,
+    required this.isSelf,
     required this.posts,
+    required this.language,
+    required this.approvedGroups,
+    required this.school,
+    required this.schoolDepartment,
+    required this.lessons,
+    required this.followings,
+    required this.followers,
+    required this.approvedFollowings,
+    required this.approvedFollowers,
+    required this.stories,
+    required this.followingStories,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
+      id: json['id'],
+      accountType: json['account_type'] ?? 'private',
+      languageId: json['language_id'],
+      avatar: json['avatar'] ?? '',
+      banner: json['banner'] ?? '',
+      description: json['description'],
+      schoolId: json['school_id']?.toString(),
+      schoolDepartmentId: json['school_department_id']?.toString(),
       name: json['name'] ?? '',
       surname: json['surname'] ?? '',
+      phone: json['phone'],
       username: json['username'] ?? '',
       email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
-      avatar: json['avatar_url'] ?? '',
-      coverPhoto: json['cover_photo'] ?? '',
-      bio: json['bio'] ?? '',
-      instagram: json['instagram'] ?? '',
-      twitter: json['twitter'] ?? '',
-      facebook: json['facebook'] ?? '',
-      linkedin: json['linkedin'] ?? '',
-      accountType: json['account_type'] ?? 'private',
+      emailVerifiedAt: json['email_verified_at'],
+      birthDate: json['birthday'] ?? '',
+      instagram: json['instagram'],
+      tiktok: json['tiktok'],
+      twitter: json['twitter'],
+      facebook: json['facebook'],
+      linkedin: json['linkedin'],
       notificationEmail: json['notification_email'] ?? true,
       notificationMobile: json['notification_mobile'] ?? true,
-      schoolId: json['school_id']?.toString() ?? '',
-      schoolDepartmentId: json['school_department_id']?.toString() ?? '',
-      followers: (json['followers'] is List)
-          ? json['followers'].length
-          : (json['followers'] is int ? json['followers'] : 0),
-      following: (json['followings'] is List)
-          ? json['followings'].length
-          : (json['followings'] is int ? json['followings'] : 0),
-      postCount: (json['posts'] is List) ? json['posts'].length : 0,
-      schoolName: json['school']?['name'] ?? '',
-      schoolLogo: json['school']?['logo'] ?? '',
-      schoolDepartment: json['school_department']?['name'] ?? '',
-      schoolGrade: json['school_grade'] ?? '',
-      birthDate: json['birthday'] ?? '',
-      courses: (json['lessons'] as List?)
-              ?.map((e) => e['name'].toString())
-              .toList() ??
-          [],
-      joinedGroups: (json['approved_groups'] as List?)
-              ?.map((group) => GroupSuggestionModel.fromJson(group))
-              .toList() ??
-          [],
-      posts: (json['posts'] as List?)
-              ?.map((e) => PostModel.fromJson(e))
-              .toList() ??
-          [],
+      isActive: json['is_active'] ?? true,
+      isOnline: json['is_online'] ?? true,
+      deletedAt: json['deleted_at'],
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      isFollowing: json['is_following'] ?? false,
+      isFollowingPending: json['is_following_pending'] ?? false,
+      avatarUrl: json['avatar_url'] ?? '',
+      bannerUrl: json['banner_url'] ?? '',
+      unreadMessagesTotalCount: json['unread_messages_total_count'] ?? 0,
+      followingCount: json['following_count'] ?? 0,
+      followerCount: json['follower_count'] ?? 0,
+      isSelf: json['is_self'] ?? false,
+      posts: (json['posts'] as List?)?.map((e) => PostModel.fromJson(e)).toList() ?? [],
+      language: json['language'],
+      approvedGroups: json['approved_groups'] ?? [],
+      school: json['school'],
+      schoolDepartment: json['school_department'],
+      lessons: (json['lessons'] as List?)?.map((e) => e['name'].toString()).toList() ?? [],
+      followings: json['followings'] ?? [],
+      followers: json['followers'] ?? [],
+      approvedFollowings: json['approved_followings'] ?? [],
+      approvedFollowers: json['approved_followers'] ?? [],
+      stories: json['stories'] ?? [],
+      followingStories: json['following_stories'] ?? [],
     );
   }
 }

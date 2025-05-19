@@ -8,7 +8,6 @@ import '../../models/story_model.dart';
 class StoryService {
   static final box = GetStorage();
 
-
   static Future<List<StoryModel>> fetchStories() async {
     try {
       final response = await http.get(
@@ -18,8 +17,8 @@ class StoryService {
         },
       );
 
-      debugPrint("📥 Story Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📥 Story Body: ${response.body}",wrapWidth: 1024);
+      debugPrint("📥 Story Response: ${response.statusCode}", wrapWidth: 1024);
+      debugPrint("📥 Story Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -29,7 +28,7 @@ class StoryService {
         return [];
       }
     } catch (e) {
-      debugPrint("❗ Story çekilirken hata: $e",wrapWidth: 1024);
+      debugPrint("❗ Story çekilirken hata: $e", wrapWidth: 1024);
       return [];
     }
   }

@@ -13,15 +13,11 @@ class ProfileController extends GetxController {
   // Mock Kullanıcı Verileri
   var isPrLoading = false.obs; // Yüklenme durumu
 
-  var profileImage = "https://i.pravatar.cc/150?img=20".obs;
-  var fullName = "Canan Kara".obs;
-  var bio =
-      "Lise buluşması için etkinlik yapıyoruz katılmak isteyen tüm arkadaşları bu güzel etkinliğe bekliyoruz.."
-          .obs;
-  var coverImage =
-      "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-          .obs;
-  var username = "@ckara".obs;
+  var profileImage = "".obs;
+  var fullName = "".obs;
+  var bio = "".obs;
+  var coverImage = "".obs;
+  var username = "".obs;
   var postCount = 352.obs;
   var followers = 2352.obs;
   var following = 532.obs;
@@ -94,23 +90,23 @@ class ProfileController extends GetxController {
       // Verileri UI'daki observable alanlara at
       fullName.value = "${data.name} ${data.surname}";
       username.value = "@${data.username}";
-      profileImage.value = data.avatar;
+      profileImage.value = data.avatarUrl;
       debugPrint("👤 Avatar URL: ${data.avatar}");
 
-      coverImage.value = data.coverPhoto;
-      bio.value = data.bio;
-      followers.value = data.followers;
-      following.value = data.following;
-      postCount.value = data.postCount;
+      coverImage.value = data.banner;
+      bio.value = data.description ?? '';
+      followers.value = data.followers.length;
+      following.value = data.followings.length;
+      postCount.value = data.posts.length;
       birthDate.value = formatBirthday(data.birthDate);
-      schoolName.value = data.schoolName;
+      schoolName.value = data.school;
       schoolDepartment.value = data.schoolDepartment;
-      schoolGrade.value = data.schoolGrade;
-      lessons.value = data.courses;
+      //schoolGrade.value = data.schoolGrade;
+      lessons.value = data.lessons;
       profilePosts.assignAll(data.posts);
       appBarController.updateProfileImage(profileImage.value);
     } catch (e) {
-      debugPrint("Profil verisi yüklenemedi: $e",wrapWidth: 1024);
+      debugPrint("Profil verisi yüklenemedi: $e", wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }

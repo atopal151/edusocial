@@ -1,4 +1,5 @@
 class MatchModel {
+  final int userId;
   final String name;
   final String profileImage;
   final bool isOnline;
@@ -9,18 +10,21 @@ class MatchModel {
   final String about;
   final int grade;
   final List<String> matchedTopics;
-
+final bool isFollowing;
+  /// Yaş hesaplama
   int? get age {
     if (birthday == null) return null;
     final now = DateTime.now();
     int age = now.year - birthday!.year;
-    if (now.month < birthday!.month || (now.month == birthday!.month && now.day < birthday!.day)) {
+    if (now.month < birthday!.month ||
+        (now.month == birthday!.month && now.day < birthday!.day)) {
       age--;
     }
     return age;
   }
 
   MatchModel({
+    required this.userId,
     required this.name,
     required this.profileImage,
     required this.isOnline,
@@ -31,21 +35,46 @@ class MatchModel {
     required this.about,
     required this.grade,
     required this.matchedTopics,
+    required this.isFollowing,
   });
 
   factory MatchModel.fromJson(Map<String, dynamic> json) {
     final user = json['matched_user'] ?? {};
+
     return MatchModel(
+      userId: user['id'] ?? 0, // ✅ user içinden alınmalı
       name: user['name'] ?? '',
       profileImage: user['avatar_url'] ?? '',
       isOnline: user['is_online'] ?? false,
-      birthday: user['birthday'] != null ? DateTime.tryParse(user['birthday']) : null,
+      birthday: user['birthday'] != null
+          ? DateTime.tryParse(user['birthday'])
+          : null,
       schoolName: user['school']?['name'] ?? '',
       schoolLogo: user['school']?['logo'] ?? '',
       department: user['school_department']?['name'] ?? '',
-      about: user['about'] ?? '',
-      grade: user['grade'] ?? 0,
+      about: user['bio'] ?? '', // ✅ 'about' yerine 'bio' geldiğini unutma
+      grade: user['school_grade'] != null
+          ? int.tryParse(user['school_grade'].toString()) ?? 0
+          : 0,
       matchedTopics: [json['matched_lesson'] ?? ''],
+      isFollowing: user['is_following'] ?? false, // 👈 burası önemli
     );
   }
+  MatchModel copyWith({bool? isFollowing}) {
+  return MatchModel(
+    userId: userId,
+    name: name,
+    profileImage: profileImage,
+    isOnline: isOnline,
+    birthday: birthday,
+    schoolName: schoolName,
+    schoolLogo: schoolLogo,
+    department: department,
+    about: about,
+    grade: grade,
+    matchedTopics: matchedTopics,
+    isFollowing: isFollowing ?? this.isFollowing,
+  );
+}
+
 }

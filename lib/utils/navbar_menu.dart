@@ -13,11 +13,11 @@ class NavbarMenu extends StatefulWidget {
 
 class _NavbarMenuState extends State<NavbarMenu> {
   final MatchController matchController = Get.find();
-
   final NavigationController controller = Get.find();
 
   final List<String> icons = ["post", "chat", "match", "event", "profile"];
   static const double centerButtonWidth = 57;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -29,7 +29,6 @@ class _NavbarMenuState extends State<NavbarMenu> {
             padding: EdgeInsets.only(top: 15, bottom: 30, left: 15, right: 15),
             decoration: BoxDecoration(
               color: Colors.white,
-           
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -64,6 +63,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
             ),
           ),
         ),
+
         Positioned(
           bottom: 35, // Navbarın üstüne çıkmasını sağlar
           left: MediaQuery.of(context).size.width / 2 - 25, // Ortalar

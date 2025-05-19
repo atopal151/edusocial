@@ -32,6 +32,9 @@ class ProfileUpdateController extends GetxController {
   final linkedinController = TextEditingController();
   final schoolIdController = TextEditingController();
   final departmentIdController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final tiktokController = TextEditingController();
+  final languageIdController = TextEditingController();
 
   // Ekstra seçenekler
   var accountType = 'private'.obs; // "private" veya "public"
@@ -97,17 +100,21 @@ class ProfileUpdateController extends GetxController {
     surnameController.text = data.surname;
     emailController.text = data.email;
     birthdayController.text = formatBirthday(data.birthDate);
-    phoneController.text = data.phone; // null olabilir
-    instagramController.text = data.instagram;
-    twitterController.text = data.twitter;
-    facebookController.text = data.facebook;
-    linkedinController.text = data.linkedin;
-    schoolIdController.text = data.schoolId;
-    departmentIdController.text = data.schoolDepartmentId;
+    phoneController.text = data.phone ?? ''; // null olabilir
+    instagramController.text = data.instagram ?? '';
+    twitterController.text = data.twitter ?? '';
+    facebookController.text = data.facebook ?? '';
+    linkedinController.text = data.linkedin ?? '';
+    schoolIdController.text = data.schoolId ?? '';
+    departmentIdController.text = data.schoolDepartmentId ?? '';
     accountType.value = data.accountType;
     emailNotification.value = data.notificationEmail;
     mobileNotification.value = data.notificationMobile;
-    selectedLessons.value = data.courses;
+    selectedLessons.value = data.lessons;
+    descriptionController.text = data.description ?? '';
+    tiktokController.text = data.tiktok ?? '';
+    languageIdController.text = data.languageId ?? '';
+
   }
 
   /// 🎛️ Switch kontroller
@@ -169,6 +176,9 @@ class ProfileUpdateController extends GetxController {
         lessons: selectedLessons,
         avatarFile: selectedAvatar,
         coverFile: selectedCoverPhoto,
+        description: descriptionController.text,
+        tiktok: tiktokController.text,
+        languageId: languageIdController.text
       );
 
       Get.snackbar("Başarılı", "Profil bilgileri güncellendi!");
