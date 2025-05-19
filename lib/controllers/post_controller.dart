@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:edusocial/services/post_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,57 +12,8 @@ class PostController extends GetxController {
 
   @override
   void onInit() {
-    fetchPosts(); // Sayfa açıldığında verileri çek
-    fetchHomePosts(); // Sayfa açıldığında verileri çek
+    fetchHomePosts(); // Gerçek verileri çek
     super.onInit();
-  }
-
-  void fetchPosts() async {
-    await Future.delayed(Duration(seconds: 2)); // API çağrısı simülasyonu
-
-    var fetchedPosts = [
-      PostModel(
-        profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
-        userName: "Alara Christie",
-        postDate: "31 Oca Cum",
-        postDescription:
-            "Çözmeye çalıştım ama iç içe türev alma kısmında kafam karıştı...",
-        postImage:
-            "https://images.pexels.com/photos/31341763/pexels-photo-31341763/free-photo-of-toskana-daki-siyah-ve-beyaz-kis-ormani.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        likeCount: 253,
-        commentCount: 8434,
-      ),
-      PostModel(
-        profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
-        userName: "Alara Christie",
-        postDate: "2 Şub Cum",
-        postDescription: "Diferansiyel denklemlerle ilgili çalışıyorum.",
-        postImage: null, // Bu gönderide fotoğraf yok
-        likeCount: 180,
-        commentCount: 1290,
-      ),
-      PostModel(
-        profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
-        userName: "Alara Christie",
-        postDate: "2 Şub Cum",
-        postDescription: "Diferansiyel denklemlerle ilgili çalışıyorum.",
-        postImage: null, // Bu gönderide fotoğraf yok
-        likeCount: 180,
-        commentCount: 1290,
-      ),
-      PostModel(
-        profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
-        userName: "Alara Christie",
-        postDate: "2 Şub Cum",
-        postDescription: "Diferansiyel denklemlerle ilgili çalışıyorum.",
-        postImage: null, // Bu gönderide fotoğraf yok
-        likeCount: 180,
-        commentCount: 1290,
-      ),
-    ];
-
-    postList.assignAll(fetchedPosts);
-    isLoading.value = false;
   }
 
   void fetchHomePosts() async {
@@ -69,11 +21,28 @@ class PostController extends GetxController {
     try {
       final posts = await PostServices.fetchHomePosts();
       postHomeList.assignAll(posts);
-      debugPrint(posts as String?, wrapWidth: 1024);
     } catch (e) {
-      debugPrint("❗ Post çekme hatası: $e",wrapWidth: 1024);
+      debugPrint("❗ Post çekme hatası: $e", wrapWidth: 1024);
     } finally {
       isHomeLoading.value = false;
+    }
+  }
+
+  Future<void> createPost(String content, List<File> mediaFiles) async {
+    try {
+      isLoading.value = true;
+      final success = await PostServices.createPost(content, mediaFiles);
+      if (success) {
+        Get.back();
+        Get.snackbar("Başarılı", "Gönderi paylaşıldı");
+        fetchHomePosts(); // Yeni postu listeye eklemek için
+      } else {
+        Get.snackbar("Hata", "Gönderi paylaşılamadı");
+      }
+    } catch (e) {
+      Get.snackbar("Hata", "Bir hata oluştu: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 }

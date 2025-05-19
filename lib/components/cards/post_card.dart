@@ -126,7 +126,8 @@ class PostCard extends StatelessWidget {
           ),
 
           // 🔹 Gönderi Fotoğrafı (Eğer varsa göster)
-          if (postImage != null)
+         if (postImage != null && postImage!.trim().isNotEmpty)
+
             Image.network(
               postImage!,
               width: double.infinity,

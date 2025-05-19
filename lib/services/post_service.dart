@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -8,38 +9,76 @@ import '../models/post_model.dart';
 class PostServices {
   static final _box = GetStorage();
 
-  static Future<List<PostModel>> fetchHomePosts() async {
+  static Future<bool> createPost(String content, List<File> mediaFiles) async {
     final token = _box.read('token');
 
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('${AppConstants.baseUrl}/timeline/posts'),
+    );
+
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    });
+
+    request.fields['content'] = content;
+
+    for (var file in mediaFiles) {
+      request.files
+          .add(await http.MultipartFile.fromPath('media[]', file.path));
+    }
+
     try {
-      final response = await http.get(
-        Uri.parse('${AppConstants.baseUrl}/timeline/posts'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
-      );
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint("📥 Postlar Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📥 Postlar Body: ${response.body}",wrapWidth: 1024);
+      debugPrint("📤 CreatePost Response: ${response.statusCode}");
+      debugPrint("📤 CreatePost Body: ${response.body}");
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body)['data'] as List;
-        return data.map((item) => PostModel(
-          profileImage: item['user']['avatar'] ?? '',
-          userName: item['user']['username'] ?? '',
-          postDate: item['created_at'] ?? '',
-          postDescription: item['description'] ?? '',
-          postImage: item['image'] ?? '',
-          likeCount: item['like_count'] ?? 0,
-          commentCount: item['comment_count'] ?? 0,
-        )).toList();
-      } else {
-        return [];
-      }
+      return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      debugPrint("❗ Postlar alınamadı: $e",wrapWidth: 1024);
-      return [];
+      debugPrint("❗ Post gönderilemedi: $e");
+      return false;
     }
   }
+
+  static Future<List<PostModel>> fetchHomePosts() async {
+  final token = _box.read('token');
+
+  try {
+    final response = await http.get(
+      Uri.parse('${AppConstants.baseUrl}/timeline/posts'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+
+    debugPrint("📥 Postlar Response: ${response.statusCode}",
+        wrapWidth: 1024);
+    debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+
+      /// Debug için JSON'u ham olarak gör
+      debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}", wrapWidth: 1024);
+
+      final List posts = body['data']['data'];
+
+      return posts.map((item) {
+        debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024); // Her post objesini tek tek yaz
+
+        return PostModel.fromJson(item);
+      }).toList();
+    } else {
+      return [];
+    }
+  } catch (e) {
+    debugPrint("❗ Postlar alınamadı: $e", wrapWidth: 1024);
+    return [];
+  }
+}
+
 }

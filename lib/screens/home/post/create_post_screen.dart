@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:edusocial/components/buttons/icon_button.dart';
+import 'package:edusocial/controllers/post_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,7 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
+  final PostController postController = Get.find();
   final List<XFile> _selectedImages = [];
   final ImagePicker picker = ImagePicker();
   final TextEditingController textController = TextEditingController();
@@ -44,12 +46,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   void sharePost() {
     if (textController.text.isNotEmpty) {
-      debugPrint("Yeni post: ${textController.text}");
-      for (var img in _selectedImages) {
-        debugPrint("Görsel: ${img.path}");
-      }
-      Get.back();
-      Get.snackbar("Başarılı", "Gönderi paylaşıldı");
+      final content = textController.text;
+      final mediaFiles =
+          _selectedImages.map((xfile) => File(xfile.path)).toList();
+      postController.createPost(content, mediaFiles);
+    } else {
+      Get.snackbar("Uyarı", "Lütfen gönderi içeriği girin.");
     }
   }
 
@@ -104,6 +106,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ],
       ),
       body: Column(
+
+        
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
