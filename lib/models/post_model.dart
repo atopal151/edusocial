@@ -1,35 +1,42 @@
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
 
 class PostModel {
-  final String profileImage;        // Kullanıcının avatar URL'si
-  final String userName;            // Kullanıcının adı
-  final String postDate;            // Oluşturulma zamanı
-  final String postDescription;     // Gönderi metni
-  final String? postImage;          // İlk medya dosyası varsa
-  final int likeCount;              // Beğeni sayısı
-  final int commentCount;           // Yorum sayısı
+  final String profileImage;
+  final String userName;
+  final String postDate;
+  final String postDescription;
+  final List<String> mediaUrls;
+  final int likeCount;
+  final int commentCount;
 
   PostModel({
     required this.profileImage,
     required this.userName,
     required this.postDate,
     required this.postDescription,
-    this.postImage,
+    required this.mediaUrls,
     required this.likeCount,
     required this.commentCount,
   });
 
+  // Ana sayfa ve genel kullanım
   factory PostModel.fromJson(Map<String, dynamic> json) {
     final user = json['user'] ?? {};
     final mediaList = json['media'];
 
-    String? imageUrl;
-    if (mediaList != null &&
-        mediaList is List &&
-        mediaList.isNotEmpty &&
-        mediaList[0] is Map<String, dynamic> &&
-        mediaList[0]['full_path'] is String) {
-      imageUrl = mediaList[0]['full_path'];
+    List<String> mediaUrls = [];
+    if (mediaList != null && mediaList is List) {
+      for (var media in mediaList) {
+        final fullPath = media['full_path'];
+        if (fullPath != null && fullPath is String) {
+          mediaUrls.add(
+            fullPath.startsWith('http')
+                ? fullPath
+                : "${AppConstants.baseUrl}/$fullPath",
+          );
+        }
+      }
     }
 
     return PostModel(
@@ -39,11 +46,42 @@ class PostModel {
               : "${AppConstants.baseUrl}/${user['avatar']}")
           : "${AppConstants.baseUrl}/images/static/avatar.png",
       userName: user['name'] ?? '',
-      postDate: json['created_at'] ?? '',
+      postDate: json['human_created_at'] ?? '',
       postDescription: json['content'] ?? '',
-      postImage: imageUrl,
-      likeCount: json['likes_count'] ?? 0,
-      commentCount: json['comments_count'] ?? 0,
+      mediaUrls: mediaUrls,
+      likeCount: json['like_count'] ?? 0,
+      commentCount: json['comment_count'] ?? 0,
+    );
+  }
+
+  // Profil ekranına özel
+  factory PostModel.fromJsonForProfile(
+      Map<String, dynamic> json, String avatarUrl, String fullName) {
+    debugPrint("🖼 media: ${json['media']}");
+
+    List<String> mediaUrls = [];
+
+    if (json['media'] != null && json['media'] is List) {
+      for (var media in json['media']) {
+        final fullPath = media['full_path'];
+        if (fullPath != null && fullPath is String) {
+          mediaUrls.add(
+            fullPath.startsWith('http')
+                ? fullPath
+                : "${AppConstants.baseUrl}/$fullPath",
+          );
+        }
+      }
+    }
+
+    return PostModel(
+      profileImage: avatarUrl,
+      userName: fullName,
+      postDate: json['human_created_at'] ?? '',
+      postDescription: json['content'] ?? '',
+      mediaUrls: mediaUrls,
+      likeCount: json['like_count'] ?? 0,
+      commentCount: json['comment_count'] ?? 0,
     );
   }
 }

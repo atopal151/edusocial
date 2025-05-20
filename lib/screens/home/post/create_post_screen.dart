@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:edusocial/components/buttons/icon_button.dart';
 import 'package:edusocial/controllers/post_controller.dart';
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,6 +15,7 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
+  final ProfileController profileController = Get.find();
   final PostController postController = Get.find();
   final List<XFile> _selectedImages = [];
   final ImagePicker picker = ImagePicker();
@@ -106,19 +108,20 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ],
       ),
       body: Column(
-
-        
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(
-                      'https://randomuser.me/api/portraits/men/1.jpg'),
-                ),
+                child: Obx(() => CircleAvatar(
+                      radius: 20,
+                      backgroundImage: NetworkImage(
+                        profileController.profileImage.value.isNotEmpty
+                            ? profileController.profileImage.value
+                            : "https://i.pravatar.cc/150?img=1", // fallback
+                      ),
+                    )),
               ),
               const SizedBox(width: 12),
               Expanded(

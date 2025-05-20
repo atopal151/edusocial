@@ -18,9 +18,9 @@ class ProfileController extends GetxController {
   var bio = "".obs;
   var coverImage = "".obs;
   var username = "".obs;
-  var postCount = 352.obs;
-  var followers = 2352.obs;
-  var following = 532.obs;
+  var postCount = 0.obs;
+  var followers = 0.obs;
+  var following = 0.obs;
   var birthDate = ''.obs;
   var schoolName = ''.obs;
   var schoolDepartment = ''.obs;
@@ -87,26 +87,36 @@ class ProfileController extends GetxController {
       final data = await _profileService.fetchProfileData();
       profile.value = data;
 
-      // Verileri UI'daki observable alanlara at
+      // 📌 Temel veriler
       fullName.value = "${data.name} ${data.surname}";
       username.value = "@${data.username}";
       profileImage.value = data.avatarUrl;
-      debugPrint("👤 Avatar URL: ${data.avatar}");
-
-      coverImage.value = data.banner;
+      coverImage.value = data.bannerUrl;
       bio.value = data.description ?? '';
+      birthDate.value = formatBirthday(data.birthDate);
       followers.value = data.followers.length;
       following.value = data.followings.length;
       postCount.value = data.posts.length;
-      birthDate.value = formatBirthday(data.birthDate);
-      schoolName.value = data.school;
-      schoolDepartment.value = data.schoolDepartment;
-      //schoolGrade.value = data.schoolGrade;
       lessons.value = data.lessons;
-      profilePosts.assignAll(data.posts);
+
+      // 📌 Takipçi ve takip edilen sayıları
+      followers.value = data.followers.length;
+      following.value = data.followings.length;
+
+      // 📌 Postlar
+      postCount.value = data.posts.length;
+    profilePosts.assignAll(data.posts);
+      debugPrint("✅ profilePosts.length: ${profilePosts.length}");
+
+      debugPrint("🧾 ProfilePost: $profilePosts");
+      for (var post in profilePosts) {
+        debugPrint("🧾 ProfilePost: ${post.postDescription}");
+      }
+
+      // 📌 AppBar resmi güncelle
       appBarController.updateProfileImage(profileImage.value);
     } catch (e) {
-      debugPrint("Profil verisi yüklenemedi: $e", wrapWidth: 1024);
+      debugPrint("❌ Profil verisi yüklenemedi: $e", wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }

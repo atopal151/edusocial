@@ -39,8 +39,8 @@ class ProfileModel {
   final List<PostModel> posts;
   final dynamic language;
   final List<dynamic> approvedGroups;
-  final dynamic school;
-  final dynamic schoolDepartment;
+  final Map<String, dynamic>? school;
+  final Map<String, dynamic>? schoolDepartment;
   final List<String> lessons;
   final List<dynamic> followings;
   final List<dynamic> followers;
@@ -136,12 +136,22 @@ class ProfileModel {
       followingCount: json['following_count'] ?? 0,
       followerCount: json['follower_count'] ?? 0,
       isSelf: json['is_self'] ?? false,
-      posts: (json['posts'] as List?)?.map((e) => PostModel.fromJson(e)).toList() ?? [],
+      posts: (json['posts'] as List?)?.map((e) {
+            return PostModel.fromJsonForProfile(
+              e,
+              json['avatar_url'] ?? '',
+              "${json['name']} ${json['surname']}",
+            );
+          }).toList() ??
+          [],
       language: json['language'],
       approvedGroups: json['approved_groups'] ?? [],
-      school: json['school'],
-      schoolDepartment: json['school_department'],
-      lessons: (json['lessons'] as List?)?.map((e) => e['name'].toString()).toList() ?? [],
+      school: json['school'] as Map<String, dynamic>?,
+      schoolDepartment: json['school_department'] as Map<String, dynamic>?,
+      lessons: (json['lessons'] as List?)
+              ?.map((e) => e['name'].toString())
+              .toList() ??
+          [],
       followings: json['followings'] ?? [],
       followers: json['followers'] ?? [],
       approvedFollowings: json['approved_followings'] ?? [],

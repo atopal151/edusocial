@@ -210,7 +210,9 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
               userName: post.userName,
               postDate: post.postDate,
               postDescription: post.postDescription,
-              postImage: post.postImage,
+
+              mediaUrls:
+                  post.mediaUrls, // ✅ doğru alan              // 🔁 boş liste
               likeCount: post.likeCount,
               commentCount: post.commentCount,
             ),
