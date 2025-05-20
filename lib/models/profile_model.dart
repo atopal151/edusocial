@@ -103,7 +103,7 @@ class ProfileModel {
     return ProfileModel(
       id: json['id'],
       accountType: json['account_type'] ?? 'private',
-      languageId: json['language_id'],
+      languageId: json['language_id']?.toString(),
       avatar: json['avatar'] ?? '',
       banner: json['banner'] ?? '',
       description: json['description'],
@@ -115,7 +115,7 @@ class ProfileModel {
       username: json['username'] ?? '',
       email: json['email'] ?? '',
       emailVerifiedAt: json['email_verified_at'],
-      birthDate: json['birthday'] ?? '',
+      birthDate: json['birthday']?.toString() ?? '',
       instagram: json['instagram'],
       tiktok: json['tiktok'],
       twitter: json['twitter'],

@@ -6,7 +6,7 @@ import '../../controllers/post_controller.dart';
 class PostHomeList extends StatelessWidget {
   PostHomeList({super.key});
 
-  final PostController postController = Get.find();
+  final PostController postController = Get.put(PostController());
 
   @override
   Widget build(BuildContext context) {

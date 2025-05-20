@@ -18,8 +18,8 @@ class EntryServices {
         },
       );
 
-      debugPrint("📥 Entry Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📥 Entry Body: ${response.body}",wrapWidth: 1024);
+      /*debugPrint("📥 Entry Response: ${response.statusCode}", wrapWidth: 1024);
+      debugPrint("📥 Entry Body: ${response.body}", wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
@@ -30,8 +30,40 @@ class EntryServices {
         return [];
       }
     } catch (e) {
-      debugPrint("❗ Entry API error: $e",wrapWidth: 1024);
+      debugPrint("❗ Entry API error: $e", wrapWidth: 1024);
       return [];
+    }
+  }
+
+  static Future<bool> createTopicWithEntry({
+    required String name,
+    required String content,
+    required int topicCategoryId,
+  }) async {
+    final token = GetStorage().read("token");
+
+    try {
+      final response = await http.post(
+        Uri.parse("${AppConstants.baseUrl}/timeline/topics"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: jsonEncode({
+          "name": name,
+          "content": content,
+          "topic_category_id": topicCategoryId,
+        }),
+      );
+
+    /*  debugPrint("📤 Create Topic Response: ${response.statusCode}");
+      debugPrint("📤 Create Topic Body: ${response.body}");*/
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      debugPrint("❗ Create Topic error: $e");
+      return false;
     }
   }
 }

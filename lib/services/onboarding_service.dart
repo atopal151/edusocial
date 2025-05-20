@@ -26,8 +26,8 @@ class OnboardingServices {
         },
       );
 
-      debugPrint("🔥 Okul Listesi Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("🔥 Okul Listesi Body: ${response.body}",wrapWidth: 1024);
+     /* debugPrint("🔥 Okul Listesi Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("🔥 Okul Listesi Body: ${response.body}",wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body)['data'];
@@ -71,8 +71,8 @@ class OnboardingServices {
         }),
       );
 
-      debugPrint("📤 Update School Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📤 Update School Body: ${response.body}",wrapWidth: 1024);
+      /*debugPrint("📤 Update School Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📤 Update School Body: ${response.body}",wrapWidth: 1024);*/
 
       return response.statusCode == 200;
     } catch (e) {
@@ -100,8 +100,8 @@ class OnboardingServices {
         body: jsonEncode({"name": lessonName}),
       );
 
-      debugPrint("🔥 Ders Ekleme Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("🔥 Ders Ekleme Body: ${response.body}",wrapWidth: 1024);
+    /*  debugPrint("🔥 Ders Ekleme Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("🔥 Ders Ekleme Body: ${response.body}",wrapWidth: 1024);*/
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
@@ -129,8 +129,8 @@ class OnboardingServices {
         body: jsonEncode({"group_id": groupId}),
       );
 
-      debugPrint("🟢 Grup katılım response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("🟢 Body: ${response.body}",wrapWidth: 1024);
+     /* debugPrint("🟢 Grup katılım response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("🟢 Body: ${response.body}",wrapWidth: 1024);*/
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
@@ -151,8 +151,8 @@ class OnboardingServices {
         },
       );
 
-      debugPrint("📥 Grup listesi response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📥 Grup listesi body: ${response.body}",wrapWidth: 1024);
+     /* debugPrint("📥 Grup listesi response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📥 Grup listesi body: ${response.body}",wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body)['data'];

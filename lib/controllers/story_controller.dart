@@ -9,12 +9,31 @@ class StoryController extends GetxController {
 
 
 //----------------------------------------------------------------------------//
-  Future<void> fetchStories() async {
-    isLoading.value = true;
-    final result = await StoryService.fetchStories();
-    storyList.assignAll(result);
-    isLoading.value = false;
-  }
+ void fetchStories() async {
+  isLoading.value = true;
+  final result = await StoryService.fetchStories();
+
+  // Mevcut user için "MyStory" mock veya gerçek şekilde eklensin
+  final myStory = StoryModel(
+    id: "0",
+    userId: "self",
+    username: "Sen",
+    profileImage: "https://i.pravatar.cc/150?img=5",
+    isMyStory: true,
+    isViewed: false,
+    storyUrls: [],
+    createdAt: DateTime.now(),
+    hasStory: false,
+  );
+
+  // önce varsa eski myStory’yi çıkar
+  result.removeWhere((e) => e.isMyStory);
+
+  // en başa ekle
+  storyList.assignAll([myStory, ...result]);
+  isLoading.value = false;
+}
+
 
 //----------------------------------------------------------------------------//
   void updateMyStory(List<String> imagePaths) {

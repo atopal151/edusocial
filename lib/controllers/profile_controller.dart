@@ -34,37 +34,10 @@ class ProfileController extends GetxController {
   RxBool isLoading = true.obs;
 
   // 📦 Takipçi listesi (Mock)
-  var followerList = [
-    {
-      "username": "alihanmatrak",
-      "fullName": "ALİ HAN MATRAK",
-      "avatarUrl": "https://randomuser.me/api/portraits/men/10.jpg",
-    },
-    {
-      "username": "srt_umt",
-      "fullName": "Ümit SERT",
-      "avatarUrl": "https://randomuser.me/api/portraits/men/12.jpg",
-    },
-    {
-      "username": "ismailysr20",
-      "fullName": "İsmail Yaşar",
-      "avatarUrl": "https://randomuser.me/api/portraits/men/14.jpg",
-    },
-  ].obs;
+  var followerList = [].obs;
 
   // 📦 Takip edilenler listesi (Mock)
-  var followingList = [
-    {
-      "username": "srt_umt",
-      "fullName": "Ümit SERT",
-      "avatarUrl": "https://randomuser.me/api/portraits/men/12.jpg",
-    },
-    {
-      "username": "earaz__",
-      "fullName": "Erdal Araz",
-      "avatarUrl": "https://randomuser.me/api/portraits/men/3.jpg",
-    },
-  ].obs;
+  var followingList = [].obs;
 
   @override
   void onInit() {
@@ -105,13 +78,13 @@ class ProfileController extends GetxController {
 
       // 📌 Postlar
       postCount.value = data.posts.length;
-    profilePosts.assignAll(data.posts);
-      debugPrint("✅ profilePosts.length: ${profilePosts.length}");
+      profilePosts.assignAll(data.posts);
+      //debugPrint("✅ profilePosts.length: ${profilePosts.length}");
 
-      debugPrint("🧾 ProfilePost: $profilePosts");
-      for (var post in profilePosts) {
+      //debugPrint("🧾 ProfilePost: $profilePosts");
+      /*for (var post in profilePosts) {
         debugPrint("🧾 ProfilePost: ${post.postDescription}");
-      }
+      }*/
 
       // 📌 AppBar resmi güncelle
       appBarController.updateProfileImage(profileImage.value);

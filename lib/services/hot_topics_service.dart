@@ -20,8 +20,8 @@ class HotTopicsService {
         },
       );
 
-      debugPrint("📥 Topics Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📥 Topics Body: ${response.body}",wrapWidth: 1024);
+     /* debugPrint("📥 Topics Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📥 Topics Body: ${response.body}",wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);

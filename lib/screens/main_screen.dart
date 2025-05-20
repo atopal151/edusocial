@@ -1,4 +1,5 @@
 import 'package:edusocial/controllers/home_controller.dart';
+import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,8 @@ class MainScreen extends StatelessWidget {
     Get.put(SearchTextController());
     Get.put(HomeController());
     Get.put(EntryController());
-    
+
+    Get.put(PostController());
     //print('MAIN controller hash: ${navigationController.hashCode}');
 
     return Scaffold(

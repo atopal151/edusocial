@@ -1,12 +1,10 @@
 // group_services.dart
 import 'dart:convert';
-import 'dart:io';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import '../../models/group_models/group_model.dart';
 
 class GroupServices {
@@ -21,9 +19,9 @@ class GroupServices {
           'Authorization': 'Bearer ${box.read('token')}',
         },
       );
-      debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
-          wrapWidth: 1024);
-      debugPrint("📥 Group Suggestion Body: ${response.body}", wrapWidth: 1024);
+      // debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
+      //  wrapWidth: 1024);
+      //debugPrint("📥 Group Suggestion Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -39,63 +37,16 @@ class GroupServices {
     }
   }
 
-  Future<bool> createGroup({
-    required String name,
-    required String description,
-    required String groupAreaId,
-    required bool isPrivate,
-    File? avatar,
-    File? banner,
-  }) async {
-    final box = GetStorage();
-    final token = box.read('token');
-
-    var uri = Uri.parse("${AppConstants.baseUrl}/group");
-
-    var request = http.MultipartRequest('POST', uri);
-    request.headers['Authorization'] = 'Bearer $token';
-
-    request.fields['name'] = name;
-    request.fields['description'] = description;
-    request.fields['group_area_id'] = groupAreaId;
-    request.fields['is_private'] = isPrivate ? '1' : '0';
-
-    if (avatar != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'avatar',
-        avatar.path,
-        contentType: MediaType('image', 'jpeg'),
-      ));
-    }
-
-    if (banner != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'banner',
-        banner.path,
-        contentType: MediaType('image', 'jpeg'),
-      ));
-    }
-
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
-
-    debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",
-        wrapWidth: 1024);
-    debugPrint("📤 Grup Oluşturma Body: ${response.body}", wrapWidth: 1024);
-
-    return response.statusCode == 200 || response.statusCode == 201;
-  }
-
   Future<List<GroupModel>> fetchUserGroups() async {
     final box = GetStorage();
     final token = box.read('token');
 
-    debugPrint("🚀 fetchUserGroups() çağrıldı");
-    debugPrint("🔑 Token: $token");
+    //debugPrint("🚀 fetchUserGroups() çağrıldı");
+    //debugPrint("🔑 Token: $token");
 
     try {
       final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
-      debugPrint("🌐 İstek Atılıyor: $uri");
+      //debugPrint("🌐 İstek Atılıyor: $uri");
 
       final response = await http.get(
         uri,
@@ -105,17 +56,17 @@ class GroupServices {
         },
       );
 
-      debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
+      /*debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
           wrapWidth: 1024);
       debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
-          wrapWidth: 1024);
+          wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
-            wrapWidth: 1024);
+        /*debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
+            wrapWidth: 1024);*/
 
         final userGroupList = data.map((item) {
           final group = GroupModel(
@@ -129,8 +80,8 @@ class GroupServices {
             category: item['category'] ?? 'Genel',
             isJoined: true, // Kullanıcı zaten bu gruplara üye
           );
-          debugPrint("✅ Kullanıcı Grubu: ${group.name} (${group.id})",
-              wrapWidth: 1024);
+          /* debugPrint("✅ Kullanıcı Grubu: ${group.name} (${group.id})",
+              wrapWidth: 1024);*/
           return group;
         }).toList();
 
@@ -150,8 +101,8 @@ class GroupServices {
     final box = GetStorage();
     final token = box.read('token');
 
-    debugPrint("🚀 fetchAllGroups() çağrıldı");
-    debugPrint("🔑 Token: $token", wrapWidth: 1024);
+    /* debugPrint("🚀 fetchAllGroups() çağrıldı");
+    debugPrint("🔑 Token: $token", wrapWidth: 1024);*/
 
     try {
       final uri = Uri.parse("${AppConstants.baseUrl}/groups");
@@ -165,18 +116,18 @@ class GroupServices {
         },
       );
 
-      debugPrint("📥 HTTP Status Code: ${response.statusCode}",
+      /* debugPrint("📥 HTTP Status Code: ${response.statusCode}",
           wrapWidth: 1024);
 
       // 🔽 Dönen cevabı aynen gösteriyoruz
       debugPrint("📦 RAW Response Body:", wrapWidth: 1024);
-      debugPrint(response.body, wrapWidth: 1024);
+      debugPrint(response.body, wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        debugPrint("📦 Gelen Grup Sayısı: ${data.length}", wrapWidth: 1024);
+        // debugPrint("📦 Gelen Grup Sayısı: ${data.length}", wrapWidth: 1024);
         final groupList = data.map((item) {
           final group = GroupModel(
             id: item['id'].toString(),
@@ -189,13 +140,13 @@ class GroupServices {
             category: item['category'] ?? 'Genel',
             isJoined: item['is_member'] ?? false,
           );
-          debugPrint("✅ Grup Eklendi: ${group.name} (${group.id})",
-              wrapWidth: 1024);
+          /* debugPrint("✅ Grup Eklendi: ${group.name} (${group.id})",
+              wrapWidth: 1024);*/
           return group;
         }).toList();
 
-        debugPrint("🎯 Toplam ${groupList.length} grup modele dönüştürüldü.",
-            wrapWidth: 1024);
+        /* debugPrint("🎯 Toplam ${groupList.length} grup modele dönüştürüldü.",
+            wrapWidth: 1024);*/
         return groupList;
       } else {
         debugPrint("❌ Sunucudan beklenmeyen yanıt alındı.", wrapWidth: 1024);

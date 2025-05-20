@@ -42,8 +42,8 @@ static Future<bool> followUser(int userId) async {
       body: jsonEncode({"user_id": userId}),
     );
 
-    debugPrint("📥 Follow response: ${response.statusCode}");
-    debugPrint("📥 Body: ${response.body}");
+  /*  debugPrint("📥 Follow response: ${response.statusCode}");
+    debugPrint("📥 Body: ${response.body}");*/
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
@@ -62,8 +62,8 @@ static Future<bool> unfollowUser(int userId) async {
   final token = box.read('token');
 
   try {
-    debugPrint("📤 Unfollow request sending to: $url");
-    debugPrint("📤 Payload: { user_id: $userId }");
+  /*  debugPrint("📤 Unfollow request sending to: $url");
+    debugPrint("📤 Payload: { user_id: $userId }");*/
 
     final response = await http.post(
       url,
@@ -74,8 +74,8 @@ static Future<bool> unfollowUser(int userId) async {
       body: jsonEncode({"user_id": userId}),
     );
 
-    debugPrint("📥 Unfollow response: ${response.statusCode}");
-    debugPrint("📥 Unfollow body: ${response.body}");
+    /*debugPrint("📥 Unfollow response: ${response.statusCode}");
+    debugPrint("📥 Unfollow body: ${response.body}");*/
 
     final body = jsonDecode(response.body);
 

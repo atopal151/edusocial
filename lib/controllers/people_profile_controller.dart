@@ -13,14 +13,14 @@ class PeopleProfileController extends GetxController {
   Future<void> loadUserProfile(int userId) async {
     try {
       isLoading.value = true;
-      debugPrint("🔄 Profil yükleniyor: userId = $userId");
+      //debugPrint("🔄 Profil yükleniyor: userId = $userId");
 
       final data = await PeopleProfileService.fetchUserById(userId);
       if (data != null) {
         profile.value = data;
         isFollowing.value = data.isFollowing;
-        debugPrint("✅ Profil yüklendi: ${data.name} ${data.surname}");
-        debugPrint("👥 isFollowing: ${isFollowing.value}");
+       // debugPrint("✅ Profil yüklendi: ${data.name} ${data.surname}");
+        //debugPrint("👥 isFollowing: ${isFollowing.value}");
       } else {
         debugPrint("⚠️ Profil verisi boş döndü");
       }

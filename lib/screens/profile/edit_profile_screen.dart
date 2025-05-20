@@ -54,7 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeaderPhotoWithAvatar(),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 90),
                     _buildTextField(
                         "Kullanıcı Adı", "@", controller.usernameController),
                     const SizedBox(height: 10),
@@ -136,127 +136,117 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildHeaderPhotoWithAvatar() {
-    return Stack(
+Widget _buildHeaderPhotoWithAvatar() {
+  return SizedBox(
+    height: 160, // 120 kapak + 60 profil yüksekliği (yarısı taşar)
+    child: Stack(
       clipBehavior: Clip.none,
       children: [
-        _buildCoverPhotoSection(),
-        Positioned(
-          bottom: -40,
-          left: Get.width / 2 - 55,
-          child: _buildProfilePicture(),
-        )
-      ],
-    );
-  }
-
-  Widget _buildCoverPhotoSection() {
-    return Stack(
-      children: [
-        // Cover fotoğrafı gösterimi
-        Container(
-          height: 130,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            image: DecorationImage(
-              fit: BoxFit.cover,
+        // 1. Kapak Fotoğrafı
+        IgnorePointer(
+          child: Container(
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xffffffff),
+              borderRadius: BorderRadius.circular(20),
               image: controller.selectedCoverPhoto != null
-                  ? FileImage(controller.selectedCoverPhoto!)
-                  : (controller.userProfileModel.value?.bannerUrl
-                                  .startsWith('http') ==
-                              true
-                          ? NetworkImage(
-                              controller.userProfileModel.value!.bannerUrl)
-                          : const AssetImage('images/card_car.png'))
-                      as ImageProvider,
+                  ? DecorationImage(
+                      image: FileImage(controller.selectedCoverPhoto!),
+                      fit: BoxFit.cover,
+                    )
+                  : controller.userProfileModel.value?.bannerUrl
+                              .startsWith('http') ==
+                          true
+                      ? DecorationImage(
+                          image: NetworkImage(
+                              controller.userProfileModel.value!.bannerUrl),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
             ),
           ),
         ),
 
-        // Değiştir butonu (kamera simgesi)
+        // 2. Profil Fotoğrafı
         Positioned(
-          bottom: 10,
-          right: 10,
+          bottom: 0,
+          left: MediaQuery.of(context).size.width / 2 - 50,
           child: GestureDetector(
             onTap: () async {
-              final picked = await _picker.pickImage(
+              final pickedFile = await _picker.pickImage(
                 source: ImageSource.gallery,
                 imageQuality: 60,
               );
-              if (picked != null) {
+              if (pickedFile != null) {
                 setState(() {
-                  controller.selectedCoverPhoto = File(picked.path);
+                  controller.selectedAvatar = File(pickedFile.path);
                 });
-                Get.snackbar(
-                    "Kapak Fotoğrafı", "Yeni kapak fotoğrafı seçildi.");
+              }
+            },
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                CircleAvatar(
+                  radius: 44,
+                  backgroundColor: const Color(0xfffafafa),
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.white,
+                    backgroundImage: controller.selectedAvatar != null
+                        ? FileImage(controller.selectedAvatar!)
+                        : (controller.userProfileModel.value?.avatar
+                                    .startsWith('http') ==
+                                true
+                            ? NetworkImage(
+                                controller.userProfileModel.value!.avatar)
+                            : const AssetImage('images/user1.png'))
+                            as ImageProvider,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
+                    color: Color(0xfffb535c),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // 3. Kapak Fotoğrafı Düzenleme Butonu
+        Positioned(
+          top: 8,
+          right: 8,
+          child: GestureDetector(
+            onTap: () async {
+              final pickedFile = await _picker.pickImage(
+                source: ImageSource.gallery,
+                imageQuality: 60,
+              );
+              if (pickedFile != null) {
+                setState(() {
+                  controller.selectedCoverPhoto = File(pickedFile.path);
+                });
               }
             },
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: const BoxDecoration(
-                color: Color(0xFFEF5050),
+                color: Color(0xfffb535c),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.edit, color: Colors.white, size: 20),
+              child: const Icon(Icons.edit, size: 16, color: Colors.white),
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildProfilePicture() {
-    return Center(
-      child: Stack(
-        children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: controller.selectedAvatar != null
-                ? FileImage(controller.selectedAvatar!)
-                : (controller.userProfileModel.value?.avatar
-                            .startsWith('http') ==
-                        true
-                    ? NetworkImage(controller.userProfileModel.value!.avatar)
-                    : AssetImage('images/user1.png')) as ImageProvider,
-            onBackgroundImageError: (_, __) {
-              debugPrint(
-                  "⚠️ Avatar yüklenemedi, varsayılan resim gösteriliyor.");
-            },
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: GestureDetector(
-              onTap: () async {
-                final pickedprofile = await ImagePicker().pickImage(
-                  source: ImageSource.gallery,
-                  imageQuality: 50,
-                );
-                if (pickedprofile != null) {
-                  setState(() {
-                    controller.selectedAvatar = File(pickedprofile.path);
-                  });
-                  Get.snackbar("Başarılı", "Profil fotoğrafı seçildi.");
-                }
-              },
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEF5050),
-                  shape: BoxShape.circle,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(7.0),
-                  child:
-                      SvgPicture.asset('images/icons/edit_icon.svg', width: 18),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildTextField(
       String label, String prefix, TextEditingController controller) {

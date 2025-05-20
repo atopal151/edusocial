@@ -34,7 +34,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             createGroupController.descriptionGroupController.text.length;
       });
     });
-
   }
 
   @override
@@ -53,99 +52,109 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               Obx(
                 () => Column(
                   children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          height: 120,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Color(0xffffffff),
-                            borderRadius: BorderRadius.circular(20),
-                            image: createGroupController.coverImageFile.value !=
-                                    null
-                                ? DecorationImage(
-                                    image: FileImage(createGroupController
-                                        .coverImageFile.value!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                          ),
-                        ),
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final pickedFile = await ImagePicker()
-                                  .pickImage(source: ImageSource.gallery);
-                              if (pickedFile != null) {
-                                createGroupController.coverImageFile.value =
-                                    File(pickedFile.path);
-                              }
-                            },
+                    SizedBox(
+                      height: 160, // 120 kapak + 60 profil yüksekliği
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          // 1. Kapak Fotoğrafı
+                          IgnorePointer(
+                            // Tıklamayı engellemesin
                             child: Container(
-                              padding: EdgeInsets.all(6),
+                              height: 120,
+                              width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Color(0xfffb535c),
-                                shape: BoxShape.circle,
+                                color: Color(0xffffffff),
+                                borderRadius: BorderRadius.circular(20),
+                                image: createGroupController
+                                            .coverImageFile.value !=
+                                        null
+                                    ? DecorationImage(
+                                        image: FileImage(
+                                          createGroupController
+                                              .coverImageFile.value!,
+                                        ),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
                               ),
-                              child: Icon(Icons.edit,
-                                  size: 16, color: Colors.white),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          bottom: -40,
-                          left: MediaQuery.of(context).size.width / 2 - 40,
-                          child: InkWell(
-                            onTap: () async {
-                              final pickedFile = await ImagePicker()
-                                  .pickImage(source: ImageSource.gallery);
-                              if (pickedFile != null) {
-                                createGroupController.profileImageFile.value =
-                                    File(pickedFile.path);
-                              }
-                            },
-                            child: Stack(
-                              alignment: Alignment.bottomRight,
-                              children: [
-                                CircleAvatar(
-                                  radius: 44,
-                                  backgroundColor: Color(0xfffafafa),
-                                  child: CircleAvatar(
-                                    radius: 40,
-                                    backgroundColor: Colors.white,
-                                    backgroundImage: createGroupController
-                                                .profileImageFile.value !=
-                                            null
-                                        ? FileImage(createGroupController
-                                            .profileImageFile.value!)
-                                        : const NetworkImage(
-                                                "https://randomuser.me/api/portraits/women/2.jpg")
-                                            as ImageProvider,
+
+                          // 2. Profil Fotoğrafı
+                          Positioned(
+                            bottom: 0, // -40 yerine artık görünür alandayız
+                            left: MediaQuery.of(context).size.width / 2 - 60,
+                            child: GestureDetector(
+                              onTap: () async {
+                                final pickedFile = await ImagePicker()
+                                    .pickImage(source: ImageSource.gallery);
+                                if (pickedFile != null) {
+                                  createGroupController.profileImageFile.value =
+                                      File(pickedFile.path);
+                                }
+                              },
+                              child: Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 44,
+                                    backgroundColor: Color(0xfffafafa),
+                                    child: CircleAvatar(
+                                      radius: 40,
+                                      backgroundColor: Colors.white,
+                                      backgroundImage: createGroupController
+                                                  .profileImageFile.value !=
+                                              null
+                                          ? FileImage(createGroupController
+                                              .profileImageFile.value!)
+                                          : const NetworkImage(
+                                              "https://randomuser.me/api/portraits/women/2.jpg",
+                                            ) as ImageProvider,
+                                    ),
                                   ),
-                                ),
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: Container(
-                                    padding: EdgeInsets.all(4),
+                                  Container(
+                                    padding: EdgeInsets.all(6),
                                     decoration: BoxDecoration(
                                       color: Color(0xfffb535c),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(Icons.edit,
-                                        size: 14, color: Colors.white),
-                                  ),
-                                )
-                              ],
+                                        size: 16, color: Colors.white),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        )
-                      ],
+
+                          // 3. Kapak Fotoğrafı Edit
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: GestureDetector(
+                              onTap: () async {
+                                final pickedFile = await ImagePicker()
+                                    .pickImage(source: ImageSource.gallery);
+                                if (pickedFile != null) {
+                                  createGroupController.coverImageFile.value =
+                                      File(pickedFile.path);
+                                }
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Color(0xfffb535c),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.edit,
+                                    size: 16, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 10),
                     const Text(
                       "Grup Fotoğrafı",
                       style: TextStyle(

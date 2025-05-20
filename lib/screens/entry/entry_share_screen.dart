@@ -21,11 +21,21 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
   @override
   void initState() {
     super.initState();
-    entryController.bodyEntryController.addListener(() {
+    entryController.bodyEntryController.addListener(_entryTextListener);
+  }
+
+  void _entryTextListener() {
+    if (mounted) {
       setState(() {
         currentCharCount = entryController.bodyEntryController.text.length;
       });
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    entryController.bodyEntryController.removeListener(_entryTextListener);
+    super.dispose();
   }
 
   @override

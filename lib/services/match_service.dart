@@ -22,8 +22,8 @@ class MatchServices {
         body: jsonEncode({"user_id": userId}),
       );
 
-      debugPrint("📥 Match Follow Response: ${response.statusCode}");
-      debugPrint("📥 Match Follow Body: ${response.body}");
+     /*debugPrint("📥 Match Follow Response: ${response.statusCode}");
+      debugPrint("📥 Match Follow Body: ${response.body}");*/
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -49,9 +49,9 @@ class MatchServices {
         },
       );
 
-      debugPrint("📥 Match Response: ${response.statusCode}", wrapWidth: 1024);
+      /*debugPrint("📥 Match Response: ${response.statusCode}", wrapWidth: 1024);
       debugPrint("📥 Match Body: ${response.body}", wrapWidth: 1024);
-
+*/
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body)['data'];
         final MatchModel match = MatchModel.fromJson(data);

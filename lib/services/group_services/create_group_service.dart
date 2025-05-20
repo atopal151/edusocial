@@ -24,6 +24,7 @@ class CreateGroupService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
+        // debugPrint("📡 API Response Body: ${json.encode(jsonData)}"); // Tüm response
         final List list = jsonData["data"] ?? [];
         return list.map((e) => GroupAreaModel.fromJson(e)).toList();
       } else {
@@ -58,7 +59,8 @@ class CreateGroupService {
         request.files.add(await http.MultipartFile.fromPath(
           'avatar',
           avatar.path,
-          contentType: MediaType('image', 'jpeg'),
+         contentType: MediaType('image', avatar.path.split('.').last),
+
         ));
       }
 
@@ -66,15 +68,16 @@ class CreateGroupService {
         request.files.add(await http.MultipartFile.fromPath(
           'banner',
           banner.path,
-          contentType: MediaType('image', 'jpeg'),
+          contentType: MediaType('image', avatar!.path.split('.').last),
+
         ));
       }
 
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
 
-      debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📤 Grup Oluşturma Body: ${response.body}",wrapWidth: 1024);
+      //debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",wrapWidth: 1024);
+      //debugPrint("📤 Grup Oluşturma Body: ${response.body}",wrapWidth: 1024);
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {

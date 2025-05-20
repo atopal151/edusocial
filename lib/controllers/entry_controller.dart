@@ -7,7 +7,6 @@ class EntryController extends GetxController {
   var entryList = <EntryModel>[].obs;
   var entryPersonList = <EntryModel>[].obs;
 
-
   RxList<String> categoryEntry = <String>[].obs;
   RxString selectedCategory = "".obs;
   var isEntryLoading = false.obs;
@@ -22,23 +21,68 @@ class EntryController extends GetxController {
     fetchPersonEntries();
   }
 
-  void shareEntryPost() {
-    Get.snackbar("Paylaşıldı", "Entry paylaşıldı");
+  void shareEntryPost() async {
+    final title = titleEntryController.text.trim();
+    final body = bodyEntryController.text.trim();
+    final categoryName = selectedCategory.value;
+
+    if (title.isEmpty || body.isEmpty || categoryName.isEmpty) {
+      Get.snackbar("Eksik Bilgi", "Lütfen tüm alanları doldurun");
+      return;
+    }
+
+    isEntryLoading.value = true;
+
+    // kategori adı -> id eşleme (şimdilik sabit örnek)
+    int topicCategoryId = getCategoryIdFromName(categoryName);
+
+    final success = await EntryServices.createTopicWithEntry(
+      name: title,
+      content: body,
+      topicCategoryId: topicCategoryId,
+    );
+
+    isEntryLoading.value = false;
+
+    if (success) {
+      Get.back();
+      Get.snackbar("Başarılı", "Konu başarıyla oluşturuldu");
+      titleEntryController.clear();
+      bodyEntryController.clear();
+      selectedCategory.value = "";
+      fetchEntries(); // listeyi güncelle
+    } else {
+      Get.snackbar("Hata", "Konu oluşturulamadı");
+    }
+  }
+
+  int getCategoryIdFromName(String name) {
+    switch (name) {
+      case "Genel":
+        return 1;
+      case "Felsefe":
+        return 2;
+      case "Spor":
+        return 3;
+      case "Tarih":
+        return 4;
+      default:
+        return 1;
+    }
   }
 
   void shareEntry() {
     Get.toNamed("/entryShare");
   }
 
- void fetchEntries() async {
-  isEntryLoading.value = true;
+  void fetchEntries() async {
+    isEntryLoading.value = true;
 
-  final entries = await EntryServices.fetchTimelineEntries();
-  entryList.assignAll(entries);
+    final entries = await EntryServices.fetchTimelineEntries();
+    entryList.assignAll(entries);
 
-  isEntryLoading.value = false;
-}
-
+    isEntryLoading.value = false;
+  }
 
   void fetchPersonEntries() {
     entryPersonList.assignAll([

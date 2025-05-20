@@ -33,6 +33,7 @@ void main() async {
   Get.put(AppBarController());
   Get.put(ProfileController(), permanent: true);
   Get.put(OnboardingController());
+  
 
   HttpOverrides.global = MyHttpOverrides();
   runApp(MyApp(initialRoute: token != null ? Routes.main : Routes.login));

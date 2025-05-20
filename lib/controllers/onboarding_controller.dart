@@ -86,11 +86,11 @@ class OnboardingController extends GetxController {
   //-------------------------------------------------------------//
   /// Okul listesini yükle
   Future<void> loadSchoolList() async {
-    debugPrint("🌟 loadSchoolList çağrıldı.");
+   // debugPrint("🌟 loadSchoolList çağrıldı.");
     isLoading.value = true;
     try {
       final data = await OnboardingServices.fetchSchools();
-      debugPrint("🌟 fetchSchools tamamlandı, data: $data",wrapWidth: 1024);
+      //debugPrint("🌟 fetchSchools tamamlandı, data: $data",wrapWidth: 1024);
       schools.assignAll(data);
 
       if (schools.isNotEmpty) {
@@ -152,9 +152,9 @@ class OnboardingController extends GetxController {
   /// Okul ve bölümü backend'e kaydet
   Future<bool> submitSchoolAndDepartment() async {
     if (selectedSchoolId != null && selectedDepartmentId != null) {
-      debugPrint("📤 Okul ve Bölüm Gönderiliyor:");
-      debugPrint("📚 School ID: $selectedSchoolId");
-      debugPrint("🏛️ Department ID: $selectedDepartmentId");
+      //debugPrint("📤 Okul ve Bölüm Gönderiliyor:");
+      //debugPrint("📚 School ID: $selectedSchoolId");
+      //debugPrint("🏛️ Department ID: $selectedDepartmentId");
 
       final success = await OnboardingServices.updateSchool(
         schoolId: selectedSchoolId!,
