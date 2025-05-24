@@ -1,11 +1,11 @@
 import 'package:edusocial/components/cards/group_suggestion_card.dart';
 import 'package:edusocial/components/widgets/course_chip.dart';
+import 'package:edusocial/models/people_profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import '../../models/profile_model.dart';
 
-Widget buildPeopleProfileDetails(ProfileModel profileData) {
+Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
   return SingleChildScrollView(
     child: Container(
       color: Color(0xfffafafa),

@@ -53,7 +53,7 @@ Widget buildProfileHeader() {
                   radius: 42,
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
-                    radius: 38,
+                    radius: 40,
                     backgroundColor: const Color(0xfffafafa),
                     backgroundImage:
                         imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,

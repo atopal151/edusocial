@@ -7,6 +7,7 @@ class EntryModel {
   final String entryTitle;
   final String entryDescription;
   final bool isActive;
+  final bool isOwner; // ✅ Yeni alan
   int upvoteCount;
   int downvoteCount;
 
@@ -19,6 +20,7 @@ class EntryModel {
     required this.upvoteCount,
     required this.downvoteCount,
     required this.isActive,
+    required this.isOwner, // ✅ constructor'a da ekle
   });
 
   factory EntryModel.fromJson(Map<String, dynamic> json) {
@@ -30,10 +32,11 @@ class EntryModel {
       userName: "${user['name']} ${user['surname']}",
       entryDate: json['created_at'] ?? '',
       entryTitle: json['content'] ?? '',
-      entryDescription: json['content'] ?? '', // Eğer farklı alan varsa düzeltiriz
+      entryDescription: json['content'] ?? '',
       upvoteCount: json['like_count'] ?? 0,
       downvoteCount: json['dislike_count'] ?? 0,
       isActive: json['is_active'] ?? true,
+      isOwner: json['is_owner'] ?? false, // ✅ burada parse ediliyor
     );
   }
 }

@@ -66,26 +66,27 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    if (profile.bannerUrl.isNotEmpty)
+                      Container(
+                        height: 120,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(profile.bannerUrl),
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 10),
                     CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.grey[200],
-                      child: ClipOval(
-                        child: Image.network(
-                          profile.avatar,
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(
-                              'images/user2.png', // 📌 local asset yolu
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        ),
-                      ),
+                      backgroundImage: profile.avatarUrl.isNotEmpty
+                          ? NetworkImage(profile.avatarUrl)
+                          : const AssetImage('images/user1.png'),
+                      onBackgroundImageError: (_, __) {
+                        debugPrint("⚠️ Profil fotoğrafı yüklenemedi");
+                      },
                     ),
                     const SizedBox(height: 10),
                     Text(

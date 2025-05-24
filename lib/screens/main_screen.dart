@@ -31,16 +31,20 @@ class MainScreen extends StatelessWidget {
     //print('MAIN controller hash: ${navigationController.hashCode}');
 
     return Scaffold(
-      body: Obx(() => IndexedStack(
-            index: navigationController.selectedIndex.value,
-            children: [
-              HomeScreen(),
-              ChatListScreen(),
-              MatchResultScreen(),
-              EntryScreen(),
-              ProfileScreen(),
-            ],
-          )),
+      body: Obx(() {
+        debugPrint(
+            "📍 Index değişti: ${navigationController.selectedIndex.value}");
+        return IndexedStack(
+          index: navigationController.selectedIndex.value,
+          children: [
+            HomeScreen(),
+            ChatListScreen(),
+            MatchResultScreen(),
+            EntryScreen(),
+            ProfileScreen(),
+          ],
+        );
+      }),
       bottomNavigationBar: NavbarMenu(),
     );
   }

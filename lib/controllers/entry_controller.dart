@@ -7,8 +7,11 @@ class EntryController extends GetxController {
   var entryList = <EntryModel>[].obs;
   var entryPersonList = <EntryModel>[].obs;
 
-  RxList<String> categoryEntry = <String>[].obs;
+  RxMap<String, int> categoryMap = <String, int>{}.obs; // 🔁 Kategori adı -> id
+  RxList<String> categoryEntry =
+      <String>[].obs; // UI’da gösterilecek kategori adları
   RxString selectedCategory = "".obs;
+
   var isEntryLoading = false.obs;
   final TextEditingController titleEntryController = TextEditingController();
   final TextEditingController bodyEntryController = TextEditingController();
@@ -16,11 +19,21 @@ class EntryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    categoryEntry.value = ["Genel", "Felsefe", "Spor", "Tarih"]; // örnek
+    fetchTopicCategories(); // 🔁 Kategori listesini dinamik çek
     fetchEntries();
-    fetchPersonEntries();
   }
 
+  /// 🔁 Backend'den kategori listesini al
+  void fetchTopicCategories() async {
+    final data = await EntryServices.fetchTopicCategories();
+    categoryMap.value = data;
+    categoryEntry.value = data.keys.toList();
+    if (categoryEntry.isNotEmpty) {
+      selectedCategory.value = categoryEntry.first;
+    }
+  }
+
+  /// 📤 Entry oluştur
   void shareEntryPost() async {
     final title = titleEntryController.text.trim();
     final body = bodyEntryController.text.trim();
@@ -33,8 +46,7 @@ class EntryController extends GetxController {
 
     isEntryLoading.value = true;
 
-    // kategori adı -> id eşleme (şimdilik sabit örnek)
-    int topicCategoryId = getCategoryIdFromName(categoryName);
+    final topicCategoryId = getCategoryIdFromName(categoryName);
 
     final success = await EntryServices.createTopicWithEntry(
       name: title,
@@ -50,63 +62,32 @@ class EntryController extends GetxController {
       titleEntryController.clear();
       bodyEntryController.clear();
       selectedCategory.value = "";
-      fetchEntries(); // listeyi güncelle
+      fetchEntries(); // listeyi yenile
     } else {
       Get.snackbar("Hata", "Konu oluşturulamadı");
     }
   }
 
+  /// 🔁 Kategori adı -> ID
   int getCategoryIdFromName(String name) {
-    switch (name) {
-      case "Genel":
-        return 1;
-      case "Felsefe":
-        return 2;
-      case "Spor":
-        return 3;
-      case "Tarih":
-        return 4;
-      default:
-        return 1;
-    }
+    return categoryMap[name] ?? 1;
   }
 
   void shareEntry() {
     Get.toNamed("/entryShare");
   }
 
+  /// 📥 Tüm entry'leri getir
   void fetchEntries() async {
     isEntryLoading.value = true;
-
     final entries = await EntryServices.fetchTimelineEntries();
     entryList.assignAll(entries);
 
-    isEntryLoading.value = false;
-  }
+    entryPersonList.assignAll(
+      entries.where((entry) => entry.isOwner == true).toList(),
+    ); // ✅ filtreleme
 
-  void fetchPersonEntries() {
-    entryPersonList.assignAll([
-      EntryModel(
-          profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
-          userName: "Alara Christie",
-          entryDate: "26.12.2010 16:56",
-          entryTitle: "Geziciler dostoyevski'yi isviçre peyniri sanıyor",
-          entryDescription:
-              "Oysa ki Dostoyevski; dünyaca ünlü Ukraynalı yazar Raskolnikov'un tercih ettiği bir çeşit salamura zeytindir.",
-          upvoteCount: 345,
-          downvoteCount: 345,
-          isActive: false),
-      EntryModel(
-          profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
-          userName: "Alara Christie",
-          entryDate: "05.08.2015 12:30",
-          entryTitle: "Kitap okumak neden önemli?",
-          entryDescription:
-              "Bilgi edinmek ve hayal gücünü geliştirmek için kitap okumak büyük önem taşır.",
-          upvoteCount: 198,
-          downvoteCount: 45,
-          isActive: true),
-    ]);
+    isEntryLoading.value = false;
   }
 
   void upvotePersonEntry(int index) {

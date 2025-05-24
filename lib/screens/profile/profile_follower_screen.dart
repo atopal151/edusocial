@@ -27,17 +27,17 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
               final user = controller.followerList[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundImage: NetworkImage(user["avatarUrl"] ?? ''),
+                  backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
                 ),
                 title: Text(
-                  user["fullName"] ?? '',
+                  '${user["name"]} ${user["surname"]}',
                   style: TextStyle(
                       fontSize: 13.28,
                       fontWeight: FontWeight.w400,
                       color: Color(0xff414751)),
                 ),
                 subtitle: Text(
-                  user["username"] ?? '',
+                  '@${user["username"]}',
                   style: TextStyle(
                       fontSize: 13.28,
                       fontWeight: FontWeight.w400,

@@ -174,7 +174,7 @@ class _PostCardState extends State<PostCard> {
 
           // 🔹 Alt butonlar (like, yorum, paylaş)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             child: Row(
               children: [
                 InkWell(

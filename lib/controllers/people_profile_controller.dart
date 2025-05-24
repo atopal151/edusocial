@@ -1,13 +1,13 @@
+import 'package:edusocial/models/people_profile_model.dart';
 import 'package:edusocial/services/people_profile_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../models/profile_model.dart';
 
 class PeopleProfileController extends GetxController {
   var isLoading = true.obs; // Profil genel yüklenme durumu
   var isFollowLoading = false.obs; // Takip/çıkar butonu loading
   var isFollowing = false.obs; // Kullanıcı takip ediliyor mu
-  var profile = Rxn<ProfileModel>(); // Kullanıcı profili
+  var profile = Rxn<PeopleProfileModel>(); // Kullanıcı profili
 
   /// 👤 Kullanıcı profilini getir
   Future<void> loadUserProfile(int userId) async {

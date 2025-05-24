@@ -67,31 +67,42 @@ class MatchController extends GetxController {
   void removeTopic(String topic) {
     savedTopics.remove(topic);
   }
+void findMatches() async {
+  isLoading.value = true;
 
-  void findMatches() async {
-    isLoading.value = true;
+  final fetchedMatches = await MatchServices.fetchMatches();
 
-    final fetchedMatches = await MatchServices.fetchMatches();
+  // ✅ Sadece takip ETMEDİĞİ kullanıcıları filtrele
+  final filteredMatches =
+      fetchedMatches.where((match) => match.isFollowing == false).toList();
 
-    // ✅ sadece takip ETMEDİĞİ kullanıcıları al
-    final filteredMatches =
-        fetchedMatches.where((match) => !match.isFollowing).toList();
-
-    if (filteredMatches.isNotEmpty) {
-      matches.assignAll(filteredMatches);
-      currentIndex.value = 0;
-
-      Get.back();
-      navigationController.changeIndex(2);
-    } else {
-      Get.snackbar(
-        "Bilgi",
-        "Takip etmediğin yeni bir eşleşme bulunamadı.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      Get.back();
-    }
-
-    isLoading.value = false;
+  // 👇 Her eşleşmeyi debug için yazdır (gerekirse kaldır)
+  for (var match in fetchedMatches) {
+    debugPrint("🔍 Match: ${match.name}, isFollowing: ${match.isFollowing}");
   }
+
+  if (filteredMatches.isNotEmpty) {
+    matches.assignAll(filteredMatches);
+    currentIndex.value = 0;
+
+    // Sayfayı kapat + eşleşme sayfasına geç
+    Get.back();
+
+    // 💡 Animasyon sonrası index değiştirme garantili
+    Future.delayed(const Duration(milliseconds: 100), () {
+      navigationController.changeIndex(2);
+    });
+  } else {
+    Get.snackbar(
+      "Bilgi",
+      "Takip etmediğin yeni bir eşleşme bulunamadı.",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+    Get.back();
+  }
+
+  isLoading.value = false;
+}
+
+
 }

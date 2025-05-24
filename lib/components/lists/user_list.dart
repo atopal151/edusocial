@@ -1,4 +1,4 @@
-import 'package:edusocial/controllers/people_profile_controller.dart';
+
 import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:edusocial/utils/image_helper.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +17,6 @@ class UserListItem extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         final userId = user.userId;
-        final controller = Get.put(PeopleProfileController());
-        controller.loadUserProfile(userId);
         Get.to(() =>
             PeopleProfileScreen(userId: userId)); // ✅ burada userId eklenmeli
       },

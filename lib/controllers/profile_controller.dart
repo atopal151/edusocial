@@ -76,9 +76,12 @@ class ProfileController extends GetxController {
       followers.value = data.followers.length;
       following.value = data.followings.length;
 
+      followerList.assignAll(data.followers);
+      followingList.assignAll(data.followings);
       // 📌 Postlar
       postCount.value = data.posts.length;
-      profilePosts.assignAll(data.posts);
+     // profilePosts.assignAll(data.posts);
+
       //debugPrint("✅ profilePosts.length: ${profilePosts.length}");
 
       //debugPrint("🧾 ProfilePost: $profilePosts");

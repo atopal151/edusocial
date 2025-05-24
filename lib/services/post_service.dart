@@ -70,21 +70,21 @@ class PostServices {
         },
       );
 
-    /*  debugPrint("📥 Postlar Response: ${response.statusCode}",
+      debugPrint("📥 Postlar Response: ${response.statusCode}",
           wrapWidth: 1024);
-      debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);*/
+      debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
         /// Debug için JSON'u ham olarak gör
-      /*  debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}",
-            wrapWidth: 1024);*/
+        debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}",
+            wrapWidth: 1024);
 
         final List posts = body['data']['data'];
 
         return posts.map((item) {
-         // debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024);
+          debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024);
           return PostModel.fromJson(item);
         }).toList();
       } else {

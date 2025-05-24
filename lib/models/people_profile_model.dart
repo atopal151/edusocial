@@ -1,6 +1,6 @@
 import 'package:edusocial/models/post_model.dart';
 
-class ProfileModel {
+class PeopleProfileModel {
   final int id;
   final String accountType;
   final String? languageId;
@@ -49,7 +49,7 @@ class ProfileModel {
   final List<dynamic> stories;
   final List<dynamic> followingStories;
 
-  ProfileModel({
+  PeopleProfileModel({
     required this.id,
     required this.accountType,
     required this.languageId,
@@ -99,8 +99,8 @@ class ProfileModel {
     required this.followingStories,
   });
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    return ProfileModel(
+  factory PeopleProfileModel.fromJson(Map<String, dynamic> json) {
+    return PeopleProfileModel(
       id: json['id'],
       accountType: json['account_type'] ?? 'private',
       languageId: json['language_id']?.toString(),
@@ -146,14 +146,10 @@ class ProfileModel {
           [],
       language: json['language'],
       approvedGroups: json['approved_groups'] ?? [],
-      school: json['school'] is Map<String, dynamic> ? json['school'] : null,
-      schoolDepartment: json['school_department'] is Map<String, dynamic>
-          ? json['school_department']
-          : null,
+      school: json['school'] as Map<String, dynamic>?,
+      schoolDepartment: json['school_department'] as Map<String, dynamic>?,
       lessons: (json['lessons'] as List?)
-              ?.map((e) => e is Map && e.containsKey('name')
-                  ? e['name'].toString()
-                  : e.toString())
+              ?.map((e) => e['name'].toString())
               .toList() ??
           [],
       followings: json['followings'] ?? [],

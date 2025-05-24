@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/services/post_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/post_model.dart';
 
 class PostController extends GetxController {
+  final ProfileController profileController = Get.find<ProfileController>();
+
   var isLoading = true.obs;
   var isHomeLoading = true.obs;
   var postList = <PostModel>[].obs;
@@ -21,6 +24,9 @@ class PostController extends GetxController {
     try {
       final posts = await PostServices.fetchHomePosts();
       postHomeList.assignAll(posts);
+          // 🔍 Sadece bana ait gönderileri filtrele
+    final myPosts = posts.where((post) => post.isOwner == true).toList();
+    profileController.profilePosts.assignAll(myPosts);
     } catch (e) {
       debugPrint("❗ Post çekme hatası: $e", wrapWidth: 1024);
     } finally {

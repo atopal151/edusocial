@@ -9,6 +9,7 @@ class PostModel {
   final List<String> mediaUrls;
   final int likeCount;
   final int commentCount;
+  final bool isOwner;
 
   PostModel({
     required this.profileImage,
@@ -17,6 +18,7 @@ class PostModel {
     required this.postDescription,
     required this.mediaUrls,
     required this.likeCount,
+    required this.isOwner,
     required this.commentCount,
   });
 
@@ -45,24 +47,23 @@ class PostModel {
               ? user['avatar']
               : "${AppConstants.baseUrl}/${user['avatar']}")
           : "${AppConstants.baseUrl}/images/static/avatar.png",
-      userName: user['name'] ?? '',
-      postDate: json['human_created_at'] ?? '',
+      userName: user['full_name'] ?? '',
+      postDate: json['created_at'] ?? '',
       postDescription: json['content'] ?? '',
       mediaUrls: mediaUrls,
+      isOwner: json['is_owner'] ?? false,
       likeCount: json['like_count'] ?? 0,
       commentCount: json['comment_count'] ?? 0,
     );
   }
-
-  // Profil ekranına özel
+// Profil ekranına özel
   factory PostModel.fromJsonForProfile(
       Map<String, dynamic> json, String avatarUrl, String fullName) {
-    debugPrint("🖼 media: ${json['media']}");
+    final mediaList = json['media'];
 
     List<String> mediaUrls = [];
-
-    if (json['media'] != null && json['media'] is List) {
-      for (var media in json['media']) {
+    if (mediaList != null && mediaList is List) {
+      for (var media in mediaList) {
         final fullPath = media['full_path'];
         if (fullPath != null && fullPath is String) {
           mediaUrls.add(
@@ -74,12 +75,15 @@ class PostModel {
       }
     }
 
+    debugPrint("📦 Profil Post JSON: $json", wrapWidth: 1024);
+
     return PostModel(
       profileImage: avatarUrl,
       userName: fullName,
       postDate: json['human_created_at'] ?? '',
       postDescription: json['content'] ?? '',
       mediaUrls: mediaUrls,
+      isOwner: json['is_owner'] == true || json['is_owner'] == 'true',
       likeCount: json['like_count'] ?? 0,
       commentCount: json['comment_count'] ?? 0,
     );

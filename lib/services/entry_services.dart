@@ -35,6 +35,40 @@ class EntryServices {
     }
   }
 
+  static Future<Map<String, int>> fetchTopicCategories() async {
+  final token = GetStorage().read("token");
+
+  try {
+    final response = await http.get(
+      Uri.parse("${AppConstants.baseUrl}/topic-categories"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+      },
+    );
+
+
+    debugPrint("📥 Kategori Response: ${response.statusCode}");
+    debugPrint("📥 Kategori Body: ${response.body}");
+    if (response.statusCode == 200) {
+      final jsonBody = jsonDecode(response.body);
+      final List data = jsonBody["data"];
+
+      final Map<String, int> result = {};
+      for (var item in data) {
+        result[item["name"]] = item["id"];
+      }
+      return result;
+    } else {
+      return {};
+    }
+  } catch (e) {
+    debugPrint("❗ Topic Categories error: $e");
+    return {};
+  }
+}
+
+
   static Future<bool> createTopicWithEntry({
     required String name,
     required String content,

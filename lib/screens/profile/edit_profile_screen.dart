@@ -54,7 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeaderPhotoWithAvatar(),
-                    const SizedBox(height: 90),
+                    const SizedBox(height: 20),
                     _buildTextField(
                         "Kullanıcı Adı", "@", controller.usernameController),
                     const SizedBox(height: 10),
@@ -87,8 +87,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         "LinkedIn", "/", controller.linkedinController),
                     const SizedBox(height: 10),
                     _buildTextField("Tiktok", "@", controller.tiktokController),
-
-                    /*
                     _sectionTitle("Okul ve Bölüm Bilgisi"),
                     const SizedBox(height: 10),
                     _buildTextField(
@@ -96,7 +94,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 10),
                     _buildTextField(
                         "Bölüm ID", "", controller.departmentIdController),
-                    const SizedBox(height: 20),*/
+                    const SizedBox(height: 20),
                     _sectionTitle("Dersler"),
                     const SizedBox(height: 10),
                     _buildLessonChips(),
@@ -117,6 +115,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         "Dil ID", "", controller.languageIdController),
                     const SizedBox(height: 20),
                     _sectionTitle("Hesap Tipi"),
+                    const SizedBox(height: 10),
                     _buildAccountTypeSelector(),
                     const SizedBox(height: 30),
                     CustomButton(
@@ -136,117 +135,118 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-Widget _buildHeaderPhotoWithAvatar() {
-  return SizedBox(
-    height: 160, // 120 kapak + 60 profil yüksekliği (yarısı taşar)
-    child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // 1. Kapak Fotoğrafı
-        IgnorePointer(
-          child: Container(
-            height: 120,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xffffffff),
-              borderRadius: BorderRadius.circular(20),
-              image: controller.selectedCoverPhoto != null
-                  ? DecorationImage(
-                      image: FileImage(controller.selectedCoverPhoto!),
-                      fit: BoxFit.cover,
-                    )
-                  : controller.userProfileModel.value?.bannerUrl
-                              .startsWith('http') ==
-                          true
-                      ? DecorationImage(
-                          image: NetworkImage(
-                              controller.userProfileModel.value!.bannerUrl),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-            ),
-          ),
-        ),
-
-        // 2. Profil Fotoğrafı
-        Positioned(
-          bottom: 0,
-          left: MediaQuery.of(context).size.width / 2 - 50,
-          child: GestureDetector(
-            onTap: () async {
-              final pickedFile = await _picker.pickImage(
-                source: ImageSource.gallery,
-                imageQuality: 60,
-              );
-              if (pickedFile != null) {
-                setState(() {
-                  controller.selectedAvatar = File(pickedFile.path);
-                });
-              }
-            },
-            child: Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                CircleAvatar(
-                  radius: 44,
-                  backgroundColor: const Color(0xfffafafa),
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.white,
-                    backgroundImage: controller.selectedAvatar != null
-                        ? FileImage(controller.selectedAvatar!)
-                        : (controller.userProfileModel.value?.avatar
-                                    .startsWith('http') ==
-                                true
-                            ? NetworkImage(
-                                controller.userProfileModel.value!.avatar)
-                            : const AssetImage('images/user1.png'))
-                            as ImageProvider,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Color(0xfffb535c),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // 3. Kapak Fotoğrafı Düzenleme Butonu
-        Positioned(
-          top: 8,
-          right: 8,
-          child: GestureDetector(
-            onTap: () async {
-              final pickedFile = await _picker.pickImage(
-                source: ImageSource.gallery,
-                imageQuality: 60,
-              );
-              if (pickedFile != null) {
-                setState(() {
-                  controller.selectedCoverPhoto = File(pickedFile.path);
-                });
-              }
-            },
+  Widget _buildHeaderPhotoWithAvatar() {
+    return SizedBox(
+      height: 160, // 120 kapak + 60 profil yüksekliği (yarısı taşar)
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // 1. Kapak Fotoğrafı
+          IgnorePointer(
             child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: Color(0xfffb535c),
-                shape: BoxShape.circle,
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xffffffff),
+                borderRadius: BorderRadius.circular(20),
+                image: controller.selectedCoverPhoto != null
+                    ? DecorationImage(
+                        image: FileImage(controller.selectedCoverPhoto!),
+                        fit: BoxFit.cover,
+                      )
+                    : controller.userProfileModel.value?.bannerUrl
+                                .startsWith('http') ==
+                            true
+                        ? DecorationImage(
+                            image: NetworkImage(
+                                controller.userProfileModel.value!.bannerUrl),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
               ),
-              child: const Icon(Icons.edit, size: 16, color: Colors.white),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+
+          // 2. Profil Fotoğrafı
+          Positioned(
+            bottom: 0,
+            left: MediaQuery.of(context).size.width / 2 - 50,
+            child: GestureDetector(
+              onTap: () async {
+                final pickedFile = await _picker.pickImage(
+                  source: ImageSource.gallery,
+                  imageQuality: 60,
+                );
+                if (pickedFile != null) {
+                  setState(() {
+                    controller.selectedAvatar = File(pickedFile.path);
+                  });
+                }
+              },
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 44,
+                    backgroundColor: const Color(0xfffafafa),
+                    child: CircleAvatar(
+                      radius: 42,
+                      backgroundColor: Colors.white,
+                      backgroundImage: controller.selectedAvatar != null
+                          ? FileImage(controller.selectedAvatar!)
+                          : (controller.userProfileModel.value?.avatarUrl
+                                          .startsWith('http') ==
+                                      true
+                                  ? NetworkImage(controller
+                                      .userProfileModel.value!.avatarUrl)
+                                  : const AssetImage('images/user1.png'))
+                              as ImageProvider,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Color(0xfffb535c),
+                      shape: BoxShape.circle,
+                    ),
+                    child:
+                        const Icon(Icons.edit, size: 16, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 3. Kapak Fotoğrafı Düzenleme Butonu
+          Positioned(
+            top: 8,
+            right: 8,
+            child: GestureDetector(
+              onTap: () async {
+                final pickedFile = await _picker.pickImage(
+                  source: ImageSource.gallery,
+                  imageQuality: 60,
+                );
+                if (pickedFile != null) {
+                  setState(() {
+                    controller.selectedCoverPhoto = File(pickedFile.path);
+                  });
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Color(0xfffb535c),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.edit, size: 16, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildTextField(
       String label, String prefix, TextEditingController controller) {
@@ -365,7 +365,7 @@ Widget _buildHeaderPhotoWithAvatar() {
 
   Widget _buildAccountTypeSelector() {
     return Obx(() => Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildAccountTypeBox('public'),
             const SizedBox(width: 8),
@@ -376,30 +376,33 @@ Widget _buildHeaderPhotoWithAvatar() {
 
   Widget _buildAccountTypeBox(String type) {
     final isSelected = controller.accountType.value == type;
-    return GestureDetector(
-      onTap: () => controller.changeAccountType(type),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE7E7E7) : Colors.white,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              type.capitalizeFirst ?? '',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.black : const Color(0xFF1F1F1F),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => controller.changeAccountType(type),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFE7E7E7) : Colors.white,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                type.capitalizeFirst ?? '',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? Colors.black : const Color(0xFF1F1F1F),
+                ),
               ),
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              const Icon(Icons.check, size: 16, color: Colors.black),
+              if (isSelected) ...[
+                const SizedBox(width: 6),
+                const Icon(Icons.check, size: 16, color: Colors.black),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

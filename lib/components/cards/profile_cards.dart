@@ -45,18 +45,25 @@ Widget buildProfileDetails() {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    /*Row(
+                    Row(
                       children: [
                         CircleAvatar(
+                          backgroundColor: Color(0xfffafafa),
                           radius: 20,
-                          backgroundImage: NetworkImage(profileData.schoolLogo),
+                          backgroundImage: (profileData.school?['logo']
+                                      ?.toString()
+                                      .isNotEmpty ??
+                                  false)
+                              ? NetworkImage(profileData.school!['logo'])
+                              : AssetImage('images/school_logo.png')
+                                  as ImageProvider,
                         ),
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData.schoolName,
+                              profileData.school?['name'] ?? "Okul bilgisi yok",
                               style: const TextStyle(
                                 fontSize: 13.28,
                                 fontWeight: FontWeight.w600,
@@ -64,7 +71,7 @@ Widget buildProfileDetails() {
                               ),
                             ),
                             Text(
-                              "${profileData.schoolDepartment} • ${profileData.schoolGrade}",
+                              "${profileData.schoolDepartment?['name'] ?? "Bölüm bilgisi yok"} • ${profileData.schoolDepartment?['name'] ?? ""}",
                               style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w400,
@@ -74,7 +81,7 @@ Widget buildProfileDetails() {
                           ],
                         ),
                       ],
-                    ),*/
+                    ),
                     const SizedBox(height: 20),
 
                     /// **Kişisel Bilgiler**

@@ -90,7 +90,7 @@ class ProfileUpdateService {
           : MediaType('image', 'jpeg');
       request.files.add(
         await http.MultipartFile.fromPath(
-          'cover_photo',
+          'banner',
           coverFile.path,
           contentType: mimeType,
         ),

@@ -89,9 +89,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
                 ),
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.all(Radius.circular(15)),
-                boxShadow: [
-                  BoxShadow(color: Colors.black26, blurRadius: 10),
-                ],
+                
               ),
               child: Center(
                 child: SvgPicture.asset(
