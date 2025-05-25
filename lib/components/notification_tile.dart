@@ -56,14 +56,28 @@ Widget buildNotificationTile(NotificationModel n) {
 
 IconData _getIcon(String type) {
   switch (type) {
-    case 'follow':
+    case 'follow-request':
+    case 'follow-join-request':
       return Icons.person_add_alt_1;
-    case 'like':
+
+    case 'post-like':
       return Icons.favorite;
-    case 'comment':
+
+    case 'post-comment':
       return Icons.mode_comment;
+
+    case 'group-join-request':
+      return Icons.group_add;
+
+    case 'group-join':
+      return Icons.group;
+
+    case 'create-group-event':
+      return Icons.event;
+
     case 'group_accept':
       return Icons.check_circle;
+
     default:
       return Icons.notifications;
   }
@@ -71,18 +85,35 @@ IconData _getIcon(String type) {
 
 Color _getIconBgColor(String type) {
   switch (type) {
-    case 'follow':
-      return Colors.blue;
-    case 'like':
-      return Colors.red;
-    case 'comment':
-      return Colors.deepOrange;
+    case 'follow-request':
+    case 'follow-join-request':
+      return Color(0xFF64B5F6); // mavi - daha koyu pastel ton
+
+    case 'post-like':
+      return Color(0xFFE57373); // kırmızımsı pembe - belirgin
+
+    case 'post-comment':
+      return Color(0xFFFFB74D); // turuncu - sıcak ve net
+
+    case 'group-join-request':
+      return Color(0xFFFFF176); // sarı - doygun
+
+    case 'group-join':
+      return Color(0xFF81C784); // yeşil - dengeli pastel yeşil
+
+    case 'create-group-event':
+      return Color(0xFF9575CD); // mor - parlak ton
+
     case 'group_accept':
-      return Colors.green;
+      return Color(0xFFFFCC80); // açık kahverengi/turuncu - yumuşak
+
     default:
-      return Colors.grey;
+      return Color(0xFFBDBDBD); // nötr gri - daha koyu
   }
 }
+
+
+
 
 String _timeAgo(DateTime date) {
   final now = DateTime.now();

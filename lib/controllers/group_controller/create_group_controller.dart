@@ -28,12 +28,12 @@ class CreateGroupController extends GetxController {
  Future<void> loadGroupAreas() async {
   final fetchedAreas = await _service.fetchGroupAreas();
   
-  debugPrint("📥 Fetched Group Areas: ${fetchedAreas.map((e) => e.toJson())}");
+  //debugPrint("📥 Fetched Group Areas: ${fetchedAreas.map((e) => e.toJson())}");
 
   groupAreas.assignAll(fetchedAreas);
   if (fetchedAreas.isNotEmpty) {
     selectedGroupArea.value = fetchedAreas.first;
-    debugPrint("✅ İlk Seçilen Grup Alanı: ${selectedGroupArea.value!.name}");
+    //debugPrint("✅ İlk Seçilen Grup Alanı: ${selectedGroupArea.value!.name}");
   } else {
     debugPrint("❗ Grup alanı listesi boş geldi.");
   }

@@ -25,7 +25,7 @@ class PeopleProfileController extends GetxController {
         debugPrint("⚠️ Profil verisi boş döndü");
       }
     } catch (e) {
-      debugPrint("❌ Profil yüklenirken hata oluştu: $e", wrapWidth: 1024);
+      //debugPrint("❌ Profil yüklenirken hata oluştu: $e", wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }

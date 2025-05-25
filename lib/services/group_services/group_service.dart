@@ -106,7 +106,7 @@ class GroupServices {
 
     try {
       final uri = Uri.parse("${AppConstants.baseUrl}/groups");
-      debugPrint("🌐 İstek Atılıyor: $uri", wrapWidth: 1024);
+      //debugPrint("🌐 İstek Atılıyor: $uri", wrapWidth: 1024);
 
       final response = await http.get(
         uri,

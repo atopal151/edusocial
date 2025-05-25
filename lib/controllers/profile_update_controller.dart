@@ -93,7 +93,7 @@ class ProfileUpdateController extends GetxController {
     final data = userProfileModel.value;
     if (data == null) return;
 
-    debugPrint("📥 Profil form verileri yükleniyor...", wrapWidth: 1024);
+    //debugPrint("📥 Profil form verileri yükleniyor...", wrapWidth: 1024);
 
     usernameController.text = data.username;
     nameController.text = data.name;

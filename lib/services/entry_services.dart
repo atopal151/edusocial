@@ -4,6 +4,7 @@ import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/find_locale.dart';
 
 class EntryServices {
   static Future<List<EntryModel>> fetchTimelineEntries() async {
@@ -36,38 +37,40 @@ class EntryServices {
   }
 
   static Future<Map<String, int>> fetchTopicCategories() async {
-  final token = GetStorage().read("token");
+    final token = GetStorage().read("token");
 
-  try {
-    final response = await http.get(
-      Uri.parse("${AppConstants.baseUrl}/topic-categories"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
+    try {
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/topic-categories"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
 
+      if (response.statusCode == 200) {
+        final jsonBody = jsonDecode(response.body);
+        final List data = jsonBody["data"];
 
-    debugPrint("📥 Kategori Response: ${response.statusCode}");
-    debugPrint("📥 Kategori Body: ${response.body}");
-    if (response.statusCode == 200) {
-      final jsonBody = jsonDecode(response.body);
-      final List data = jsonBody["data"];
+        //debugPrint(" $data",wrapWidth: 1024);
+        final Map<String, int> result = {};
+        for (var item in data) {
+          final name = item["name"];
+          final id = item["id"];
 
-      final Map<String, int> result = {};
-      for (var item in data) {
-        result[item["name"]] = item["id"];
+          if (name != null && id != null) {
+            result[name.toString()] = id;
+          }
+        }
+        return result;
+      } else {
+        return {};
       }
-      return result;
-    } else {
+    } catch (e) {
+      debugPrint("❗ Topic Categories error: $e");
       return {};
     }
-  } catch (e) {
-    debugPrint("❗ Topic Categories error: $e");
-    return {};
   }
-}
-
 
   static Future<bool> createTopicWithEntry({
     required String name,
@@ -91,7 +94,7 @@ class EntryServices {
         }),
       );
 
-    /*  debugPrint("📤 Create Topic Response: ${response.statusCode}");
+      /*  debugPrint("📤 Create Topic Response: ${response.statusCode}");
       debugPrint("📤 Create Topic Body: ${response.body}");*/
 
       return response.statusCode == 200 || response.statusCode == 201;

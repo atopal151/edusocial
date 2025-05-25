@@ -153,7 +153,6 @@ class _ProfileScreenState extends State<ProfileScreen>
 
  Widget _buildPosts() {
   final posts = controller.profilePosts;
-  debugPrint("🧾 profilePosts sayısı: ${posts.length}");
   
   if (posts.isEmpty) {
     return const Center(child: Text("Hiç gönderi bulunamadı."));

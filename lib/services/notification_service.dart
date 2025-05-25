@@ -22,25 +22,19 @@ class NotificationService {
         },
       );
 
+      //debugPrint("📥 notifications Response: ${response.statusCode}", wrapWidth: 1024);
+      //debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
+
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
-        final List data = jsonBody['data'] ?? [];
+        final List data = jsonBody['data']?['post_notifications'] ?? [];
 
-        return data.map((e) => NotificationModel(
-          id: e['id'].toString(),
-          userId: e['user_id'].toString(),
-          userName: e['user_name'] ?? '',
-          profileImageUrl: e['profile_image_url'] ?? '',
-          type: e['type'] ?? 'other',
-          message: e['message'] ?? '',
-          timestamp: DateTime.tryParse(e['created_at'] ?? '') ?? DateTime.now(),
-          isRead: e['is_read'] == 1 || e['is_read'] == true,
-        )).toList();
+        return data.map((e) => NotificationModel.fromJson(e)).toList();
       } else {
         throw Exception('Bildirimler alınamadı. Status Code: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint("❗ Bildirim servisi hatası: $e");
+      debugPrint("❗ Bildirim servisi hatası: $e", wrapWidth: 1024);
       rethrow;
     }
   }

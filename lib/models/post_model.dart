@@ -75,7 +75,6 @@ class PostModel {
       }
     }
 
-    debugPrint("📦 Profil Post JSON: $json", wrapWidth: 1024);
 
     return PostModel(
       profileImage: avatarUrl,

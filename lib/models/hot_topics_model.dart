@@ -5,7 +5,7 @@ class HotTopicsModel {
 
   factory HotTopicsModel.fromJson(Map<String, dynamic> json) {
     return HotTopicsModel(
-      title: json['title'] ?? '',
+      title: json['name'] ?? '',
     );
   }
 }

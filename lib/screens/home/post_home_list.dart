@@ -21,7 +21,6 @@ class PostHomeList extends StatelessWidget {
 
       return Column(
         children: postController.postHomeList.map((post) {
-          debugPrint("🧾 Post: ${post.postDescription}");
 
           return Container(
             color: const Color(0xfffafafa),

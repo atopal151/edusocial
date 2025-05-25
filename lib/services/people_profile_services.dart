@@ -17,15 +17,15 @@ class PeopleProfileService {
         url,
         headers: {"Authorization": "Bearer $token"},
       );
-      debugPrint("📥 [fetchUserById] Status: ${response.statusCode}");
-      debugPrint("📥 [fetchUserById] Body: ${response.body}", wrapWidth: 1024);
+      //debugPrint("📥 [fetchUserById] Status: ${response.statusCode}");
+      //debugPrint("📥 [fetchUserById] Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         return PeopleProfileModel.fromJson(body['data']);
       } else {
-        debugPrint("❌ [fetchUserById] API başarısız: ${response.statusCode}");
-        debugPrint("❌ [fetchUserById] Body: ${response.body}", wrapWidth: 1024);
+       // debugPrint("❌ [fetchUserById] API başarısız: ${response.statusCode}");
+        //debugPrint("❌ [fetchUserById] Body: ${response.body}", wrapWidth: 1024);
         return null;
       }
     } catch (e) {

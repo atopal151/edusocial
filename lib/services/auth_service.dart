@@ -30,7 +30,7 @@ class AuthService {
         final token = data['data']['token'];
         if (token != null) {
           _box.write('token', token);
-          debugPrint("Token başarıyla kaydedildi: $token",wrapWidth: 1024);
+         // debugPrint("Token başarıyla kaydedildi: $token",wrapWidth: 1024);
           return data['data']['user']; // 🛑 Kullanıcı bilgilerini döndür
         }
       }
@@ -72,9 +72,8 @@ class AuthService {
 
       if (response.statusCode == 200 && data["status"] == true) {
         final token = data['data']['token']; // 🔥 BURAYI DÜZELTTİK
-        debugPrint("buradayız1");
+        
         if (token != null) {
-          debugPrint("buradayız2");
           _box.write('token', token);
           return true;
         }

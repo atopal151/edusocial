@@ -28,12 +28,9 @@ class MainScreen extends StatelessWidget {
     Get.put(EntryController());
 
     Get.put(PostController());
-    //print('MAIN controller hash: ${navigationController.hashCode}');
 
     return Scaffold(
       body: Obx(() {
-        debugPrint(
-            "📍 Index değişti: ${navigationController.selectedIndex.value}");
         return IndexedStack(
           index: navigationController.selectedIndex.value,
           children: [

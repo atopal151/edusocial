@@ -18,4 +18,20 @@ class NotificationModel {
     required this.timestamp,
     required this.isRead,
   });
+
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    final fullData = json['notification_full_data'] ?? {};
+    final user = fullData['user'] ?? {};
+
+    return NotificationModel(
+      id: json['id'].toString(),
+      userId: json['user_id'].toString(),
+      userName: user['username'] ?? 'Kullanıcı',
+      profileImageUrl: user['avatar_url'] ?? '',
+      type: json['type'] ?? 'other',
+      message: fullData['text'] ?? '',
+      timestamp: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      isRead: json['is_read'] == true || json['is_read'] == 1,
+    );
+  }
 }

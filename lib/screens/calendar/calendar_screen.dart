@@ -46,10 +46,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               SizedBox(height: 20),
               // Tarih Seçici
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // Kenarlara yasla
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Tarih seçici alanı
                   Expanded(
                     child: Container(
                       height: 50,
@@ -60,8 +58,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween, // Kenarlara yasla
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             GestureDetector(
                               onTap: controller.previousDay,
@@ -127,9 +124,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                   ),
                   SizedBox(width: 8),
-                  // Add butonu
                   GestureDetector(
-                    onTap: controller.addReminder,
+                    onTap: controller.addOrUpdateReminder,
                     child: Container(
                       height: 50,
                       width: 50,
@@ -142,10 +138,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                 ],
               ),
-
               SizedBox(height: 16),
-
-              // Hatırlatıcı Listesi
               Expanded(
                 child: Obx(() => ListView.builder(
                       itemCount: controller.reminders.length,
@@ -161,77 +154,89 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             alignment: Alignment.centerRight,
                             padding: EdgeInsets.only(right: 16),
                             child: SvgPicture.asset(
-                          "images/icons/delete_icon.svg",
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xffffffff),
-                            BlendMode.srcIn,
-                          ),
-                        ),
+                              "images/icons/delete_icon.svg",
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xffffffff),
+                                BlendMode.srcIn,
+                              ),
+                            ),
                           ),
                           onDismissed: (direction) {
                             controller.deleteReminder(reminder.id);
                           },
-                          child: Container(
-                            height: 80,
-                            margin: EdgeInsets.only(bottom: 8),
-                            padding: EdgeInsets.only(left: 5, right: 5),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xff36C897),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      bottomLeft: Radius.circular(20),
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      'images/icons/clock_icon.svg',
-                                      fit: BoxFit.scaleDown,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
+                          child: GestureDetector(
+                            onTap: () {
+                              // Detay sayfasına yönlendir
+                              Get.toNamed('/calendar-detail',
+                                  arguments: {'id': reminder.id});
+                            },
+                            onLongPress: () {
+                              // Güncelleme formunu aç
+                              controller.addOrUpdateReminder(
+                                  existing: reminder);
+                            },
+                            child: Container(
+                              height: 80,
+                              margin: EdgeInsets.only(bottom: 8),
+                              padding: EdgeInsets.only(left: 5, right: 5),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 50,
                                     decoration: BoxDecoration(
-                                      color: Color(0xffffffff),
+                                      color: Color(0xff36C897),
                                       borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(20),
-                                        bottomRight: Radius.circular(20),
+                                        topLeft: Radius.circular(20),
+                                        bottomLeft: Radius.circular(20),
                                       ),
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            reminder.title,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          Text(
-                                            reminder.dateTime,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400,
-                                              color: Color(0xFF9CA3AE),
-                                            ),
-                                          ),
-                                        ],
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                        'images/icons/clock_icon.svg',
+                                        fit: BoxFit.scaleDown,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Color(0xffffffff),
+                                        borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(20),
+                                          bottomRight: Radius.circular(20),
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              reminder.title,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            Text(
+                                              reminder.dateTime,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(0xFF9CA3AE),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
