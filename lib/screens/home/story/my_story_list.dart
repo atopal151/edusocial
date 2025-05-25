@@ -43,14 +43,18 @@ class _MyStoryListState extends State<MyStoryList> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.grey[300],
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          profileController.profileImage.value.isNotEmpty
-                              ? profileController.profileImage.value
-                              : "https://i.pravatar.cc/150?img=5",
-                        ),
-                        fit: BoxFit.cover,
-                      ),
+                      image: (profileController.profileImage.value.isNotEmpty &&
+                              profileController.profileImage.value
+                                  .startsWith("http"))
+                          ? DecorationImage(
+                              image: NetworkImage(
+                                  profileController.profileImage.value),
+                              fit: BoxFit.cover,
+                              onError: (error, stackTrace) {
+                                debugPrint("⚠️ Görsel yüklenemedi: $error");
+                              },
+                            )
+                          : null, // görsel geçersizse sadece gri daire göster
                     ),
                   ),
                   Positioned(

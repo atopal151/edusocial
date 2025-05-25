@@ -18,7 +18,7 @@ class StoryController extends GetxController {
     id: "0",
     userId: "self",
     username: "Sen",
-    profileImage: "https://i.pravatar.cc/150?img=5",
+    profileImage: "",
     isMyStory: true,
     isViewed: false,
     storyUrls: [],

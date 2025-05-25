@@ -1,3 +1,4 @@
+import 'package:edusocial/utils/hex_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -23,13 +24,21 @@ class CalendarController extends GetxController {
       allReminders.value = fetched;
       filterReminders();
     } catch (e) {
-      Get.snackbar("Hata", "Hatırlatıcılar alınamadı: $e");
+      debugPrint('Hata: $e');
     }
   }
 
   void filterReminders() {
-    reminders.value = allReminders.where((reminder) =>
-      reminder.dateTime.startsWith(selectedDate.value)).toList();
+    reminders.value = allReminders.where((reminder) {
+      try {
+        final reminderDate = DateTime.parse(reminder.dateTime);
+        final formattedReminderDate =
+            DateFormat('dd MMM yyyy').format(reminderDate);
+        return formattedReminderDate == selectedDate.value;
+      } catch (_) {
+        return false;
+      }
+    }).toList();
   }
 
   void selectDate() async {
@@ -61,10 +70,11 @@ class CalendarController extends GetxController {
 
   void addOrUpdateReminder({Reminder? existing}) {
     final titleController = TextEditingController(text: existing?.title ?? "");
-    DateTime selectedDateTime = existing != null
-      ? DateFormat('yyyy-MM-dd HH:mm:ss').parse(existing.dateTime)
-      : DateTime.now();
-    RxBool sendNotification = true.obs;
+    DateTime selectedDateTime =
+        existing != null ? DateTime.parse(existing.dateTime) : DateTime.now();
+    RxBool sendNotification = (existing?.sendNotification ?? true).obs;
+    Rx<Color> selectedColor =
+        (existing != null ? HexColor.fromHex(existing.color) : Colors.blue).obs;
 
     Get.bottomSheet(
       Container(
@@ -80,16 +90,18 @@ class CalendarController extends GetxController {
             children: [
               SizedBox(height: 20),
               CustomTextField(
-                  textColor: Color(0xFF9CA3AF),
-                  controller: titleController,
-                  hintText: "Hatırlatma Başlığı",
-                  isPassword: false,
-                  backgroundColor: Color(0xfff5f5f5)),
+                textColor: Color(0xFF9CA3AF),
+                controller: titleController,
+                hintText: "Hatırlatma Başlığı",
+                isPassword: false,
+                backgroundColor: Color(0xfff5f5f5),
+              ),
               SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Tarih: ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
+                  Text(
+                      "Tarih: ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
                   SizedBox(
                     width: 120,
                     child: CustomButton(
@@ -115,7 +127,7 @@ class CalendarController extends GetxController {
                       },
                       isLoading: false.obs,
                       backgroundColor: Color(0xff414751),
-                      textColor: Color(0xffffffff),
+                      textColor: Colors.white,
                     ),
                   ),
                 ],
@@ -148,18 +160,40 @@ class CalendarController extends GetxController {
                       },
                       isLoading: false.obs,
                       backgroundColor: Color(0xff414751),
-                      textColor: Color(0xffffffff),
+                      textColor: Colors.white,
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 20),
               Obx(() => SwitchListTile(
-                title: Text("Bildirim gönder"),
-                value: sendNotification.value,
-                onChanged: (val) => sendNotification.value = val,
-              )),
+                    title: Text("Bildirim gönder"),
+                    value: sendNotification.value,
+                    onChanged: (val) => sendNotification.value = val,
+                  )),
               SizedBox(height: 10),
+              Obx(() => Row(
+                    children: [
+                      Text("Renk: "),
+                      SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          // renk seçim ekranı açılabilir
+                          selectedColor.value = Colors.deepPurple; // örnek
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: selectedColor.value,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+              SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: CustomButton(
@@ -167,12 +201,15 @@ class CalendarController extends GetxController {
                   borderRadius: 15,
                   text: existing != null ? "Güncelle" : "Kaydet",
                   onPressed: () async {
-                    final formatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDateTime);
+                    final formatted = DateFormat('yyyy-MM-dd HH:mm:ss')
+                        .format(selectedDateTime);
                     final reminder = Reminder(
                       id: existing?.id ?? 0,
                       title: titleController.text,
                       dateTime: formatted,
                       sendNotification: sendNotification.value,
+                      color: selectedColor.value
+                          .toHex(), // renk hex olarak gönderilecek
                     );
                     try {
                       if (existing != null) {
@@ -180,7 +217,18 @@ class CalendarController extends GetxController {
                         Get.snackbar("Başarılı", "Hatırlatıcı güncellendi");
                       } else {
                         await CalendarService.createReminder(reminder);
-                        Get.snackbar("Başarılı", "Hatırlatıcı eklendi");
+                        Get.snackbar(
+                          "✅ Başarılı", // Başlık
+                          "Hatırlatıcı eklendi", // Mesaj
+                          snackPosition:
+                              SnackPosition.TOP, // Konum: TOP / BOTTOM
+                          backgroundColor: Colors.green, // Arka plan rengi
+                          colorText: Colors.white, // Yazı rengi
+                          icon: Icon(Icons.check, color: Colors.white), // İkon
+                          duration: Duration(seconds: 3), // Görünme süresi
+                          margin: EdgeInsets.all(12), // Etraf boşluğu
+                          borderRadius: 10, // Köşe yumuşaklığı
+                        );
                       }
                       await loadReminders();
                       Get.back();
@@ -206,192 +254,19 @@ class CalendarController extends GetxController {
     try {
       await CalendarService.deleteReminder(id);
       await loadReminders();
-      Get.snackbar("Silindi", "Hatırlatıcı başarıyla silindi");
+      Get.snackbar(
+        "Başarılı", // Başlık
+        "Hatırlatıcı başarı ile silindi.", // Mesaj
+        snackPosition: SnackPosition.TOP, // Konum: TOP / BOTTOM
+        backgroundColor: Color(0xffef5050), // Arka plan rengi
+        colorText: Colors.white, // Yazı rengi
+        icon: Icon(Icons.check, color: Colors.white), // İkon
+        duration: Duration(seconds: 3), // Görünme süresi
+        margin: EdgeInsets.all(12), // Etraf boşluğu
+        borderRadius: 10, // Köşe yumuşaklığı
+      );
     } catch (e) {
       Get.snackbar("Hata", "Silme başarısız: $e");
     }
   }
 }
-
-/*
-class CalendarController extends GetxController {
-  var selectedDate = DateFormat('dd MMM yyyy').format(DateTime.now()).obs;
-
-  var allReminders = <Reminder>[].obs;
-  var reminders = <Reminder>[].obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    loadMockData();
-    filterReminders();
-  }
-
-  void loadMockData() {
-    allReminders.addAll([
-      Reminder(id: 1, title: "Tasarım Ödevi", dateTime: "14 Feb 2025, 16:34"),
-      Reminder(id: 2, title: "Sunum Hazırlığı", dateTime: "20 Mar 2025, 10:00"),
-      Reminder(
-          id: 3, title: "Doktor Randevusu", dateTime: "16 Mar 2025, 14:00"),
-    ]);
-  }
-
-  void filterReminders() {
-    reminders.value = allReminders
-        .where((reminder) => reminder.dateTime.startsWith(selectedDate.value))
-        .toList();
-  }
-
-  void selectDate() async {
-    DateTime? pickedDate = await showDatePicker(
-      context: Get.context!,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate != null) {
-      selectedDate.value = DateFormat('dd MMM yyyy').format(pickedDate);
-      filterReminders();
-    }
-  }
-
-  void previousDay() {
-    DateTime currentDate = DateFormat('dd MMM yyyy').parse(selectedDate.value);
-    selectedDate.value = DateFormat('dd MMM yyyy')
-        .format(currentDate.subtract(Duration(days: 1)));
-    filterReminders();
-  }
-
-  void nextDay() {
-    DateTime currentDate = DateFormat('dd MMM yyyy').parse(selectedDate.value);
-    selectedDate.value =
-        DateFormat('dd MMM yyyy').format(currentDate.add(Duration(days: 1)));
-    filterReminders();
-  }
-
-  void addReminder() {
-    TextEditingController titleController = TextEditingController();
-    DateTime selectedDateTime = DateTime.now();
-
-    Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(height: 20),
-              CustomTextField(
-                  textColor: Color(0xFF9CA3AF),
-                  controller: titleController,
-                  hintText: "Hatırlatma Başlığı",
-                  isPassword: false,
-                  backgroundColor: Color(0xfff5f5f5)),
-              SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                      "Tarih: ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
-                  SizedBox(
-                    width: 120,
-                    child: CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
-                      text: "Tarih Seç",
-                      onPressed: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                          context: Get.context!,
-                          initialDate: selectedDateTime,
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null) {
-                          selectedDateTime = pickedDate;
-                        }
-                      },
-                      isLoading: false.obs,
-                      backgroundColor: Color(0xff414751),
-                      textColor: Color(0xffffffff),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Saat: ${DateFormat('HH:mm').format(selectedDateTime)}"),
-                  SizedBox(
-                    width: 120,
-                    child: CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
-                      text: "Saat Seç",
-                      onPressed: () async {
-                        TimeOfDay? pickedTime = await showTimePicker(
-                          context: Get.context!,
-                          initialTime: TimeOfDay.fromDateTime(selectedDateTime),
-                        );
-                        if (pickedTime != null) {
-                          selectedDateTime = DateTime(
-                            selectedDateTime.year,
-                            selectedDateTime.month,
-                            selectedDateTime.day,
-                            pickedTime.hour,
-                            pickedTime.minute,
-                          );
-                        }
-                      },
-                      isLoading: false.obs,
-                      backgroundColor: Color(0xff414751),
-                      textColor: Color(0xffffffff),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
-                  text: "Kaydet",
-                  onPressed: () {
-                    allReminders.add(Reminder(
-                      id: allReminders.length + 1,
-                      title: titleController.text,
-                      dateTime: DateFormat('dd MMM yyyy, HH:mm')
-                          .format(selectedDateTime),
-                    ));
-                    filterReminders();
-                    Get.back();
-                    Get.snackbar("Başarılı", "Hatırlatıcı eklendi");
-                  },
-                  isLoading: false.obs,
-                  backgroundColor: Color(0xffFFF6F6),
-                  textColor: Color(0xffED7474),
-                ),
-              ),
-              SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-      isScrollControlled: true,
-    );
-  }
-  
-  void deleteReminder(int id) {
-    allReminders.removeWhere((reminder) => reminder.id == id);
-    filterReminders();
-  }
-}*/

@@ -1,5 +1,4 @@
 import 'package:edusocial/utils/constants.dart';
-import 'package:flutter/material.dart';
 
 class PostModel {
   final String profileImage;

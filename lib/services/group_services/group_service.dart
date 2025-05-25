@@ -56,32 +56,43 @@ class GroupServices {
         },
       );
 
-      /*debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
+      debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
           wrapWidth: 1024);
       debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
-          wrapWidth: 1024);*/
+          wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        /*debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
-            wrapWidth: 1024);*/
+        debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
+            wrapWidth: 1024);
 
         final userGroupList = data.map((item) {
           final group = GroupModel(
             id: item['id'].toString(),
+            userId: item['user_id'],
+            groupAreaId: item['group_area_id'],
             name: item['name'] ?? '',
             description: item['description'] ?? '',
-            imageUrl: item['image'] != null
-                ? "${AppConstants.baseUrl}/${item['image']}"
-                : '',
-            memberCount: item['member_count'] ?? 0,
-            category: item['category'] ?? 'Genel',
-            isJoined: true, // Kullanıcı zaten bu gruplara üye
+            status: item['status'] ?? '',
+            isPrivate: item['is_private'] ?? false,
+            deletedAt: item['deleted_at'],
+            createdAt: item['created_at'] ?? '',
+            updatedAt: item['updated_at'] ?? '',
+            userCountWithAdmin: item['user_count_with_admin'] ?? 0,
+            userCountWithoutAdmin: item['user_count_without_admin'] ?? 0,
+            messageCount: item['message_count'] ?? 0,
+            isFounder: item['is_founder'] ?? false,
+            isMember: item['is_member'] ?? false,
+            isPending: item['is_pending'] ?? false,
+            avatarUrl: item['avatar_url'] ?? '',
+            bannerUrl: item['banner_url'] ?? '',
+            humanCreatedAt: item['human_created_at'] ?? '',
+            pivotCreatedAt: item['pivot']?['created_at'] ?? '',
+            pivotUpdatedAt: item['pivot']?['updated_at'] ?? '',
           );
-          /* debugPrint("✅ Kullanıcı Grubu: ${group.name} (${group.id})",
-              wrapWidth: 1024);*/
+
           return group;
         }).toList();
 
@@ -131,17 +142,28 @@ class GroupServices {
         final groupList = data.map((item) {
           final group = GroupModel(
             id: item['id'].toString(),
+            userId: item['user_id'],
+            groupAreaId: item['group_area_id'],
             name: item['name'] ?? '',
             description: item['description'] ?? '',
-            imageUrl: item['image'] != null
-                ? "${AppConstants.baseUrl}/${item['image']}"
-                : '',
-            memberCount: item['member_count'] ?? 0,
-            category: item['category'] ?? 'Genel',
-            isJoined: item['is_member'] ?? false,
+            status: item['status'] ?? '',
+            isPrivate: item['is_private'] ?? false,
+            deletedAt: item['deleted_at'],
+            createdAt: item['created_at'] ?? '',
+            updatedAt: item['updated_at'] ?? '',
+            userCountWithAdmin: item['user_count_with_admin'] ?? 0,
+            userCountWithoutAdmin: item['user_count_without_admin'] ?? 0,
+            messageCount: item['message_count'] ?? 0,
+            isFounder: item['is_founder'] ?? false,
+            isMember: item['is_member'] ?? false,
+            isPending: item['is_pending'] ?? false,
+            avatarUrl: item['avatar_url'] ?? '',
+            bannerUrl: item['banner_url'] ?? '',
+            humanCreatedAt: item['human_created_at'] ?? '',
+            pivotCreatedAt: item['pivot']?['created_at'] ?? '',
+            pivotUpdatedAt: item['pivot']?['updated_at'] ?? '',
           );
-          /* debugPrint("✅ Grup Eklendi: ${group.name} (${group.id})",
-              wrapWidth: 1024);*/
+
           return group;
         }).toList();
 

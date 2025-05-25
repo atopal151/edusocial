@@ -63,11 +63,11 @@ class GroupListScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GroupCard(
-                          chatNotification: 10,
-                          imageUrl: group.imageUrl,
+                          chatNotification: group.messageCount,
+                          imageUrl: group.avatarUrl,
                           groupName: group.name,
                           groupDescription: group.description,
-                          memberCount: group.memberCount,
+                          memberCount: group.userCountWithAdmin,
                           action: "Katıldınız",
                           onJoinPressed: () {},
                         ),
@@ -138,11 +138,11 @@ class GroupListScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GroupCard(
                           category: ["Flutter", "Mobil", "Yazılım"], // 👈 burası yeni
-                          imageUrl: group.imageUrl,
+                          imageUrl: group.avatarUrl,
                           groupName: group.name,
                           groupDescription: group.description,
-                          memberCount: group.memberCount,
-                          action: group.isJoined ? "Katıldınız" : "Katıl",
+                          memberCount: group.userCountWithAdmin,
+                          action: group.isPending ? "Katıldınız" : "Katıl",
                           onJoinPressed: () => controller.joinGroup(group.id),
                         ),
                       );

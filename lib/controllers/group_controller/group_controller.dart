@@ -237,7 +237,7 @@ void joinSuggestionGroup(String id) {
 
   void updateFilteredGroups() {
     filteredGroups.value = allGroups
-        .where((group) => group.category == selectedCategory.value)
+        .where((group) => group.groupAreaId == selectedCategory.value)
         .toList();
   }
 

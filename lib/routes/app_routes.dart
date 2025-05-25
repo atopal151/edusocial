@@ -8,7 +8,6 @@ import 'package:edusocial/bindings/profile_binding.dart';
 import 'package:edusocial/bindings/search_binding.dart';
 import 'package:edusocial/bindings/settings_binding.dart';
 import 'package:edusocial/screens/calendar/calendar_screen.dart';
-import 'package:edusocial/screens/calendar/reminder_detail_screen.dart';
 import 'package:edusocial/screens/chat/group_chat/group_chat_detail_screen.dart';
 import 'package:edusocial/screens/chat/user_chat/chat_detail_screen.dart';
 import 'package:edusocial/screens/chat/user_chat/chat_list_screen.dart';
@@ -59,7 +58,6 @@ class Routes {
   static const String main = '/main';
   static const String editProfile = "/settings";
   static const String calendar = "/calendar";
-  static const calendarDetail = '/calendar-detail';
   static const String searchText = "/search_text";
   static const String groupList = "/group_list";
   static const String groupDetailScreen = "/groupDetailScreen";
@@ -140,13 +138,6 @@ class Routes {
       name: calendar,
       page: () => CalendarScreen(),
       binding: CalendarBinding(),
-    ),
-    GetPage(
-      name: calendarDetail,
-      page: () {
-        final args = Get.arguments;
-        return ReminderDetailScreen(reminderId: args['id']);
-      },
     ),
     GetPage(
       name: groupList,

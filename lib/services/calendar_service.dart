@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../models/calendar_model.dart';
@@ -12,23 +13,30 @@ class CalendarService {
     final token = _box.read('token');
     final uri = Uri.parse("${AppConstants.baseUrl}/calendars");
 
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.map((e) => Reminder(
-        id: e['id'],
-        title: e['description'] ?? '',
-        dateTime: e['notification_time'] ?? '',
-      )).toList();
-    } else {
-      throw Exception("Takvim verileri alınamadı");
+     // debugPrint("📥 Calendar Response: ${response.statusCode}",wrapWidth: 1024);
+      //debugPrint("📥 Calendar Body: ${response.body}",wrapWidth: 1024);
+
+      if (response.statusCode == 200) {
+        final jsonBody = jsonDecode(response.body);
+        final List data = jsonBody['data'] ?? [];
+
+        return data.map((e) => Reminder.fromJson(e)).toList();
+      } else {
+        throw Exception(
+            "Takvim verileri alınamadı. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("❗ getReminders hatası: $e");
+      rethrow;
     }
   }
 
@@ -104,28 +112,32 @@ class CalendarService {
     }
   }
 
-   static Future<Reminder> getReminderById(int id) async {
-    final token = _box.read('token');
-    final uri = Uri.parse("${AppConstants.baseUrl}/calendars/$id");
+ static Future<Reminder> getReminderById(int id) async {
+  final token = _box.read('token');
+  final uri = Uri.parse("${AppConstants.baseUrl}/calendars/$id");
 
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
+  final response = await http.get(
+    uri,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final jsonBody = jsonDecode(response.body);
+    final data = jsonBody['data'];
+
+    return Reminder(
+      id: data['id'],
+      title: data['description'] ?? '',
+      dateTime: data['notification_time'] ?? '',
+      sendNotification: data['send_notification'] ?? true,
+      color: data['color'] ?? '#36C897', // ✅ yeni alan burada
     );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return Reminder(
-        id: data['id'],
-        title: data['description'] ?? '',
-        dateTime: data['notification_time'] ?? '',
-        sendNotification: data['send_notification'] ?? true,
-      );
-    } else {
-      throw Exception("Hatırlatıcı bulunamadı");
-    }
+  } else {
+    throw Exception("Hatırlatıcı bulunamadı");
   }
+}
+
 }

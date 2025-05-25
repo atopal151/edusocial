@@ -1,4 +1,6 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
+import 'package:edusocial/screens/calendar/reminder_detail_modal.dart';
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -165,11 +167,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             controller.deleteReminder(reminder.id);
                           },
                           child: GestureDetector(
-                            onTap: () {
-                              // Detay sayfasına yönlendir
-                              Get.toNamed('/calendar-detail',
-                                  arguments: {'id': reminder.id});
-                            },
+                            onTap: () =>
+                                showReminderDetailDialog(context, reminder.id),
                             onLongPress: () {
                               // Güncelleme formunu aç
                               controller.addOrUpdateReminder(
@@ -223,7 +222,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                               ),
                                             ),
                                             Text(
-                                              reminder.dateTime,
+                                              formatSimpleDate(reminder
+                                                  .dateTime), // 🔁 burası değişiyor
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w400,

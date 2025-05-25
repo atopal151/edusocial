@@ -49,30 +49,29 @@ class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
               return CircleAvatar(
                 radius: 20,
                 backgroundColor: Colors.grey.shade200,
-                child: ClipOval(
-                  child: isNetworkImage
-                      ? Image.network(
-                          imagePath,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            debugPrint("⚠️ Görsel yüklenemedi: $error",wrapWidth: 1024);
-                            return Image.asset(
-                              'images/user1.png',
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        )
-                      : Image.asset(
-                          imagePath.isNotEmpty ? imagePath : 'images/user1.png',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
-                ),
+                child: (imagePath.isEmpty || imagePath == 'null')
+                    ? null
+                    : ClipOval(
+                        child: isNetworkImage
+                            ? Image.network(
+                                imagePath,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  debugPrint("⚠️ Görsel yüklenemedi: $error",
+                                      wrapWidth: 1024);
+                                  return const SizedBox.shrink();
+                                  // Yüklenemediğinde de sadece gri daire kalır
+                                },
+                              )
+                            : Image.asset(
+                                imagePath,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
               );
             })
             ),
