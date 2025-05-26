@@ -7,7 +7,11 @@ class StoryController extends GetxController {
   final isLoading = false.obs;
   final RxList<StoryModel> storyList = <StoryModel>[].obs;
 
-
+@override
+  void onInit() {
+    super.onInit();
+    fetchStories();
+  }
 //----------------------------------------------------------------------------//
  void fetchStories() async {
   isLoading.value = true;
@@ -52,6 +56,19 @@ class StoryController extends GetxController {
   StoryModel? getMyStory() {
     return storyList.firstWhereOrNull((story) => story.isMyStory);
   }
+
+  Future<void> loadMyStoryFromServer(String userId) async {
+  final mediaList = await StoryService.fetchStoriesByUserId(userId);
+
+  final myStory = getMyStory();
+  if (myStory != null) {
+    myStory.storyUrls = mediaList;
+    myStory.hasStory = mediaList.isNotEmpty;
+    myStory.createdAt = DateTime.now();
+    storyList.refresh();
+  }
+}
+
 
 //----------------------------------------------------------------------------//
   List<StoryModel> getOtherStories() {

@@ -1,41 +1,25 @@
+import 'package:edusocial/services/comment_services.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/comment_model.dart';
+import '../../models/comment_model.dart';
 
 class CommentController extends GetxController {
-  var comments = <CommentModel>[].obs;
+  var commentList = <CommentModel>[].obs;
+  var isLoading = false.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchMockComments();
+  Future<void> fetchComments(String postId) async {
+    isLoading.value = true;
+    final comments = await CommentService.fetchComments(postId);
+    commentList.assignAll(comments);
+
+        debugPrint('Comment: $comments');
+    isLoading.value = false;
   }
 
-  void fetchMockComments() {
-    comments.value = [
-      CommentModel(
-        username: "Ahmet Yılmaz",
-        userProfileImage: "https://randomuser.me/api/portraits/men/10.jpg",
-        commentText: "Bu gönderi harika!",
-        commentDate: "2 saat önce",
-      ),
-      CommentModel(
-        username: "Zeynep Kara",
-        userProfileImage: "https://randomuser.me/api/portraits/women/21.jpg",
-        commentText: "Tebrikler 👏",
-        commentDate: "1 saat önce",
-      ),
-    ];
-  }
-
-  void addComment(String text) {
-    comments.insert(
-      0,
-      CommentModel(
-        username: "Sen",
-        userProfileImage: "https://randomuser.me/api/portraits/men/32.jpg",
-        commentText: text,
-        commentDate: "Şimdi",
-      ),
-    );
+  Future<void> addComment(String postId, String content) async {
+    final success = await CommentService.postComment(postId, content);
+    if (success) {
+      fetchComments(postId);
+    }
   }
 }

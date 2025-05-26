@@ -5,7 +5,8 @@ import '../../controllers/comment_controller.dart';
 import '../input_fields/comment_input_field.dart';
 
 class CommentBottomSheet extends StatefulWidget {
-  const CommentBottomSheet({super.key});
+  final String postId;
+  const CommentBottomSheet({super.key, required this.postId});
 
   @override
   State<CommentBottomSheet> createState() => _CommentBottomSheetState();
@@ -13,8 +14,14 @@ class CommentBottomSheet extends StatefulWidget {
 
 class _CommentBottomSheetState extends State<CommentBottomSheet> {
   final CommentController controller = Get.put(CommentController());
+final TextEditingController messageController = TextEditingController();
 
-  final TextEditingController textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchComments(widget.postId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +51,8 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               ),
               //  Başlık
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   "Yorumlar",
                   style: GoogleFonts.inter(
@@ -52,15 +60,15 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                 ),
               ),
               const SizedBox(height: 12),
-      
+
               // 🧾 Yorumlar listesi
               Expanded(
                 child: Obx(() {
                   return ListView.separated(
-                    itemCount: controller.comments.length,
+                    itemCount: controller.commentList.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      final comment = controller.comments[index];
+                      final comment = controller.commentList[index];
                       return Container(
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
@@ -71,7 +79,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                           children: [
                             CircleAvatar(
                               backgroundImage:
-                                  NetworkImage(comment.userProfileImage),
+                                  NetworkImage(comment.userAvatar),
                               radius: 20,
                             ),
                             const SizedBox(width: 10),
@@ -83,7 +91,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          comment.username,
+                                          comment.userName,
                                           style: GoogleFonts.inter(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
@@ -91,7 +99,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                         ),
                                       ),
                                       Text(
-                                        comment.commentDate,
+                                        comment.createdAt,
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
                                           color: Colors.grey,
@@ -101,7 +109,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    comment.commentText,
+                                    comment.content,
                                     style: GoogleFonts.inter(fontSize: 13),
                                   ),
                                 ],
@@ -114,11 +122,12 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   );
                 }),
               ),
-      
+
               // Yorum Yazma Alanı
               Padding(
                 padding: const EdgeInsets.all(5),
-                child: buildCommentInputField(controller),
+                child:buildCommentInputField(controller, widget.postId, messageController)
+
               ),
             ],
           ),

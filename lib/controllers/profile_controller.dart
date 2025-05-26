@@ -12,7 +12,7 @@ class ProfileController extends GetxController {
 
   // Mock Kullanıcı Verileri
   var isPrLoading = false.obs; // Yüklenme durumu
-
+  var userId = ''.obs;
   var profileImage = "".obs;
   var fullName = "".obs;
   var bio = "".obs;
@@ -61,6 +61,7 @@ class ProfileController extends GetxController {
       profile.value = data;
 
       // 📌 Temel veriler
+      userId.value = data.id.toString(); // 👈 id verisi varsa burada saklanır
       fullName.value = "${data.name} ${data.surname}";
       username.value = "@${data.username}";
       profileImage.value = data.avatarUrl;
@@ -80,7 +81,7 @@ class ProfileController extends GetxController {
       followingList.assignAll(data.followings);
       // 📌 Postlar
       postCount.value = data.posts.length;
-     // profilePosts.assignAll(data.posts);
+      // profilePosts.assignAll(data.posts);
 
       //debugPrint("✅ profilePosts.length: ${profilePosts.length}");
 

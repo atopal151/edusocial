@@ -13,7 +13,7 @@ import 'story/story_viewer_page.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
-  final GroupController groupController = Get.put(GroupController());
+  final GroupController groupController = Get.find();
   final StoryController storyController = Get.find();
   HomeScreen({super.key});
 

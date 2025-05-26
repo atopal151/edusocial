@@ -1,3 +1,4 @@
+import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,6 +11,7 @@ import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 
 class PostCard extends StatefulWidget {
+  final int postId;
   final String profileImage;
   final String userName;
   final String postDate;
@@ -17,16 +19,19 @@ class PostCard extends StatefulWidget {
   final List<String> mediaUrls;
   final int likeCount;
   final int commentCount;
+  final bool isLiked;
 
   const PostCard({
     super.key,
     required this.profileImage,
+    required this.postId,
     required this.userName,
     required this.postDate,
     required this.postDescription,
     required this.mediaUrls,
     required this.likeCount,
     required this.commentCount,
+    required this.isLiked,
   });
 
   @override
@@ -36,6 +41,15 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  late bool isLiked;
+  late int likeCount;
+
+  @override
+  void initState() {
+    super.initState();
+    isLiked = widget.isLiked;
+    likeCount = widget.likeCount;
+  }
 
   @override
   void dispose() {
@@ -47,6 +61,7 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     final ProfileController profileController = Get.find<ProfileController>();
 
+    final PostController postController = Get.find<PostController>();
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
@@ -101,14 +116,16 @@ class _PostCardState extends State<PostCard> {
                           backgroundColor: Colors.white,
                           context: context,
                           shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                            borderRadius:
+                                BorderRadius.vertical(top: Radius.circular(25)),
                           ),
                           builder: (_) => const TreePointBottomSheet(),
                         );
                       },
                       child: SvgPicture.asset(
                         "images/icons/tree_dot.svg",
-                        colorFilter: const ColorFilter.mode(Color(0xff414751), BlendMode.srcIn),
+                        colorFilter: const ColorFilter.mode(
+                            Color(0xff414751), BlendMode.srcIn),
                       ),
                     ),
                   ],
@@ -150,7 +167,8 @@ class _PostCardState extends State<PostCard> {
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               color: Colors.grey.shade200,
-                              child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                              child: const Icon(Icons.broken_image,
+                                  size: 40, color: Colors.grey),
                             );
                           },
                         ),
@@ -178,15 +196,24 @@ class _PostCardState extends State<PostCard> {
             child: Row(
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    setState(() {
+                      isLiked = !isLiked;
+                      likeCount += isLiked ? 1 : -1;
+                    });
+                    postController.toggleLike(widget.postId.toString());
+                  },
                   child: SvgPicture.asset(
                     "images/icons/post_like.svg",
-                    colorFilter: const ColorFilter.mode(Color(0xff9ca3ae), BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(
+                      isLiked ? Colors.red : Color(0xff9ca3ae),
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  widget.likeCount.toString(),
+                  likeCount.toString(),
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -205,13 +232,15 @@ class _PostCardState extends State<PostCard> {
                         maxChildSize: 0.95,
                         minChildSize: 0.95,
                         expand: false,
-                        builder: (_, controller) => CommentBottomSheet(),
+                        builder: (_, controller) => CommentBottomSheet(
+                            postId: widget.postId.toString()),
                       ),
                     );
                   },
                   child: SvgPicture.asset(
                     "images/icons/post_chat.svg",
-                    colorFilter: const ColorFilter.mode(Color(0xff9ca3ae), BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                        Color(0xff9ca3ae), BlendMode.srcIn),
                   ),
                 ),
                 const SizedBox(width: 5),
@@ -226,19 +255,23 @@ class _PostCardState extends State<PostCard> {
                 const Spacer(),
                 InkWell(
                   onTap: () {
-                    final shareText = "${widget.userName} bir gönderi paylaştı:\n\n${widget.postDescription}";
+                    final shareText =
+                        "${widget.userName} bir gönderi paylaştı:\n\n${widget.postDescription}";
                     showModalBottomSheet(
                       backgroundColor: Colors.white,
                       context: context,
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(25)),
                       ),
-                      builder: (_) => ShareOptionsBottomSheet(postText: shareText),
+                      builder: (_) =>
+                          ShareOptionsBottomSheet(postText: shareText),
                     );
                   },
                   child: SvgPicture.asset(
                     "images/icons/share.svg",
-                    colorFilter: const ColorFilter.mode(Color(0xff9ca3ae), BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                        Color(0xff9ca3ae), BlendMode.srcIn),
                   ),
                 ),
                 const SizedBox(width: 5),

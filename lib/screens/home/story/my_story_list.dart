@@ -1,3 +1,4 @@
+import 'package:edusocial/screens/home/story/story_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/cards/story_card.dart';
@@ -16,6 +17,17 @@ class _MyStoryListState extends State<MyStoryList> {
   final ProfileController profileController = Get.find<ProfileController>();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final myStory = storyController.getMyStory();
+      if (myStory != null && myStory.storyUrls.isEmpty) {
+        storyController.loadMyStoryFromServer(profileController.userId.value);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(() {
       // Story listesinde varsa, kullan
@@ -28,8 +40,15 @@ class _MyStoryListState extends State<MyStoryList> {
 
       // Boşsa ve kendi hikayesi yoksa gösterilecek widget
       return GestureDetector(
-        onTap: () {
-          Get.toNamed('/addStory');
+        onTap: () async {
+          await storyController
+              .loadMyStoryFromServer(profileController.userId.value);
+
+          final myIndex =
+              storyController.storyList.indexWhere((e) => e.isMyStory);
+          if (myIndex != -1) {
+            Get.to(() => StoryViewerPage(initialIndex: myIndex));
+          }
         },
         child: Padding(
           padding: const EdgeInsets.only(top: 10.0),
@@ -60,15 +79,20 @@ class _MyStoryListState extends State<MyStoryList> {
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed('/addStory');
+                      },
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.add_circle_rounded,
+                            size: 18, color: Colors.black),
                       ),
-                      child: Icon(Icons.add_circle_rounded,
-                          size: 18, color: Colors.black),
                     ),
                   ),
                 ],

@@ -207,6 +207,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
           return Container(
             color: const Color(0xfffafafa),
             child: PostCard(
+              postId: post.id,
               profileImage: post.profileImage,
               userName: post.userName,
               postDate: post.postDate,
@@ -215,7 +216,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
               mediaUrls:
                   post.mediaUrls, // ✅ doğru alan              // 🔁 boş liste
               likeCount: post.likeCount,
-              commentCount: post.commentCount,
+              commentCount: post.commentCount, isLiked: post.isLiked,
             ),
           );
         },

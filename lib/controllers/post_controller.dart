@@ -19,14 +19,15 @@ class PostController extends GetxController {
     super.onInit();
   }
 
+//POST GET
   void fetchHomePosts() async {
     isHomeLoading.value = true;
     try {
       final posts = await PostServices.fetchHomePosts();
       postHomeList.assignAll(posts);
-          // 🔍 Sadece bana ait gönderileri filtrele
-    final myPosts = posts.where((post) => post.isOwner == true).toList();
-    profileController.profilePosts.assignAll(myPosts);
+      // 🔍 Sadece bana ait gönderileri filtrele
+      final myPosts = posts.where((post) => post.isOwner == true).toList();
+      profileController.profilePosts.assignAll(myPosts);
     } catch (e) {
       debugPrint("❗ Post çekme hatası: $e", wrapWidth: 1024);
     } finally {
@@ -34,6 +35,7 @@ class PostController extends GetxController {
     }
   }
 
+//post create
   Future<void> createPost(String content, List<File> mediaFiles) async {
     try {
       isLoading.value = true;
@@ -49,6 +51,15 @@ class PostController extends GetxController {
       Get.snackbar("Hata", "Bir hata oluştu: $e");
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  //postlike
+
+  Future<void> toggleLike(String postId) async {
+    final success = await PostServices.toggleLike(postId);
+    if (!success) {
+      Get.snackbar("Hata", "Beğeni işlemi başarısız oldu.");
     }
   }
 }

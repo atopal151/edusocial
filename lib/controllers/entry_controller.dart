@@ -23,6 +23,8 @@ class EntryController extends GetxController {
     fetchEntries();
   }
 
+  
+
   /// 🔁 Backend'den kategori listesini al
   void fetchTopicCategories() async {
     final data = await EntryServices.fetchTopicCategories();

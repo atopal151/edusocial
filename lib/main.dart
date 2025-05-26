@@ -27,6 +27,7 @@ void main() async {
 
   final box = GetStorage();
   final token = box.read('token');
+  
   Get.put(LoginController(), permanent: true);
   Get.put(NavigationController(), permanent: true);
   Get.put(MatchController(), permanent: true);

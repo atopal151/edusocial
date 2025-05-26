@@ -151,29 +151,31 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
- Widget _buildPosts() {
-  final posts = controller.profilePosts;
-  
-  if (posts.isEmpty) {
-    return const Center(child: Text("Hiç gönderi bulunamadı."));
-  }
+  Widget _buildPosts() {
+    final posts = controller.profilePosts;
 
-  return ListView.builder(
-    itemCount: posts.length,
-    itemBuilder: (context, index) {
-      final post = posts[index];
-      return PostCard(
-        profileImage: post.profileImage,
-        userName: post.userName,
-        postDate: post.postDate,
-        postDescription: post.postDescription,
-        mediaUrls: post.mediaUrls,
-        likeCount: post.likeCount,
-        commentCount: post.commentCount,
-      );
-    },
-  );
-}
+    if (posts.isEmpty) {
+      return const Center(child: Text("Hiç gönderi bulunamadı."));
+    }
+
+    return ListView.builder(
+      itemCount: posts.length,
+      itemBuilder: (context, index) {
+        final post = posts[index];
+        return PostCard(
+          postId: post.id,
+          profileImage: post.profileImage,
+          userName: post.userName,
+          postDate: post.postDate,
+          postDescription: post.postDescription,
+          mediaUrls: post.mediaUrls,
+          likeCount: post.likeCount,
+          commentCount: post.commentCount,
+          isLiked: post.isLiked,
+        );
+      },
+    );
+  }
 
   /// **Entryler Sekmesi İçeriği**
   Widget _buildEntries() {

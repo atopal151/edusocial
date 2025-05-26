@@ -32,4 +32,34 @@ class StoryService {
       return [];
     }
   }
+
+  static Future<List<String>> fetchStoriesByUserId(String userId) async {
+  final token = GetStorage().read('token');
+
+  try {
+    final response = await http.get(
+      Uri.parse("${AppConstants.baseUrl}/timeline/stories/$userId"),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+   // debugPrint("📥 Story Detail Response: ${response.statusCode}");
+    //debugPrint("📥 Story Detail Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final List data = body["data"];
+
+      // Eğer her bir item bir story içeriğiyse ve içinde "url" varsa:
+      return data.map<String>((item) => item["url"].toString()).toList();
+    } else {
+      return [];
+    }
+  } catch (e) {
+    debugPrint("❗ fetchStoriesByUserId() hatası: $e");
+    return [];
+  }
+}
+
 }

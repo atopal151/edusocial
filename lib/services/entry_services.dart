@@ -18,8 +18,8 @@ class EntryServices {
         },
       );
 
-      /*debugPrint("📥 Entry Response: ${response.statusCode}", wrapWidth: 1024);
-      debugPrint("📥 Entry Body: ${response.body}", wrapWidth: 1024);*/
+      //debugPrint("📥 Entry Response: ${response.statusCode}", wrapWidth: 1024);
+      //debugPrint("📥 Entry Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
@@ -70,6 +70,8 @@ class EntryServices {
       return {};
     }
   }
+
+  
 
   static Future<bool> createTopicWithEntry({
     required String name,

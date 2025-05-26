@@ -70,8 +70,8 @@ class PostServices {
         },
       );
 
-      //debugPrint("📥 Postlar Response: ${response.statusCode}",
-        //  wrapWidth: 1024);
+     // debugPrint("📥 Postlar Response: ${response.statusCode}",
+       //   wrapWidth: 1024);
       //debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
@@ -95,4 +95,37 @@ class PostServices {
       return [];
     }
   }
+
+  // post like endpoint
+
+  static Future<bool> toggleLike(String postId) async {
+  final token = _box.read('token');
+
+  try {
+    final response = await http.post(
+      Uri.parse('${AppConstants.baseUrl}/post-like'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+      body: {
+        'post_id': postId,
+      },
+    );
+
+    //debugPrint("📤 Like Response: ${response.statusCode}");
+    //debugPrint("📤 Like Body: ${response.body}");
+
+    return response.statusCode == 200;
+  } catch (e) {
+    debugPrint("❌ toggleLike Hatası: $e");
+    return false;
+  }
+}
+
+//delete post 
+
+
+
+
 }

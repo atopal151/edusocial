@@ -9,7 +9,7 @@ import '../../components/cards/group_suggestion_card.dart';
 class GroupSuggestionListView extends StatelessWidget {
   GroupSuggestionListView({super.key});
 
-  final GroupController groupController = Get.put(GroupController());
+  final GroupController groupController = Get.find();
 
   @override
   Widget build(BuildContext context) {

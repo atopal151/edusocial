@@ -8,8 +8,8 @@ import 'package:http/http.dart' as http;
 import '../../models/group_models/group_model.dart';
 
 class GroupServices {
-  // group_services.dart
 
+//ana sayfa içerisinde çıkacak olan önerilen group alanı endpointi
   Future<List<GroupSuggestionModel>> fetchSuggestionGroups() async {
     final box = GetStorage();
     try {
@@ -19,8 +19,8 @@ class GroupServices {
           'Authorization': 'Bearer ${box.read('token')}',
         },
       );
-      // debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
-      //  wrapWidth: 1024);
+      //debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
+        //wrapWidth: 1024);
       //debugPrint("📥 Group Suggestion Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
@@ -36,6 +36,7 @@ class GroupServices {
       return [];
     }
   }
+
 
   Future<List<GroupModel>> fetchUserGroups() async {
     final box = GetStorage();
@@ -56,17 +57,17 @@ class GroupServices {
         },
       );
 
-      debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
-          wrapWidth: 1024);
-      debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
-          wrapWidth: 1024);
+     // debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
+       //   wrapWidth: 1024);
+      //debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
+        //  wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
-            wrapWidth: 1024);
+      //  debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
+        //    wrapWidth: 1024);
 
         final userGroupList = data.map((item) {
           final group = GroupModel(
