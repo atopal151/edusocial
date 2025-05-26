@@ -1,64 +1,36 @@
-// 2. event_services.dart
-import '../models/event_model.dart';
+import 'dart:convert';
+import 'package:edusocial/models/event_model.dart';
+import 'package:edusocial/utils/constants.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class EventServices {
   Future<List<EventModel>> fetchEvents() async {
-    await Future.delayed(Duration(seconds: 1));
-    return [
-      EventModel(
-        title: "Yapay Zeka Sohbetleri",
-        description: "AI teknolojileri üzerine güncel gelişmeler konuşulacak.",
-        date: "28 Mart 2025",
-        location: "Denizli",
-        image:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      ),
-      EventModel(
-        title: "Flutter Atölyesi",
-        description: "Flutter ile mobil uygulama geliştirmeye giriş.",
-        date: "30 Mart 2025",
-        location: "Denizli",
-        image:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      ),
-      EventModel(
-        title: "Networking Buluşması",
-        description: "Sektör profesyonelleriyle tanışma ve sohbet fırsatı.",
-        date: "2 Nisan 2025",
-        location: "Denizli",
-        image:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-     
-      ),
-      EventModel(
-        title: "Hackathon 2025",
-        description:
-            "48 saat sürecek yazılım geliştirme yarışmasına hazır olun!",
-        date: "5 Nisan 2025",
-        location: "Denizli",
-        image:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-     
-      ),
-      EventModel(
-        title: "Girişimcilik Paneli",
-        description: "Girişimciler tecrübelerini paylaşıyor.",
-        date: "7 Nisan 2025",
-        location: "Denizli",
-        image:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-     
-      ),
-      EventModel(
-        title: "Kadınlar Teknolojide",
-        description: "Kadın yazılımcılarla ilham verici bir söyleşi.",
-        date: "10 Nisan 2025",
-        location: "Denizli",
-        image:
-            "https://images.pexels.com/photos/31361239/pexels-photo-31361239/free-photo-of-zarif-sarap-kadehi-icinde-taze-cilekler.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-     
-      ),
-    
-    ];
+    try {
+      final token = GetStorage().read("token");
+
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/events"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
+
+     // debugPrint("📥 Events Response: ${response.statusCode}", wrapWidth: 1024);
+      //debugPrint("📥 Events Body: ${response.body}", wrapWidth: 1024);
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final List data = body['data'];
+        return data.map((e) => EventModel.fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      debugPrint("❗ Events çekilirken hata: $e", wrapWidth: 1024);
+      return [];
+    }
   }
 }

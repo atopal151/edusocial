@@ -466,8 +466,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         return EventCard(
                             eventTitle: event.title,
                             eventDescription: event.title,
-                            eventDate: event.date,
-                            eventImage: event.image,
+                            eventDate: event.endTime,
+                            eventImage: event.bannerUrl,
                             onShare: () {},
                             onLocation: () {});
                       },

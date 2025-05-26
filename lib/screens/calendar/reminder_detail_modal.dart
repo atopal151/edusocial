@@ -41,7 +41,7 @@ Future<void> showReminderDetailDialog(BuildContext context, int reminderId) asyn
                 Text("📝 Başlık: ${reminder.title}",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 SizedBox(height: 10),
-                Text("⏰ Zaman: ${formatSimpleDate(reminder.dateTime)}",
+                Text("⏰ Zaman: ${formatSimpleDateClock(reminder.dateTime)}",
                     style: TextStyle(fontSize: 14)),
                 SizedBox(height: 10),
                 Text("🔔 Bildirim: ${reminder.sendNotification ? 'Açık' : 'Kapalı'}",

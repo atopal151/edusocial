@@ -10,7 +10,6 @@ import 'package:http_parser/http_parser.dart';
 class CreateGroupService {
   final _box = GetStorage();
 
-
   Future<List<GroupAreaModel>> fetchGroupAreas() async {
     try {
       final token = _box.read("token");
@@ -31,10 +30,23 @@ class CreateGroupService {
         return [];
       }
     } catch (e) {
-      debugPrint("❗ Grup alanları alınamadı: $e",wrapWidth: 1024);
+      debugPrint("❗ Grup alanları alınamadı: $e", wrapWidth: 1024);
       return [];
     }
   }
+  String getMimeType(File file) {
+  final ext = file.path.split('.').last.toLowerCase();
+  switch (ext) {
+    case 'png':
+      return 'png';
+    case 'jpg':
+    case 'jpeg':
+      return 'jpeg';
+    default:
+      return 'jpeg';
+  }
+}
+
 
   Future<bool> createGroup({
     required String name,
@@ -59,7 +71,7 @@ class CreateGroupService {
         request.files.add(await http.MultipartFile.fromPath(
           'avatar',
           avatar.path,
-         contentType: MediaType('image', avatar.path.split('.').last),
+          contentType: MediaType('image', getMimeType(avatar)),
 
         ));
       }
@@ -68,7 +80,7 @@ class CreateGroupService {
         request.files.add(await http.MultipartFile.fromPath(
           'banner',
           banner.path,
-          contentType: MediaType('image', avatar!.path.split('.').last),
+          contentType: MediaType('image', getMimeType(banner)),
 
         ));
       }
@@ -76,12 +88,16 @@ class CreateGroupService {
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
 
-      //debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",wrapWidth: 1024);
-      //debugPrint("📤 Grup Oluşturma Body: ${response.body}",wrapWidth: 1024);
+      debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",
+          wrapWidth: 1024);
+      debugPrint("📤 Grup Oluşturma Body: ${response.body}", wrapWidth: 1024);
+
+      debugPrint("📦 Avatar dosyası var mı: ${avatar?.existsSync()}");
+      debugPrint("📦 Banner dosyası var mı: ${banner?.existsSync()}");
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
-      debugPrint("❗ Grup oluşturma hatası: $e",wrapWidth: 1024);
+      debugPrint("❗ Grup oluşturma hatası: $e", wrapWidth: 1024);
       return false;
     }
   }

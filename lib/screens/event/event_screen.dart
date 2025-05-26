@@ -35,8 +35,8 @@ class _EventScreenState extends State<EventScreen> {
             return EventCard(
               eventTitle: event.title,
               eventDescription: event.description,
-              eventDate: event.date,
-              eventImage: event.image,
+              eventDate: event.endTime,
+              eventImage: event.bannerUrl,
               onShare: () => controller.shareEvent(event.title),
               onLocation: () => controller.showLocation(event.title),
             );

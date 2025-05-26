@@ -16,7 +16,7 @@ class UserListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        final userId = user.userId;
+        final userId = user.id;
         Get.to(() =>
             PeopleProfileScreen(userId: userId)); // ✅ burada userId eklenmeli
       },
@@ -38,7 +38,7 @@ class UserListItem extends StatelessWidget {
                       backgroundColor: Colors.grey[200],
                       child: ClipOval(
                         child: Image.network(
-                          getFullAvatarUrl(user.profileImage),
+                          getFullAvatarUrl(user.avatarUrl),
                           width: 48,
                           height: 48,
                           fit: BoxFit.cover,
@@ -60,7 +60,7 @@ class UserListItem extends StatelessWidget {
                         width: 15,
                         height: 15,
                         decoration: BoxDecoration(
-                          color: user.isActive
+                          color: user.isOnline
                               ? Color(0xff4DD64B)
                               : Color(0xffd9d9d9),
                           shape: BoxShape.circle,

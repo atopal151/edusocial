@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../controllers/search_text_controller.dart';
 import '../../components/lists/user_list.dart';
 import '../../components/lists/group_list.dart';
@@ -201,15 +202,20 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                         return EventCard(
                           eventTitle: event.title,
                           eventDescription: event.description,
-                          eventDate: event.date,
-                          eventImage: event.image,
+                          eventDate: event.endTime,
+                          eventImage: event.bannerUrl,
                           onShare: () {
                             Get.snackbar("Paylaşıldı",
                                 "${event.title} etkinliği paylaşıldı.");
                           },
-                          onLocation: () {
-                            Get.snackbar("Konum Görüntülendi",
-                                "${event.title} etkinliğinin konumu açıldı.");
+                          onLocation: () async {
+                            final url = event.location;
+                            if (await canLaunchUrl(Uri.parse(url))) {
+                              await launchUrl(Uri.parse(url),
+                                  mode: LaunchMode.externalApplication);
+                            } else {
+                              Get.snackbar("Hata", "Konum açılamadı: $url");
+                            }
                           },
                         );
                       },

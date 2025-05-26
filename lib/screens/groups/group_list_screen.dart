@@ -64,7 +64,7 @@ class GroupListScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GroupCard(
                           chatNotification: group.messageCount,
-                          imageUrl: group.avatarUrl,
+                          imageUrl: group.bannerUrl,
                           groupName: group.name,
                           groupDescription: group.description,
                           memberCount: group.userCountWithAdmin,

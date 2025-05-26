@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class GroupListItem extends StatelessWidget {
   final GroupSearchModel group;
 
@@ -18,7 +17,7 @@ class GroupListItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16),
         margin: EdgeInsets.symmetric(vertical: 6),
-        height: 106, 
+        height: 106,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -27,23 +26,26 @@ class GroupListItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
-              clipBehavior: Clip.none, 
+              clipBehavior: Clip.none,
               alignment: Alignment.bottomCenter,
               children: [
                 CircleAvatar(
-                  backgroundImage: AssetImage(group.image),
+                  backgroundImage: NetworkImage(group.avatarUrl),
                   radius: 30,
                 ),
                 Positioned(
-                  bottom: -20, 
+                  bottom: -20,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.people, color: Color(0xffEF5050), size: 14),
                       SizedBox(width: 4),
                       Text(
-                        "${group.memberCount}",
-                        style: GoogleFonts.inter(color: Color(0xff414751), fontSize: 13.28,fontWeight: FontWeight.w600),
+                        "${group.userCountWithAdmin}",
+                        style: GoogleFonts.inter(
+                            color: Color(0xff414751),
+                            fontSize: 13.28,
+                            fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -58,13 +60,17 @@ class GroupListItem extends StatelessWidget {
                 children: [
                   Text(
                     group.name,
-                    style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold,color:Color(0xff414751)),
+                    style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff414751)),
                   ),
                   SizedBox(height: 4), // Boşluk ekledim
                   Text(
                     group.description,
-                    
-                    style: GoogleFonts.inter(fontSize: 12,color: Color(0xff9CA3AE)),
+
+                    style: GoogleFonts.inter(
+                        fontSize: 12, color: Color(0xff9CA3AE)),
                     maxLines: 2, // Çok uzun açıklamalarda taşmayı önlemek için
                     overflow: TextOverflow.ellipsis,
                   ),

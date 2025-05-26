@@ -47,7 +47,7 @@ class CalendarService {
 
     final body = jsonEncode({
       "description": reminder.title,
-      "color": "#36C897",
+      "color": reminder.color,
       "send_notification": true,
       "notification_time": reminder.dateTime,
     });
@@ -74,7 +74,7 @@ class CalendarService {
 
     final body = jsonEncode({
       "description": reminder.title,
-      "color": "#36C897",
+      "color": reminder.color,
       "send_notification": true,
       "notification_time": reminder.dateTime,
     });

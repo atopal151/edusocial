@@ -1,3 +1,5 @@
+
+
 class GroupSuggestionModel {
   final String id;
   final String groupName;
@@ -16,13 +18,18 @@ class GroupSuggestionModel {
   });
 
   factory GroupSuggestionModel.fromJson(Map<String, dynamic> json) {
-    return GroupSuggestionModel(
-      id: json['id'] ?? '',
-      groupName: json['groupName'],
-      groupImage: json['groupImage'],
-      groupAvatar: json['groupAvatar'],
-      memberCount: json['memberCount'],
-      description: json['description'],
-    );
-  }
+  return GroupSuggestionModel(
+    id: json['id'].toString(),
+    groupName: json['name'] ?? '',
+    description: json['description'] ?? '',
+    memberCount: json['user_count_with_admin'] ?? 0,
+    groupAvatar: (json['avatar_url'] != null && json['avatar_url'].toString().isNotEmpty)
+        ? json['avatar_url']
+        : 'https://via.placeholder.com/150',
+    groupImage: (json['banner_url'] != null && json['banner_url'].toString().isNotEmpty)
+        ? json['banner_url']
+        : 'https://via.placeholder.com/300x150',
+  );
+}
+
 }

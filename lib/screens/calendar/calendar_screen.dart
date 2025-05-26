@@ -1,6 +1,7 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/screens/calendar/reminder_detail_modal.dart';
 import 'package:edusocial/utils/date_format.dart';
+import 'package:edusocial/utils/hex_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -183,7 +184,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                   Container(
                                     width: 50,
                                     decoration: BoxDecoration(
-                                      color: Color(0xff36C897),
+                                      color: HexColor.fromHex(reminder
+                                          .color), // 🔁 renk backend'den geliyor
                                       borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(20),
                                         bottomLeft: Radius.circular(20),
@@ -222,7 +224,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                               ),
                                             ),
                                             Text(
-                                              formatSimpleDate(reminder
+                                              formatSimpleDateClock(reminder
                                                   .dateTime), // 🔁 burası değişiyor
                                               style: TextStyle(
                                                 fontSize: 12,

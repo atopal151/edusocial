@@ -1,4 +1,6 @@
 import 'package:edusocial/components/widgets/course_chip.dart';
+import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -107,7 +109,7 @@ Widget buildProfileDetails() {
                             height: 20,
                           ),
                           label: "Doğum Tarihi",
-                          value: profileData.birthDate,
+                          value: formatSimpleDate(profileData.birthDate),
                         ),
                         SizedBox(
                           height: 10,
@@ -184,7 +186,9 @@ Widget buildProfileDetails() {
                             child: Padding(
                               padding: const EdgeInsets.only(right: 10),
                               child: buildGroupSuggestionCard(
-                                  profileData.approvedGroups[index]),
+                                GroupSuggestionModel.fromJson(
+                                    profileData.approvedGroups[index]),
+                              ),
                             ),
                           );
                         },

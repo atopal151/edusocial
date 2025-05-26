@@ -1,4 +1,5 @@
 import 'package:edusocial/components/buttons/custom_button.dart';
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -105,7 +106,7 @@ class EventCard extends StatelessWidget {
                     SizedBox(
                       width: 6,
                     ),
-                    Text(eventDate,
+                    Text(formatSimpleDateClock(eventDate),
                         style: GoogleFonts.inter(
                             fontSize: 10, color: Color(0xff9ca3ae))),
                   ],

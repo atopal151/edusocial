@@ -20,8 +20,8 @@ class ProfileService {
 
    /* debugPrint("📥 kullanıcı HTTP Status Code: ${response.statusCode}",wrapWidth: 1024);
     debugPrint("📦 Kullanıcı Bilgileri Body:\n${response.body}",wrapWidth: 1024);*/
-    final jsonBody = json.decode(response.body);
-    final pretty = const JsonEncoder.withIndent('  ').convert(jsonBody);
+    //final jsonBody = json.decode(response.body);
+    //final pretty = const JsonEncoder.withIndent('  ').convert(jsonBody);
     //debugPrint(pretty, wrapWidth: 1024); // Konsol kesmesin diye
     if (response.statusCode == 200) {
       final jsonBody = json.decode(response.body);

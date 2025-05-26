@@ -39,7 +39,7 @@ class CreateGroupController extends GetxController {
   }
 }
 
-  Future<void> createGroup() async {
+Future<void> createGroup() async {
   final name = nameGroupController.text.trim();
   final desc = descriptionGroupController.text.trim();
   final area = selectedGroupArea.value;
@@ -49,25 +49,34 @@ class CreateGroupController extends GetxController {
     return;
   }
 
+
   isLoading.value = true;
 
-  final success = await _service.createGroup(
-    name: name,
-    description: desc,
-    groupAreaId: area.id,
-    isPrivate: isPrivate.value,
-    avatar: profileImageFile.value,
-    banner: coverImageFile.value,
-  );
+  try {
+    final success = await _service.createGroup(
+      name: name,
+      description: desc,
+      groupAreaId: area.id,
+      isPrivate: isPrivate.value,
+      avatar: profileImageFile.value,
+      banner: coverImageFile.value,
+    );
 
-  isLoading.value = false;
+    isLoading.value = false;
 
-  if (success) {
-    Get.back();
-    Get.snackbar("Başarılı", "Grup başarıyla oluşturuldu");
-  } else {
-    Get.snackbar("Hata", "Grup oluşturulamadı");
+    if (success) {
+      Get.back();
+      Get.snackbar("Başarılı", "Grup başarıyla oluşturuldu");
+    } else {
+      Get.snackbar("Hata", "Grup oluşturulamadı (false döndü)");
+    }
+  } catch (e, stack) {
+    isLoading.value = false;
+    debugPrint("❌ Grup oluşturulurken hata oluştu: $e");
+    debugPrint("📛 Stack Trace:\n$stack");
+    Get.snackbar("Hata", "Grup oluşturulamadı: $e");
   }
 }
+
 
 }

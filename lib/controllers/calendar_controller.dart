@@ -1,5 +1,6 @@
 import 'package:edusocial/utils/hex_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../components/buttons/custom_button.dart';
@@ -178,8 +179,29 @@ class CalendarController extends GetxController {
                       SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {
-                          // renk seçim ekranı açılabilir
-                          selectedColor.value = Colors.deepPurple; // örnek
+                          Get.dialog(
+                            AlertDialog(
+                              title: Text('Renk Seç'),
+                              content: SingleChildScrollView(
+                                child: ColorPicker(
+                                  pickerColor: selectedColor.value,
+                                  onColorChanged: (color) {
+                                    selectedColor.value = color;
+                                  },
+                                  showLabel: true,
+                                  pickerAreaHeightPercent: 0.8,
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text('Tamam'),
+                                  onPressed: () {
+                                    Get.back(); // renk seçimi tamamlandı
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
                         },
                         child: Container(
                           width: 30,

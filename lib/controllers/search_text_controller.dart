@@ -43,6 +43,12 @@ class SearchTextController extends GetxController {
       filteredUsers.assignAll(response.users);
       filteredGroups.assignAll(response.groups);
       filteredEvents.assignAll(response.events);
+
+      debugPrint('allgroup: $allGroups');
+
+      debugPrint('alluser: $allUsers');
+
+      debugPrint('allevent: $allEvents');
     } catch (e) {
       debugPrint("❗ Arama hatası: $e",wrapWidth: 1024);
       clearResults();
