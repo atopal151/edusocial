@@ -30,8 +30,25 @@ class GroupListItem extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(group.avatarUrl),
                   radius: 30,
+                  backgroundColor:
+                      Colors.grey[300], // Hata durumunda gösterilecek arka plan
+                  child: group.bannerUrl.trim().isEmpty
+                      ? Icon(Icons.group,
+                          color: Colors.white) // URL boşsa ikon göster
+                      : ClipOval(
+                          child: Image.network(
+                            group.bannerUrl,
+                            fit: BoxFit.cover,
+                            width: 60,
+                            height: 60,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.group,
+                                  color:
+                                      Colors.white); // Yüklenemezse ikon göster
+                            },
+                          ),
+                        ),
                 ),
                 Positioned(
                   bottom: -20,

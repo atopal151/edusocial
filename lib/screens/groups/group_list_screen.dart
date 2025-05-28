@@ -24,26 +24,26 @@ class GroupListScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16),
-            child: CustomButton(
-                height: 45,
-                borderRadius: 15,
-                text: "Yeni Grup Oluştur",
-                onPressed: () {
-                  controller.getCreateGroup();
-                },
-                isLoading: controller.isGroupLoading,
-                backgroundColor: Color(0xfffb535c),
-                textColor: Color(0xffffffff),
-               ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16),
+                child: CustomButton(
+                  height: 45,
+                  borderRadius: 15,
+                  text: "Yeni Grup Oluştur",
+                  onPressed: () {
+                    controller.getCreateGroup();
+                  },
+                  isLoading: controller.isGroupLoading,
+                  backgroundColor: Color(0xfffb535c),
+                  textColor: Color(0xffffffff),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Text("Bulunduğun Gruplar",
@@ -111,12 +111,11 @@ class GroupListScreen extends StatelessWidget {
                                   child: Text(
                                     category,
                                     style: TextStyle(
-                                      color: isSelected
-                                          ? Color(0xffef5050)
-                                          : Color(0xff414751),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12
-                                    ),
+                                        color: isSelected
+                                            ? Color(0xffef5050)
+                                            : Color(0xff414751),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12),
                                   ),
                                 ),
                               ),
@@ -137,13 +136,19 @@ class GroupListScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: GroupCard(
-                          category: ["Flutter", "Mobil", "Yazılım"], // 👈 burası yeni
-                          imageUrl: group.avatarUrl,
+                          category: [], // 👈 kategoriler varsa eklenir
+                          imageUrl: group.bannerUrl,
                           groupName: group.name,
                           groupDescription: group.description,
                           memberCount: group.userCountWithAdmin,
-                          action: group.isPending ? "Katıldınız" : "Katıl",
-                          onJoinPressed: () => controller.joinGroup(group.id),
+                          action: group.isMember
+                              ? "Katıldınız"
+                              : (group.isPending ? "Onay Bekliyor" : "Katıl"),
+                          onJoinPressed: () {
+                            if (!group.isMember && !group.isPending) {
+                              controller.joinGroup(group.id);
+                            }
+                          },
                         ),
                       );
                     },

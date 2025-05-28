@@ -1,27 +1,29 @@
 // group_controller.dart
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:edusocial/models/group_models/group_detail_model.dart';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../models/document_model.dart';
-import '../../models/event_model.dart';
 import '../../models/group_models/group_model.dart';
-import '../../models/link_model.dart';
 import '../../services/group_services/group_service.dart';
 
 class GroupController extends GetxController {
   var userGroups = <GroupModel>[].obs;
   var allGroups = <GroupModel>[].obs;
   var suggestionGroups = <GroupSuggestionModel>[].obs;
+
   var isLoading = false.obs;
   var isGroupLoading = false.obs;
-  var selectedCategory = "Kimya".obs;
+
+  var selectedCategory = "All".obs;
   var groupDetail = Rxn<GroupDetailModel>();
   var filteredGroups = <GroupModel>[].obs;
 
-  var categories = ["Kimya", "Fizik", "Teknoloji", "Eğitim"].obs;
+  var categories = ['All'].obs;
+
+  Map<String, String> categoryMap = {}; // id => name
 
   Rx<File?> coverImageFile = Rx<File?>(null);
   Rx<File?> profileImageFile = Rx<File?>(null);
@@ -40,31 +42,13 @@ class GroupController extends GetxController {
     fetchAllGroups();
     fetchSuggestionGroups();
 
-    categoryGroup.value = ["Genel", "Felsefe", "Spor", "Tarih"]; // örnek
-    //loadMockGroupData(); // backend yerine simule veri
+    fetchGroupAreas();
+    categoryGroup.value = [];
+
     ever(selectedCategory, (_) => updateFilteredGroups());
   }
 
-void joinSuggestionGroup(String id) {
-  final index = suggestionGroups.indexWhere((group) => group.id == id);
-  if (index != -1) {
-    Get.snackbar("Katıldın", "${suggestionGroups[index].groupName} grubuna katıldın");
-  }
-}
-
-  void getCreateGroup() {
-    Get.toNamed("/createGroup");
-  }
-
-  void createGroup() {
-    Get.snackbar("Grup Oluşturma", "Grup Oluşturuldu");
-  }
-
-  void toggleNotification(bool value) {
-    selectedRequest.value = value;
-  }
-
-
+//-------------------------------fetch-------------------------------
   void fetchUserGroups() async {
     isLoading.value = true;
     userGroups.value = await _groupServices.fetchUserGroups();
@@ -84,6 +68,72 @@ void joinSuggestionGroup(String id) {
     isLoading.value = false;
   }
 
+  void fetchGroupAreas() async {
+    final areas = await _groupServices.fetchGroupAreas();
+
+    for (var area in areas) {
+      final id = area['id'].toString();
+      final name = area['name'].toString();
+
+      categoryMap[id] = name;
+
+      if (!categories.contains(name)) {
+        categories.add(name);
+      }
+    }
+  }
+//--------------------------------------------------------------
+
+  void joinSuggestionGroup(String id) {
+    final index = suggestionGroups.indexWhere((group) => group.id == id);
+    if (index != -1) {
+      Get.snackbar(
+          "Katıldın", "${suggestionGroups[index].groupName} grubuna katıldın");
+    }
+  }
+
+  void requestToJoinGroup(String groupId) async {
+    isGroupLoading.value = true;
+
+    final success = await _groupServices.sendJoinRequest(groupId);
+
+    if (success) {
+      final index = allGroups.indexWhere((g) => g.id == groupId);
+      if (index != -1) {
+        allGroups[index] = allGroups[index].copyWith(isJoined: true);
+      }
+
+      Get.snackbar("İstek Gönderildi", "Gruba katılma isteğiniz gönderildi.");
+    } else {
+      Get.snackbar("Hata", "İstek gönderilemedi. Lütfen tekrar deneyin.");
+    }
+
+    isGroupLoading.value = false;
+  }
+
+ void joinGroup(String id) async {
+  final success = await _groupServices.sendJoinRequest(id);
+
+  if (success) {
+    final index = allGroups.indexWhere((group) => group.id == id);
+    if (index != -1) {
+      allGroups[index] = allGroups[index].copyWith(isJoined: true);
+      Get.snackbar("Katılım Başarılı", "${allGroups[index].name} grubuna katılım isteği gönderildi");
+    }
+  } else {
+    Get.snackbar("Katılım Hatası", "Gruba katılma isteği gönderilemedi", backgroundColor: Colors.red.shade100);
+  }
+}
+
+
+  void getCreateGroup() {
+    Get.toNamed("/createGroup");
+  }
+
+  void toggleNotification(bool value) {
+    selectedRequest.value = value;
+  }
+
   void getGrupDetail() {
     Get.toNamed("/group_detail_screen");
   }
@@ -93,17 +143,17 @@ void joinSuggestionGroup(String id) {
   }
 
   void updateFilteredGroups() {
-    filteredGroups.value = allGroups
-        .where((group) => group.groupAreaId == selectedCategory.value)
-        .toList();
-  }
+    if (selectedCategory.value == "All" || selectedCategory.value.isEmpty) {
+      filteredGroups.value = allGroups;
+    } else {
+      // Kategori adına göre filtreleme → ID'yi bul, sonra filtrele
+      final selectedId = categoryMap.entries
+          .firstWhereOrNull((entry) => entry.value == selectedCategory.value)
+          ?.key;
 
-  void joinGroup(String id) {
-    final index = allGroups.indexWhere((group) => group.id == id);
-    if (index != -1) {
-      allGroups[index] = allGroups[index].copyWith(isJoined: true);
-      Get.snackbar(
-          "Katılım Başarılı", "${allGroups[index].name} grubuna katıldınız");
+      filteredGroups.value = allGroups
+          .where((group) => group.groupAreaId.toString() == selectedId)
+          .toList();
     }
   }
 }

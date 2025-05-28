@@ -34,7 +34,8 @@ class CreateGroupService {
       return [];
     }
   }
-  String getMimeType(File file) {
+
+String getMimeType(File file) {
   final ext = file.path.split('.').last.toLowerCase();
   switch (ext) {
     case 'png':
@@ -42,6 +43,10 @@ class CreateGroupService {
     case 'jpg':
     case 'jpeg':
       return 'jpeg';
+    case 'heic':
+    case 'webp':
+    case 'bmp':
+      return 'jpeg'; // Dönüştürülmüş gibi gönderiyoruz
     default:
       return 'jpeg';
   }

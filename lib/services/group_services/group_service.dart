@@ -18,9 +18,9 @@ class GroupServices {
           'Authorization': 'Bearer ${box.read('token')}',
         },
       );
-      debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
-          wrapWidth: 1024);
-      debugPrint("📥 Group Suggestion Body: ${response.body}", wrapWidth: 1024);
+      // debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
+      //   wrapWidth: 1024);
+      //debugPrint("📥 Group Suggestion Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -55,10 +55,10 @@ class GroupServices {
         },
       );
 
-       debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
-         wrapWidth: 1024);
-      debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
-        wrapWidth: 1024);
+      // debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
+      // wrapWidth: 1024);
+      //debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
+      //wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -107,6 +107,33 @@ class GroupServices {
     }
   }
 
+  Future<List<Map<String, dynamic>>> fetchGroupAreas() async {
+    final box = GetStorage();
+    final token = box.read('token');
+
+    try {
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/groups/areas"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        final List<dynamic> data = jsonBody['data'] ?? [];
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        debugPrint("❌ Grup alanları alınamadı. Status: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      debugPrint("💥 Grup alanları alınırken hata oluştu: $e");
+      return [];
+    }
+  }
+
   Future<List<GroupModel>> fetchAllGroups() async {
     final box = GetStorage();
     final token = box.read('token');
@@ -126,18 +153,18 @@ class GroupServices {
         },
       );
 
-      /* debugPrint("📥 HTTP Status Code: ${response.statusCode}",
-          wrapWidth: 1024);
+      //debugPrint("📥 Group Status Code: ${response.statusCode}",
+        //  wrapWidth: 1024);
 
       // 🔽 Dönen cevabı aynen gösteriyoruz
-      debugPrint("📦 RAW Response Body:", wrapWidth: 1024);
-      debugPrint(response.body, wrapWidth: 1024);*/
+      //debugPrint("📦 Group Response Body:", wrapWidth: 1024);
+      //debugPrint(response.body, wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        // debugPrint("📦 Gelen Grup Sayısı: ${data.length}", wrapWidth: 1024);
+        //debugPrint("📦 Gelen Grup Sayısı: ${data.length}", wrapWidth: 1024);
         final groupList = data.map((item) {
           final group = GroupModel(
             id: item['id'].toString(),
@@ -176,6 +203,37 @@ class GroupServices {
     } catch (e) {
       debugPrint("💥 Hata oluştu: $e", wrapWidth: 1024);
       return [];
+    }
+  }
+
+  Future<bool> sendJoinRequest(String groupId) async {
+    final box = GetStorage();
+    final token = box.read('token');
+
+    try {
+      final response = await http.post(
+        Uri.parse("${AppConstants.baseUrl}/group-join"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "group_id": groupId,
+        }),
+      );
+
+      debugPrint("📤 Join request status: ${response.statusCode}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        debugPrint("❌ Katılma isteği başarısız: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("💥 Join isteği hatası: $e");
+      return false;
     }
   }
 }

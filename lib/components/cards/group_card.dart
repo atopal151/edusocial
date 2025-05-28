@@ -38,11 +38,14 @@ class GroupCard extends StatelessWidget {
           ///ARKA PLAN GÖRSELİ
           ClipRRect(
             borderRadius: BorderRadius.circular(15),
-            child: Image.network(
-              imageUrl,
-              width: double.infinity,
-              height: 120,
-              fit: BoxFit.cover,
+            child: Container(
+              decoration: BoxDecoration(color: Color(0xffffffff)),
+              child: Image.network(
+                imageUrl,
+                width: double.infinity,
+                height: 120,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
 
