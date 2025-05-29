@@ -1,3 +1,4 @@
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../models/entry_model.dart';
@@ -27,7 +28,6 @@ class EntryCard extends StatelessWidget {
         onPressed();
       },
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -79,7 +79,7 @@ class EntryCard extends StatelessWidget {
                           color: Color(0xff414751)),
                     ),
                     Text(
-                      entry.entryDate,
+                      formatSimpleDateClock(entry.entryDate),
                       style: const TextStyle(
                           fontSize: 10,
                           color: Color(0xff9ca3ae),
@@ -195,8 +195,8 @@ class EntryCard extends StatelessWidget {
                       border: Border.all(width: 0.1),
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: const Text(
-                      "Okul İlişkileri",
+                    child:  Text(
+                      entry.topicTitle,
                       style: TextStyle(fontSize: 12, color: Color(0xff9ca3ae)),
                     ),
                   ),

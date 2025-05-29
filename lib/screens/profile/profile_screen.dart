@@ -193,6 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           return Container(
             color: Color(0xfffafafa),
             child: EntryCard(
+
               onPressed: () {
                 Get.toNamed("/entryDetail", arguments: entry);
               },

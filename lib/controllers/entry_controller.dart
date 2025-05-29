@@ -7,38 +7,41 @@ class EntryController extends GetxController {
   var entryList = <EntryModel>[].obs;
   var entryPersonList = <EntryModel>[].obs;
   final RxList<EntryModel> filteredByCategoryList = <EntryModel>[].obs;
+  final RxList<EntryModel> filteredEntries = <EntryModel>[].obs;
 
   RxMap<String, int> categoryMap = <String, int>{}.obs; // 🔁 Kategori adı -> id
-  RxList<String> categoryEntry =
-      <String>[].obs; // UI’da gösterilecek kategori adları
+  RxList<String> categoryEntry = <String>[].obs; // UI’da gösterilecek kategori adları
   RxString selectedCategory = "".obs;
 
   var isEntryLoading = false.obs;
   final TextEditingController titleEntryController = TextEditingController();
   final TextEditingController bodyEntryController = TextEditingController();
+final RxString topicName = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchTopicCategories(); // 🔁 Kategori listesini dinamik çek
-    fetchEntries();
+      /// 🔁 Kategori değiştiğinde entry'leri otomatik getir
+  ever(selectedCategory, (_) {
+    fetchEntriesForSelectedCategory();
+  });
   }
 
-
-  void filterEntriesByCategory(String categoryName) {
-  selectedCategory.value = categoryName;
-
+/// 🔄 Seçilen kategoriye ait entry'leri getir
+Future<void> fetchEntriesForSelectedCategory() async {
+  final categoryName = selectedCategory.value;
   final categoryId = getCategoryIdFromName(categoryName);
 
-  final filtered = entryList.where((entry) {
-    // Entry modelinde kategori ID'si varsa kıyasla
-    // Eğer yoksa EntryModel’e topicCategoryId alanı eklememiz gerekir
-    return entry.topicCategoryId == categoryId;
-  }).toList();
+  isEntryLoading.value = true;
 
-  filteredByCategoryList.assignAll(filtered);
+  final entries = await EntryServices.fetchEntriesByTopicId(categoryId);
+
+  // 🔄 Hem genel hem filtrelenmiş listeye atama yap
+  entryList.value = entries;
+  filteredByCategoryList.value = entries;
+  isEntryLoading.value = false;
 }
-
 
 
   /// 🔁 Backend'den kategori listesini al
@@ -52,41 +55,44 @@ class EntryController extends GetxController {
   }
 
   /// 📤 Entry oluştur
-  void shareEntryPost() async {
-    final title = titleEntryController.text.trim();
-    final body = bodyEntryController.text.trim();
-    final categoryName = selectedCategory.value;
+void shareEntryPost() async {
+  final title = titleEntryController.text.trim();
+  final body = bodyEntryController.text.trim();
+  final categoryName = selectedCategory.value;
 
-    if (title.isEmpty || body.isEmpty || categoryName.isEmpty) {
-      Get.snackbar("Eksik Bilgi", "Lütfen tüm alanları doldurun");
-      return;
-    }
-
-    isEntryLoading.value = true;
-
-    final topicCategoryId = getCategoryIdFromName(categoryName);
-
-    final success = await EntryServices.createTopicWithEntry(
-      name: title,
-      content: body,
-      topicCategoryId: topicCategoryId,
-    );
-
-    isEntryLoading.value = false;
-
-    if (success) {
-      Get.back();
-      Get.snackbar("Başarılı", "Konu başarıyla oluşturuldu");
-      titleEntryController.clear();
-      bodyEntryController.clear();
-      selectedCategory.value = "";
-      fetchEntries(); // listeyi yenile
-    } else {
-      Get.snackbar("Hata", "Konu oluşturulamadı");
-    }
+  if (title.isEmpty || body.isEmpty || categoryName.isEmpty) {
+    Get.snackbar("Eksik Bilgi", "Lütfen tüm alanları doldurun");
+    return;
   }
 
-  /// 🔁 Kategori adı -> ID
+  isEntryLoading.value = true;
+
+  final topicCategoryId = getCategoryIdFromName(categoryName);
+
+  // 🐞 DEBUG: Kontrol için kategori adı ve ID yazdır
+  debugPrint("🟡 Seçilen Kategori: $categoryName");
+  debugPrint("🟡 Gönderilen topicCategoryId: $topicCategoryId");
+
+  final success = await EntryServices.createTopicWithEntry(
+    name: title,
+    content: body,
+    topicCategoryId: topicCategoryId,
+  );
+
+  isEntryLoading.value = false;
+
+  if (success) {
+    Get.back();
+    Get.snackbar("Başarılı", "Konu başarıyla oluşturuldu");
+    titleEntryController.clear();
+    bodyEntryController.clear();
+    selectedCategory.value = "";
+  } else {
+    Get.snackbar("Hata", "Konu oluşturulamadı");
+  }
+}
+
+  /// Kategori adına göre ID döndür
   int getCategoryIdFromName(String name) {
     return categoryMap[name] ?? 1;
   }
@@ -94,22 +100,6 @@ class EntryController extends GetxController {
   void shareEntry() {
     Get.toNamed("/entryShare");
   }
-
-  /// 📥 Tüm entry'leri getir
-void fetchEntries() async {
-  isEntryLoading.value = true;
-  final entries = await EntryServices.fetchTimelineEntries();
-  entryList.assignAll(entries);
-  entryPersonList.assignAll(entries.where((entry) => entry.isOwner).toList());
-
-  // ✅ ilk yüklemede filtre uygula
-  if (selectedCategory.isNotEmpty) {
-    filterEntriesByCategory(selectedCategory.value);
-  }
-
-  isEntryLoading.value = false;
-}
-
 
   void upvotePersonEntry(int index) {
     entryPersonList[index].upvoteCount++;

@@ -4,6 +4,7 @@ import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:edusocial/models/entry_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../components/user_appbar/user_appbar.dart';
 import '../../components/widgets/share_bottom_sheet.dart';
 import '../../controllers/entry_controller.dart';
@@ -24,58 +25,68 @@ class _EntryScreenState extends State<EntryScreen> {
   void initState() {
     super.initState();
 
-    filteredEntries.assignAll(entryController.entryList);
+    // İlk açılışta veri çek
+    entryController.fetchEntriesForSelectedCategory();
+    // İlk veri yüklendiğinde listeyi eşitle
+    ever(entryController.entryList, (_) {
+      filteredEntries.assignAll(entryController.entryList);
+    });
+  }
+
+  @override
+  void dispose() {
+    filteredEntries.clear();
+    entrySearchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xfffafafa),
+      backgroundColor: const Color(0xfffafafa),
       appBar: UserAppBar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // 🔍 Arama Alanı
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8),
             child: SearchTextField(
               label: "Entry ara",
               controller: entrySearchController,
               onChanged: (value) {
-                filteredEntries.value = entryController.entryList
-                    .where((entry) =>
-                        entry.entryTitle
-                            .toLowerCase()
-                            .contains(value.toLowerCase()) ||
-                        entry.entryDescription
-                            .toLowerCase()
-                            .contains(value.toLowerCase()))
-                    .toList();
+                final query = value.toLowerCase();
+                filteredEntries.assignAll(
+                  entryController.entryList.where((entry) {
+                    return entry.entryTitle.toLowerCase().contains(query) ||
+                        entry.entryDescription.toLowerCase().contains(query);
+                  }).toList(),
+                );
               },
             ),
           ),
-          SizedBox(
-            height: 10,
-          ),
+
+          const SizedBox(height: 10),
+
+          // ➕ Yeni Konu Butonu
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: CustomButton(
               height: 45,
               borderRadius: 15,
               text: "+ Yeni Konu Aç",
-              onPressed: () {
-                entryController.shareEntry();
-              },
+              onPressed: () => entryController.shareEntry(),
               isLoading: entryController.isEntryLoading,
-              backgroundColor: Color(0xfffb535c),
-              textColor: Color(0xffffffff),
+              backgroundColor: const Color(0xfffb535c),
+              textColor: Colors.white,
             ),
           ),
+
+          const SizedBox(height: 10),
+
+          // 📚 Kategori Seçimi
           SizedBox(
-            height: 10,
-          ),
-          SizedBox(
-            height: 50,
+            height: 35,
             child: Obx(() {
               final categories = entryController.categoryEntry;
               final selected = entryController.selectedCategory.value;
@@ -90,21 +101,27 @@ class _EntryScreenState extends State<EntryScreen> {
                   final isSelected = category == selected;
 
                   return GestureDetector(
-                    onTap: () =>
-                        entryController.filterEntriesByCategory(category),
+                    onTap: () {
+                      entryController.selectedCategory.value = category;
+                      entryController.fetchEntriesForSelectedCategory();
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color:
-                            isSelected ? Color(0xfffb535c) : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(20),
+                        color: isSelected
+                            ? const Color(0xfffb535c)
+                            : Color(0xffefefef),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                       child: Center(
                         child: Text(
                           category,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black87,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color:
+                                isSelected ? Colors.white : Color(0xff414751),
                           ),
                         ),
                       ),
@@ -114,35 +131,39 @@ class _EntryScreenState extends State<EntryScreen> {
               );
             }),
           ),
+
+          // 📄 Entry Listesi
           Obx(() {
             return Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  // entryController'dan verileri yeniden çek
-                  entryController.fetchEntries();
-
-                  // filtreleme varsa güncelle
-                  filteredEntries.assignAll(entryController.entryList
-                      .where((entry) =>
-                          entry.entryTitle.toLowerCase().contains(
-                              entrySearchController.text.toLowerCase()) ||
-                          entry.entryDescription.toLowerCase().contains(
-                              entrySearchController.text.toLowerCase()))
-                      .toList());
+                  final searchText = entrySearchController.text.toLowerCase();
+                  filteredEntries.assignAll(
+                    entryController.entryList.where((entry) {
+                      return entry.entryTitle
+                              .toLowerCase()
+                              .contains(searchText) ||
+                          entry.entryDescription
+                              .toLowerCase()
+                              .contains(searchText);
+                    }).toList(),
+                  );
                 },
                 child: ListView.separated(
-                  itemCount: entryController.filteredByCategoryList.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  itemCount: filteredEntries.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final entry = filteredEntries[index];
                     return EntryCard(
+                      entry: entry,
                       onPressedProfile: () {
                         Get.toNamed("/peopleProfile");
                       },
                       onPressed: () {
                         Get.toNamed("/entryDetail", arguments: entry);
                       },
-                      entry: entry,
                       onUpvote: () => entryController.upvoteEntry(index),
                       onDownvote: () => entryController.downvoteEntry(index),
                       onShare: () {

@@ -1,5 +1,3 @@
-import 'package:edusocial/utils/constants.dart';
-
 class EntryModel {
   final String profileImage;
   final String userName;
@@ -11,6 +9,7 @@ class EntryModel {
   int downvoteCount;
   final int topicCategoryId;
   final int topicId;
+  final String topicTitle; // 🆕 Eklenen alan
 
   EntryModel({
     required this.profileImage,
@@ -23,24 +22,24 @@ class EntryModel {
     required this.isOwner,
     required this.topicCategoryId,
     required this.topicId,
+    required this.topicTitle, // 🆕 Eklenen alan
   });
 
   factory EntryModel.fromJson(Map<String, dynamic> json) {
     final user = json['user'] ?? {};
-
+    final topic = json['topic'] ?? {};
     return EntryModel(
-      profileImage: user['avatar'] != null
-          ? "${AppConstants.baseUrl}/${user['avatar']}"
-          : "",
+      profileImage: user['avatar_url'] ?? '',
       userName: "${user['name'] ?? ''} ${user['surname'] ?? ''}".trim(),
-      entryDate: json['human_created_at'] ?? json['created_at'] ?? '',
-      entryTitle: json['content'] ?? '',
-      entryDescription: json['content'] ?? '',
+      entryDate: json['created_at'] ?? '',
+      entryTitle: json['title'] ?? json['content'] ?? '',
+      entryDescription: json['description'] ?? '',
       upvoteCount: json['upvote_count'] ?? json['like_count'] ?? 0,
       downvoteCount: json['downvote_count'] ?? json['dislike_count'] ?? 0,
       isOwner: json['is_owner'] ?? false,
       topicCategoryId: json['topic_category_id'] ?? 0,
       topicId: json['topic_id'] ?? 0,
+      topicTitle: topic['name'] ?? '', // 🆕 nested erişim
     );
   }
 }

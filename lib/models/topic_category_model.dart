@@ -1,23 +1,19 @@
-import 'topic_model.dart';
-
-class TopicCategoryModel {
+class CategoryModel {
   final int id;
-  final String name;
-  final List<TopicModel> topics;
+  final String title;
+  final String description;
 
-  TopicCategoryModel({
+  CategoryModel({
     required this.id,
-    required this.name,
-    required this.topics,
+    required this.title,
+    required this.description,
   });
 
-  factory TopicCategoryModel.fromJson(Map<String, dynamic> json) {
-    return TopicCategoryModel(
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
       id: json['id'],
-      name: json['name'],
-      topics: (json['topics'] as List)
-          .map((e) => TopicModel.fromJson(e))
-          .toList(),
+      title: json['title'],
+      description: json['description'],
     );
   }
 }
