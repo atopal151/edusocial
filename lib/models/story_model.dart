@@ -1,10 +1,11 @@
+import 'package:get/get.dart';
+
 class StoryModel {
   final String id;
-  final String userId;
-  final String username;
-  final String profileImage;
-  late final bool isMyStory;
-  final bool isViewed;
+  final int userId;
+   String username;
+   String profileImage;
+  RxBool isViewed;
   List<String> storyUrls;
   DateTime createdAt;
   bool hasStory;
@@ -14,26 +15,29 @@ class StoryModel {
     required this.userId,
     required this.username,
     required this.profileImage,
-    required this.isMyStory,
-    required this.isViewed,
+    required bool isViewed,
     required this.storyUrls,
     required this.createdAt,
     required this.hasStory,
-  });
+  }) : isViewed = isViewed.obs;
 
   factory StoryModel.fromJson(Map<String, dynamic> json) {
+    final user = json["user"] ?? {};
     final stories = json["stories"] ?? [];
+
     return StoryModel(
-      id: json["id"].toString(),
-      userId: json["user_id"].toString(),
-      username: json["username"] ?? "",
-      profileImage: json["profile_image"] ?? "",
-      isMyStory: false,
-      hasStory: false,
-      isViewed: false,
-      storyUrls: List<String>.from(stories.map((e) => e["url"])),
-      createdAt: stories.isNotEmpty
-          ? DateTime.parse(stories[0]["created_at"])
+      id: user["id"].toString(),
+      userId: user["id"],
+      username: user["name"] ?? "",
+      profileImage: user["avatar"] ?? "",
+      hasStory: stories.isNotEmpty,
+      isViewed: (user["is_showed"] ?? false) == true,
+      storyUrls: stories
+          .where((e) => e["path"] != null && e["path"].toString().isNotEmpty)
+          .map<String>((e) => e["path"].toString())
+          .toList(),
+      createdAt: stories.isNotEmpty && stories[0]["created_at"] != null
+          ? DateTime.tryParse(stories[0]["created_at"]) ?? DateTime.now()
           : DateTime.now(),
     );
   }

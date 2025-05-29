@@ -55,7 +55,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   }
 
   void nextStory() {
-    final stories = storyController.getOtherStories();
+    final stories = storyController.otherStories();
     final currentStory = stories[_currentIndex];
     if (_storyIndex < currentStory.storyUrls.length - 1) {
       setState(() {
@@ -77,7 +77,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   }
 
   void previousStory() {
-    final stories = storyController.getOtherStories();
+    final stories = storyController.otherStories();
     if (_storyIndex > 0) {
       setState(() {
         _storyIndex--;
@@ -119,7 +119,15 @@ class _StoryViewerPageState extends State<StoryViewerPage>
 
   @override
   Widget build(BuildContext context) {
-    final stories = storyController.getOtherStories();
+    final my = storyController.getMyStory();
+    final others = storyController.getOtherStories();
+
+    // Tüm storyleri tek listede birleştir
+    final stories = [
+      if (my != null) my,
+      ...others,
+    ];
+
     if (stories.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.black,
@@ -190,6 +198,16 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                         ? Image.network(
                             story.storyUrls[_storyIndex],
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint(
+                                  "❗ Story resmi yüklenemedi: ${story.storyUrls[_storyIndex]}");
+                              return Container(
+                                color: Colors.black,
+                                alignment: Alignment.center,
+                                child: Icon(Icons.broken_image,
+                                    color: Colors.white, size: 48),
+                              );
+                            },
                           )
                         : Container(color: Colors.black),
                   ),

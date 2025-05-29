@@ -1,55 +1,34 @@
+// my_story_list.dart
+import 'package:edusocial/components/cards/user_story_card.dart';
 import 'package:edusocial/screens/home/story/story_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../components/cards/story_card.dart';
 import '../../../controllers/profile_controller.dart';
 import '../../../controllers/story_controller.dart';
 
-class MyStoryList extends StatefulWidget {
-  const MyStoryList({super.key});
-
-  @override
-  State<MyStoryList> createState() => _MyStoryListState();
-}
-
-class _MyStoryListState extends State<MyStoryList> {
+class MyStoryList extends StatelessWidget {
   final StoryController storyController = Get.find<StoryController>();
   final ProfileController profileController = Get.find<ProfileController>();
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final myStory = storyController.getMyStory();
-      if (myStory != null && myStory.storyUrls.isEmpty) {
-        storyController.loadMyStoryFromServer(profileController.userId.value);
-      }
-    });
-  }
+  MyStoryList({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      // Story listesinde varsa, kullan
-      final myStory = storyController.getMyStory();
+      final myStory = storyController.myStory.value;
 
-      // Yoksa, profil bilgilerinden oluştur
       if (myStory != null && myStory.hasStory) {
-        return StoryCard(story: myStory);
+        return GestureDetector(
+          onTap: () {
+            Get.to(() => StoryViewerPage(initialIndex: 0));
+          },
+          child: UserStoryCard(story: myStory)
+
+        );
       }
 
-      // Boşsa ve kendi hikayesi yoksa gösterilecek widget
       return GestureDetector(
-        onTap: () async {
-          await storyController
-              .loadMyStoryFromServer(profileController.userId.value);
-
-          final myIndex =
-              storyController.storyList.indexWhere((e) => e.isMyStory);
-          if (myIndex != -1) {
-            Get.to(() => StoryViewerPage(initialIndex: myIndex));
-          }
-        },
+        onTap: () => Get.toNamed('/addStory'),
         child: Padding(
           padding: const EdgeInsets.only(top: 10.0),
           child: Column(
@@ -62,37 +41,26 @@ class _MyStoryListState extends State<MyStoryList> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.grey[300],
-                      image: (profileController.profileImage.value.isNotEmpty &&
-                              profileController.profileImage.value
-                                  .startsWith("http"))
+                      image: profileController.profileImage.value.isNotEmpty &&
+                              profileController.profileImage.value.startsWith("http")
                           ? DecorationImage(
-                              image: NetworkImage(
-                                  profileController.profileImage.value),
+                              image: NetworkImage(profileController.profileImage.value),
                               fit: BoxFit.cover,
-                              onError: (error, stackTrace) {
-                                debugPrint("⚠️ Görsel yüklenemedi: $error");
-                              },
                             )
-                          : null, // görsel geçersizse sadece gri daire göster
+                          : null,
                     ),
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: InkWell(
-                      onTap: () {
-                        Get.toNamed('/addStory');
-                      },
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.add_circle_rounded,
-                            size: 18, color: Colors.black),
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
                       ),
+                      child: Icon(Icons.add_circle_rounded, size: 18, color: Colors.black),
                     ),
                   ),
                 ],

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -47,17 +48,20 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     }
   }
 
-  void shareStory() {
+void shareStory() async {
   if (_selectedImages.isNotEmpty) {
-    final paths = _selectedImages.map((x) => x.path).toList();
-
     final StoryController storyController = Get.find<StoryController>();
-    storyController.updateMyStory(paths);
 
-    debugPrint("Story paylaşıldı ve kaydedildi ✅");
+    final File imageFile = File(_selectedImages.first.path);
+
+    await storyController.createStory(imageFile);
+
+    debugPrint("✅ Hikaye yüklendi ve güncellendi.");
     Get.back();
   }
 }
+
+
 
 
   @override

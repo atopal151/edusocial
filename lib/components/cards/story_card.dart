@@ -12,41 +12,45 @@ class StoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController profileController=Get.find<ProfileController>();
+    final ProfileController profileController = Get.find<ProfileController>();
     final StoryController storyController = Get.find<StoryController>();
 
     // Şu anki story'nin index'ini buluyoruz
-    final index = storyController.getOtherStories().indexOf(story);
+    final index = storyController.otherStories().indexOf(story);
+
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top:10.0),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 6),
-            padding: const EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: story.isViewed
-                  ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade200])
-                  : const LinearGradient(colors: [Color(0xfffb535c), Color(0xfffb535c)]),
-            ),
-            child: InkWell(
-              onTap: () {
-                Get.to(() => StoryViewerPage(initialIndex: index));
-              },
-              onLongPress: () {
-                profileController.getToPeopleProfileScreen();
-              },
-              child: CircleAvatar(
-                radius: 32,
-                backgroundColor: Colors.white,
+          padding: const EdgeInsets.only(top: 10.0),
+          child: Obx(() {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              padding: const EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: story.isViewed.value
+                    ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade200])
+                    : const LinearGradient(colors: [Color(0xfffb535c), Color(0xfffb535c)]),
+              ),
+              child: InkWell(
+                onTap: () {
+                  Get.to(() => StoryViewerPage(initialIndex: index));
+                  story.isViewed.value = true; // izlenmiş olarak işaretle
+                },
+                onLongPress: () {
+                  profileController.getToPeopleProfileScreen();
+                },
                 child: CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(story.profileImage),
+                  radius: 32,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 30,
+                    backgroundImage: NetworkImage(story.profileImage),
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          }),
         ),
         const SizedBox(height: 4),
         Text(
