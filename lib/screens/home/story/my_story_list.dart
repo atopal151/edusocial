@@ -1,6 +1,6 @@
 // my_story_list.dart
 import 'package:edusocial/components/cards/user_story_card.dart';
-import 'package:edusocial/screens/home/story/story_viewer_page.dart';
+import 'package:edusocial/screens/home/story/my_story_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/profile_controller.dart';
@@ -19,12 +19,15 @@ class MyStoryList extends StatelessWidget {
 
       if (myStory != null && myStory.hasStory) {
         return GestureDetector(
-          onTap: () {
-            Get.to(() => StoryViewerPage(initialIndex: 0));
-          },
-          child: UserStoryCard(story: myStory)
-
-        );
+            onTap: () {
+              final hasMyStory = storyController.getMyStory() != null;
+              if (hasMyStory) {
+                Get.to(() => const MyStoryViewerPage());
+              } else {
+                debugPrint("❗ My story yok, story viewer açılamaz");
+              }
+            },
+            child: UserStoryCard(story: myStory));
       }
 
       return GestureDetector(
@@ -42,9 +45,11 @@ class MyStoryList extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: Colors.grey[300],
                       image: profileController.profileImage.value.isNotEmpty &&
-                              profileController.profileImage.value.startsWith("http")
+                              profileController.profileImage.value
+                                  .startsWith("http")
                           ? DecorationImage(
-                              image: NetworkImage(profileController.profileImage.value),
+                              image: NetworkImage(
+                                  profileController.profileImage.value),
                               fit: BoxFit.cover,
                             )
                           : null,
@@ -60,7 +65,8 @@ class MyStoryList extends StatelessWidget {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.add_circle_rounded, size: 18, color: Colors.black),
+                      child: Icon(Icons.add_circle_rounded,
+                          size: 18, color: Colors.black),
                     ),
                   ),
                 ],

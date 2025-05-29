@@ -15,8 +15,6 @@ class StoryCard extends StatelessWidget {
     final ProfileController profileController = Get.find<ProfileController>();
     final StoryController storyController = Get.find<StoryController>();
 
-    // Şu anki story'nin index'ini buluyoruz
-    final index = storyController.otherStories().indexOf(story);
 
     return Column(
       children: [
@@ -29,12 +27,20 @@ class StoryCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: story.isViewed.value
-                    ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade200])
-                    : const LinearGradient(colors: [Color(0xfffb535c), Color(0xfffb535c)]),
+                    ? LinearGradient(
+                        colors: [Colors.grey.shade400, Colors.grey.shade200])
+                    : const LinearGradient(
+                        colors: [Color(0xfffb535c), Color(0xfffb535c)]),
               ),
               child: InkWell(
                 onTap: () {
+                  final index = storyController.getMyStory() != null
+                      ? storyController.getOtherStories().indexOf(story) +
+                          1 // myStory varsa offset +1
+                      : storyController.getOtherStories().indexOf(story);
+
                   Get.to(() => StoryViewerPage(initialIndex: index));
+
                   story.isViewed.value = true; // izlenmiş olarak işaretle
                 },
                 onLongPress: () {

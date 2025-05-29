@@ -40,7 +40,7 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  int currentPage = 0;
   late bool isLiked;
   late int likeCount;
 
@@ -156,7 +156,7 @@ class _PostCardState extends State<PostCard> {
                     controller: _pageController,
                     itemCount: widget.mediaUrls.length,
                     onPageChanged: (index) {
-                      setState(() => _currentPage = index);
+                      setState(() => currentPage = index);
                     },
                     itemBuilder: (context, index) {
                       return ClipRRect(

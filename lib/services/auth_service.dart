@@ -30,7 +30,7 @@ class AuthService {
         final token = data['data']['token'];
         if (token != null) {
           _box.write('token', token);
-         // debugPrint("Token başarıyla kaydedildi: $token",wrapWidth: 1024);
+          debugPrint("Token başarıyla kaydedildi: $token",wrapWidth: 1024);
           return data['data']['user']; // 🛑 Kullanıcı bilgilerini döndür
         }
       }

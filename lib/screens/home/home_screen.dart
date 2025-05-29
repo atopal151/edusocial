@@ -10,7 +10,6 @@ import '../../controllers/home_controller.dart';
 import 'hot_topics_list.dart';
 import 'story/my_story_list.dart';
 import 'post_home_list.dart';
-import 'story/story_viewer_page.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
