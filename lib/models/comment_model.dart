@@ -16,11 +16,16 @@ class CommentModel {
   factory CommentModel.fromJson(Map<String, dynamic> json) {
     final user = json['user'] ?? {};
     return CommentModel(
-      id: json['id'],
+      id: json['id'] ?? 0,
       content: json['content'] ?? '',
-      userName: user['full_name'] ?? '',
-      userAvatar: user['avatar'] ?? '',
+      userName: user['username'] ?? '',
+      userAvatar: user['avatar_url'] ?? '',
       createdAt: json['created_at'] ?? '',
     );
+  }
+
+  @override
+  String toString() {
+    return 'Yorum(id: $id, user: $userName, content: $content, date: $createdAt)';
   }
 }

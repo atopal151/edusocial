@@ -13,6 +13,9 @@ class PostController extends GetxController {
   var postList = <PostModel>[].obs;
   var postHomeList = <PostModel>[].obs;
 
+  var selectedPost = Rxn<PostModel>();
+  var isPostDetailLoading = false.obs;
+  
   @override
   void onInit() {
     fetchHomePosts(); // Gerçek verileri çek
@@ -32,6 +35,24 @@ class PostController extends GetxController {
       debugPrint("❗ Post çekme hatası: $e", wrapWidth: 1024);
     } finally {
       isHomeLoading.value = false;
+    }
+  }
+
+  /// Belirli bir gönderinin detayını getir
+  Future<void> fetchPostDetail(String postId) async {
+    isPostDetailLoading.value = true;
+    try {
+      final detail = await PostServices.fetchPostDetail(postId);
+      if (detail != null) {
+        selectedPost.value = detail;
+      } else {
+        Get.snackbar("Hata", "Gönderi detayları alınamadı.");
+      }
+    } catch (e) {
+      debugPrint("❗ Post Detail Hatası: $e");
+      Get.snackbar("Hata", "Detay alınırken sorun oluştu.");
+    } finally {
+      isPostDetailLoading.value = false;
     }
   }
 

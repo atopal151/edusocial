@@ -47,7 +47,7 @@ class PostServices {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-     /* debugPrint("📤 CreatePost Response: ${response.statusCode}");
+      /* debugPrint("📤 CreatePost Response: ${response.statusCode}");
       debugPrint("📤 CreatePost Body: ${response.body}");*/
 
       return response.statusCode == 200 || response.statusCode == 201;
@@ -70,15 +70,15 @@ class PostServices {
         },
       );
 
-     // debugPrint("📥 Postlar Response: ${response.statusCode}",
-       //   wrapWidth: 1024);
+      // debugPrint("📥 Postlar Response: ${response.statusCode}",
+      //   wrapWidth: 1024);
       //debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
         /// Debug için JSON'u ham olarak gör
-      //  debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}",
+        //  debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}",
         //    wrapWidth: 1024);
 
         final List posts = body['data']['data'];
@@ -96,36 +96,61 @@ class PostServices {
     }
   }
 
+  /// Belirli bir gönderinin detayını getirir
+  static Future<PostModel?> fetchPostDetail(String postId) async {
+    final token = _box.read('token');
+
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/timeline/posts/$postId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      //debugPrint("📥 Post Detail Response: ${response.statusCode}");
+      //debugPrint("📥 Post Detail Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final data = body['data'];
+        return PostModel.fromJson(data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      debugPrint("❗ fetchPostDetail Hatası: $e");
+      return null;
+    }
+  }
+
   // post like endpoint
 
   static Future<bool> toggleLike(String postId) async {
-  final token = _box.read('token');
+    final token = _box.read('token');
 
-  try {
-    final response = await http.post(
-      Uri.parse('${AppConstants.baseUrl}/post-like'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
-      body: {
-        'post_id': postId,
-      },
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/post-like'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+        body: {
+          'post_id': postId,
+        },
+      );
 
-    //debugPrint("📤 Like Response: ${response.statusCode}");
-    //debugPrint("📤 Like Body: ${response.body}");
+      //debugPrint("📤 Like Response: ${response.statusCode}");
+      //debugPrint("📤 Like Body: ${response.body}");
 
-    return response.statusCode == 200;
-  } catch (e) {
-    debugPrint("❌ toggleLike Hatası: $e");
-    return false;
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("❌ toggleLike Hatası: $e");
+      return false;
+    }
   }
-}
 
-//delete post 
-
-
-
-
+//delete post
 }

@@ -1,4 +1,5 @@
 import 'package:edusocial/components/widgets/edusocial_dialog.dart';
+import 'package:edusocial/models/group_models/group_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../services/onboarding_service.dart';
@@ -17,10 +18,9 @@ class OnboardingController extends GetxController {
   TextEditingController courseController = TextEditingController();
   RxList<String> courses = <String>[].obs;
 
-  RxList<Map<String, dynamic>> groups = <Map<String, dynamic>>[].obs;
+  RxList<GroupModel> groups = <GroupModel>[].obs;
 
   String userEmail = "";
-
 
   //-------------------------------------------------------------//
   void addCourse() {
@@ -63,19 +63,21 @@ class OnboardingController extends GetxController {
         }
       }
     } catch (e) {
-      debugPrint("❗ Ders ekleme işlemlerinde hata: $e",wrapWidth: 1024);
+      debugPrint("❗ Ders ekleme işlemlerinde hata: $e", wrapWidth: 1024);
       isLoading.value = false;
     }
   }
 
   //-------------------------------------------------------------//
   void joinGroup(String groupName) async {
-    int index = groups.indexWhere((group) => group["name"] == groupName);
-    if (index != -1 && groups[index]["id"] != null) {
-      final groupId = groups[index]["id"];
+    int index = groups.indexWhere((group) => group.name == groupName);
+    if (index != -1) {
+      final groupId = int.tryParse(groups[index].id) ?? 0;
       final success = await OnboardingServices.requestGroupJoin(groupId);
+
       if (success) {
-        groups[index]["action"] = "Katılım Bekleniyor";
+        final updatedGroup = groups[index].copyWith(isJoined: true);
+        groups[index] = updatedGroup;
         groups.refresh();
       } else {
         Get.snackbar("İşlem Başarısız", "Gruba katılım isteği gönderilemedi.");
@@ -86,7 +88,7 @@ class OnboardingController extends GetxController {
   //-------------------------------------------------------------//
   /// Okul listesini yükle
   Future<void> loadSchoolList() async {
-   // debugPrint("🌟 loadSchoolList çağrıldı.");
+    // debugPrint("🌟 loadSchoolList çağrıldı.");
     isLoading.value = true;
     try {
       final data = await OnboardingServices.fetchSchools();
@@ -99,7 +101,7 @@ class OnboardingController extends GetxController {
         _loadDepartmentsForSelectedSchool();
       }
     } catch (e) {
-      debugPrint("❗ Okul listesi yüklenirken hata: $e",wrapWidth: 1024);
+      debugPrint("❗ Okul listesi yüklenirken hata: $e", wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }
@@ -168,14 +170,14 @@ class OnboardingController extends GetxController {
   }
 
   //-------------------------------------------------------------//
-
   Future<void> fetchGroupsFromApi() async {
     isLoading.value = true;
     try {
-      final data = await OnboardingServices.fetchAllGroups();
+      final List<GroupModel> data = await OnboardingServices.fetchAllGroups();
       groups.assignAll(data);
+      debugPrint('Groups: $groups');
     } catch (e) {
-      debugPrint("❗ Grup verileri alınamadı: $e",wrapWidth: 1024);
+      debugPrint("❗ Grup verileri alınamadı: $e");
     } finally {
       isLoading.value = false;
     }

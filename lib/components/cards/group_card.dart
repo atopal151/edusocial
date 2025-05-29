@@ -110,7 +110,7 @@ class GroupCard extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 0,
+            bottom: 30,
             child: Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(

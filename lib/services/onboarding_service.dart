@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:edusocial/models/group_models/group_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -140,32 +141,29 @@ class OnboardingServices {
   }
 
   //-------------------------------------------------------------//
-  static Future<List<Map<String, dynamic>>> fetchAllGroups() async {
-    final token = _box.read('token');
-    try {
-      final response = await http.get(
-        Uri.parse('${AppConstants.baseUrl}/groups'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
-      );
+ static Future<List<GroupModel>> fetchAllGroups() async {
+  final token = _box.read('token');
+  try {
+    final response = await http.get(
+      Uri.parse('${AppConstants.baseUrl}/groups'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
 
-     /* debugPrint("📥 Grup listesi response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📥 Grup listesi body: ${response.body}",wrapWidth: 1024);*/
-
-      if (response.statusCode == 200) {
-        final List data = jsonDecode(response.body)['data'];
-        return data.cast<Map<String, dynamic>>();
-      } else {
-        debugPrint("❗ Grup listesi alınamadı: ${response.body}",wrapWidth: 1024);
-        return [];
-      }
-    } catch (e) {
-      debugPrint("❗ Grup listesi çekilirken hata: $e",wrapWidth: 1024);
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body)['data'];
+      return data.map((e) => GroupModel.fromJson(e)).toList();
+    } else {
+      debugPrint("❗ Grup listesi alınamadı: ${response.body}");
       return [];
     }
+  } catch (e) {
+    debugPrint("❗ Grup listesi çekilirken hata: $e");
+    return [];
   }
+}
 
   //-------------------------------------------------------------//
 }

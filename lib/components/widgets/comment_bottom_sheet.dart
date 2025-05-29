@@ -1,3 +1,4 @@
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,8 +15,7 @@ class CommentBottomSheet extends StatefulWidget {
 
 class _CommentBottomSheetState extends State<CommentBottomSheet> {
   final CommentController controller = Get.put(CommentController());
-final TextEditingController messageController = TextEditingController();
-
+  final TextEditingController messageController = TextEditingController();
 
   @override
   void initState() {
@@ -78,8 +78,7 @@ final TextEditingController messageController = TextEditingController();
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(comment.userAvatar),
+                              backgroundImage: NetworkImage(comment.userAvatar),
                               radius: 20,
                             ),
                             const SizedBox(width: 10),
@@ -87,7 +86,7 @@ final TextEditingController messageController = TextEditingController();
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  Row( 
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -99,7 +98,8 @@ final TextEditingController messageController = TextEditingController();
                                         ),
                                       ),
                                       Text(
-                                        comment.createdAt,
+                                        formatSimpleDateClock(
+                                            comment.createdAt),
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
                                           color: Colors.grey,
@@ -110,7 +110,7 @@ final TextEditingController messageController = TextEditingController();
                                   const SizedBox(height: 4),
                                   Text(
                                     comment.content,
-                                    style: GoogleFonts.inter(fontSize: 13),
+                                    style: GoogleFonts.inter(fontSize: 12,color: Color(0xff9ca3ae)),
                                   ),
                                 ],
                               ),
@@ -125,10 +125,9 @@ final TextEditingController messageController = TextEditingController();
 
               // Yorum Yazma Alanı
               Padding(
-                padding: const EdgeInsets.all(5),
-                child:buildCommentInputField(controller, widget.postId, messageController)
-
-              ),
+                  padding: const EdgeInsets.all(5),
+                  child: buildCommentInputField(
+                      controller, widget.postId, messageController)),
             ],
           ),
         ),

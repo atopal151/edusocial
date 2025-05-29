@@ -43,13 +43,15 @@ class Step3View extends StatelessWidget {
                   return Padding(
                     padding: const EdgeInsets.only(right: 10),
                     child: GroupCard(
-                      action: group["action"]??"",
-                      imageUrl: group["image"] ?? "",
-                      groupName: group["name"] ?? "Bilinmeyen Grup",
-                      groupDescription: group["description"] ?? "Açıklama yok",
-                      memberCount: group["members"] ?? 0,
+                      action: group.isMember
+                          ? "Katıldınız"
+                          : (group.isPending ? "Katılım Bekleniyor" : ""),
+                      imageUrl: group.bannerUrl,
+                      groupName: group.name,
+                      groupDescription: group.description,
+                      memberCount: group.userCountWithAdmin,
                       onJoinPressed: () {
-                        controller.joinGroup(group["name"] ?? "");
+                        controller.joinGroup(group.name);
                       },
                     ),
                   );
@@ -58,14 +60,13 @@ class Step3View extends StatelessWidget {
             ),
             SizedBox(height: 30),
             CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
+              height: 50,
+              borderRadius: 15,
               text: "Hesabı Tamamla",
               onPressed: controller.completeOnboarding,
               isLoading: controller.isLoading,
               backgroundColor: Color(0xFF414751),
-                    textColor: Colors.white,
+              textColor: Colors.white,
             ),
             SizedBox(height: 20),
           ],
