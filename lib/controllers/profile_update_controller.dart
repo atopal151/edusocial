@@ -37,7 +37,7 @@ class ProfileUpdateController extends GetxController {
   final languageIdController = TextEditingController();
 
   // Ekstra seçenekler
-  var accountType = 'private'.obs; // "private" veya "public"
+  var accountType = ''.obs; // "private" veya "public"
   var emailNotification = true.obs;
   var mobileNotification = true.obs;
   var selectedLessons = <String>[].obs;

@@ -41,6 +41,7 @@ class EntryCard extends StatelessWidget {
               children: [
                 // Profil Fotoğrafı + Çevrimiçi Durumu
                 Stack(
+                  
                   children: [
                     InkWell(
                       onTap: onPressedProfile,
@@ -49,7 +50,7 @@ class EntryCard extends StatelessWidget {
                         backgroundImage: NetworkImage(entry.profileImage),
                       ),
                     ),
-                    Positioned(
+                    /*Positioned(
                       bottom: 0,
                       right: 0,
                       child: Container(
@@ -61,7 +62,7 @@ class EntryCard extends StatelessWidget {
                           border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
                 const SizedBox(width: 10),

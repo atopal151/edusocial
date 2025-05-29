@@ -35,41 +35,47 @@ class EntryServices {
     }
   }
 
-  static Future<Map<String, int>> fetchTopicCategories() async {
-    final token = GetStorage().read("token");
+static Future<Map<String, int>> fetchTopicCategories() async {
+  final token = GetStorage().read("token");
 
-    try {
-      final response = await http.get(
-        Uri.parse("${AppConstants.baseUrl}/topic-categories"),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/json",
-        },
-      );
+  try {
+    final response = await http.get(
+      Uri.parse("${AppConstants.baseUrl}/topic-categories"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final jsonBody = jsonDecode(response.body);
-        final List data = jsonBody["data"];
+    if (response.statusCode == 200) {
+      final jsonBody = jsonDecode(response.body);
+      final List data = jsonBody["data"];
 
-        //debugPrint(" $data",wrapWidth: 1024);
-        final Map<String, int> result = {};
-        for (var item in data) {
-          final name = item["name"];
-          final id = item["id"];
+      debugPrint("📥 Status Code: ${response.statusCode}");
+      debugPrint("📥 Body: ${response.body}");
+      debugPrint("📦 RAW DATA: $data");
 
-          if (name != null && id != null) {
-            result[name.toString()] = id;
-          }
+      final Map<String, int> result = {};
+      for (var item in data) {
+        final name = item["title"]; // ✅ DÜZELTİLDİ
+        final id = item["id"];
+
+        if (name != null && id != null) {
+          result[name.toString()] = id;
         }
-        return result;
-      } else {
-        return {};
       }
-    } catch (e) {
-      debugPrint("❗ Topic Categories error: $e");
+
+      debugPrint("📦 Topic Category Map: $result");
+      return result;
+    } else {
       return {};
     }
+  } catch (e) {
+    debugPrint("❗ Topic Categories error: $e");
+    return {};
   }
+}
+
 
   
 

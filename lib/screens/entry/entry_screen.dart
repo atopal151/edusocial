@@ -60,19 +60,59 @@ class _EntryScreenState extends State<EntryScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16),
             child: CustomButton(
-                height: 45,
-                borderRadius: 15,
-                text: "+ Yeni Konu Aç",
-                onPressed: () {
-                  entryController.shareEntry();
-                },
-                isLoading: entryController.isEntryLoading,
-                backgroundColor: Color(0xfffb535c),
-                textColor: Color(0xffffffff),
-               ),
+              height: 45,
+              borderRadius: 15,
+              text: "+ Yeni Konu Aç",
+              onPressed: () {
+                entryController.shareEntry();
+              },
+              isLoading: entryController.isEntryLoading,
+              backgroundColor: Color(0xfffb535c),
+              textColor: Color(0xffffffff),
+            ),
           ),
           SizedBox(
             height: 10,
+          ),
+          SizedBox(
+            height: 50,
+            child: Obx(() {
+              final categories = entryController.categoryEntry;
+              final selected = entryController.selectedCategory.value;
+
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: categories.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  final isSelected = category == selected;
+
+                  return GestureDetector(
+                    onTap: () =>
+                        entryController.filterEntriesByCategory(category),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected ? Color(0xfffb535c) : Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }),
           ),
           Obx(() {
             return Expanded(
@@ -91,7 +131,7 @@ class _EntryScreenState extends State<EntryScreen> {
                       .toList());
                 },
                 child: ListView.separated(
-                  itemCount: filteredEntries.length,
+                  itemCount: entryController.filteredByCategoryList.length,
                   separatorBuilder: (context, index) => SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final entry = filteredEntries[index];

@@ -6,6 +6,7 @@ import '../models/entry_model.dart';
 class EntryController extends GetxController {
   var entryList = <EntryModel>[].obs;
   var entryPersonList = <EntryModel>[].obs;
+  final RxList<EntryModel> filteredByCategoryList = <EntryModel>[].obs;
 
   RxMap<String, int> categoryMap = <String, int>{}.obs; // 🔁 Kategori adı -> id
   RxList<String> categoryEntry =
@@ -23,7 +24,22 @@ class EntryController extends GetxController {
     fetchEntries();
   }
 
-  
+
+  void filterEntriesByCategory(String categoryName) {
+  selectedCategory.value = categoryName;
+
+  final categoryId = getCategoryIdFromName(categoryName);
+
+  final filtered = entryList.where((entry) {
+    // Entry modelinde kategori ID'si varsa kıyasla
+    // Eğer yoksa EntryModel’e topicCategoryId alanı eklememiz gerekir
+    return entry.topicCategoryId == categoryId;
+  }).toList();
+
+  filteredByCategoryList.assignAll(filtered);
+}
+
+
 
   /// 🔁 Backend'den kategori listesini al
   void fetchTopicCategories() async {
@@ -80,17 +96,20 @@ class EntryController extends GetxController {
   }
 
   /// 📥 Tüm entry'leri getir
-  void fetchEntries() async {
-    isEntryLoading.value = true;
-    final entries = await EntryServices.fetchTimelineEntries();
-    entryList.assignAll(entries);
+void fetchEntries() async {
+  isEntryLoading.value = true;
+  final entries = await EntryServices.fetchTimelineEntries();
+  entryList.assignAll(entries);
+  entryPersonList.assignAll(entries.where((entry) => entry.isOwner).toList());
 
-    entryPersonList.assignAll(
-      entries.where((entry) => entry.isOwner == true).toList(),
-    ); // ✅ filtreleme
-
-    isEntryLoading.value = false;
+  // ✅ ilk yüklemede filtre uygula
+  if (selectedCategory.isNotEmpty) {
+    filterEntriesByCategory(selectedCategory.value);
   }
+
+  isEntryLoading.value = false;
+}
+
 
   void upvotePersonEntry(int index) {
     entryPersonList[index].upvoteCount++;

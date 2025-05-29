@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mime/mime.dart';
 import '../utils/constants.dart';
 
 class ProfileUpdateService {
@@ -71,31 +72,43 @@ class ProfileUpdateService {
       request.fields['lessons[$i]'] = lessons[i];
     }
 
-    // 🖼️ Avatar resmi eklenmişse
-    if (avatarFile != null) {
-      final mimeType = avatarFile.path.endsWith('.png')
-          ? MediaType('image', 'png')
-          : MediaType('image', 'jpeg');
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'avatar',
-          avatarFile.path,
-          contentType: mimeType,
-        ),
-      );
-    }
-    if (coverFile != null) {
-      final mimeType = coverFile.path.endsWith('.png')
-          ? MediaType('image', 'png')
-          : MediaType('image', 'jpeg');
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'banner',
-          coverFile.path,
-          contentType: mimeType,
-        ),
-      );
-    }
+// 🖼️ Avatar resmi eklenmişse
+if (avatarFile != null) {
+  final mime = lookupMimeType(avatarFile.path);
+  final mediaType = mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
+
+  debugPrint('📤 Avatar dosyası yolu: ${avatarFile.path}');
+  debugPrint('📤 Avatar mime türü: $mime');
+
+  request.files.add(
+    await http.MultipartFile.fromPath(
+      'avatar',
+      avatarFile.path,
+      contentType: mediaType,
+    ),
+  );
+} else {
+  debugPrint('⚠️ Avatar dosyası null, yüklenmedi.');
+}
+
+// 🖼️ Banner resmi eklenmişse
+if (coverFile != null) {
+  final mime = lookupMimeType(coverFile.path);
+  final mediaType = mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
+
+  debugPrint('📤 Banner dosyası yolu: ${coverFile.path}');
+  debugPrint('📤 Banner mime türü: $mime');
+
+  request.files.add(
+    await http.MultipartFile.fromPath(
+      'banner',
+      coverFile.path,
+      contentType: mediaType,
+    ),
+  );
+} else {
+  debugPrint('⚠️ Banner dosyası null, yüklenmedi.');
+}
 
     try {
       final streamedResponse = await request.send();

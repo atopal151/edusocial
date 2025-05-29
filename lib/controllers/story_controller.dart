@@ -60,27 +60,6 @@ class StoryController extends GetxController {
 
       myStory.value = my;
       otherStories.assignAll(others);
-
-      // Debug çıktısı
-      debugPrint('📋 My Story:');
-      if (my != null) {
-        debugPrint(
-            '👤 Ben: ${my.username}, ID: ${my.userId}, URL sayısı: ${my.storyUrls.length}');
-        for (var url in my.storyUrls) {
-          debugPrint('   - $url');
-        }
-      } else {
-        debugPrint('❌ Kullanıcıya ait story bulunamadı');
-      }
-
-      debugPrint('📋 Other Stories:');
-      for (var s in others) {
-        debugPrint(
-            '➡️ Kullanıcı: ${s.username}, ID: ${s.userId}, URL sayısı: ${s.storyUrls.length}');
-        for (var url in s.storyUrls) {
-          debugPrint('   - $url');
-        }
-      }
     } catch (e) {
       debugPrint("❗ fetchStories error: $e");
     } finally {
