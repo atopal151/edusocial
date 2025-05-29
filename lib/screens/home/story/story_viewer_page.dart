@@ -102,6 +102,17 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       Get.back();
     }
   }
+    String timeAgo(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inSeconds < 60) return 'az önce';
+    if (difference.inMinutes < 60) return '${difference.inMinutes} dk önce';
+    if (difference.inHours < 24) return '${difference.inHours} saat önce';
+    if (difference.inDays == 1) return 'dün';
+    if (difference.inDays < 7) return '${difference.inDays} gün önce';
+    return '${date.day}/${date.month}/${date.year}';
+  }
 
   @override
   void dispose() {
@@ -200,7 +211,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                           children: [
                             Text(story.username,
                                 style: TextStyle(color: Colors.white, fontSize: 16)),
-                            Text("...", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                            Text(timeAgo(story.created_at), style: TextStyle(color: Colors.white70, fontSize: 12)),
                           ],
                         ),
                         Spacer(),

@@ -28,6 +28,7 @@ import 'package:edusocial/screens/profile/profile_following_screen.dart';
 import 'package:edusocial/screens/profile/profile_screen.dart';
 import 'package:edusocial/screens/search/search_text_screen.dart';
 import 'package:edusocial/screens/settings/settings_screen.dart';
+import 'package:edusocial/utils/auth_guard.dart';
 import 'package:get/get.dart';
 import '../bindings/signup_binding.dart';
 import '../bindings/login_binding.dart';
@@ -212,6 +213,7 @@ class Routes {
     GetPage(
       name: main,
       page: () => MainScreen(),
+      middlewares: [AuthGuard()]
     ),
     GetPage(name: addStory, page: () => AddStoryScreen()),
   ];

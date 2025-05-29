@@ -5,6 +5,9 @@ import '../components/widgets/edusocial_dialog.dart';
 import '../services/auth_service.dart';
 
 class SignupController extends GetxController {
+
+  TextEditingController nameSuController = TextEditingController();
+  TextEditingController surnameSuController = TextEditingController();
   TextEditingController usernameSuController = TextEditingController();
   TextEditingController emailSuController = TextEditingController();
   TextEditingController passwordSuController = TextEditingController();
@@ -30,6 +33,8 @@ class SignupController extends GetxController {
     }
     if (usernameSuController.text.isEmpty ||
         emailSuController.text.isEmpty ||
+        nameSuController.text.isEmpty ||
+        surnameSuController.text.isEmpty ||
         passwordSuController.text.isEmpty ||
         confirmPasswordSuController.text.isEmpty) {
       EduSocialDialogs.showError(
@@ -49,6 +54,8 @@ class SignupController extends GetxController {
     isSuLoading.value = true;
     final success = await _authService.register(
       username: usernameSuController.text,
+      name: nameSuController.text,
+      surname: surnameSuController.text,
       email: emailSuController.text,
       password: passwordSuController.text,
       confirmPassword: confirmPasswordSuController.text,

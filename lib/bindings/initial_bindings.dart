@@ -14,31 +14,31 @@ import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/topics_controller.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_update_controller.dart';
-
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/social/chat_controller.dart';
 
 class InitialBindings extends Bindings {
   @override
   void dependencies() {
-    /// Login işlemi için gerekli controller'lar
-    Get.put(HomeController()); 
+    // Global controller'lar (uygulama boyunca hep açık kalacaklar)
+
     Get.put(LoginController(), permanent: true);
     Get.put(NavigationController(), permanent: true);
-    Get.put(MatchController(), permanent: true);
-    Get.put(ProfileController(), permanent: true);
     Get.put(OnboardingController(), permanent: true);
+    Get.put(MatchController(), permanent: true);
+    Get.put(AppBarController(), permanent: true);
+    Get.put(ProfileController(), permanent: true);
+    Get.put(GroupController(), permanent: true);
     Get.put(GetMaterialController(), permanent: true);
+    Get.put(StoryController(), permanent: true);
 
-    /// Ana Sayfa ve diğer sosyal özellikler
+    // İhtiyaç anında yüklenecek olanlar (lazy yükleme)
     Get.lazyPut(() => EventController());
     Get.lazyPut(() => EntryDetailController());
     Get.lazyPut(() => SearchTextController());
     Get.lazyPut(() => HomeController());
     Get.lazyPut(() => StoryController());
     Get.lazyPut(() => EntryController());
-    Get.lazyPut(() => GroupController());
-    Get.lazyPut(() => AppBarController());
     Get.lazyPut(() => TopicsController());
     Get.lazyPut(() => PostController());
     Get.lazyPut(() => ChatController());

@@ -1,3 +1,4 @@
+import 'package:edusocial/controllers/group_controller/group_controller.dart';
 import 'package:edusocial/controllers/home_controller.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
@@ -29,6 +30,7 @@ class MainScreen extends StatelessWidget {
     Get.put(EntryController());
     Get.put(StoryController());
     Get.put(PostController());
+    Get.put(GroupController());
 
     return Scaffold(
       body: Obx(() {

@@ -54,7 +54,7 @@ class LoginController extends GetxController {
         Future.delayed(Duration(milliseconds: 200), () {
           final storyController = Get.find<StoryController>();
           storyController.fetchStories();
-          Get.offAllNamed('/home');
+          Get.offAllNamed('/main');
         });
       }
     } else {

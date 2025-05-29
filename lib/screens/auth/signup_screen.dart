@@ -72,6 +72,18 @@ class SignupView extends StatelessWidget {
                           ),
                           CustomTextField(
                               textColor: Color(0xFF9ca3ae),
+                              hintText: "Ad",
+                              controller: controller.nameSuController,
+                              backgroundColor: Color(0xfff5f5f5)),
+                          SizedBox(height: 10),
+                          CustomTextField(
+                              textColor: Color(0xFF9ca3ae),
+                              hintText: "Soyad",
+                              controller: controller.surnameSuController,
+                              backgroundColor: Color(0xfff5f5f5)),
+                          SizedBox(height: 10),
+                          CustomTextField(
+                              textColor: Color(0xFF9ca3ae),
                               hintText: "Kullanıcı adı",
                               controller: controller.usernameSuController,
                               backgroundColor: Color(0xfff5f5f5)),
@@ -130,9 +142,8 @@ class SignupView extends StatelessWidget {
                           ),
                           SizedBox(height: 20),
                           CustomButton(
-
-                        height: 50,
-                        borderRadius: 15,
+                              height: 50,
+                              borderRadius: 15,
                               backgroundColor: Color(0xffE75454),
                               text: "Kayıt Ol",
                               isLoading: controller.isSuLoading,

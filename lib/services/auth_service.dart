@@ -45,6 +45,8 @@ class AuthService {
   String? getToken() => _box.read('token');
 
   Future<bool> register({
+    required String name,
+    required String surname,
     required String username,
     required String email,
     required String password,
@@ -59,8 +61,8 @@ class AuthService {
           'Accept': 'application/json',
         },
         body: jsonEncode({
-          'name': "nametest",
-          'surname': 'surnametest',
+          'name': name,
+          'surname': surname,
           'username': username,
           'email': email,
           'password': password,

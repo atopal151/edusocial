@@ -197,7 +197,7 @@ void previousStory() {
                             const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       Text(
-                        timeAgo(story.createdAt),
+                        timeAgo(story.created_at),
                         style: const TextStyle(
                             color: Colors.white70, fontSize: 12),
                       ),

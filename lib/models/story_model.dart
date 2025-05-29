@@ -7,7 +7,7 @@ class StoryModel {
    String profileImage;
   RxBool isViewed;
   List<String> storyUrls;
-  DateTime createdAt;
+  DateTime created_at;
   bool hasStory;
 
   StoryModel({
@@ -17,7 +17,7 @@ class StoryModel {
     required this.profileImage,
     required bool isViewed,
     required this.storyUrls,
-    required this.createdAt,
+    required this.created_at,
     required this.hasStory,
   }) : isViewed = isViewed.obs;
 
@@ -36,7 +36,7 @@ class StoryModel {
           .where((e) => e["path"] != null && e["path"].toString().isNotEmpty)
           .map<String>((e) => e["path"].toString())
           .toList(),
-      createdAt: stories.isNotEmpty && stories[0]["created_at"] != null
+      created_at: stories.isNotEmpty && stories[0]["created_at"] != null
           ? DateTime.tryParse(stories[0]["created_at"]) ?? DateTime.now()
           : DateTime.now(),
     );
