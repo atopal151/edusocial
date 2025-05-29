@@ -14,15 +14,31 @@ class StoryViewerPage extends StatefulWidget {
 class _StoryViewerPageState extends State<StoryViewerPage>
     with TickerProviderStateMixin {
   final StoryController storyController = Get.find<StoryController>();
+
   late PageController _pageController;
+  late List<dynamic> allStories; // myStory + otherStories
   int _currentIndex = 0;
   int _storyIndex = 0;
-  Timer? _timer;
   AnimationController? _animationController;
 
   @override
   void initState() {
     super.initState();
+
+    final my = storyController.getMyStory();
+    final others = storyController.getOtherStories();
+    allStories = [
+      if (my != null) my,
+      ...others,
+    ];
+
+    // Hatalı index varsa geri dön
+    if (widget.initialIndex >= allStories.length || allStories.isEmpty) {
+      debugPrint("❗ Story görüntülenemiyor: index=${widget.initialIndex}, total=${allStories.length}");
+      Future.delayed(Duration.zero, () => Get.back());
+      return;
+    }
+
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: _currentIndex);
     _startStory();
@@ -31,158 +47,92 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   void _startStory() {
     _animationController?.stop();
     _animationController?.dispose();
+
+    final story = allStories[_currentIndex];
+    final totalStoryCount = story.storyUrls.length;
+
+    if (_storyIndex >= totalStoryCount) {
+      _storyIndex = 0;
+    }
+
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 10),
+      duration: Duration(seconds: 7),
     )
-      ..addListener(() {
-        setState(() {});
-      })
+      ..addListener(() => setState(() {}))
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           nextStory();
         }
       });
-    _animationController!.forward();
-  }
 
-  void _pauseStory() {
-    _animationController?.stop();
-  }
-
-  void _resumeStory() {
     _animationController?.forward();
   }
 
   void nextStory() {
-    final stories = storyController.otherStories();
-    final currentStory = stories[_currentIndex];
+    final currentStory = allStories[_currentIndex];
+
     if (_storyIndex < currentStory.storyUrls.length - 1) {
-      setState(() {
-        _storyIndex++;
-      });
+      setState(() => _storyIndex++);
       _startStory();
-    } else if (_currentIndex < stories.length - 1) {
+    } else if (_currentIndex < allStories.length - 1) {
       setState(() {
         _currentIndex++;
         _storyIndex = 0;
       });
       _pageController.jumpToPage(_currentIndex);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _startStory();
-      });
+      _startStory();
     } else {
       Get.back();
     }
   }
 
   void previousStory() {
-    final stories = storyController.otherStories();
     if (_storyIndex > 0) {
-      setState(() {
-        _storyIndex--;
-      });
+      setState(() => _storyIndex--);
       _startStory();
     } else if (_currentIndex > 0) {
       setState(() {
         _currentIndex--;
-        final previous = stories[_currentIndex];
-        _storyIndex = previous.storyUrls.length - 1;
+        _storyIndex = allStories[_currentIndex].storyUrls.length - 1;
       });
       _pageController.jumpToPage(_currentIndex);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _startStory();
-      });
+      _startStory();
     } else {
       Get.back();
     }
   }
 
-  String timeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inSeconds < 60) return 'az önce';
-    if (difference.inMinutes < 60) return '${difference.inMinutes} dk önce';
-    if (difference.inHours < 24) return '${difference.inHours} saat önce';
-    if (difference.inDays == 1) return 'dün';
-    if (difference.inDays < 7) return '${difference.inDays} gün önce';
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
   @override
   void dispose() {
-    _timer?.cancel();
     _animationController?.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final my = storyController.getMyStory();
-    final others = storyController.getOtherStories();
-
-    // Tüm storyleri tek listede birleştir
-    final stories = [
-      if (my != null) my,
-      ...others,
-    ];
-
-    if (stories.isEmpty) {
+    if (allStories.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.black,
         body: Center(
-          child: Text(
-            "Story bulunamadı",
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
+          child: Text("Story bulunamadı", style: TextStyle(color: Colors.white)),
         ),
       );
     }
+
     return SafeArea(
-      top: true,
-      bottom: false,
-      minimum: EdgeInsets.only(top: 12),
       child: Scaffold(
         backgroundColor: Colors.black,
         body: PageView.builder(
           controller: _pageController,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: stories.length,
+          itemCount: allStories.length,
           itemBuilder: (context, index) {
-            final story = stories[index];
-            final isCurrentStory = index == _currentIndex;
-
+            final story = allStories[index];
+            final isCurrent = index == _currentIndex;
+      
             return GestureDetector(
-              onLongPressStart: (_) => _pauseStory(),
-              onLongPressEnd: (_) => _resumeStory(),
-              onHorizontalDragEnd: (details) {
-                if (details.primaryVelocity != null) {
-                  if (details.primaryVelocity! > 0) {
-                    if (_currentIndex > 0) {
-                      setState(() {
-                        _currentIndex--;
-                        _storyIndex = 0;
-                      });
-                      _pageController.jumpToPage(_currentIndex);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _startStory();
-                      });
-                    }
-                  } else {
-                    if (_currentIndex < stories.length - 1) {
-                      setState(() {
-                        _currentIndex++;
-                        _storyIndex = 0;
-                      });
-                      _pageController.jumpToPage(_currentIndex);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _startStory();
-                      });
-                    }
-                  }
-                }
-              },
               onTapDown: (details) {
                 final width = MediaQuery.of(context).size.width;
                 if (details.globalPosition.dx < width / 2) {
@@ -191,6 +141,8 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                   nextStory();
                 }
               },
+              onLongPressStart: (_) => _animationController?.stop(),
+              onLongPressEnd: (_) => _animationController?.forward(),
               child: Stack(
                 children: [
                   Positioned.fill(
@@ -199,39 +151,34 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                             story.storyUrls[_storyIndex],
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              debugPrint(
-                                  "❗ Story resmi yüklenemedi: ${story.storyUrls[_storyIndex]}");
-                              return Container(
-                                color: Colors.black,
-                                alignment: Alignment.center,
-                                child: Icon(Icons.broken_image,
-                                    color: Colors.white, size: 48),
+                              return Center(
+                                child: Icon(Icons.broken_image, color: Colors.white, size: 48),
                               );
                             },
                           )
-                        : Container(color: Colors.black),
+                        : Center(
+                            child: Text("Görsel yok", style: TextStyle(color: Colors.white)),
+                          ),
                   ),
-                  if (isCurrentStory)
+                  if (isCurrent)
                     Positioned(
-                      top: 10,
+                      top: 40,
                       left: 10,
                       right: 10,
                       child: Row(
                         children: List.generate(
                           story.storyUrls.length,
                           (i) => Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 2),
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 2),
                               child: LinearProgressIndicator(
-                                borderRadius: BorderRadius.circular(50),
                                 value: i < _storyIndex
                                     ? 1
                                     : i == _storyIndex
                                         ? _animationController?.value ?? 0
                                         : 0,
-                                backgroundColor: Colors.white38,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                backgroundColor: Colors.white30,
+                                valueColor: AlwaysStoppedAnimation(Colors.white),
                               ),
                             ),
                           ),
@@ -239,7 +186,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                       ),
                     ),
                   Positioned(
-                    top: 25,
+                    top: 60,
                     left: 16,
                     right: 16,
                     child: Row(
@@ -251,16 +198,9 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              story.username,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
-                            ),
-                            Text(
-                              timeAgo(story.createdAt),
-                              style: TextStyle(
-                                  color: Colors.white70, fontSize: 12),
-                            ),
+                            Text(story.username,
+                                style: TextStyle(color: Colors.white, fontSize: 16)),
+                            Text("...", style: TextStyle(color: Colors.white70, fontSize: 12)),
                           ],
                         ),
                         Spacer(),

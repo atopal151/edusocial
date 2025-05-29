@@ -27,63 +27,66 @@ class StoryController extends GetxController {
       }
     });
   }
-Future<void> fetchStories() async {
-  try {
-    isLoading.value = true;
 
-    final allStories = await StoryService.fetchStories();
-    final currentUserIdStr = profileController.userId.value.trim();
+  Future<void> fetchStories() async {
+    try {
+      isLoading.value = true;
 
-    if (currentUserIdStr.isEmpty) {
-      debugPrint("⚠️ Kullanıcı ID boş, story filtrelenemiyor");
-      return;
-    }
+      final allStories = await StoryService.fetchStories();
+      final currentUserIdStr = profileController.userId.value.trim();
 
-    final currentUserId = int.tryParse(currentUserIdStr);
-    if (currentUserId == null) {
-      debugPrint("⚠️ Kullanıcı ID sayıya çevrilemedi: $currentUserIdStr");
-      return;
-    }
+      if (currentUserIdStr.isEmpty) {
+        debugPrint("⚠️ Kullanıcı ID boş, story filtrelenemiyor");
+        isLoading.value = false;
+        return;
+      }
 
-    final List<StoryModel> others = [];
-    StoryModel? my;
+      final currentUserId = int.tryParse(currentUserIdStr);
+      if (currentUserId == null) {
+        debugPrint("⚠️ Kullanıcı ID sayıya çevrilemedi: $currentUserIdStr");
+        return;
+      }
 
-    for (var story in allStories) {
-      if (story.userId == currentUserId) {
-        my = story;
+      final List<StoryModel> others = [];
+      StoryModel? my;
+
+      for (var story in allStories) {
+        if (story.userId == currentUserId) {
+          my = story;
+        } else {
+          others.add(story);
+        }
+      }
+
+      myStory.value = my;
+      otherStories.assignAll(others);
+
+      // Debug çıktısı
+      debugPrint('📋 My Story:');
+      if (my != null) {
+        debugPrint(
+            '👤 Ben: ${my.username}, ID: ${my.userId}, URL sayısı: ${my.storyUrls.length}');
+        for (var url in my.storyUrls) {
+          debugPrint('   - $url');
+        }
       } else {
-        others.add(story);
+        debugPrint('❌ Kullanıcıya ait story bulunamadı');
       }
-    }
 
-    myStory.value = my;
-    otherStories.assignAll(others);
-
-    // Debug çıktısı
-    debugPrint('📋 My Story:');
-    if (my != null) {
-      debugPrint('👤 Ben: ${my.username}, ID: ${my.userId}, URL sayısı: ${my.storyUrls.length}');
-      for (var url in my.storyUrls) {
-        debugPrint('   - $url');
+      debugPrint('📋 Other Stories:');
+      for (var s in others) {
+        debugPrint(
+            '➡️ Kullanıcı: ${s.username}, ID: ${s.userId}, URL sayısı: ${s.storyUrls.length}');
+        for (var url in s.storyUrls) {
+          debugPrint('   - $url');
+        }
       }
-    } else {
-      debugPrint('❌ Kullanıcıya ait story bulunamadı');
+    } catch (e) {
+      debugPrint("❗ fetchStories error: $e");
+    } finally {
+      isLoading.value = false;
     }
-
-    debugPrint('📋 Other Stories:');
-    for (var s in others) {
-      debugPrint('➡️ Kullanıcı: ${s.username}, ID: ${s.userId}, URL sayısı: ${s.storyUrls.length}');
-      for (var url in s.storyUrls) {
-        debugPrint('   - $url');
-      }
-    }
-  } catch (e) {
-    debugPrint("❗ fetchStories error: $e");
-  } finally {
-    isLoading.value = false;
   }
-}
-
 
 /*
   /// 👤 Şu anki kullanıcıya ait story'yi serverdan yükle

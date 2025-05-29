@@ -16,29 +16,42 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
   int _storyIndex = 0;
   AnimationController? _animationController;
 
-  @override
-  void initState() {
-    super.initState();
+@override
+void initState() {
+  super.initState();
+  _storyIndex = 0;
+
+  final story = storyController.getMyStory();
+  if (story != null && story.storyUrls.length > 1) {
     _startStory();
   }
+}
 
-  void _startStory() {
-    _animationController?.stop();
-    _animationController?.dispose();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 10),
-    )
-      ..addListener(() {
-        setState(() {});
-      })
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          nextStory();
-        }
-      });
-    _animationController!.forward();
-  }
+
+
+void _startStory() {
+  _animationController?.stop();
+  _animationController?.dispose();
+
+  final story = storyController.getMyStory();
+  if (story == null || story.storyUrls.length <= 1) return; // güvenlik kontrolü
+
+  _animationController = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 10),
+  )
+    ..addListener(() {
+      setState(() {});
+    })
+    ..addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        nextStory();
+      }
+    });
+
+  _animationController!.forward();
+}
+
 
   void _pauseStory() {
     _animationController?.stop();
@@ -48,30 +61,37 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
     _animationController?.forward();
   }
 
-  void nextStory() {
-    final story = storyController.getMyStory();
-    if (story == null) return;
+void nextStory() {
+  final story = storyController.getMyStory();
+  if (story == null) return;
 
-    if (_storyIndex < story.storyUrls.length - 1) {
-      setState(() {
-        _storyIndex++;
-      });
-      _startStory();
-    } else {
-      Get.back();
-    }
+  final total = story.storyUrls.length;
+
+  // Eğer son story ise → çık
+  if (_storyIndex >= total - 1) {
+    _animationController?.stop();
+    Get.back();
+    return;
   }
 
-  void previousStory() {
-    if (_storyIndex > 0) {
-      setState(() {
-        _storyIndex--;
-      });
-      _startStory();
-    } else {
-      Get.back();
-    }
+  // Aksi halde bir sonraki story'ye geç
+  setState(() {
+    _storyIndex++;
+  });
+  _startStory();
+}
+
+void previousStory() {
+  if (_storyIndex > 0) {
+    setState(() {
+      _storyIndex--;
+    });
+    _startStory();
+  } else {
+    _animationController?.stop(); // güvenlik için
+    Get.back();
   }
+}
 
   String timeAgo(DateTime date) {
     final now = DateTime.now();
@@ -98,7 +118,7 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
     if (story == null || story.storyUrls.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.black,
-        body: Center(
+        body: const Center(
           child: Text("Story bulunamadı",
               style: TextStyle(color: Colors.white)),
         ),
@@ -125,7 +145,7 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
                 story.storyUrls[_storyIndex],
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return Center(
+                  return const Center(
                     child: Icon(Icons.broken_image,
                         color: Colors.white, size: 48),
                   );
@@ -141,7 +161,7 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
                   story.storyUrls.length,
                   (i) => Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: LinearProgressIndicator(
                         borderRadius: BorderRadius.circular(50),
                         value: i < _storyIndex
@@ -151,7 +171,7 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
                                 : 0,
                         backgroundColor: Colors.white38,
                         valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white),
+                            const AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     ),
                   ),
@@ -167,24 +187,25 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
                   CircleAvatar(
                     backgroundImage: NetworkImage(story.profileImage),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         story.username,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       Text(
                         timeAgo(story.createdAt),
-                        style:
-                            TextStyle(color: Colors.white70, fontSize: 12),
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 12),
                       ),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                   IconButton(
-                    icon: Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close, color: Colors.white),
                     onPressed: () => Get.back(),
                   )
                 ],
