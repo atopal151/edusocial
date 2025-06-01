@@ -54,11 +54,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
-                Text(entry.entryTitle,
+                /*Text(entry.entryTitle,
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xff414751))),
+                        color: Color(0xff414751))),*/
               ],
             ),
           ),

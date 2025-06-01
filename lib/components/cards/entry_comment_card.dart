@@ -1,4 +1,5 @@
 
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
@@ -31,7 +32,7 @@ class EntryCommentCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            entry.entryDescription,
+            entry.content,
             style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
           ),
           const SizedBox(height: 10),
@@ -131,13 +132,13 @@ class EntryCommentCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            entry.userName,
+                            entry.user.name,
                             overflow: TextOverflow.ellipsis,
                             style:  GoogleFonts.inter(
                                 fontWeight: FontWeight.w600, fontSize: 12,color: Color(0xff414751)),
                           ),
                           Text(
-                            entry.entryDate,
+                            formatSimpleDateClock(entry.createdAt),
                             style:  GoogleFonts.inter(
                                 color: Color(0xff9ca3ae), fontSize: 10),
                           ),
@@ -147,7 +148,7 @@ class EntryCommentCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     CircleAvatar(
                       radius: 12,
-                      backgroundImage: NetworkImage(entry.profileImage),
+                      backgroundImage: NetworkImage(entry.user.avatarUrl),
                     ),
                   ],
                 ),

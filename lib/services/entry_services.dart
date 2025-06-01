@@ -1,49 +1,51 @@
 import 'dart:convert';
-import 'package:edusocial/models/entry_model.dart';
+import 'package:edusocial/models/topic_with_entry_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 class EntryServices {
+  static Future<TopicEntryResponse?> fetchEntriesByTopicId(int topicId) async {
+    final token = GetStorage().read("token");
 
-static Future<List<EntryModel>> fetchEntriesByTopicId(int topicId) async {
-  final token = GetStorage().read("token");
+    try {
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/timeline/topics/$topicId"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
 
-  try {
-    final response = await http.get(
-      Uri.parse("${AppConstants.baseUrl}/timeline/topics/$topicId"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
+      //debugPrint("📥 Entry topic full response: ${response.body}");
 
-    debugPrint("📥 Entry category id Body: ${response.body}", wrapWidth: 1024);
+      if (response.statusCode == 200) {
+        final jsonBody = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      final jsonBody = jsonDecode(response.body);
-      final data = jsonBody["data"];
-      debugPrint("📥 Gelen Response: ${response.body}");
+        if (jsonBody != null && jsonBody["data"] != null) {
+          final data = jsonBody["data"];
 
-      // 🔁 "entrys" anahtarına dikkat!
-      if (data != null && data["entrys"] != null) {
-        final List<dynamic> entryList = data["entrys"];
-        return entryList.map((e) => EntryModel.fromJson(e)).toList();
+          if (data is Map<String, dynamic>) {
+            return TopicEntryResponse.fromJson(data);
+          } else {
+            debugPrint("❗ 'data' beklenen formatta değil: ${data.runtimeType}");
+            return null;
+          }
+        } else {
+          debugPrint("⚠️ 'data' alanı null veya eksik!");
+          return null;
+        }
       } else {
-        debugPrint("⚠️ 'entrys' alanı boş veya yok.");
-        return [];
+        debugPrint("⚠️ Topic entries failed: ${response.statusCode}");
+        return null;
       }
-    } else {
-      debugPrint("⚠️ Topic entries response failed: ${response.statusCode}");
-      return [];
+    } catch (e, stackTrace) {
+      debugPrint("❗ fetchEntriesByTopicId error: $e");
+      debugPrint("❗ StackTrace: $stackTrace");
+      return null;
     }
-  } catch (e) {
-    debugPrint("❗ fetchEntriesByTopicId error: $e");
-    return [];
   }
-}
-
 
   static Future<Map<String, int>> fetchTopicCategories() async {
     final token = GetStorage().read("token");
@@ -61,9 +63,9 @@ static Future<List<EntryModel>> fetchEntriesByTopicId(int topicId) async {
         final jsonBody = jsonDecode(response.body);
         final List data = jsonBody["data"];
 
-        debugPrint("📥 Status Code: ${response.statusCode}");
-        debugPrint("📥 Body: ${response.body}");
-        debugPrint("📦 RAW DATA: $data");
+        //debugPrint("📥 Status Code: ${response.statusCode}");
+        //debugPrint("📥 Body: ${response.body}");
+        //debugPrint("📦 RAW DATA: $data");
 
         final Map<String, int> result = {};
         for (var item in data) {
@@ -75,7 +77,7 @@ static Future<List<EntryModel>> fetchEntriesByTopicId(int topicId) async {
           }
         }
 
-        debugPrint("📦 Topic Category Map: $result");
+        //debugPrint("📦 Topic Category Map: $result");
         return result;
       } else {
         return {};

@@ -47,22 +47,22 @@ class EntryCard extends StatelessWidget {
                       onTap: onPressedProfile,
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundImage: NetworkImage(entry.profileImage),
+                        backgroundImage: NetworkImage(entry.user.avatarUrl),
                       ),
                     ),
-                    /*Positioned(
+                    Positioned(
                       bottom: 0,
                       right: 0,
                       child: Container(
                         width: 12,
                         height: 12,
                         decoration: BoxDecoration(
-                          color: entry.isActive ? Colors.green : Colors.grey,
+                          color: entry.user.isOnline ? Colors.green : Colors.grey,
                           borderRadius: BorderRadius.circular(50),
                           border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
-                    ),*/
+                    ),
                   ],
                 ),
                 const SizedBox(width: 10),
@@ -72,14 +72,14 @@ class EntryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      entry.userName,
+                      entry.user.name,
                       style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                           color: Color(0xff414751)),
                     ),
                     Text(
-                      formatSimpleDateClock(entry.entryDate),
+                      formatSimpleDateClock(entry.createdAt),
                       style: const TextStyle(
                           fontSize: 10,
                           color: Color(0xff9ca3ae),
@@ -94,7 +94,7 @@ class EntryCard extends StatelessWidget {
 
             //  Entry Başlığı
             Text(
-              entry.entryTitle,
+              entry.content,
               style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13.28,
@@ -104,7 +104,7 @@ class EntryCard extends StatelessWidget {
 
             //  Entry Açıklaması
             Text(
-              entry.entryDescription,
+              entry.content,
               style: const TextStyle(
                   fontSize: 12,
                   color: Color(0xff9ca3ae),
@@ -184,7 +184,7 @@ class EntryCard extends StatelessWidget {
                   width: 10,
                 ),
                 //  Okul İlişkileri Butonu
-                GestureDetector(
+               GestureDetector(
                   onTap: () {
                     // Butona tıklanınca yapılacak işlemi buraya ekleyin
                   },
@@ -196,7 +196,7 @@ class EntryCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child:  Text(
-                      entry.topicTitle,
+                      entry.content,
                       style: TextStyle(fontSize: 12, color: Color(0xff9ca3ae)),
                     ),
                   ),

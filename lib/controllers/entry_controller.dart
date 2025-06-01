@@ -1,3 +1,4 @@
+import 'package:edusocial/models/topic_model.dart';
 import 'package:edusocial/services/entry_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ class EntryController extends GetxController {
   var entryPersonList = <EntryModel>[].obs;
   final RxList<EntryModel> filteredByCategoryList = <EntryModel>[].obs;
   final RxList<EntryModel> filteredEntries = <EntryModel>[].obs;
+var currentTopic = Rxn<TopicModel>();
 
   RxMap<String, int> categoryMap = <String, int>{}.obs; // 🔁 Kategori adı -> id
   RxList<String> categoryEntry = <String>[].obs; // UI’da gösterilecek kategori adları
@@ -28,20 +30,27 @@ final RxString topicName = ''.obs;
   });
   }
 
-/// 🔄 Seçilen kategoriye ait entry'leri getir
 Future<void> fetchEntriesForSelectedCategory() async {
   final categoryName = selectedCategory.value;
   final categoryId = getCategoryIdFromName(categoryName);
 
   isEntryLoading.value = true;
 
-  final entries = await EntryServices.fetchEntriesByTopicId(categoryId);
+  final response = await EntryServices.fetchEntriesByTopicId(categoryId);
 
-  // 🔄 Hem genel hem filtrelenmiş listeye atama yap
-  entryList.value = entries;
-  filteredByCategoryList.value = entries;
+  if (response != null) {
+    topicName.value = response.topic.name;
+    entryList.value = response.entries;
+    filteredByCategoryList.value = response.entries;
+  } else {
+    entryList.clear();
+    filteredByCategoryList.clear();
+    topicName.value = "";
+  }
+
   isEntryLoading.value = false;
 }
+
 
 
   /// 🔁 Backend'den kategori listesini al
@@ -100,7 +109,7 @@ void shareEntryPost() async {
   void shareEntry() {
     Get.toNamed("/entryShare");
   }
-
+/*
   void upvotePersonEntry(int index) {
     entryPersonList[index].upvoteCount++;
     entryPersonList.refresh();
@@ -119,5 +128,5 @@ void shareEntryPost() async {
   void downvoteEntry(int index) {
     entryList[index].downvoteCount++;
     entryList.refresh();
-  }
+  }*/
 }

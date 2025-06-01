@@ -240,8 +240,8 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
             child: EntryCard(
               onPressed: () {},
               entry: entry,
-              onUpvote: () => entryController.upvoteEntry(index),
-              onDownvote: () => entryController.downvoteEntry(index),
+              onUpvote: (){},
+              onDownvote: (){},
               onShare: () {},
             ),
           );

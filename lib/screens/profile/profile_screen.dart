@@ -198,8 +198,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                 Get.toNamed("/entryDetail", arguments: entry);
               },
               entry: entry,
-              onUpvote: () => entryController.upvoteEntry(index),
-              onDownvote: () => entryController.downvoteEntry(index),
+              onUpvote: () {},
+              onDownvote: () {},
               onShare: () {},
             ),
           );

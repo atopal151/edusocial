@@ -1,20 +1,24 @@
-import 'entry_model.dart'; // mevcut EntryModel
-import 'topic_model.dart'; // aşağıda vereceğim
-class TopicWithEntryModel {
+import 'package:edusocial/models/entry_model.dart';
+import 'package:edusocial/models/topic_model.dart';
+
+class TopicEntryResponse {
   final TopicModel topic;
   final List<EntryModel> entries;
 
-  TopicWithEntryModel({
+  TopicEntryResponse({
     required this.topic,
     required this.entries,
   });
 
-  factory TopicWithEntryModel.fromJson(Map<String, dynamic> json) {
-    return TopicWithEntryModel(
-      topic: TopicModel.fromJson(json["topic"]),
-      entries: (json["entrys"] as List<dynamic>)
-          .map((e) => EntryModel.fromJson(e))
-          .toList(),
+  factory TopicEntryResponse.fromJson(Map<String, dynamic> json) {
+    final topicJson = json['topic'];
+    final entryList = json['entrys'];
+
+    return TopicEntryResponse(
+      topic: TopicModel.fromJson(topicJson),
+      entries: entryList != null
+          ? (entryList as List).map((e) => EntryModel.fromJson(e)).toList()
+          : [],
     );
   }
 }

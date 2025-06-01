@@ -58,8 +58,8 @@ class _EntryScreenState extends State<EntryScreen> {
                 final query = value.toLowerCase();
                 filteredEntries.assignAll(
                   entryController.entryList.where((entry) {
-                    return entry.entryTitle.toLowerCase().contains(query) ||
-                        entry.entryDescription.toLowerCase().contains(query);
+                    return entry.content.toLowerCase().contains(query) ||
+                        entry.content.toLowerCase().contains(query);
                   }).toList(),
                 );
               },
@@ -140,10 +140,10 @@ class _EntryScreenState extends State<EntryScreen> {
                   final searchText = entrySearchController.text.toLowerCase();
                   filteredEntries.assignAll(
                     entryController.entryList.where((entry) {
-                      return entry.entryTitle
+                      return entry.content
                               .toLowerCase()
                               .contains(searchText) ||
-                          entry.entryDescription
+                          entry.content
                               .toLowerCase()
                               .contains(searchText);
                     }).toList(),
@@ -164,11 +164,11 @@ class _EntryScreenState extends State<EntryScreen> {
                       onPressed: () {
                         Get.toNamed("/entryDetail", arguments: entry);
                       },
-                      onUpvote: () => entryController.upvoteEntry(index),
-                      onDownvote: () => entryController.downvoteEntry(index),
+                      onUpvote: (){},
+                      onDownvote: () {},
                       onShare: () {
                         final String shareText =
-                            "${entry.userName} bir gönderi paylaştı: \n\n${entry.entryDescription}";
+                            "";
                         showModalBottomSheet(
                           context: context,
                           shape: const RoundedRectangleBorder(
