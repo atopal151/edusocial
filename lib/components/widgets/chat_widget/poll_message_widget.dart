@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/chat_detail_model.dart';
+import '../../../models/chat_models/chat_detail_model.dart';
 
 class PollMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -20,7 +20,7 @@ class PollMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment:
-          message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+          message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         width: 250,
         margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
@@ -31,20 +31,20 @@ class PollMessageWidget extends StatelessWidget {
             bottomLeft: const Radius.circular(15),
             bottomRight: const Radius.circular(15),
             topLeft:
-                message.isSentByMe ? const Radius.circular(15) : Radius.zero,
+                message.isMe ? const Radius.circular(15) : Radius.zero,
             topRight:
-                message.isSentByMe ? Radius.zero : const Radius.circular(15),
+                message.isMe ? Radius.zero : const Radius.circular(15),
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(message.content,
+            Text(message.message,
                 style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 10,
                     color: Color(0xff414751))),
-            const SizedBox(height: 10),
+          /*  const SizedBox(height: 10),
             ...?message.pollOptions?.map((option) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Obx(() => GestureDetector(
@@ -95,7 +95,7 @@ class PollMessageWidget extends StatelessWidget {
                           ),
                         ),
                       )),
-                )),
+                )),*/
           ],
         ),
       ),

@@ -1,13 +1,9 @@
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/message_input_field.dart';
-import '../../../components/widgets/chat_widget/document_message_widget.dart';
-import '../../../components/widgets/chat_widget/image_message_widget.dart';
-import '../../../components/widgets/chat_widget/link_messaje_widget.dart';
-import '../../../components/widgets/chat_widget/poll_message_widget.dart';
 import '../../../components/widgets/chat_widget/text_message_widget.dart';
 import '../../../controllers/social/chat_detail_controller.dart';
-import '../../../models/chat_detail_model.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key});
@@ -20,6 +16,20 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final ChatDetailController controller = Get.put(ChatDetailController());
 
   TextEditingController messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Örnek: route parametrelerinden veya LoginController’dan alabilirsin
+
+    final conversationId = Get.arguments['conversationId'];
+    final currentUserId =
+        Get.find<ProfileController>().userId.value; // ya da sabit test ID'si
+
+    controller.fetchConversationMessages(conversationId, currentUserId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +84,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               child: Obx(() => ListView.builder(
                     controller: controller.scrollController,
                     itemCount: controller.messages.length,
+                    padding: const EdgeInsets.only(bottom: 75),
+                    itemBuilder: (context, index) {
+                      final message = controller.messages[index];
+                      return TextMessageWidget(message: message);
+                    },
+                  )),
+            ),
+
+            /* Expanded(
+              child: Obx(() => ListView.builder(
+                    controller: controller.scrollController,
+                    itemCount: controller.messages.length,
                     padding: EdgeInsets.only(bottom: 75),
                     itemBuilder: (context, index) {
                       final message = controller.messages[index];
@@ -104,7 +126,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       }
                     },
                   )),
-            ),
+            ),*/
             Container(
               decoration: BoxDecoration(color: Color(0xffffffff)),
               child: Padding(

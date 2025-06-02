@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../models/chat_detail_model.dart';
+import '../../../models/chat_models/chat_detail_model.dart';
 
 class ImageMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -15,20 +15,20 @@ class ImageMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment:
-          message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+          message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
-          child: isLocalFile(message.content)
+          child: isLocalFile(message.message)
               ? Image.file(
-                  File(message.content),
+                  File(message.message),
                   width: 200,
                   height: 150,
                   fit: BoxFit.cover,
                 )
               : Image.network(
-                  message.content,
+                  message.message,
                   width: 200,
                   height: 150,
                   fit: BoxFit.cover,

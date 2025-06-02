@@ -1,4 +1,4 @@
-import 'package:edusocial/controllers/social/match_controller.dart';
+import 'package:edusocial/controllers/match_controller.dart';
 import 'package:get/get.dart';
 
 class MatchBinding extends Bindings {

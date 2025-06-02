@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../models/chat_detail_model.dart';
+import '../../../models/chat_models/chat_detail_model.dart';
 
 class LinkMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -10,10 +10,10 @@ class LinkMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => launchUrl(Uri.parse(message.content)),
+      onTap: () => launchUrl(Uri.parse(message.message)),
       child: Align(
         alignment:
-            message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            message.isMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           padding: EdgeInsets.all(12),
@@ -22,7 +22,7 @@ class LinkMessageWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
-            message.content,
+            message.message,
             style: TextStyle(
                 color: Colors.blue, decoration: TextDecoration.underline),
           ),

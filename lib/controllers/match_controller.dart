@@ -2,8 +2,8 @@ import 'package:edusocial/services/match_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../models/match_model.dart';
-import '../nav_bar_controller.dart';
+import '../models/match_model.dart';
+import 'nav_bar_controller.dart';
 
 class MatchController extends GetxController {
   final TextEditingController textFieldController = TextEditingController();

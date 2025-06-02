@@ -1,55 +1,128 @@
-import '../models/chat_model.dart';
+import 'dart:convert';
+
+import 'package:edusocial/models/chat_models/chat_detail_model.dart';
+import 'package:edusocial/models/chat_models/chat_user_model.dart';
+import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
+import '../models/chat_models/chat_model.dart';
 
 class ChatServices {
-  /// **Online arkadaş listesini API'den çekme (Simüle)**
-  static Future<List<UserModel>> fetchOnlineFriends() async {
-    await Future.delayed(Duration(seconds: 1)); // Simüle gecikme
-    return [
-      UserModel(
-        id: 1,
-        name: "Alexander Rybak",
-        username: "@alexenderrybak",
-        profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
-        isOnline: true,
-      ),
-      UserModel(
-        id: 2,
-        username: "@sophiemorre",
-        name: "Sophia Moore",
-        profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
-        isOnline: false,
-      ),
-    ];
+  static final _box = GetStorage();
+
+
+
+  static Future<List<ChatUserModel>> fetchOnlineFriends() async {
+    final token = _box.read('token');
+    final url = Uri.parse("${AppConstants.baseUrl}/timeline/last-conversation");
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      debugPrint("🌐 URL: ${url.toString()}");
+      debugPrint("🔑 Token: $token");
+      debugPrint("📥 Response Status Code: ${response.statusCode}");
+      debugPrint("📥 Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final dataList = body['data'] as List<dynamic>;
+
+        final chatList = dataList
+            .map((json) => ChatUserModel.fromJson(json))
+            .toList();
+
+        debugPrint("✅ Chat List: $chatList");
+
+        return chatList;
+      } else {
+        throw Exception("Failed to fetch last conversation.");
+      }
+    } catch (e) {
+      debugPrint("🛑 Hata: $e");
+      rethrow;
+    }
   }
 
-  /// **Mesaj listesini API'den çekme (Simüle)**
-  static Future<List<ChatModel>> fetchChatList() async {
-    await Future.delayed(Duration(seconds: 1)); // Simüle gecikme
-    return [
-      ChatModel(
-        sender: UserModel(
-          id: 1,
-          name: "Alexander Rybak",
-          username: "@alexenderrybak",
-          profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
-          isOnline: true,
-        ),
-        lastMessage: "Geziciler Dostoyevski'yi İsviçre peyniri sanıyor",
-        lastMessageTime: "23:08",
-        unreadCount: 12,
-      ),
-      ChatModel(
-        sender: UserModel(
-          id: 2,
-          name: "Sophia Moore",
-          username: "@sophiemorre",
-          profileImage: "https://randomuser.me/api/portraits/women/2.jpg",
-          isOnline: false,
-        ),
-        lastMessage: "Bugün okulda olan olayı duydunuz mu?",
-        lastMessageTime: "22:45",
-        unreadCount: 5,
-      ),
-    ];
+  /// Mesaj detaylarını getir (Show Conversation)
+static Future<List<MessageModel>> fetchConversationMessages(
+    int conversationId, String currentUserId) async {
+  final token = _box.read('token');
+  final response = await http.get(
+    Uri.parse('${AppConstants.baseUrl}/conversation/$conversationId'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    },
+  );
+
+  //debugPrint("✅ Show Conversation JSON: ${response.body}", wrapWidth: 1024);
+
+  if (response.statusCode == 200) {
+    final body = jsonDecode(response.body);
+    final List<dynamic> messagesJson = body['data'];
+
+    return messagesJson
+        .map((json) => MessageModel.fromJson(json as Map<String, dynamic>))
+        .toList();
+  } else {
+    throw Exception('Mesajlar getirilemedi!');
   }
+}
+
+
+
+
+  
+  /// Birebir mesaj listesi çek
+  static Future<List<ChatModel>> fetchChatList() async {
+    try {
+      final token = _box.read('token');
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/conversation'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        //debugPrint("✅ Gelen JSON Body:");
+        //debugPrint(jsonEncode(body));
+
+        if (body is Map<String, dynamic> && body.containsKey('data')) {
+          final data = body['data'];
+          if (data is List) {
+            return data.map((json) {
+            //  debugPrint("🔍 Her chat JSON:");
+             // debugPrint(jsonEncode(json));
+              return ChatModel.fromJson(json);
+            }).toList();
+          } else {
+            debugPrint("⚠️ 'data' alanı liste değilmiş. Tip: ${data.runtimeType}");
+            return [];
+          }
+        } else {
+          debugPrint("⚠️ 'data' alanı yok veya map değil!");
+          return [];
+        }
+      } else {
+        debugPrint("❌ Chat listesi çekilemedi. StatusCode: ${response.statusCode}");
+        throw Exception('Chat listesi alınamadı.');
+      }
+    } catch (e) {
+      debugPrint("❌ Chat listesi çekilirken hata: $e");
+      rethrow;
+    }
+  }
+
+
 }

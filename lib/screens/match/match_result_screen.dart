@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../components/cards/match_card/match_card.dart';
 import '../../components/user_appbar/user_appbar.dart';
-import '../../controllers/social/match_controller.dart';
+import '../../controllers/match_controller.dart';
 
 class MatchResultScreen extends StatefulWidget {
   const MatchResultScreen({super.key});

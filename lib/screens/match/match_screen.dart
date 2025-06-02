@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_textfield_step2.dart';
 import '../../components/lists/custom_chip_list.dart';
-import '../../controllers/social/match_controller.dart';
+import '../../controllers/match_controller.dart';
 
 class MatchScreen extends StatefulWidget {
   const MatchScreen({super.key});

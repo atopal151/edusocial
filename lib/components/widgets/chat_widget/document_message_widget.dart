@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/chat_detail_model.dart';
+import '../../../models/chat_models/chat_detail_model.dart';
 
 class DocumentMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -9,7 +9,7 @@ class DocumentMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         padding: EdgeInsets.all(10),
@@ -24,7 +24,7 @@ class DocumentMessageWidget extends StatelessWidget {
             SizedBox(width: 10),
             Flexible(
               child: Text(
-                message.content.split('/').last, // dosya adı
+                message.message.split('/').last, // dosya adı
                 style: TextStyle(fontSize: 12),
                 overflow: TextOverflow.ellipsis,
               ),

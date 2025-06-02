@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../controllers/social/match_controller.dart';
+import '../../../controllers/match_controller.dart';
 
 class MatchCard extends StatefulWidget {
   const MatchCard({super.key});

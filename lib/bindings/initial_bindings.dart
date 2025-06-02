@@ -1,6 +1,7 @@
+import 'package:edusocial/services/socket_services.dart';
 import 'package:get/get.dart';
 import 'package:edusocial/controllers/login_controller.dart';
-import 'package:edusocial/controllers/social/match_controller.dart';
+import 'package:edusocial/controllers/match_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:edusocial/controllers/event_controller.dart';
@@ -31,6 +32,8 @@ class InitialBindings extends Bindings {
     Get.put(GroupController(), permanent: true);
     Get.put(GetMaterialController(), permanent: true);
     Get.put(StoryController(), permanent: true);
+    // 🌐 Socket Service
+    Get.put(SocketService(), permanent: true);
 
     // İhtiyaç anında yüklenecek olanlar (lazy yükleme)
     Get.lazyPut(() => EventController());

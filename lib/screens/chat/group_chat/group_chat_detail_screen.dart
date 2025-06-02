@@ -8,7 +8,7 @@ import '../../../components/widgets/group_chat_widget/group_poll_message_widget.
 import '../../../components/widgets/group_chat_widget/group_text_message_widget.dart';
 import '../../../components/widgets/tree_point_bottom_sheet.dart';
 import '../../../controllers/social/group_chat_detail_controller.dart';
-import '../../../models/group_models/group_message_model.dart';
+import '../../../models/chat_models/group_message_model.dart';
 
 class GroupChatDetailScreen extends StatefulWidget {
   const GroupChatDetailScreen({super.key});
