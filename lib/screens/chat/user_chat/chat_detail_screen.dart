@@ -1,7 +1,8 @@
+import 'package:edusocial/components/widgets/chat_widget/message_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/message_input_field.dart';
-import '../../../components/widgets/chat_widget/text_message_widget.dart';
+import '../../../components/widgets/chat_widget/link_media_text_message_widget.dart';
 import '../../../controllers/social/chat_detail_controller.dart';
 
 class ChatDetailScreen extends StatefulWidget {
@@ -123,7 +124,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     padding: const EdgeInsets.only(bottom: 75),
                     itemBuilder: (context, index) {
                       final message = controller.messages[index];
-                      return TextMessageWidget(message: message);
+                      return MessageWidgetFactory.buildMessageWidget(message);
                     },
                   )),
             ),

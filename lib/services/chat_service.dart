@@ -11,8 +11,6 @@ import '../models/chat_models/chat_model.dart';
 class ChatServices {
   static final _box = GetStorage();
 
-
-
   static Future<List<ChatUserModel>> fetchOnlineFriends() async {
     final token = _box.read('token');
     final url = Uri.parse("${AppConstants.baseUrl}/timeline/last-conversation");
@@ -26,20 +24,19 @@ class ChatServices {
         },
       );
 
-      debugPrint("🌐 URL: ${url.toString()}");
-      debugPrint("🔑 Token: $token");
-      debugPrint("📥 Response Status Code: ${response.statusCode}");
-      debugPrint("📥 Response Body: ${response.body}");
+      // debugPrint("🌐 URL: ${url.toString()}");
+      //debugPrint("🔑 Token: $token");
+      // debugPrint("📥 Response Status Code: ${response.statusCode}");
+      // debugPrint("📥 Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         final dataList = body['data'] as List<dynamic>;
 
-        final chatList = dataList
-            .map((json) => ChatUserModel.fromJson(json))
-            .toList();
+        final chatList =
+            dataList.map((json) => ChatUserModel.fromJson(json)).toList();
 
-        debugPrint("✅ Chat List: $chatList");
+        // debugPrint("✅ Chat List: $chatList");
 
         return chatList;
       } else {
@@ -52,35 +49,31 @@ class ChatServices {
   }
 
   /// Mesaj detaylarını getir (Show Conversation)
-static Future<List<MessageModel>> fetchConversationMessages(
-    int chatId) async {
-  final token = _box.read('token');
-  final response = await http.get(
-    Uri.parse('${AppConstants.baseUrl}/conversation/$chatId'),
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Accept': 'application/json',
-    },
-  );
+  static Future<List<MessageModel>> fetchConversationMessages(
+      int chatId) async {
+    final token = _box.read('token');
+    final response = await http.get(
+      Uri.parse('${AppConstants.baseUrl}/conversation/$chatId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
 
-  //debugPrint('Gönderilen chatId:$chatId');
-  //debugPrint("✅ Show Conversation JSON: ${response.body}", wrapWidth: 1024);
-  if (response.statusCode == 200) {
-    final body = jsonDecode(response.body);
-    final List<dynamic> messagesJson = body['data'];
+    debugPrint('Gönderilen chatId:$chatId');
+    debugPrint("✅ Show Conversation JSON: ${response.body}", wrapWidth: 1024);
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final List<dynamic> messagesJson = body['data'];
 
-    return messagesJson
-        .map((json) => MessageModel.fromJson(json as Map<String, dynamic>))
-        .toList();
-  } else {
-    throw Exception('Mesajlar getirilemedi!');
+      return messagesJson
+          .map((json) => MessageModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } else {
+      throw Exception('Mesajlar getirilemedi!');
+    }
   }
-}
 
-
-
-
-  
   /// Birebir mesaj listesi çek
   static Future<List<ChatModel>> fetchChatList() async {
     try {
@@ -95,19 +88,20 @@ static Future<List<MessageModel>> fetchConversationMessages(
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-       // debugPrint("✅ Gelen JSON Body:");
-       // debugPrint(jsonEncode(body));
+        // debugPrint("✅ Gelen JSON Body:");
+        // debugPrint(jsonEncode(body));
 
         if (body is Map<String, dynamic> && body.containsKey('data')) {
           final data = body['data'];
           if (data is List) {
             return data.map((json) {
-           //   debugPrint("🔍 Her chat JSON:");
-          //    debugPrint(jsonEncode(json));
+              //   debugPrint("🔍 Her chat JSON:");
+              //    debugPrint(jsonEncode(json));
               return ChatModel.fromJson(json);
             }).toList();
           } else {
-            debugPrint("⚠️ 'data' alanı liste değilmiş. Tip: ${data.runtimeType}");
+            debugPrint(
+                "⚠️ 'data' alanı liste değilmiş. Tip: ${data.runtimeType}");
             return [];
           }
         } else {
@@ -115,7 +109,8 @@ static Future<List<MessageModel>> fetchConversationMessages(
           return [];
         }
       } else {
-        debugPrint("❌ Chat listesi çekilemedi. StatusCode: ${response.statusCode}");
+        debugPrint(
+            "❌ Chat listesi çekilemedi. StatusCode: ${response.statusCode}");
         throw Exception('Chat listesi alınamadı.');
       }
     } catch (e) {
@@ -123,6 +118,4 @@ static Future<List<MessageModel>> fetchConversationMessages(
       rethrow;
     }
   }
-
-
 }
