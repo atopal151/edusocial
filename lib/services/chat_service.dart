@@ -53,18 +53,18 @@ class ChatServices {
 
   /// Mesaj detaylarını getir (Show Conversation)
 static Future<List<MessageModel>> fetchConversationMessages(
-    int conversationId, String currentUserId) async {
+    int chatId) async {
   final token = _box.read('token');
   final response = await http.get(
-    Uri.parse('${AppConstants.baseUrl}/conversation/$conversationId'),
+    Uri.parse('${AppConstants.baseUrl}/conversation/$chatId'),
     headers: {
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
     },
   );
 
+  //debugPrint('Gönderilen chatId:$chatId');
   //debugPrint("✅ Show Conversation JSON: ${response.body}", wrapWidth: 1024);
-
   if (response.statusCode == 200) {
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
@@ -95,15 +95,15 @@ static Future<List<MessageModel>> fetchConversationMessages(
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        //debugPrint("✅ Gelen JSON Body:");
-        //debugPrint(jsonEncode(body));
+       // debugPrint("✅ Gelen JSON Body:");
+       // debugPrint(jsonEncode(body));
 
         if (body is Map<String, dynamic> && body.containsKey('data')) {
           final data = body['data'];
           if (data is List) {
             return data.map((json) {
-            //  debugPrint("🔍 Her chat JSON:");
-             // debugPrint(jsonEncode(json));
+           //   debugPrint("🔍 Her chat JSON:");
+          //    debugPrint(jsonEncode(json));
               return ChatModel.fromJson(json);
             }).toList();
           } else {

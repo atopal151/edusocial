@@ -1,4 +1,3 @@
-import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/message_input_field.dart';
@@ -14,51 +13,88 @@ class ChatDetailScreen extends StatefulWidget {
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final ChatDetailController controller = Get.put(ChatDetailController());
-
   TextEditingController messageController = TextEditingController();
+
+  late String name;
+  late String avatarUrl;
+  late bool isOnline;
 
   @override
   void initState() {
     super.initState();
 
-    // Örnek: route parametrelerinden veya LoginController’dan alabilirsin
+    final chatId = Get.arguments['chatId'];
+    controller.fetchConversationMessages(chatId);
 
-    final conversationId = Get.arguments['conversationId'];
-    final currentUserId =
-        Get.find<ProfileController>().userId.value; // ya da sabit test ID'si
+    // AppBar bilgileri:
+    name = Get.arguments['name'] ?? 'Bilinmiyor';
+    avatarUrl = Get.arguments['avatarUrl'] ?? '';
+    isOnline = Get.arguments['isOnline'] ?? false;
 
-    controller.fetchConversationMessages(conversationId, currentUserId);
+    debugPrint('Chat ID: $chatId');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xffffffff),
-        surfaceTintColor: Color(0xffffffff),
+        backgroundColor: const Color(0xffffffff),
+        surfaceTintColor: const Color(0xffffffff),
         title: InkWell(
           onTap: () {
             Get.toNamed("/peopleProfile");
           },
           child: Row(
             children: [
-              CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://randomuser.me/api/portraits/men/1.jpg")),
-              SizedBox(width: 10),
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage:
+                        (avatarUrl.isNotEmpty && !avatarUrl.endsWith('/0'))
+                            ? NetworkImage(avatarUrl)
+                            : null,
+                    child: (avatarUrl.isEmpty || avatarUrl.endsWith('/0'))
+                        ? const Icon(Icons.person,
+                            color: Colors.white, size: 20)
+                        : null,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 15,
+                      height: 15,
+                      decoration: BoxDecoration(
+                        color: isOnline
+                            ? const Color(0xff65d384)
+                            : const Color(0xffd9d9d9),
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Roger Carscraad",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff414751))),
-                  Text("Çevrimiçi",
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xff9ca3ae),
-                          fontWeight: FontWeight.w400)),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff414751)),
+                  ),
+                  Text(
+                    isOnline ? "Çevrimiçi" : "Çevrimdışı",
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xff9ca3ae),
+                        fontWeight: FontWeight.w400),
+                  ),
                 ],
               ),
             ],
@@ -69,15 +105,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             onTap: () {
               Get.toNamed("/user_chat_detail");
             },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Icon(Icons.more_horiz),
             ),
           ),
         ],
       ),
       body: Container(
-        color: Color(0xfffafafa),
+        color: const Color(0xfffafafa),
         child: Column(
           children: [
             Expanded(
@@ -91,44 +127,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     },
                   )),
             ),
-
-            /* Expanded(
-              child: Obx(() => ListView.builder(
-                    controller: controller.scrollController,
-                    itemCount: controller.messages.length,
-                    padding: EdgeInsets.only(bottom: 75),
-                    itemBuilder: (context, index) {
-                      final message = controller.messages[index];
-                      if (message.messageType == MessageType.text) {
-                        return TextMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.document) {
-                        return DocumentMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.image) {
-                        return ImageMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.link) {
-                        return LinkMessageWidget(message: message);
-                      } else if (message.messageType == MessageType.poll) {
-                        return PollMessageWidget(
-                          message: message,
-                          pollVotes: controller.pollVotes,
-                          selectedOption: controller.selectedPollOption,
-                          onVote: controller.votePoll,
-                        );
-                      }
-
-                      /*
-                      else if (message.messageType == MessageType.poll) {
-                        return PollMessageWidget(message: message);
-                      } */
-
-                      else {
-                        return Container();
-                      }
-                    },
-                  )),
-            ),*/
             Container(
-              decoration: BoxDecoration(color: Color(0xffffffff)),
+              decoration: const BoxDecoration(color: Color(0xffffffff)),
               child: Padding(
                 padding: const EdgeInsets.only(
                     left: 16.0, right: 16, top: 8, bottom: 20),

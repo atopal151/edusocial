@@ -35,6 +35,7 @@ class ChatController extends GetxController {
       isLoading(true);
       final friends = await ChatServices.fetchOnlineFriends();
       onlineFriends.assignAll(friends);
+      debugPrint('Online Arkadaşlar:$friends', wrapWidth: 1024);
     } catch (e) {
       debugPrint('Online arkadaşlar çekilirken hata: $e');
     } finally {
@@ -47,7 +48,7 @@ class ChatController extends GetxController {
       isLoading(true);
       final fetchedChats = await ChatServices.fetchChatList();
 
-      // last_message alanı null olanları filtrele
+      // last_message alanı null olanları filtrelemiyoruz
       final filteredChats =
           fetchedChats.where((chat) => chat.lastMessage != null).toList();
 
@@ -109,6 +110,7 @@ class ChatController extends GetxController {
         chatList.add(ChatModel(
           id: data['sender_id'] ?? 0,
           name: data['sender']['name'] ?? '',
+          surname: data['sender']['surname'] ?? '',
           username: data['sender']['username'] ?? '',
           avatar: data['sender']['avatar_url'] ?? '',
           conversationId: conversationId,
@@ -162,9 +164,15 @@ class ChatController extends GetxController {
   }
 
   /// 📃 Chat detay sayfasına yönlendir
-  void getChatDetailPage(int conversationId) {
-    Get.toNamed("/chat_detail", arguments: {
-      'conversationId': conversationId, // int veya String olabilir
+  void getChatDetailPage(int chatId,
+      {required String name,
+      required String avatarUrl,
+      required bool isOnline}) {
+    Get.toNamed('/chat_detail', arguments: {
+      'chatId': chatId,
+      'name': name,
+      'avatarUrl': avatarUrl,
+      'isOnline': isOnline,
     });
   }
 

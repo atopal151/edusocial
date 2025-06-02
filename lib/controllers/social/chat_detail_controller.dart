@@ -149,31 +149,30 @@ class ChatDetailController extends GetxController {
     selectedPollOption.value = option;
   }
 
-void fetchConversationMessages(int conversationId, String currentUserId) async {
-  try {
-    isLoading.value = true;
-    final fetchedMessages = await ChatServices.fetchConversationMessages(conversationId, currentUserId);
+  void fetchConversationMessages(int chatId) async {
+    try {
+      isLoading.value = true;
+      final fetchedMessages =
+          await ChatServices.fetchConversationMessages(chatId);
 
-   // debugPrint("📝 API'den gelen veri: $fetchedMessages");
-    //debugPrint("fetchedMessages runtimeType: ${fetchedMessages.runtimeType}");
-    if (fetchedMessages.isNotEmpty) {
-      debugPrint("fetchedMessages[0] runtimeType: ${fetchedMessages[0].runtimeType}");
+      // debugPrint("📝 API'den gelen veri: $fetchedMessages");
+      //debugPrint("fetchedMessages runtimeType: ${fetchedMessages.runtimeType}");
+      if (fetchedMessages.isNotEmpty) {
+        debugPrint(
+            "fetchedMessages[0] runtimeType: ${fetchedMessages[0].runtimeType}");
+      }
+
+      messages.assignAll(fetchedMessages);
+      //debugPrint('MESAJLAR: $messages');
+    } catch (e, stackTrace) {
+      debugPrint("🛑 Mesajlar getirilemedi: $e");
+      debugPrint(stackTrace.toString());
+    } finally {
+      isLoading.value = false;
     }
-
-    messages.assignAll(fetchedMessages);
-    //debugPrint('MESAJLAR: $messages');
-    scrollToBottom();
-  } catch (e, stackTrace) {
-    debugPrint("🛑 Mesajlar getirilemedi: $e");
-    debugPrint(stackTrace.toString());
-  } finally {
-    isLoading.value = false;
   }
-}
-
 
   void sendPoll(String question, List<String> options) {
-    
     scrollToBottom();
   }
 
@@ -181,7 +180,6 @@ void fetchConversationMessages(int conversationId, String currentUserId) async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      
       scrollToBottom();
     }
   }
@@ -197,8 +195,6 @@ void fetchConversationMessages(int conversationId, String currentUserId) async {
         final filePath = result.files.single.path!;
         debugPrint("Seçilen dosya: $filePath", wrapWidth: 1024);
 
-       
-
         scrollToBottom();
       }
     } catch (e) {
@@ -207,7 +203,6 @@ void fetchConversationMessages(int conversationId, String currentUserId) async {
   }
 
   void sendMessage(String text) {
-    
     scrollToBottom();
   }
 
@@ -222,9 +217,11 @@ void fetchConversationMessages(int conversationId, String currentUserId) async {
   }
 
   void simulateIncomingMessages() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
-
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.delayed(const Duration(milliseconds: 1500), () {
       scrollToBottom();
     });
-  }
+  });
+}
+
 }

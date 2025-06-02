@@ -1,4 +1,5 @@
 import 'package:edusocial/components/input_fields/search_text_field.dart';
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/user_appbar/user_appbar.dart';
@@ -66,10 +67,16 @@ class _ChatListScreenState extends State<ChatListScreen>
                         itemBuilder: (context, index) {
                           final friend = chatController.onlineFriends[index];
                           return Padding(
-                            padding: const EdgeInsets.only(left:10,right: 1),
+                            padding: const EdgeInsets.only(left: 10, right: 1),
                             child: GestureDetector(
                               onTap: () {
-                                 //chatController.getChatDetailPage();
+                                debugPrint('tıklanan chat id:${friend.id}');
+                                chatController.getChatDetailPage(
+                                  friend.id,
+                                  name: friend.name,
+                                  avatarUrl: friend.profileImage,
+                                  isOnline: friend.isOnline,
+                                );
                               },
                               child: Column(
                                 children: [
@@ -163,7 +170,13 @@ class _ChatListScreenState extends State<ChatListScreen>
             final chat = chatController.filteredChatList[index];
             return GestureDetector(
               onTap: () {
-                chatController.getChatDetailPage(chat.conversationId);
+                debugPrint('tıklanan chat id:${chat.id}');
+                chatController.getChatDetailPage(
+                  chat.id,
+                  name: chat.name,
+                  avatarUrl: chat.avatar,
+                  isOnline: chat.isOnline,
+                );
               },
               child: Padding(
                 padding:
@@ -206,7 +219,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              chat.username,
+                              chat.name,
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 13),
                             ),
@@ -223,7 +236,8 @@ class _ChatListScreenState extends State<ChatListScreen>
                       Column(
                         children: [
                           Text(
-                            chat.lastMessage?.createdAt ?? '',
+                            formatSimpleDateClock(
+                                chat.lastMessage?.createdAt ?? ''),
                             style: const TextStyle(
                                 fontSize: 10, color: Colors.grey),
                           ),

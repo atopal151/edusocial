@@ -16,6 +16,7 @@ class MessageModel {
   final ConversationModel conversation;
   final List<MessageMediaModel> messageMedia;
   final List<MessageLinkModel> messageLink;
+  final String? senderAvatarUrl; // 💡 Yeni alan
 
   MessageModel({
     required this.id,
@@ -30,9 +31,11 @@ class MessageModel {
     required this.conversation,
     required this.messageMedia,
     required this.messageLink,
+    this.senderAvatarUrl, // 💡 Yeni alan
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
+    final senderJson = json['sender'];
     return MessageModel(
       id: json['id'] is int
           ? json['id']
@@ -46,8 +49,8 @@ class MessageModel {
       message: json['message'] ?? '',
       isRead: json['is_read'] == true ||
           (json['is_read'] is int && json['is_read'] == 1),
-      isMe: json['is_me'] == true ||
-          (json['is_me'] is int && json['is_me'] == 1),
+      isMe:
+          json['is_me'] == true || (json['is_me'] is int && json['is_me'] == 1),
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       sender: json['sender'] != null
@@ -64,6 +67,9 @@ class MessageModel {
               ?.map((e) => MessageLinkModel.fromJson(e))
               .toList() ??
           [],
+      senderAvatarUrl: senderJson != null
+          ? senderJson['avatar_url'] ?? ""
+          : "", // 💡 Avatar URL'yi çek
     );
   }
 }
