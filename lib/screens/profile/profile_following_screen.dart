@@ -18,6 +18,7 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: BackAppBar(
+        title: 'Takip edilen',
         backgroundColor: Color(0xfffafafa),
         iconBackgroundColor: Color(0xffffffff),
       ),
@@ -30,7 +31,7 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
                   backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
                 ),
                 title: Text(
-                  '${user["name"]} ${user["surname"]}',
+                  '${user["name"]} ${user["surname"]} ',
                   style: TextStyle(
                       fontSize: 13.28,
                       fontWeight: FontWeight.w400,

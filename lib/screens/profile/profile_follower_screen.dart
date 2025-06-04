@@ -18,6 +18,7 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: BackAppBar(
+        title: 'Takipçi',
         backgroundColor: Color(0xfffafafa),
         iconBackgroundColor: Color(0xffffffff),
       ),

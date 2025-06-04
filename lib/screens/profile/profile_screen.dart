@@ -158,22 +158,25 @@ class _ProfileScreenState extends State<ProfileScreen>
       return const Center(child: Text("Hiç gönderi bulunamadı."));
     }
 
-    return ListView.builder(
-      itemCount: posts.length,
-      itemBuilder: (context, index) {
-        final post = posts[index];
-        return PostCard(
-          postId: post.id,
-          profileImage: post.profileImage,
-          userName: post.userName,
-          postDate: post.postDate,
-          postDescription: post.postDescription,
-          mediaUrls: post.mediaUrls,
-          likeCount: post.likeCount,
-          commentCount: post.commentCount,
-          isLiked: post.isLiked,
-        );
-      },
+    return Container(
+      decoration: BoxDecoration(color: Color(0xfffafafa)),
+      child: ListView.builder(
+        itemCount: posts.length,
+        itemBuilder: (context, index) {
+          final post = posts[index];
+          return PostCard(
+            postId: post.id,
+            profileImage: post.profileImage,
+            userName: post.userName,
+            postDate: post.postDate,
+            postDescription: post.postDescription,
+            mediaUrls: post.mediaUrls,
+            likeCount: post.likeCount,
+            commentCount: post.commentCount,
+            isLiked: post.isLiked,
+          );
+        },
+      ),
     );
   }
 
@@ -193,7 +196,6 @@ class _ProfileScreenState extends State<ProfileScreen>
           return Container(
             color: Color(0xfffafafa),
             child: EntryCard(
-
               onPressed: () {
                 Get.toNamed("/entryDetail", arguments: entry);
               },

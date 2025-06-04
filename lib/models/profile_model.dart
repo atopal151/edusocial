@@ -1,4 +1,6 @@
 import 'package:edusocial/models/post_model.dart';
+import 'package:edusocial/models/school_department_model.dart';
+import 'package:edusocial/models/school_model.dart';
 
 class ProfileModel {
   final int id;
@@ -39,8 +41,8 @@ class ProfileModel {
   final List<PostModel> posts;
   final dynamic language;
   final List<dynamic> approvedGroups;
-  final Map<String, dynamic>? school;
-  final Map<String, dynamic>? schoolDepartment;
+  final SchoolModel? school;
+  final SchoolDepartmentModel? schoolDepartment;
   final List<String> lessons;
   final List<dynamic> followings;
   final List<dynamic> followers;
@@ -146,9 +148,12 @@ class ProfileModel {
           [],
       language: json['language']['name'],
       approvedGroups: json['approved_groups'] ?? [],
-      school: json['school']['name'] is Map<String, dynamic> ? json['school']['name'] : null,
-      schoolDepartment: json['school_department']['title'] is Map<String, dynamic>
-          ? json['school_department']['title']
+      school: json['school'] != null && json['school'] is Map<String, dynamic>
+          ? SchoolModel.fromJson(json['school'])
+          : null,
+      schoolDepartment: json['school_department'] != null &&
+              json['school_department'] is Map<String, dynamic>
+          ? SchoolDepartmentModel.fromJson(json['school_department'])
           : null,
       lessons: (json['lessons'] as List?)
               ?.map((e) => e is Map && e.containsKey('name')

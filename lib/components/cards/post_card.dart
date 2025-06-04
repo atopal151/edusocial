@@ -80,12 +80,18 @@ class _PostCardState extends State<PostCard> {
                 Row(
                   children: [
                     InkWell(
-                      onTap: () => profileController.getToPeopleProfileScreen(),
-                      child: CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(widget.profileImage),
-                      ),
-                    ),
+                        onTap: () =>
+                            profileController.getToPeopleProfileScreen(),
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.grey.shade300, // Gri arkaplan
+                          backgroundImage: widget.profileImage.isNotEmpty
+                              ? NetworkImage(widget.profileImage)
+                              : null, // Eğer profil resmi varsa kullan
+                          child: widget.profileImage.isEmpty
+                              ? const Icon(Icons.person, color: Colors.white)
+                              : null, // Profil resmi yoksa ikon
+                        )),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(

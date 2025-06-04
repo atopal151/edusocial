@@ -52,11 +52,11 @@ Widget buildProfileDetails() {
                         CircleAvatar(
                           backgroundColor: Color(0xfffafafa),
                           radius: 20,
-                          backgroundImage: (profileData.school?['logo']
+                          backgroundImage: (profileData.school?.logo
                                       ?.toString()
                                       .isNotEmpty ??
                                   false)
-                              ? NetworkImage(profileData.school!['logo'])
+                              ? NetworkImage(profileData.school!.logo.toString())
                               : AssetImage('images/school_logo.png')
                                   as ImageProvider,
                         ),
@@ -65,7 +65,7 @@ Widget buildProfileDetails() {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData.school?['name']?? "Okul bilgisi yok",
+                              profileData.school?.name?? "Okul bilgisi yok",
                               style: const TextStyle(
                                 fontSize: 13.28,
                                 fontWeight: FontWeight.w600,
@@ -73,7 +73,7 @@ Widget buildProfileDetails() {
                               ),
                             ),
                             Text(
-                              "${profileData.schoolDepartment?['name'] ?? "Bölüm bilgisi yok"} • ${profileData.schoolDepartment?['name'] ?? ""}",
+                              "${profileData.schoolDepartment?.title ?? "Bölüm bilgisi yok"} ",
                               style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w400,

@@ -71,9 +71,9 @@ class ProfileController extends GetxController {
       lessons.value = data.lessons;
 
       // 📌 Okul ve Bölüm Bilgileri
-      schoolName.value = data.school?['name'] ?? 'Okul bilgisi yok';
+      schoolName.value = data.school?.name ?? 'Okul bilgisi yok';
       schoolDepartment.value =
-          data.schoolDepartment?['title'] ?? 'Bölüm bilgisi yok';
+          data.schoolDepartment?.title ?? 'Bölüm bilgisi yok';
 
       // 📌 Takipçi ve takip edilen sayıları
       followers.value = data.followers.length;
