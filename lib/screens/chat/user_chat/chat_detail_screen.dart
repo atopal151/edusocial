@@ -2,7 +2,6 @@ import 'package:edusocial/components/widgets/chat_widget/message_widget_factory.
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/message_input_field.dart';
-import '../../../components/widgets/chat_widget/link_media_text_message_widget.dart';
 import '../../../controllers/social/chat_detail_controller.dart';
 
 class ChatDetailScreen extends StatefulWidget {
@@ -13,26 +12,35 @@ class ChatDetailScreen extends StatefulWidget {
 }
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
-  final ChatDetailController controller = Get.put(ChatDetailController());
-  TextEditingController messageController = TextEditingController();
+  // Controller'ı permanent olarak Get.put ile register ettik
+  final ChatDetailController controller = Get.put(ChatDetailController(), permanent: true);
 
   late String name;
   late String avatarUrl;
   late bool isOnline;
+  late int chatId;
 
   @override
   void initState() {
     super.initState();
 
-    final chatId = Get.arguments['chatId'];
-    controller.fetchConversationMessages(chatId);
-
-    // AppBar bilgileri:
+    // Chat ID ve diğer bilgileri al
+    chatId = Get.arguments['chatId'];
     name = Get.arguments['name'] ?? 'Bilinmiyor';
     avatarUrl = Get.arguments['avatarUrl'] ?? '';
     isOnline = Get.arguments['isOnline'] ?? false;
 
     debugPrint('Chat ID: $chatId');
+
+    // Mesajları yükle ve dinlemeye başla
+    controller.fetchConversationMessages(chatId);
+    controller.startListeningToNewMessages(chatId);
+  }
+
+  @override
+  void dispose() {
+    controller.stopListeningToNewMessages();
+    super.dispose();
   }
 
   @override
@@ -52,13 +60,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   CircleAvatar(
                     radius: 20,
                     backgroundColor: Colors.grey[300],
-                    backgroundImage:
-                        (avatarUrl.isNotEmpty && !avatarUrl.endsWith('/0'))
-                            ? NetworkImage(avatarUrl)
-                            : null,
+                    backgroundImage: (avatarUrl.isNotEmpty && !avatarUrl.endsWith('/0'))
+                        ? NetworkImage(avatarUrl)
+                        : null,
                     child: (avatarUrl.isEmpty || avatarUrl.endsWith('/0'))
-                        ? const Icon(Icons.person,
-                            color: Colors.white, size: 20)
+                        ? const Icon(Icons.person, color: Colors.white, size: 20)
                         : null,
                   ),
                   Positioned(
@@ -68,9 +74,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       width: 15,
                       height: 15,
                       decoration: BoxDecoration(
-                        color: isOnline
-                            ? const Color(0xff65d384)
-                            : const Color(0xffd9d9d9),
+                        color: isOnline ? const Color(0xff65d384) : const Color(0xffd9d9d9),
                         borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: Colors.white, width: 2),
                       ),
@@ -85,16 +89,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   Text(
                     name,
                     style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff414751)),
+                        fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xff414751)),
                   ),
                   Text(
                     isOnline ? "Çevrimiçi" : "Çevrimdışı",
                     style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xff9ca3ae),
-                        fontWeight: FontWeight.w400),
+                        fontSize: 12, color: Color(0xff9ca3ae), fontWeight: FontWeight.w400),
                   ),
                 ],
               ),
@@ -118,21 +118,22 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         child: Column(
           children: [
             Expanded(
-              child: Obx(() => ListView.builder(
-                    controller: controller.scrollController,
-                    itemCount: controller.messages.length,
-                    padding: const EdgeInsets.only(bottom: 75),
-                    itemBuilder: (context, index) {
-                      final message = controller.messages[index];
-                      return MessageWidgetFactory.buildMessageWidget(message);
-                    },
-                  )),
+              child: Obx(
+                () => ListView.builder(
+                  controller: controller.scrollController,
+                  itemCount: controller.messages.length,
+                  padding: const EdgeInsets.only(bottom: 75),
+                  itemBuilder: (context, index) {
+                    final message = controller.messages[index];
+                    return MessageWidgetFactory.buildMessageWidget(message);
+                  },
+                ),
+              ),
             ),
             Container(
               decoration: const BoxDecoration(color: Color(0xffffffff)),
               child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16.0, right: 16, top: 8, bottom: 20),
+                padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8, bottom: 20),
                 child: buildMessageInputField(),
               ),
             ),

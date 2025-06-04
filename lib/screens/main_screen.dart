@@ -4,8 +4,10 @@ import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
+import 'package:edusocial/services/socket_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../controllers/entry_controller.dart';
 import '../controllers/entry_detail_controller.dart';
 import '../controllers/event_controller.dart';
@@ -32,6 +34,9 @@ class MainScreen extends StatelessWidget {
     Get.put(PostController());
     Get.put(GroupController());
 
+    final token = GetStorage().read('token');
+    debugPrint('Verilen Token: $token');
+    SocketService.to.connectSocket(token);
     return Scaffold(
       body: Obx(() {
         return IndexedStack(

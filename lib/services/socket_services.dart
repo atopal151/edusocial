@@ -3,64 +3,96 @@ import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService extends GetxService {
+  static SocketService get to => Get.find();
+
   late IO.Socket _socket;
+  final _isConnected = false.obs;
 
-  IO.Socket get socket => _socket;
+  bool get isConnected => _isConnected.value;
 
-  /// Socket bağlantısını başlat
+  // Socket URL (Backend tarafından 443 portu için onaylanmış)
+  final String _socketUrl = 'wss://stageapi.edusocial.pl';
+
+  // Socket bağlantısını başlat
   void connectSocket(String token) {
-    _socket = IO.io(
-      'https://stageapi.edusocial.pl:3001',
-      IO.OptionBuilder()
-          .setTransports(['websocket'])
-          .enableAutoConnect()
-          .setAuth({'token': 'Bearer $token'})
-          .build(),
-    );
+    debugPrint('🔑 Gelen Token: $token');
+    if (_isConnected.value) {
+      debugPrint('🔌 Socket zaten bağlı.');
+      return;
+    }
 
-    _socket.connect();
+    try {
+      _socket = IO.io(
+        _socketUrl,
+        IO.OptionBuilder()
+            .setTransports(['websocket']) // websocket harici transport kapalı
+            .enableForceNew() // yeni bağlantı açılır
+            .setAuth({'token': 'Bearer $token'}) // token set edilir
+            .setTimeout(10000) // 10 saniye timeout
+            .build(),
+      );
 
-    _socket.onConnect((_) {
-      debugPrint('✅ Socket bağlantısı başarılı.');
-    });
+      debugPrint('🪝 Socket yapılandırması yapıldı.');
 
-    _socket.onDisconnect((_) {
-      debugPrint('⚠️ Socket bağlantısı koptu.');
-    });
+      // Bağlantı sağlandığında
+      _socket.onConnect((_) {
+        debugPrint('✅ Socket bağlantısı sağlandı.');
+        debugPrint('🟢 Socket ID: ${_socket.id}');
+        _isConnected.value = true;
+      });
 
-    _socket.onError((err) {
-      debugPrint('❌ Socket hatası: $err');
-    });
-  }
+      // Bağlantı koparsa
+      _socket.onDisconnect((_) {
+        debugPrint('❌ Socket bağlantısı kesildi.');
+        _isConnected.value = false;
+      });
 
-  /// Socket bağlantısını kapat
-  void disconnectSocket() {
-    if (_socket.connected) {
-      _socket.disconnect();
-      debugPrint('⛔️ Socket bağlantısı kapatıldı.');
+      // Bağlantı hatası alırsak
+      _socket.onConnectError((data) {
+        debugPrint('⚠️ Socket bağlantı hatası: $data');
+      });
+
+      // Genel hata yakalayıcı
+      _socket.onError((data) {
+        debugPrint('❌ Socket genel hatası: $data');
+      });
+
+      // Dinlenecek eventler
+      _socket.on('conversation:new_message', (data) {
+        debugPrint('📥 Yeni birebir mesaj: $data');
+        // Burada ilgili controller'a yönlendirebilirsin.
+      });
+
+      _socket.on('group_conversation:new_message', (data) {
+        debugPrint('👥 Yeni grup mesajı: $data');
+        // Burada da grup mesaj servisine gönder.
+      });
+
+      _socket.on('conversation:un_read_message_count', (data) {
+        debugPrint('📬 Okunmamış mesaj sayısı: ${data['count']}');
+        // UI veya controller ile paylaşabilirsin.
+      });
+    } catch (e) {
+      debugPrint('🚨 Socket bağlantısı sırasında beklenmeyen hata: $e');
     }
   }
 
-  /// Birebir mesaj dinleyicisi ekle
-  void onPrivateMessage(Function(dynamic data) callback) {
-    _socket.on('conversation:new_message', callback);
+  // Mesaj gönderme örneği
+  void sendMessage(String eventName, dynamic message) {
+    if (_isConnected.value) {
+      _socket.emit(eventName, message);
+      debugPrint('📤 Mesaj gönderildi: $eventName => $message');
+    } else {
+      debugPrint('❌ Socket bağlantısı yok, mesaj gönderilemedi.');
+    }
   }
 
-  /// Grup mesajı dinleyicisi ekle
-  void onGroupMessage(Function(dynamic data) callback) {
-    _socket.on('group_conversation:new_message', callback);
-  }
-
-  /// Okunmamış mesaj sayısı dinleyicisi ekle
-  void onUnreadMessageCount(Function(dynamic data) callback) {
-    _socket.on('conversation:un_read_message_count', callback);
-  }
-
-  /// Dinleyicileri kaldır (sayfa değişince vs.)
-  void removeAllListeners() {
-    _socket.off('conversation:new_message');
-    _socket.off('group_conversation:new_message');
-    _socket.off('conversation:un_read_message_count');
-    debugPrint('🔌 Tüm socket eventleri kaldırıldı.');
+  // Socket bağlantısını kapat
+  void disconnectSocket() {
+    if (_isConnected.value) {
+      _socket.disconnect();
+      _isConnected.value = false;
+      debugPrint('🔌 Socket bağlantısı kapatıldı.');
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:edusocial/services/socket_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -16,17 +17,15 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await GetStorage.init();
 
-  
 
-  
 
   HttpOverrides.global = MyHttpOverrides();
-  runApp(MyApp(initialRoute: Routes.main)); // Hepsini main’e yönlendir
 
+  runApp(MyApp(initialRoute: Routes.main));
 }
+
 
 class MyApp extends StatelessWidget {
   final String initialRoute;

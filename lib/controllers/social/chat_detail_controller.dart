@@ -1,9 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:edusocial/components/buttons/custom_button.dart';
+import 'package:edusocial/controllers/profile_controller.dart';
+import 'package:edusocial/models/chat_models/conversation_model.dart';
+import 'package:edusocial/models/chat_models/sender_model.dart';
 import 'package:edusocial/services/chat_service.dart';
+import 'package:edusocial/services/socket_services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/chat_models/chat_detail_model.dart';
 import '../../models/user_chat_detail_model.dart';
@@ -19,11 +25,61 @@ class ChatDetailController extends GetxController {
   RxMap<String, int> pollVotes = <String, int>{}.obs;
   RxString selectedPollOption = ''.obs;
 
+  Rx<File?> selectedImage = Rx<File?>(null);
   TextEditingController pollTitleController = TextEditingController();
+
+  late int currentChatId;
+  final ProfileController profileController = Get.find<ProfileController>();
+  final SocketService socketService = Get.find<SocketService>();
+
+@override
+void onInit() {
+  super.onInit();
+
+    // Socket Listener'ı sadece 1 kez ekliyoruz
+   /* socketService.onPrivateMessage((data) {
+      onNewPrivateMessage(data);
+    });*/
+}
+
+
   @override
-  void onInit() {
-    super.onInit();
-    simulateIncomingMessages();
+  void onClose() {
+    stopListeningToNewMessages();
+    super.onClose();
+  }
+
+  void onNewPrivateMessage(dynamic data) {
+    final conversationId = data['conversation_id'];
+    if (conversationId == currentChatId) {
+      messages.add(MessageModel.fromJson(data));
+      messages.refresh();
+      scrollToBottom();
+    }
+  }
+
+
+  void startListeningToNewMessages(int chatId) {
+    currentChatId = chatId;
+  }
+
+  void stopListeningToNewMessages() {
+   // socketService.removeAllListeners();
+  }
+
+ void fetchConversationMessages(int chatId) async {
+    try {
+      isLoading.value = true;
+      final fetchedMessages = await ChatServices.fetchConversationMessages(chatId);
+      messages.assignAll(fetchedMessages);
+      messages.refresh();
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+    } catch (e, stackTrace) {
+      debugPrint("🛑 Mesajlar getirilemedi: $e");
+      debugPrint(stackTrace.toString());
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void openPollBottomSheet() {
@@ -37,22 +93,19 @@ class ChatDetailController extends GetxController {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 20),
               TextField(
-                style: TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: 12),
                 controller: pollTitleController,
                 decoration: InputDecoration(
                   hintText: "Anket Başlığı",
                   filled: true,
                   fillColor: const Color(0xfff5f5f5),
-                  hintStyle:
-                      const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -69,7 +122,7 @@ class ChatDetailController extends GetxController {
                           children: [
                             Expanded(
                               child: TextField(
-                                style: TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 12),
                                 decoration: InputDecoration(
                                   hintText: "+ Seçenek Ekle",
                                   filled: true,
@@ -99,22 +152,13 @@ class ChatDetailController extends GetxController {
                   )),
               TextButton.icon(
                 onPressed: () => pollOptions.add(''),
-                icon: const Icon(
-                  Icons.add,
-                  color: Color(0xffED7474),
-                  size: 15,
-                ),
+                icon: const Icon(Icons.add, color: Color(0xffED7474), size: 15),
                 label: const Text(
                   'Seçenek Ekle',
                   style: TextStyle(color: Color(0xffED7474), fontSize: 12),
                 ),
               ),
               const SizedBox(height: 30),
-
-              /**
-               *  backgroundColor: const Color(0xffFFF6F6),
-                    foregroundColor: const Color(0xffED7474),
-               */
               CustomButton(
                   text: "Gönder",
                   height: 45,
@@ -129,8 +173,8 @@ class ChatDetailController extends GetxController {
                     }
                   },
                   isLoading: isLoading,
-                  backgroundColor: Color(0xffFFF6F6),
-                  textColor: Color(0xffED7474)),
+                  backgroundColor: const Color(0xffFFF6F6),
+                  textColor: const Color(0xffED7474)),
               const SizedBox(height: 20),
             ],
           ),
@@ -140,47 +184,15 @@ class ChatDetailController extends GetxController {
     );
   }
 
-  void votePoll(String option) {
-    if (!pollVotes.containsKey(option)) {
-      pollVotes[option] = 1;
-    } else {
-      pollVotes[option] = pollVotes[option]! + 1;
-    }
-    selectedPollOption.value = option;
-  }
-
-  void fetchConversationMessages(int chatId) async {
-    try {
-      isLoading.value = true;
-      final fetchedMessages =
-          await ChatServices.fetchConversationMessages(chatId);
-
-      // debugPrint("📝 API'den gelen veri: $fetchedMessages");
-      //debugPrint("fetchedMessages runtimeType: ${fetchedMessages.runtimeType}");
-      if (fetchedMessages.isNotEmpty) {
-        debugPrint(
-            "fetchedMessages[0] runtimeType: ${fetchedMessages[0].runtimeType}");
-      }
-
-      messages.assignAll(fetchedMessages);
-      //debugPrint('MESAJLAR: $messages');
-    } catch (e, stackTrace) {
-      debugPrint("🛑 Mesajlar getirilemedi: $e");
-      debugPrint(stackTrace.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   void sendPoll(String question, List<String> options) {
     scrollToBottom();
   }
 
   void pickImageFromGallery() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      scrollToBottom();
+      selectedImage.value = File(pickedFile.path);
+      debugPrint("📸 Seçilen resim: ${pickedFile.path}");
     }
   }
 
@@ -193,35 +205,60 @@ class ChatDetailController extends GetxController {
 
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
-        debugPrint("Seçilen dosya: $filePath", wrapWidth: 1024);
-
+        debugPrint("Seçilen dosya: $filePath");
         scrollToBottom();
       }
     } catch (e) {
-      debugPrint("Belge seçme hatası: $e", wrapWidth: 1024);
+      debugPrint("Belge seçme hatası: $e");
     }
   }
+  void sendMessage(String text) async {
+    try {
+      isLoading.value = true;
+      List<File> mediaFilesToSend = [];
+      if (selectedImage.value != null) {
+        mediaFilesToSend.add(selectedImage.value!);
+      }
 
-  void sendMessage(String text) {
-    scrollToBottom();
+      await ChatServices.sendMessage(
+        currentChatId,
+        text,
+        mediaFiles: mediaFilesToSend.isNotEmpty ? mediaFilesToSend : null,
+      );
+
+      messages.add(MessageModel(
+        id: 0,
+        conversationId: currentChatId,
+        senderId: 0,
+        message: text,
+        isRead: true,
+        isMe: true,
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
+        sender: SenderModel.empty(),
+        conversation: ConversationModel.empty(),
+        messageMedia: [],
+        messageLink: [],
+        senderAvatarUrl: '',
+      ));
+
+      messages.refresh();
+      selectedImage.value = null;
+      scrollToBottom();
+    } catch (e) {
+      debugPrint("🛑 Mesaj gönderilemedi: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void scrollToBottom() {
     if (scrollController.hasClients) {
       scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
+        scrollController.position.maxScrollExtent + 100,
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     }
   }
-
-  void simulateIncomingMessages() {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      scrollToBottom();
-    });
-  });
-}
-
 }

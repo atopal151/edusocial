@@ -32,8 +32,10 @@ class InitialBindings extends Bindings {
     Get.put(GroupController(), permanent: true);
     Get.put(GetMaterialController(), permanent: true);
     Get.put(StoryController(), permanent: true);
+    
     // 🌐 Socket Service
-    Get.put(SocketService(), permanent: true);
+    Get.lazyPut<SocketService>(() => SocketService());
+
 
     // İhtiyaç anında yüklenecek olanlar (lazy yükleme)
     Get.lazyPut(() => EventController());

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:edusocial/models/chat_models/chat_detail_model.dart';
 import 'package:edusocial/models/chat_models/chat_user_model.dart';
@@ -6,10 +7,59 @@ import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import '../models/chat_models/chat_model.dart';
 
 class ChatServices {
   static final _box = GetStorage();
+
+  static Future<void> sendMessage(
+    int receiverId,
+    String message, {
+    List<File>? mediaFiles,
+    List<String>? links,
+  }) async {
+    final token = _box.read('token');
+    final url = Uri.parse('${AppConstants.baseUrl}/conversation');
+
+    var request = http.MultipartRequest('POST', url);
+    request.headers['Authorization'] = 'Bearer $token';
+
+    // Text alanları ekle
+    request.fields['receiver_id'] = receiverId.toString();
+    request.fields['message'] = message;
+
+    // Linkleri ekle
+    if (links != null && links.isNotEmpty) {
+      for (var link in links) {
+        request.fields['links[]'] = link;
+      }
+    }
+
+    // Medya dosyalarını ekle
+    if (mediaFiles != null && mediaFiles.isNotEmpty) {
+      for (var file in mediaFiles) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'media[]', // backend burada 'media' veya 'media[]' mi bekliyor kontrol et
+            file.path,
+            contentType: MediaType('image', 'jpeg'), // veya dosya tipine göre
+          ),
+        );
+      }
+    }
+
+    var streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    //debugPrint("✅ Send Message Response: ${response.body}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      debugPrint("✅ Mesaj başarıyla gönderildi!");
+    } else {
+      throw Exception("❌ Mesaj gönderilemedi: ${response.statusCode}");
+    }
+  }
 
   static Future<List<ChatUserModel>> fetchOnlineFriends() async {
     final token = _box.read('token');
@@ -26,8 +76,8 @@ class ChatServices {
 
       // debugPrint("🌐 URL: ${url.toString()}");
       //debugPrint("🔑 Token: $token");
-      // debugPrint("📥 Response Status Code: ${response.statusCode}");
-      // debugPrint("📥 Response Body: ${response.body}");
+       // debugPrint("📥 Response Status Code: ${response.statusCode}");
+       //debugPrint("📥 Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -36,7 +86,7 @@ class ChatServices {
         final chatList =
             dataList.map((json) => ChatUserModel.fromJson(json)).toList();
 
-        // debugPrint("✅ Chat List: $chatList");
+       //debugPrint("✅ Chat List: $chatList");
 
         return chatList;
       } else {
@@ -60,8 +110,8 @@ class ChatServices {
       },
     );
 
-    debugPrint('Gönderilen chatId:$chatId');
-    debugPrint("✅ Show Conversation JSON: ${response.body}", wrapWidth: 1024);
+    //debugPrint('Gönderilen chatId:$chatId');
+    //debugPrint("✅ Show Conversation JSON: ${response.body}", wrapWidth: 1024);
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
       final List<dynamic> messagesJson = body['data'];
@@ -88,15 +138,15 @@ class ChatServices {
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        // debugPrint("✅ Gelen JSON Body:");
-        // debugPrint(jsonEncode(body));
+      //  debugPrint("✅ Gelen JSON Body:");
+      //  debugPrint(jsonEncode(body));
 
         if (body is Map<String, dynamic> && body.containsKey('data')) {
           final data = body['data'];
           if (data is List) {
             return data.map((json) {
-              //   debugPrint("🔍 Her chat JSON:");
-              //    debugPrint(jsonEncode(json));
+                // debugPrint("🔍 Her chat JSON:");
+                  //debugPrint(jsonEncode(json));
               return ChatModel.fromJson(json);
             }).toList();
           } else {

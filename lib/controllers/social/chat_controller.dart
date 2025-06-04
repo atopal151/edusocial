@@ -1,9 +1,11 @@
+
 import 'package:edusocial/models/chat_models/chat_user_model.dart';
 import 'package:edusocial/models/chat_models/last_message_model.dart';
 import 'package:edusocial/services/chat_service.dart';
 import 'package:edusocial/services/socket_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../models/chat_models/chat_model.dart';
 import '../../models/chat_models/group_chat_model.dart';
 
@@ -19,15 +21,30 @@ class ChatController extends GetxController {
   final TextEditingController searchController = TextEditingController();
 
   /// Socket servisi
-  final SocketService socketService = Get.find<SocketService>();
+  final SocketService _socketService = Get.find<SocketService>();
+  final GetStorage _box = GetStorage();
+@override
+void onInit() {
+  super.onInit();
+  fetchChatList();
+  fetchOnlineFriends();
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchChatList();
-    fetchOnlineFriends();
-    // Burada istersen API çağrıları yapılabilir.
-  }
+
+    // Token'ı GetStorage'dan al
+    String? token = _box.read('token');
+
+    if (token != null && token.isNotEmpty) {
+      debugPrint('🔑 Storage token bulundu: $token');
+      _socketService.connectSocket(token);
+    } else {
+      debugPrint('⚠️ Storage token bulunamadı. Socket bağlanmadı.');
+    }
+
+  // Şimdi socket bağlantısını başlatalım:
+  //initSocketConnection(token);
+}
+
+
 
   /// 🔥 Online arkadaşları getir
   Future<void> fetchOnlineFriends() async {
@@ -60,33 +77,32 @@ class ChatController extends GetxController {
       isLoading(false);
     }
   }
-
+/*
   /// 🔌 Socket bağlantısını başlat
   void initSocketConnection(String token) {
     socketService.connectSocket(token);
 
-    /// Birebir mesaj dinleyicisi
     socketService.onPrivateMessage((data) {
       handleNewPrivateMessage(data);
+      if (Get.isRegistered<ChatDetailController>()) {
+        Get.find<ChatDetailController>().onNewPrivateMessage(data);
+      }
     });
 
-    /// Grup mesajı dinleyicisi
     socketService.onGroupMessage((data) {
       handleNewGroupMessage(data);
     });
 
-    /// Okunmamış mesaj sayısı dinleyicisi
     socketService.onUnreadMessageCount((data) {
       updateUnreadCount(data['count']);
     });
   }
-
   /// 🔌 Socket bağlantısını kapat
   void disconnectSocket() {
     socketService.disconnectSocket();
     socketService.removeAllListeners();
   }
-
+*/
   /// 📥 Yeni birebir mesaj geldiğinde listeyi güncelle
   void handleNewPrivateMessage(dynamic data) {
     debugPrint("📡 Yeni birebir mesaj payload: $data");
