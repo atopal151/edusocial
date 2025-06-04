@@ -61,34 +61,30 @@ class ProfileController extends GetxController {
       profile.value = data;
 
       // 📌 Temel veriler
-      userId.value = data.id.toString(); // 👈 id verisi varsa burada saklanır
+      userId.value = data.id.toString();
       fullName.value = "${data.name} ${data.surname}";
       username.value = "@${data.username}";
       profileImage.value = data.avatarUrl;
       coverImage.value = data.bannerUrl;
       bio.value = data.description ?? '';
       birthDate.value = formatBirthday(data.birthDate);
-      followers.value = data.followers.length;
-      following.value = data.followings.length;
-      postCount.value = data.posts.length;
       lessons.value = data.lessons;
+
+      // 📌 Okul ve Bölüm Bilgileri
+      schoolName.value = data.school?['name'] ?? 'Okul bilgisi yok';
+      schoolDepartment.value =
+          data.schoolDepartment?['title'] ?? 'Bölüm bilgisi yok';
 
       // 📌 Takipçi ve takip edilen sayıları
       followers.value = data.followers.length;
       following.value = data.followings.length;
 
+      // 📌 Takipçi ve Takip Edilen Listesi
       followerList.assignAll(data.followers);
       followingList.assignAll(data.followings);
+
       // 📌 Postlar
       postCount.value = data.posts.length;
-      // profilePosts.assignAll(data.posts);
-
-      //debugPrint("✅ profilePosts.length: ${profilePosts.length}");
-
-      //debugPrint("🧾 ProfilePost: $profilePosts");
-      /*for (var post in profilePosts) {
-        debugPrint("🧾 ProfilePost: ${post.postDescription}");
-      }*/
 
       // 📌 AppBar resmi güncelle
       appBarController.updateProfileImage(profileImage.value);

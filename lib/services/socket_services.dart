@@ -15,9 +15,9 @@ class SocketService extends GetxService {
 
   // Socket bağlantısını başlat
   void connectSocket(String token) {
-    debugPrint('🔑 Gelen Token: $token');
+    //debugPrint('🔑 Gelen Token: $token');
     if (_isConnected.value) {
-      debugPrint('🔌 Socket zaten bağlı.');
+      //debugPrint('🔌 Socket zaten bağlı.');
       return;
     }
 
@@ -32,12 +32,12 @@ class SocketService extends GetxService {
             .build(),
       );
 
-      debugPrint('🪝 Socket yapılandırması yapıldı.');
+     // debugPrint('🪝 Socket yapılandırması yapıldı.');
 
       // Bağlantı sağlandığında
       _socket.onConnect((_) {
-        debugPrint('✅ Socket bağlantısı sağlandı.');
-        debugPrint('🟢 Socket ID: ${_socket.id}');
+       // debugPrint('✅ Socket bağlantısı sağlandı.');
+        //debugPrint('🟢 Socket ID: ${_socket.id}');
         _isConnected.value = true;
       });
 

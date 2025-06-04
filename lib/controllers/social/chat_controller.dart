@@ -34,7 +34,7 @@ void onInit() {
     String? token = _box.read('token');
 
     if (token != null && token.isNotEmpty) {
-      debugPrint('🔑 Storage token bulundu: $token');
+      //debugPrint('🔑 Storage token bulundu: $token');
       _socketService.connectSocket(token);
     } else {
       debugPrint('⚠️ Storage token bulunamadı. Socket bağlanmadı.');
@@ -52,7 +52,7 @@ void onInit() {
       isLoading(true);
       final friends = await ChatServices.fetchOnlineFriends();
       onlineFriends.assignAll(friends);
-      debugPrint('Online Arkadaşlar:$friends', wrapWidth: 1024);
+      //debugPrint('Online Arkadaşlar:$friends', wrapWidth: 1024);
     } catch (e) {
       debugPrint('Online arkadaşlar çekilirken hata: $e');
     } finally {
@@ -105,7 +105,7 @@ void onInit() {
 */
   /// 📥 Yeni birebir mesaj geldiğinde listeyi güncelle
   void handleNewPrivateMessage(dynamic data) {
-    debugPrint("📡 Yeni birebir mesaj payload: $data");
+    //debugPrint("📡 Yeni birebir mesaj payload: $data");
 
     try {
       final conversationId = data['conversation_id'] ?? 0;

@@ -144,11 +144,11 @@ class ProfileModel {
             );
           }).toList() ??
           [],
-      language: json['language'],
+      language: json['language']['name'],
       approvedGroups: json['approved_groups'] ?? [],
-      school: json['school'] is Map<String, dynamic> ? json['school'] : null,
-      schoolDepartment: json['school_department'] is Map<String, dynamic>
-          ? json['school_department']
+      school: json['school']['name'] is Map<String, dynamic> ? json['school']['name'] : null,
+      schoolDepartment: json['school_department']['title'] is Map<String, dynamic>
+          ? json['school_department']['title']
           : null,
       lessons: (json['lessons'] as List?)
               ?.map((e) => e is Map && e.containsKey('name')

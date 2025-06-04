@@ -70,7 +70,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                             padding: const EdgeInsets.only(left: 10, right: 1),
                             child: GestureDetector(
                               onTap: () {
-                                debugPrint('tıklanan chat id:${friend.id}');
+                                //debugPrint('tıklanan chat id:${friend.id}');
                                 chatController.getChatDetailPage(
                                   friend.id,
                                   name: friend.name,

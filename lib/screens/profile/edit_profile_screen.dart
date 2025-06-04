@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:edusocial/components/input_fields/custom_textfield_step2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -18,6 +19,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final ProfileUpdateController controller = Get.put(ProfileUpdateController());
   final ImagePicker _picker = ImagePicker();
+  var accountType = ''.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -89,13 +91,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     _buildTextField("Tiktok", "@", controller.tiktokController),
                     _sectionTitle("Okul ve Bölüm Bilgisi"),
                     const SizedBox(height: 10),
-                    _buildTextField(
-                        "Okul ID", "", controller.schoolIdController),
+                    _buildSchoolDropdown(),
                     const SizedBox(height: 10),
-                    _buildTextField(
-                        "Bölüm ID", "", controller.departmentIdController),
+                    _buildDepartmentDropdown(),
                     const SizedBox(height: 20),
                     _sectionTitle("Dersler"),
+                    const SizedBox(height: 10),
+                    CustomTextFieldStep2(
+                      controller: controller.lessonController,
+                      onAdd: () {
+                        if (controller.lessonController.text.isNotEmpty) {
+                          controller.addLesson(
+                              controller.lessonController.text.trim());
+                          controller.lessonController.clear();
+                        }
+                      },
+                    ),
                     const SizedBox(height: 10),
                     _buildLessonChips(),
                     const SizedBox(height: 20),
@@ -111,12 +122,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         controller.mobileNotification,
                         controller.toggleMobileNotification),
                     const SizedBox(height: 20),
-                    _buildTextField(
-                        "Dil ID", "", controller.languageIdController),
+                    _sectionTitle("Dil Seçimi"),
+                    const SizedBox(height: 20),
+                    _buildLanguageDropdown(),
                     const SizedBox(height: 20),
                     _sectionTitle("Hesap Tipi"),
                     const SizedBox(height: 10),
-                    _buildAccountTypeSelector(),
+                    _buildAccountTypeDropdown(),
                     const SizedBox(height: 30),
                     CustomButton(
                       height: 50,
@@ -132,6 +144,199 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
             )),
+    );
+  }
+
+  Widget _buildAccountTypeDropdown() {
+    return Obx(
+      () => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: controller.accountType.value.isNotEmpty
+                ? controller.accountType.value
+                : null,
+            hint: Text(
+              "Hesap Tipi Seçimi",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            items: ['public', 'private'].map((type) {
+              return DropdownMenuItem<String>(
+                value: type,
+                child: Text(
+                  type.capitalizeFirst ?? '',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (selected) {
+              if (selected != null) {
+                controller.changeAccountType(selected);
+              }
+            },
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageDropdown() {
+    return Obx(
+      () => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<int>(
+            isExpanded: true,
+            value: controller.selectedLanguageId.value,
+            hint: Text(
+              "Dil Seçimi",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            items: controller.languages.map((language) {
+              return DropdownMenuItem<int>(
+                value: language.id,
+                child: Text(
+                  language.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (selected) {
+              if (selected != null) {
+                controller.onLanguageSelected(selected);
+              }
+            },
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSchoolDropdown() {
+    return Obx(
+      () => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: controller.selectedSchoolName.value.isNotEmpty
+                ? controller.selectedSchoolName.value
+                : null,
+            hint: Text(
+              "Okul Seçimi",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            items: controller.userSchools.map((school) {
+              return DropdownMenuItem<String>(
+                value: school['name'],
+                child: Text(
+                  school['name'],
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (selected) {
+              if (selected != null) {
+                controller.onSchoolChanged(selected);
+              }
+            },
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDepartmentDropdown() {
+    return Obx(
+      () => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: controller.selectedDepartmentName.value.isNotEmpty
+                ? controller.selectedDepartmentName.value
+                : null,
+            hint: Text(
+              "Bölüm Seçimi",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            items: controller.userDepartments.map((department) {
+              return DropdownMenuItem<String>(
+                value: department['title'],
+                child: Text(
+                  department['title'],
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (selected) {
+              if (selected != null) {
+                controller.onDepartmentChanged(selected);
+              }
+            },
+            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          ),
+        ),
+      ),
     );
   }
 
@@ -334,7 +539,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Colors.grey.shade300),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -361,51 +565,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             );
           }).toList(),
         ));
-  }
-
-  Widget _buildAccountTypeSelector() {
-    return Obx(() => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildAccountTypeBox('public'),
-            const SizedBox(width: 8),
-            _buildAccountTypeBox('private'),
-          ],
-        ));
-  }
-
-  Widget _buildAccountTypeBox(String type) {
-    final isSelected = controller.accountType.value == type;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => controller.changeAccountType(type),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFE7E7E7) : Colors.white,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                type.capitalizeFirst ?? '',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected ? Colors.black : const Color(0xFF1F1F1F),
-                ),
-              ),
-              if (isSelected) ...[
-                const SizedBox(width: 6),
-                const Icon(Icons.check, size: 16, color: Colors.black),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _sectionTitle(String title) {

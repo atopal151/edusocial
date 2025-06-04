@@ -65,7 +65,7 @@ Widget buildProfileDetails() {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData.school?['name'] ?? "Okul bilgisi yok",
+                              profileData.school?['name']?? "Okul bilgisi yok",
                               style: const TextStyle(
                                 fontSize: 13.28,
                                 fontWeight: FontWeight.w600,

@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:edusocial/models/language_model.dart';
 import 'package:edusocial/models/profile_model.dart';
+import 'package:edusocial/services/onboarding_service.dart';
 import 'package:edusocial/services/profile_service.dart';
 import 'package:edusocial/services/profile_update_services.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,20 @@ class ProfileUpdateController extends GetxController {
 
   // Ana model (backend'den gelen tüm veriler burada tutulur)
   Rx<ProfileModel?> userProfileModel = Rx<ProfileModel?>(null);
+
+  RxList<Map<String, dynamic>> userSchools = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> userDepartments = <Map<String, dynamic>>[].obs;
+  final TextEditingController lessonController = TextEditingController();
+
+  /// 🌍 Diller
+  var languages = <LanguageModel>[].obs;
+  var selectedLanguageId = Rxn<int>();
+
+  var selectedSchoolName = "".obs;
+  int? selectedSchoolId;
+
+  var selectedDepartmentName = "".obs;
+  int? selectedDepartmentId;
 
   // Yüklenme durumu
   var isLoading = false.obs;
@@ -46,6 +62,88 @@ class ProfileUpdateController extends GetxController {
   void onInit() {
     super.onInit();
     fetchUserProfile();
+    fetchLanguages();
+  }
+
+  /// 🌍 Dilleri API'den çek
+  Future<void> fetchLanguages() async {
+    try {
+      languages.value = await ProfileUpdateService.fetchLanguages();
+    } catch (e) {
+      Get.snackbar('Hata', 'Dilleri çekerken hata oluştu!');
+    }
+  }
+
+  Future<void> loadUserSchoolList() async {
+    isLoading.value = true;
+    try {
+      final data = await OnboardingServices.fetchSchools();
+      userSchools.assignAll(data);
+
+      if (userSchools.isNotEmpty) {
+        // Eğer profilden gelen ID varsa, okul adı eşleşmesi yap
+        final selectedSchool = userSchools.firstWhereOrNull(
+          (school) => school['id'].toString() == schoolIdController.text,
+        );
+        if (selectedSchool != null) {
+          selectedSchoolName.value = selectedSchool['name'];
+          selectedSchoolId = selectedSchool['id'];
+          loadDepartmentsForSelectedSchool();
+        }
+      }
+    } catch (e) {
+      debugPrint("❗ Kullanıcı okul listesi yüklenirken hata: $e",
+          wrapWidth: 1024);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void loadDepartmentsForSelectedSchool() {
+    final selected = userSchools.firstWhereOrNull(
+      (school) => school['id'] == selectedSchoolId,
+    );
+    if (selected != null && selected['departments'] != null) {
+      userDepartments.assignAll(
+        (selected['departments'] as List)
+            .map<Map<String, dynamic>>((d) => {
+                  "id": d['id'],
+                  "title": d['title'],
+                })
+            .toList(),
+      );
+
+      if (userDepartments.isNotEmpty) {
+        final selectedDept = userDepartments.firstWhereOrNull(
+          (dept) => dept['id'].toString() == departmentIdController.text,
+        );
+        if (selectedDept != null) {
+          selectedDepartmentName.value = selectedDept['title'];
+          selectedDepartmentId = selectedDept['id'];
+        }
+      }
+    }
+  }
+
+  void onSchoolChanged(String schoolName) {
+    final selected =
+        userSchools.firstWhereOrNull((school) => school['name'] == schoolName);
+
+    if (selected != null) {
+      selectedSchoolName.value = selected['name'];
+      selectedSchoolId = selected['id'];
+      loadDepartmentsForSelectedSchool();
+    }
+  }
+
+  void onDepartmentChanged(String departmentName) {
+    final selected = userDepartments.firstWhereOrNull(
+      (dept) => dept['title'] == departmentName,
+    );
+    if (selected != null) {
+      selectedDepartmentName.value = selected['title'];
+      selectedDepartmentId = selected['id'];
+    }
   }
 
   String formatBirthday(String isoString) {
@@ -81,6 +179,7 @@ class ProfileUpdateController extends GetxController {
       final profileData = await _profileService.fetchProfileData();
       userProfileModel.value = profileData;
       loadUserData(); // TextField'lara aktar
+      await loadUserSchoolList();
     } catch (e) {
       Get.snackbar("Hata", "Profil verisi alınamadı: $e");
     } finally {
@@ -93,7 +192,7 @@ class ProfileUpdateController extends GetxController {
     final data = userProfileModel.value;
     if (data == null) return;
 
-    //debugPrint("📥 Profil form verileri yükleniyor...", wrapWidth: 1024);
+    //adebugPrint("📥 Profil form verileri yükleniyor...", wrapWidth: 1024);
 
     usernameController.text = data.username;
     nameController.text = data.name;
@@ -115,6 +214,15 @@ class ProfileUpdateController extends GetxController {
     tiktokController.text = data.tiktok ?? '';
     languageIdController.text = data.languageId ?? '';
 
+    // 🌍 Seçili dil id'sini de set et
+    if (data.languageId != null && data.languageId!.isNotEmpty) {
+      selectedLanguageId.value = int.tryParse(data.languageId!);
+    }
+  }
+
+  /// 🌍 Dil seçildiğinde çağrılacak
+  void onLanguageSelected(int languageId) {
+    selectedLanguageId.value = languageId;
   }
 
   /// 🎛️ Switch kontroller
@@ -171,14 +279,14 @@ class ProfileUpdateController extends GetxController {
         accountType: accountType.value,
         emailNotification: emailNotification.value,
         mobileNotification: mobileNotification.value,
-        schoolId: schoolIdController.text,
-        departmentId: departmentIdController.text,
-        lessons: selectedLessons,
+        schoolId: selectedSchoolId?.toString() ?? '',
+        departmentId: selectedDepartmentId?.toString() ?? '',
+        lessons: selectedLessons.toList(),
         avatarFile: selectedAvatar,
         coverFile: selectedCoverPhoto,
         description: descriptionController.text,
         tiktok: tiktokController.text,
-        languageId: languageIdController.text
+        languageId: selectedLanguageId.value?.toString() ?? '',
       );
 
       Get.snackbar("Başarılı", "Profil bilgileri güncellendi!");

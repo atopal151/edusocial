@@ -9,7 +9,6 @@ import 'package:edusocial/services/socket_services.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/chat_models/chat_detail_model.dart';
 import '../../models/user_chat_detail_model.dart';

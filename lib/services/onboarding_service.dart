@@ -27,8 +27,8 @@ class OnboardingServices {
         },
       );
 
-     /* debugPrint("🔥 Okul Listesi Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("🔥 Okul Listesi Body: ${response.body}",wrapWidth: 1024);*/
+      debugPrint("🔥 Okul Listesi Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("🔥 Okul Listesi Body: ${response.body}",wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body)['data'];

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:edusocial/models/language_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import 'package:http_parser/http_parser.dart';
@@ -8,6 +10,28 @@ import '../utils/constants.dart';
 
 class ProfileUpdateService {
   static final _box = GetStorage();
+
+static Future<List<LanguageModel>> fetchLanguages() async {
+  final token = GetStorage().read('token');
+  final response = await http.get(
+    Uri.parse('${AppConstants.baseUrl}/languages'),
+    headers: {
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  debugPrint('🌐 Status Code: ${response.statusCode}');
+  debugPrint('📩 Response Body: ${response.body}');
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    final List<dynamic> data = jsonData['data'];
+    return data.map((e) => LanguageModel.fromJson(e)).toList();
+  } else {
+    throw Exception('Dilleri çekerken hata oluştu!');
+  }
+}
+
 
   /// 📤 Profil bilgilerini güncelle
   static Future<void> updateProfile({
@@ -30,7 +54,6 @@ class ProfileUpdateService {
     required String description,
     required String tiktok,
     required String languageId,
-
     File? avatarFile,
     File? coverFile, // Yeni parametre olarak al
   }) async {
@@ -64,51 +87,53 @@ class ProfileUpdateService {
       'description': description,
       'tiktok': tiktok,
       'language_id': languageId,
-
     });
-
+// 📚 Ders bilgileri (array formatı)
+    debugPrint('🎯 Lessons gönderilen: ${lessons.toString()}');
     // 📚 Ders bilgileri (array formatı)
     for (int i = 0; i < lessons.length; i++) {
       request.fields['lessons[$i]'] = lessons[i];
     }
 
 // 🖼️ Avatar resmi eklenmişse
-if (avatarFile != null) {
-  final mime = lookupMimeType(avatarFile.path);
-  final mediaType = mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
+    if (avatarFile != null) {
+      final mime = lookupMimeType(avatarFile.path);
+      final mediaType =
+          mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
 
-  debugPrint('📤 Avatar dosyası yolu: ${avatarFile.path}');
-  debugPrint('📤 Avatar mime türü: $mime');
+      //debugPrint('📤 Avatar dosyası yolu: ${avatarFile.path}');
+      //debugPrint('📤 Avatar mime türü: $mime');
 
-  request.files.add(
-    await http.MultipartFile.fromPath(
-      'avatar',
-      avatarFile.path,
-      contentType: mediaType,
-    ),
-  );
-} else {
-  debugPrint('⚠️ Avatar dosyası null, yüklenmedi.');
-}
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'avatar',
+          avatarFile.path,
+          contentType: mediaType,
+        ),
+      );
+    } else {
+      debugPrint('⚠️ Avatar dosyası null, yüklenmedi.');
+    }
 
 // 🖼️ Banner resmi eklenmişse
-if (coverFile != null) {
-  final mime = lookupMimeType(coverFile.path);
-  final mediaType = mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
+    if (coverFile != null) {
+      final mime = lookupMimeType(coverFile.path);
+      final mediaType =
+          mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
 
-  debugPrint('📤 Banner dosyası yolu: ${coverFile.path}');
-  debugPrint('📤 Banner mime türü: $mime');
+      //debugPrint('📤 Banner dosyası yolu: ${coverFile.path}');
+      //debugPrint('📤 Banner mime türü: $mime');
 
-  request.files.add(
-    await http.MultipartFile.fromPath(
-      'banner',
-      coverFile.path,
-      contentType: mediaType,
-    ),
-  );
-} else {
-  debugPrint('⚠️ Banner dosyası null, yüklenmedi.');
-}
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'banner',
+          coverFile.path,
+          contentType: mediaType,
+        ),
+      );
+    } else {
+      debugPrint('⚠️ Banner dosyası null, yüklenmedi.');
+    }
 
     try {
       final streamedResponse = await request.send();
