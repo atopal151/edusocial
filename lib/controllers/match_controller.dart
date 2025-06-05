@@ -20,6 +20,31 @@ class MatchController extends GetxController {
   void onInit() {
     super.onInit();
     _loadMockData();
+    findMatches();
+  }
+
+  void addCoursesToProfile() async {
+    isLoading.value = true;
+    try {
+      for (var topic in savedTopics) {
+        bool success = await MatchServices.addLesson(topic);
+        if (!success) {
+          Get.snackbar("Hata", "'$topic' dersi zaten eklenmiş veya eklenemedi.",
+              snackPosition: SnackPosition.BOTTOM);
+        }
+      }
+      Get.snackbar("Başarılı", "Dersler profilinize kaydedildi!",
+          snackPosition: SnackPosition.BOTTOM);
+      
+      Get.back();
+      findMatches();
+    } catch (e) {
+      debugPrint("❗ Ders kaydedilirken hata: $e");
+      Get.snackbar("Hata", "Bir hata oluştu.",
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void followUser() async {
@@ -67,42 +92,34 @@ class MatchController extends GetxController {
   void removeTopic(String topic) {
     savedTopics.remove(topic);
   }
-void findMatches() async {
-  isLoading.value = true;
 
-  final fetchedMatches = await MatchServices.fetchMatches();
+  void findMatches() async {
+    isLoading.value = true;
 
-  // ✅ Sadece takip ETMEDİĞİ kullanıcıları filtrele
-  final filteredMatches =
-      fetchedMatches.where((match) => match.isFollowing == false).toList();
+    final fetchedMatches = await MatchServices.fetchMatches();
 
-  // 👇 Her eşleşmeyi debug için yazdır (gerekirse kaldır)
-  for (var match in fetchedMatches) {
-    debugPrint("🔍 Match: ${match.name}, isFollowing: ${match.isFollowing}");
+    // ✅ Şu satırı yorum satırına aldık:
+    // final filteredMatches = fetchedMatches.where((match) => match.isFollowing == false).toList();
+
+    // 👇 Tüm listeyi kullan
+    final allMatches = fetchedMatches;
+
+    // 👇 Her eşleşmeyi debug için yazdır (gerekirse kaldır)
+    for (var match in allMatches) {
+      debugPrint("🔍 Match: ${match.name}, isFollowing: ${match.isFollowing}");
+    }
+
+    if (allMatches.isNotEmpty) {
+      matches.assignAll(allMatches);
+    } else {
+      Get.snackbar(
+        "Bilgi",
+        "Hiç eşleşme bulunamadı.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      Get.back();
+    }
+
+    isLoading.value = false;
   }
-
-  if (filteredMatches.isNotEmpty) {
-    matches.assignAll(filteredMatches);
-    currentIndex.value = 0;
-
-    // Sayfayı kapat + eşleşme sayfasına geç
-    Get.back();
-
-    // 💡 Animasyon sonrası index değiştirme garantili
-    Future.delayed(const Duration(milliseconds: 100), () {
-      navigationController.changeIndex(2);
-    });
-  } else {
-    Get.snackbar(
-      "Bilgi",
-      "Takip etmediğin yeni bir eşleşme bulunamadı.",
-      snackPosition: SnackPosition.BOTTOM,
-    );
-    Get.back();
-  }
-
-  isLoading.value = false;
-}
-
-
 }

@@ -69,10 +69,10 @@ class _NavbarMenuState extends State<NavbarMenu> {
           left: MediaQuery.of(context).size.width / 2 - 25, // Ortalar
           child: GestureDetector(
             onTap: () {
-              if (matchController.matches.isEmpty) {
+             /* if (matchController.matches.isEmpty) {
                 Get.toNamed("/match");
                 return;
-              }
+              }*/
               controller.changeIndex(2);
             },
             child: Container(

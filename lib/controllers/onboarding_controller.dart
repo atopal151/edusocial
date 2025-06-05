@@ -11,6 +11,8 @@ class OnboardingController extends GetxController {
   int? selectedDepartmentId;
   RxString warningMessage = ''.obs;
   RxBool isLoading = false.obs;
+  var savedTopics = <String>[].obs;
+
 
   RxList<Map<String, dynamic>> schools = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> departments = <Map<String, dynamic>>[].obs;
@@ -23,6 +25,11 @@ class OnboardingController extends GetxController {
   String userEmail = "";
 
   //-------------------------------------------------------------//
+
+
+
+
+
   void addCourse() {
     if (courseController.text.isNotEmpty) {
       if (!courses.contains(courseController.text)) {

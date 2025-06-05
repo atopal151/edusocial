@@ -154,7 +154,7 @@ class _MatchScreenState extends State<MatchScreen> {
                         height: 50,
                         borderRadius: 15,
                       text: "Uygun Eşleşmeleri Bul",
-                      onPressed: controller.findMatches,
+                      onPressed: controller.addCoursesToProfile,
                       isLoading: controller.isLoading,
                       backgroundColor: Colors.white,
                       textColor: Color(0xffE75555)),

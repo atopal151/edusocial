@@ -101,7 +101,7 @@ class _MatchCardState extends State<MatchCard> {
         image: DecorationImage(
           image: match.profileImage.isNotEmpty
               ? NetworkImage(match.profileImage)
-              : const AssetImage("images/default_user.jpg") as ImageProvider,
+              : const AssetImage("images/user1.jpg") as ImageProvider,
           fit: BoxFit.cover,
         ),
       ),
