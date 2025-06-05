@@ -16,9 +16,8 @@ class UserListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        final userId = user.id;
         Get.to(() =>
-            PeopleProfileScreen(userId: userId)); // ✅ burada userId eklenmeli
+            PeopleProfileScreen(username: user.username)); // ✅ burada userId eklenmeli
       },
       child: Container(
         padding: EdgeInsets.all(12),

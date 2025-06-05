@@ -7,25 +7,44 @@ class PeopleProfileController extends GetxController {
   var isLoading = true.obs; // Profil genel yüklenme durumu
   var isFollowLoading = false.obs; // Takip/çıkar butonu loading
   var isFollowing = false.obs; // Kullanıcı takip ediliyor mu
+  var isFollowingPending = false.obs; // Takip isteği bekliyor mu
   var profile = Rxn<PeopleProfileModel>(); // Kullanıcı profili
 
-  /// 👤 Kullanıcı profilini getir
+  /// Username ile profil çekme
+  Future<void> loadUserProfileByUsername(String username) async {
+    try {
+      isLoading.value = true;
+
+      final data = await PeopleProfileService.fetchUserByUsername(username);
+      if (data != null) {
+        profile.value = data;
+        isFollowing.value = data.isFollowing;
+        isFollowingPending.value = data.isFollowingPending; // 🔥 Bunu ekledik
+      } else {
+        debugPrint("⚠️ Profil verisi boş döndü (username: $username)");
+      }
+    } catch (e) {
+      debugPrint("❌ Profil yüklenirken hata oluştu: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// userId ile profil çekme
   Future<void> loadUserProfile(int userId) async {
     try {
       isLoading.value = true;
-      //debugPrint("🔄 Profil yükleniyor: userId = $userId");
 
       final data = await PeopleProfileService.fetchUserById(userId);
       if (data != null) {
         profile.value = data;
         isFollowing.value = data.isFollowing;
-       // debugPrint("✅ Profil yüklendi: ${data.name} ${data.surname}");
-        //debugPrint("👥 isFollowing: ${isFollowing.value}");
+        isFollowingPending.value = data.isFollowingPending; // 🔥 Bunu ekledik
       } else {
         debugPrint("⚠️ Profil verisi boş döndü");
       }
     } catch (e) {
-      //debugPrint("❌ Profil yüklenirken hata oluştu: $e", wrapWidth: 1024);
+      debugPrint("❌ Profil yüklenirken hata oluştu: $e", wrapWidth: 1024);
     } finally {
       isLoading.value = false;
     }
@@ -39,9 +58,10 @@ class PeopleProfileController extends GetxController {
 
       final result = await PeopleProfileService.followUser(userId);
       if (result) {
-        isFollowing.value = true;
-        debugPrint("✅ Takip edildi");
-
+        // İsteğe göre backend pending mi true dönüyor yoksa isFollowing mi bilemiyoruz.
+        // En garantili yöntem profili tekrar çekmek:
+        await loadUserProfile(userId);
+        debugPrint("✅ Takip edildi veya takip isteği gönderildi");
       } else {
         debugPrint("⚠️ Takip işlemi başarısız");
       }
@@ -60,11 +80,8 @@ class PeopleProfileController extends GetxController {
 
       final result = await PeopleProfileService.unfollowUser(userId);
       if (result) {
-        isFollowing.value = false;
+        await loadUserProfile(userId); // 🔥 Profil yeniden çekilsin
         debugPrint("✅ Takip bırakıldı");
-
-  await loadUserProfile(userId); // ⬅️ Profil yeniden çekilsin
-
       } else {
         debugPrint("⚠️ Takip bırakma işlemi başarısız");
       }

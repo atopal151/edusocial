@@ -1,6 +1,6 @@
+import 'package:edusocial/models/group_models/grouped_notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/group_models/grouped_notification_model.dart';
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
 
@@ -14,7 +14,7 @@ class NotificationController extends GetxController {
     fetchNotifications();
   }
 
-  /// 🔄 Bildirimleri çek
+  /// Bildirimleri çek
   void fetchNotifications() async {
     isLoading.value = true;
     try {
@@ -26,7 +26,7 @@ class NotificationController extends GetxController {
     isLoading.value = false;
   }
 
-  /// 📆 Bildirimleri tarihe göre gruplar
+  /// Bildirimleri tarihe göre gruplar
   List<GroupedNotifications> groupNotificationsByDate(List<NotificationModel> notifs) {
     final now = DateTime.now();
     List<GroupedNotifications> grouped = [];
@@ -40,9 +40,9 @@ class NotificationController extends GetxController {
 
       if (isSameDay(date, now)) {
         today.add(notif);
-      } else if (isSameDay(date, now.subtract(Duration(days: 1)))) {
+      } else if (isSameDay(date, now.subtract(const Duration(days: 1)))) {
         yesterday.add(notif);
-      } else if (date.isAfter(now.subtract(Duration(days: 7)))) {
+      } else if (date.isAfter(now.subtract(const Duration(days: 7)))) {
         thisWeek.add(notif);
       }
     }

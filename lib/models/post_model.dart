@@ -70,38 +70,39 @@ class PostModel {
     );
   }
 
-  factory PostModel.fromJsonForProfile(
-      Map<String, dynamic> json, String avatarUrl, String fullName) {
-    final mediaList = json['media'];
+factory PostModel.fromJsonForProfile(
+    Map<String, dynamic> json, String avatarUrl, String fullName) {
+  final mediaList = json['media'];
 
-    List<String> mediaUrls = [];
-    if (mediaList != null && mediaList is List) {
-      for (var media in mediaList) {
-        final fullPath = media['full_path'];
-        if (fullPath != null && fullPath is String) {
-          mediaUrls.add(
-            fullPath.startsWith('http')
-                ? fullPath
-                : "${AppConstants.baseUrl}/$fullPath",
-          );
-        }
+  List<String> mediaUrls = [];
+  if (mediaList != null && mediaList is List) {
+    for (var media in mediaList) {
+      final fullPath = media['full_path'];
+      if (fullPath != null && fullPath is String) {
+        mediaUrls.add(
+          fullPath.startsWith('http')
+              ? fullPath
+              : "${AppConstants.baseUrl}/$fullPath",
+        );
       }
     }
-
-    return PostModel(
-      id: json['id'] ?? 0,
-      slug: json['slug'] ?? '',
-      status: json['status'] ?? '',
-      profileImage: avatarUrl,
-      userName: fullName,
-      username: json['user']?['username'] ?? '',
-      postDate: json['human_created_at'] ?? '',
-      postDescription: json['content'] ?? '',
-      mediaUrls: mediaUrls,
-      likeCount: json['likes_count'] ?? 0,
-      commentCount: json['comments_count'] ?? 0,
-      isOwner: json['is_owner'] == true || json['is_owner'] == 'true',
-      isLiked: json['is_liked_by_user'] ?? false,
-    );
   }
+
+  return PostModel(
+    id: json['id'] ?? 0,
+    slug: json['slug'] ?? '',
+    status: json['status'] ?? '',
+    profileImage: avatarUrl,  // dışarıdan parametre ile geliyor
+    userName: fullName,       // dışarıdan parametre ile geliyor
+    username: json['username'] ?? '', // JSON’da yoksa boş kalsın
+    postDate: json['created_at'] ?? '',
+    postDescription: json['content'] ?? '',
+    mediaUrls: mediaUrls,
+    likeCount: json['like_count'] ?? 0,      // 🔥 Düzeltildi
+    commentCount: json['comment_count'] ?? 0, // 🔥 Düzeltildi
+    isOwner: json['is_owner'] == true || json['is_owner'] == 'true',
+    isLiked: json['is_liked_by_user'] ?? false,
+  );
+}
+
 }

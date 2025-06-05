@@ -8,6 +8,35 @@ import '../../utils/constants.dart';
 class PeopleProfileService {
   static final box = GetStorage();
 
+  static Future<PeopleProfileModel?> fetchUserByUsername(
+      String username) async {
+    final url =
+        Uri.parse('${AppConstants.baseUrl}/user/find-by-username/$username');
+    final token = box.read('token');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {"Authorization": "Bearer $token"},
+      );
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+
+        //final bodyString = const JsonEncoder.withIndent('  ').convert(body);
+        //debugPrint('🔍 Userdata:\n$bodyString');
+
+        return PeopleProfileModel.fromJson(body['data']);
+      } else {
+        debugPrint(
+            "❌ [fetchUserByUsername] API başarısız: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("❌ fetchUserByUsername error: $e");
+      return null;
+    }
+  }
+
   static Future<PeopleProfileModel?> fetchUserById(int userId) async {
     final url = Uri.parse('${AppConstants.baseUrl}/user/find-by-id/$userId');
     final token = box.read('token');
@@ -24,7 +53,7 @@ class PeopleProfileService {
         final body = jsonDecode(response.body);
         return PeopleProfileModel.fromJson(body['data']);
       } else {
-       // debugPrint("❌ [fetchUserById] API başarısız: ${response.statusCode}");
+        // debugPrint("❌ [fetchUserById] API başarısız: ${response.statusCode}");
         //debugPrint("❌ [fetchUserById] Body: ${response.body}", wrapWidth: 1024);
         return null;
       }

@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
   return SingleChildScrollView(
     child: Container(
-      color: Color(0xfffafafa),
+      color: const Color(0xfffafafa),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -16,53 +16,63 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Color(0xffffffff),
+                color: const Color(0xffffffff),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// **Okul Bilgisi**
-                  const Text(
-                    "Okuduğu Okul",
-                    style: TextStyle(
-                      fontSize: 13.28,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1F1F1F),
+                  if (profileData.school != null) ...[
+                    const Text(
+                      "Okuduğu Okul",
+                      style: TextStyle(
+                        fontSize: 13.28,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1F1F1F),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                 /* Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(profileData.schoolLogo),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            profileData.schoolName,
-                            style: const TextStyle(
-                              fontSize: 13.28,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF414751),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                       CircleAvatar(
+                          backgroundColor: Color(0xfffafafa),
+                          radius: 20,
+                          backgroundImage: (profileData.school?.logo
+                                      ?.toString()
+                                      .isNotEmpty ??
+                                  false)
+                              ? NetworkImage(profileData.school!.logo.toString())
+                              : AssetImage('images/school_logo.png')
+                                  as ImageProvider,
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profileData.school?.name ?? '',
+                              style: const TextStyle(
+                                fontSize: 13.28,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF414751),
+                              ),
                             ),
-                          ),
-                          Text(
-                            "${profileData.schoolDepartment} • ${profileData.schoolGrade}",
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF9CA3AE),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),*/
-                  const SizedBox(height: 20),
+                            if (profileData.schoolDepartment != null)
+                              Text(
+                                profileData.schoolDepartment?.title ?? '',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF9CA3AE),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                  ],
 
                   /// **Kişisel Bilgiler**
                   const Text(
@@ -79,7 +89,7 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                       _buildPersonalInfo(
                         icon: SvgPicture.asset(
                           "images/icons/calendar_icon.svg",
-                          colorFilter: ColorFilter.mode(
+                          colorFilter: const ColorFilter.mode(
                             Color(0xff414751),
                             BlendMode.srcIn,
                           ),
@@ -93,7 +103,7 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                       _buildPersonalInfo(
                         icon: SvgPicture.asset(
                           "images/icons/profile_tab_icon.svg",
-                          colorFilter: ColorFilter.mode(
+                          colorFilter: const ColorFilter.mode(
                             Color(0xff414751),
                             BlendMode.srcIn,
                           ),
@@ -103,31 +113,52 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                         label: "E-posta Adresi",
                         value: profileData.email,
                       ),
+                      const SizedBox(height: 10),
+                      if (profileData.language != null &&
+                          profileData.language is Map &&
+                          profileData.language['name'] != null)
+                        _buildPersonalInfo(
+                          icon: SvgPicture.asset(
+                            "images/icons/language_icon.svg",
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xff414751),
+                              BlendMode.srcIn,
+                            ),
+                            width: 20,
+                            height: 20,
+                          ),
+                          label: "Dil",
+                          value: profileData.language['name'],
+                        ),
                     ],
                   ),
                   const SizedBox(height: 20),
 
                   /// **Aldığı Dersler**
-                  const Text(
-                    "Aldığı Dersler",
-                    style: TextStyle(
-                      fontSize: 13.28,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1F1F1F),
+                  if (profileData.lessons.isNotEmpty) ...[
+                    const Text(
+                      "Aldığı Dersler",
+                      style: TextStyle(
+                        fontSize: 13.28,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1F1F1F),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: profileData.lessons.map((course) {
-                      return buildCourseChip(course);
-                    }).toList(),
-                  ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: profileData.lessons.map((course) {
+                        return buildCourseChip(course);
+                      }).toList(),
+                    ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(height: 20),
+
+            /// **Katıldığı Gruplar**
             if (profileData.approvedGroups.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(8.0),

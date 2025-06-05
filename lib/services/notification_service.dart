@@ -8,7 +8,7 @@ import '../utils/constants.dart';
 class NotificationService {
   static final _box = GetStorage();
 
-  /// 📥 Mobil bildirimleri çek
+  /// Tüm bildirimleri çek
   static Future<List<NotificationModel>> fetchMobileNotifications() async {
     final token = _box.read('token');
     final uri = Uri.parse("${AppConstants.baseUrl}/notifications/mobile");
@@ -22,14 +22,23 @@ class NotificationService {
         },
       );
 
-      //debugPrint("📥 notifications Response: ${response.statusCode}", wrapWidth: 1024);
-      //debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
+      debugPrint("📥 notifications Response: ${response.statusCode}", wrapWidth: 1024);
+      debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
-        final List data = jsonBody['data']?['post_notifications'] ?? [];
 
-        return data.map((e) => NotificationModel.fromJson(e)).toList();
+        final postNotifs = jsonBody['data']?['post_notifications'] ?? [];
+        final invitationNotifs = jsonBody['data']?['invitation_notifications'] ?? [];
+        final followerNotifs = jsonBody['data']?['follower_notifications'] ?? [];
+
+        final allNotifs = [
+          ...postNotifs,
+          ...invitationNotifs,
+          ...followerNotifs
+        ];
+
+        return allNotifs.map((e) => NotificationModel.fromJson(e)).toList();
       } else {
         throw Exception('Bildirimler alınamadı. Status Code: ${response.statusCode}');
       }

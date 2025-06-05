@@ -1,4 +1,7 @@
+import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/models/post_model.dart';
+import 'package:edusocial/models/school_department_model.dart';
+import 'package:edusocial/models/school_model.dart';
 
 class PeopleProfileModel {
   final int id;
@@ -39,8 +42,8 @@ class PeopleProfileModel {
   final List<PostModel> posts;
   final dynamic language;
   final List<dynamic> approvedGroups;
-  final Map<String, dynamic>? school;
-  final Map<String, dynamic>? schoolDepartment;
+  final SchoolModel? school;
+  final SchoolDepartmentModel? schoolDepartment;
   final List<String> lessons;
   final List<dynamic> followings;
   final List<dynamic> followers;
@@ -139,17 +142,27 @@ class PeopleProfileModel {
       posts: (json['posts'] as List?)?.map((e) {
             return PostModel.fromJsonForProfile(
               e,
-              json['avatar_url'] ?? '',
+              json['avatar'] ?? '',
               "${json['name']} ${json['surname']}",
             );
           }).toList() ??
           [],
-      language: json['language'],
-      approvedGroups: json['approved_groups'] ?? [],
-      school: json['school'] as Map<String, dynamic>?,
-      schoolDepartment: json['school_department'] as Map<String, dynamic>?,
+      language: json['language']?['name'],
+      approvedGroups: json['groups'] != null
+        ? List<GroupSuggestionModel>.from(
+            json['groups'].map((x) => GroupSuggestionModel.fromJson(x)))
+        : [],
+      school: json['school'] != null && json['school'] is Map<String, dynamic>
+          ? SchoolModel.fromJson(json['school'])
+          : null,
+      schoolDepartment: json['school_department'] != null &&
+              json['school_department'] is Map<String, dynamic>
+          ? SchoolDepartmentModel.fromJson(json['school_department'])
+          : null,
       lessons: (json['lessons'] as List?)
-              ?.map((e) => e['name'].toString())
+              ?.map((e) => e is Map && e.containsKey('name')
+                  ? e['name'].toString()
+                  : e.toString())
               .toList() ??
           [],
       followings: json['followings'] ?? [],
@@ -160,4 +173,5 @@ class PeopleProfileModel {
       followingStories: json['following_stories'] ?? [],
     );
   }
+
 }
