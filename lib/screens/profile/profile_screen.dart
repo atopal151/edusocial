@@ -176,6 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             commentCount: post.commentCount,
             isLiked: post.isLiked,
             isOwner: post.isOwner,
+            links: post.links,
           );
         },
       ),

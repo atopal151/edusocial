@@ -14,6 +14,7 @@ class PostModel {
   final int commentCount;
   final bool isOwner;
   final bool isLiked;
+  final List<String> links;
 
   PostModel({
     required this.id,
@@ -29,6 +30,7 @@ class PostModel {
     required this.commentCount,
     required this.isOwner,
     required this.isLiked,
+    required this.links,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -66,7 +68,10 @@ class PostModel {
       likeCount: json['likes_count'] ?? 0,
       commentCount: json['comments_count'] ?? 0,
       isOwner: json['is_owner'] ?? false,
-      isLiked: json['is_liked_by_user'] ?? false,
+      isLiked: json['is_liked_by_user'] ?? false,  links: (json['links'] as List?)
+              ?.map((e) => e['link']?.toString() ?? '')
+              .toList() ??
+          [],
     );
   }
 
@@ -101,7 +106,10 @@ factory PostModel.fromJsonForProfile(
     likeCount: json['like_count'] ?? 0,      // 🔥 Düzeltildi
     commentCount: json['comment_count'] ?? 0, // 🔥 Düzeltildi
     isOwner: json['is_owner'] == true || json['is_owner'] == 'true',
-    isLiked: json['is_liked_by_user'] ?? false,
+    isLiked: json['is_liked_by_user'] ?? false,  links: (json['links'] as List?)
+              ?.map((e) => e['link']?.toString() ?? '')
+              .toList() ??
+          [],
   );
 }
 

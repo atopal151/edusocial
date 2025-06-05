@@ -35,7 +35,7 @@ class MainScreen extends StatelessWidget {
     Get.put(GroupController());
 
     final token = GetStorage().read('token');
-    debugPrint('Verilen Token: $token');
+    //debugPrint('Verilen Token: $token');
     SocketService.to.connectSocket(token);
     return Scaffold(
       body: Obx(() {

@@ -24,6 +24,7 @@ class PostHomeList extends StatelessWidget {
           return Container(
             color: const Color(0xfffafafa),
             child: PostCard(
+              links: post.links,
               postId: post.id,
               profileImage: post.profileImage,
               userName: post.username,

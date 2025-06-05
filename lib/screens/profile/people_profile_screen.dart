@@ -126,7 +126,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 20),
 
                     /// TabBar
@@ -137,12 +137,9 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
             ),
           ],
           body: TabBarView(
-            
             controller: _tabController,
             physics: const NeverScrollableScrollPhysics(),
-            
             children: [
-              
               Column(
                 children: [
                   Container(
@@ -174,10 +171,10 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   Widget _buildPosts() {
     final posts = controller.profile.value?.posts ?? [];
 
-    if(controller.profile.value?.isFollowingPending==true){
+    if (controller.profile.value?.isFollowingPending == true) {
       return const Center(child: Icon(Icons.lock));
     }
-    
+
     if (posts.isEmpty) {
       return const Center(child: Text("Hiç gönderi bulunamadı."));
     }
@@ -201,6 +198,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
             commentCount: post.commentCount,
             isLiked: post.isLiked,
             isOwner: post.isLiked,
+            links: post.links,
           );
         },
       ),
@@ -209,10 +207,9 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 
   Widget _buildEntries() {
     return Obx(() {
-
-       if(controller.profile.value?.isFollowingPending==true){
-      return const Center(child: Icon(Icons.lock));
-    }
+      if (controller.profile.value?.isFollowingPending == true) {
+        return const Center(child: Icon(Icons.lock));
+      }
       if (entryController.entryPersonList.isEmpty) {
         return const Center(child: Text("Hiç entry bulunamadı."));
       }
@@ -236,7 +233,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   }
 
   Widget _buildProfileDetails() {
-     if(controller.profile.value?.isFollowingPending==true){
+    if (controller.profile.value?.isFollowingPending == true) {
       return const Center(child: Icon(Icons.lock));
     }
     return Obx(() {

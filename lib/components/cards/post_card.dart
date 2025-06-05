@@ -23,6 +23,7 @@ class PostCard extends StatefulWidget {
   final int commentCount;
   final bool isLiked;
   final bool isOwner;
+  final List<String> links; // ✅ Yeni ekledik!
 
   const PostCard(
       {super.key,
@@ -36,7 +37,8 @@ class PostCard extends StatefulWidget {
       required this.likeCount,
       required this.commentCount,
       required this.isLiked,
-      required this.isOwner});
+      required this.isOwner,
+    required this.links,});
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -174,6 +176,34 @@ class _PostCardState extends State<PostCard> {
                   maxLines: 10,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (widget.links.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                       
+                        ...widget.links.map(
+                          (link) => InkWell(
+                            onTap: () {
+                              // Linke tıklayınca açılabilir:
+                              // launchUrl(Uri.parse(link));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Text(
+                                link,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
