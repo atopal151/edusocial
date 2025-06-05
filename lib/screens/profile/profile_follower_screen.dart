@@ -1,4 +1,5 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
+import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/profile_controller.dart';
@@ -27,7 +28,12 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
             itemBuilder: (context, index) {
               final user = controller.followerList[index];
               return ListTile(
+                 onTap: () {
+                  Get.to(() => PeopleProfileScreen(
+                      username: user['username'])); // ✅ burada userId eklenmeli
+                },
                 leading: CircleAvatar(
+                  backgroundColor: Color(0xffffffff),
                   backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
                 ),
                 title: Text(

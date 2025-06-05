@@ -1,4 +1,5 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
+import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/profile_controller.dart';
@@ -27,7 +28,12 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
             itemBuilder: (context, index) {
               final user = controller.followingList[index];
               return ListTile(
+                onTap: () {
+                  Get.to(() => PeopleProfileScreen(
+                      username: user['username'])); // ✅ burada userId eklenmeli
+                },
                 leading: CircleAvatar(
+                  backgroundColor: Color(0xffffffff),
                   backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
                 ),
                 title: Text(
@@ -38,7 +44,7 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
                       color: Color(0xff414751)),
                 ),
                 subtitle: Text(
-                 '@${user["username"]}',
+                  '@${user["username"]}',
                   style: TextStyle(
                       fontSize: 13.28,
                       fontWeight: FontWeight.w400,
@@ -54,10 +60,10 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
                   ),
                   child: Text(
                     "Mesaj Gönder",
-                     style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xff414751)),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xff414751)),
                   ),
                 ),
               );

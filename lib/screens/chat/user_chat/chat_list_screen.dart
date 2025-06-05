@@ -83,6 +83,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   Stack(
                                     children: [
                                       CircleAvatar(
+                                        backgroundColor: Color(0xffffffff),
                                         radius: 28,
                                         backgroundImage:
                                             NetworkImage(friend.profileImage),
