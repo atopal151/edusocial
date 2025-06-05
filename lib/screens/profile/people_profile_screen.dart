@@ -192,13 +192,15 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
           return PostCard(
             postId: post.id,
             profileImage: post.profileImage,
-            userName: post.userName,
+            name: post.name,
+            userName: post.username,
             postDate: date,
             postDescription: post.postDescription,
             mediaUrls: post.mediaUrls,
             likeCount: post.likeCount,
             commentCount: post.commentCount,
             isLiked: post.isLiked,
+            isOwner: post.isLiked,
           );
         },
       ),

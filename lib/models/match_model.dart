@@ -1,6 +1,7 @@
 class MatchModel {
   final int userId;
   final String name;
+  final String username;
   final String profileImage;
   final bool isOnline;
   final DateTime? birthday;
@@ -26,6 +27,7 @@ final bool isFollowing;
   MatchModel({
     required this.userId,
     required this.name,
+    required this.username,
     required this.profileImage,
     required this.isOnline,
     required this.birthday,
@@ -44,6 +46,7 @@ final bool isFollowing;
     return MatchModel(
       userId: user['id'] ?? 0, // ✅ user içinden alınmalı
       name: user['name'] ?? '',
+      username: user['username'],
       profileImage: user['avatar_url'] ?? '',
       isOnline: user['is_online'] ?? false,
       birthday: user['birthday'] != null
@@ -64,6 +67,7 @@ final bool isFollowing;
   return MatchModel(
     userId: userId,
     name: name,
+    username: username,
     profileImage: profileImage,
     isOnline: isOnline,
     birthday: birthday,

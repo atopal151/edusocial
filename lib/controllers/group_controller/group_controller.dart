@@ -111,20 +111,21 @@ class GroupController extends GetxController {
     isGroupLoading.value = false;
   }
 
- void joinGroup(String id) async {
-  final success = await _groupServices.sendJoinRequest(id);
+  void joinGroup(String id) async {
+    final success = await _groupServices.sendJoinRequest(id);
 
-  if (success) {
-    final index = allGroups.indexWhere((group) => group.id == id);
-    if (index != -1) {
-      allGroups[index] = allGroups[index].copyWith(isJoined: true);
-      Get.snackbar("Katılım Başarılı", "${allGroups[index].name} grubuna katılım isteği gönderildi");
+    if (success) {
+      final index = allGroups.indexWhere((group) => group.id == id);
+      if (index != -1) {
+        allGroups[index] = allGroups[index].copyWith(isJoined: true);
+        Get.snackbar("Katılım Başarılı",
+            "${allGroups[index].name} grubuna katılım isteği gönderildi");
+      }
+    } else {
+      Get.snackbar("Katılım Hatası", "Gruba katılma isteği gönderilemedi",
+          backgroundColor: Colors.red.shade100);
     }
-  } else {
-    Get.snackbar("Katılım Hatası", "Gruba katılma isteği gönderilemedi", backgroundColor: Colors.red.shade100);
   }
-}
-
 
   void getCreateGroup() {
     Get.toNamed("/createGroup");

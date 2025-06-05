@@ -102,71 +102,75 @@ class ProfileModel {
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    return ProfileModel(
-      id: json['id'],
-      accountType: json['account_type'] ?? 'private',
-      languageId: json['language_id']?.toString(),
-      avatar: json['avatar'] ?? '',
-      banner: json['banner'] ?? '',
-      description: json['description'],
-      schoolId: json['school_id']?.toString(),
-      schoolDepartmentId: json['school_department_id']?.toString(),
-      name: json['name'] ?? '',
-      surname: json['surname'] ?? '',
-      phone: json['phone'],
-      username: json['username'] ?? '',
-      email: json['email'] ?? '',
-      emailVerifiedAt: json['email_verified_at'],
-      birthDate: json['birthday']?.toString() ?? '',
-      instagram: json['instagram'],
-      tiktok: json['tiktok'],
-      twitter: json['twitter'],
-      facebook: json['facebook'],
-      linkedin: json['linkedin'],
-      notificationEmail: json['notification_email'] ?? true,
-      notificationMobile: json['notification_mobile'] ?? true,
-      isActive: json['is_active'] ?? true,
-      isOnline: json['is_online'] ?? true,
-      deletedAt: json['deleted_at'],
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-      isFollowing: json['is_following'] ?? false,
-      isFollowingPending: json['is_following_pending'] ?? false,
-      avatarUrl: json['avatar_url'] ?? '',
-      bannerUrl: json['banner_url'] ?? '',
-      unreadMessagesTotalCount: json['unread_messages_total_count'] ?? 0,
-      followingCount: json['following_count'] ?? 0,
-      followerCount: json['follower_count'] ?? 0,
-      isSelf: json['is_self'] ?? false,
-      posts: (json['posts'] as List?)?.map((e) {
-            return PostModel.fromJsonForProfile(
-              e,
-              json['avatar_url'] ?? '',
-              "${json['name']} ${json['surname']}",
-            );
-          }).toList() ??
-          [],
-      language: json['language']['name'],
-      approvedGroups: json['approved_groups'] ?? [],
-      school: json['school'] != null && json['school'] is Map<String, dynamic>
-          ? SchoolModel.fromJson(json['school'])
-          : null,
-      schoolDepartment: json['school_department'] != null &&
-              json['school_department'] is Map<String, dynamic>
-          ? SchoolDepartmentModel.fromJson(json['school_department'])
-          : null,
-      lessons: (json['lessons'] as List?)
-              ?.map((e) => e is Map && e.containsKey('name')
-                  ? e['name'].toString()
-                  : e.toString())
-              .toList() ??
-          [],
-      followings: json['followings'] ?? [],
-      followers: json['followers'] ?? [],
-      approvedFollowings: json['approved_followings'] ?? [],
-      approvedFollowers: json['approved_followers'] ?? [],
-      stories: json['stories'] ?? [],
-      followingStories: json['following_stories'] ?? [],
-    );
-  }
+  return ProfileModel(
+    id: json['id'],
+    accountType: json['account_type'] ?? 'private',
+    languageId: json['language_id']?.toString(),
+    avatar: json['avatar'] ?? '',
+    banner: json['banner'] ?? '',
+    description: json['description'],
+    schoolId: json['school_id']?.toString(),
+    schoolDepartmentId: json['school_department_id']?.toString(),
+    name: json['name'] ?? '',
+    surname: json['surname'] ?? '',
+    phone: json['phone'],
+    username: json['username'] ?? '',
+    email: json['email'] ?? '',
+    emailVerifiedAt: json['email_verified_at'],
+    birthDate: json['birthday']?.toString() ?? '',
+    instagram: json['instagram'],
+    tiktok: json['tiktok'],
+    twitter: json['twitter'],
+    facebook: json['facebook'],
+    linkedin: json['linkedin'],
+    notificationEmail: json['notification_email'] ?? true,
+    notificationMobile: json['notification_mobile'] ?? true,
+    isActive: json['is_active'] ?? true,
+    isOnline: json['is_online'] ?? true,
+    deletedAt: json['deleted_at'],
+    createdAt: json['created_at'] ?? '',
+    updatedAt: json['updated_at'] ?? '',
+    isFollowing: json['is_following'] ?? false,
+    isFollowingPending: json['is_following_pending'] ?? false,
+    avatarUrl: json['avatar_url'] ?? '',
+    bannerUrl: json['banner_url'] ?? '',
+    unreadMessagesTotalCount: json['unread_messages_total_count'] ?? 0,
+    followingCount: json['following_count'] ?? 0,
+    followerCount: json['follower_count'] ?? 0,
+    isSelf: json['is_self'] ?? false,
+    posts: (json['posts'] as List?)
+            ?.map((e) => PostModel.fromJsonForProfile(
+                  e,
+                  json['avatar_url'] ?? '',
+                  "${json['name']} ${json['surname']}",
+                ))
+            .toList() ??
+        [],
+    language: json['language']?['name'], // null koruması eklendi
+    approvedGroups: (json['approved_groups'] as List<dynamic>?) ?? [],
+    school: json['school'] != null && json['school'] is Map<String, dynamic>
+        ? SchoolModel.fromJson(json['school'])
+        : null,
+    schoolDepartment: json['school_department'] != null &&
+            json['school_department'] is Map<String, dynamic>
+        ? SchoolDepartmentModel.fromJson(json['school_department'])
+        : null,
+    lessons: (json['lessons'] as List?)
+            ?.map((e) => e is Map && e.containsKey('name')
+                ? e['name'].toString()
+                : e.toString())
+            .toList() ??
+        [],
+    followings: (json['followings'] as List<dynamic>?) ?? [],
+    followers: (json['followers'] as List<dynamic>?) ?? [],
+    approvedFollowings:
+        (json['approved_followings'] as List<dynamic>?) ?? [],
+    approvedFollowers:
+        (json['approved_followers'] as List<dynamic>?) ?? [],
+    stories: (json['stories'] as List<dynamic>?) ?? [],
+    followingStories:
+        (json['following_stories'] as List<dynamic>?) ?? [],
+  );
+}
+
 }

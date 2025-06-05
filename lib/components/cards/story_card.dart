@@ -1,4 +1,4 @@
-import 'package:edusocial/controllers/profile_controller.dart';
+//import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/story_controller.dart';
@@ -12,7 +12,7 @@ class StoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProfileController profileController = Get.find<ProfileController>();
+    //final ProfileController profileController = Get.find<ProfileController>();
     final StoryController storyController = Get.find<StoryController>();
 
 
@@ -44,12 +44,14 @@ class StoryCard extends StatelessWidget {
                   story.isViewed.value = true; // izlenmiş olarak işaretle
                 },
                 onLongPress: () {
-                  profileController.getToPeopleProfileScreen();
+                  //profileController.getToPeopleProfileScreen(story.username);
                 },
                 child: CircleAvatar(
                   radius: 32,
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
+
+                  backgroundColor: Colors.white,
                     radius: 30,
                     backgroundImage: NetworkImage(story.profileImage),
                   ),
@@ -60,7 +62,7 @@ class StoryCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          story.username,
+          '@${story.username}',
           style: const TextStyle(fontSize: 12),
           overflow: TextOverflow.ellipsis,
         )

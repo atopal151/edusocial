@@ -5,7 +5,7 @@ class PostModel {
   final String slug;
   final String status;
   final String profileImage;
-  final String userName;
+  final String name;
   final String username; // @kullaniciadi gibi göstermek için
   final String postDate;
   final String postDescription;
@@ -20,7 +20,7 @@ class PostModel {
     required this.slug,
     required this.status,
     required this.profileImage,
-    required this.userName,
+    required this.name,
     required this.username,
     required this.postDate,
     required this.postDescription,
@@ -58,7 +58,7 @@ class PostModel {
               ? user['avatar']
               : "${AppConstants.baseUrl}/${user['avatar']}")
           : "${AppConstants.baseUrl}/images/static/avatar.png",
-      userName: user['full_name'] ?? '',
+      name: user['full_name'] ?? '',
       username: user['username'] ?? '',
       postDate: json['created_at'] ?? '',
       postDescription: json['content'] ?? '',
@@ -93,7 +93,7 @@ factory PostModel.fromJsonForProfile(
     slug: json['slug'] ?? '',
     status: json['status'] ?? '',
     profileImage: avatarUrl,  // dışarıdan parametre ile geliyor
-    userName: fullName,       // dışarıdan parametre ile geliyor
+    name: fullName,       // dışarıdan parametre ile geliyor
     username: json['username'] ?? '', // JSON’da yoksa boş kalsın
     postDate: json['created_at'] ?? '',
     postDescription: json['content'] ?? '',

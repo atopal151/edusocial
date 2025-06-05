@@ -21,19 +21,19 @@ class PostHomeList extends StatelessWidget {
 
       return Column(
         children: postController.postHomeList.map((post) {
-
           return Container(
             color: const Color(0xfffafafa),
             child: PostCard(
               postId: post.id,
               profileImage: post.profileImage,
-              userName: post.userName,
+              userName: post.username,
               postDate: post.postDate,
               postDescription: post.postDescription,
-
+              name: post.name,
               mediaUrls: post.mediaUrls, // ✅ doğru alan // 🔁 boş liste
               likeCount: post.likeCount,
               commentCount: post.commentCount, isLiked: post.isLiked,
+              isOwner: post.isOwner,
             ),
           );
         }).toList(),

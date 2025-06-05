@@ -17,7 +17,12 @@ String formatSimpleDateClock(String dateString) {
 }
 
 
-String formatSimpleDate(String rawDateTime) {
-  final parsed = DateTime.parse(rawDateTime).toLocal();
-  return DateFormat('dd.MM.yyyy').format(parsed); // örnek: 25 05 2025 • 17:20
+String formatSimpleDate(String? dateStr) {
+  if (dateStr == null || dateStr.isEmpty) return '';
+  try {
+    DateTime parsedDate = DateTime.parse(dateStr);
+    return DateFormat('dd.MM.yyyy').format(parsedDate);
+  } catch (e) {
+    return ''; // veya "Geçersiz Tarih"
+  }
 }

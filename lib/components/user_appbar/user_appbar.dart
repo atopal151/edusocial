@@ -1,3 +1,4 @@
+import 'package:edusocial/controllers/group_controller/group_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -5,6 +6,7 @@ import '../../controllers/appbar_controller.dart';
 
 class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBarController controller = Get.put(AppBarController());
+final GroupController groupController = Get.find<GroupController>();
 
   UserAppBar({super.key});
 
@@ -79,7 +81,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              Positioned(
+             /* Positioned(
                 top: -5,
                 right: -5,
                 child: Container(
@@ -99,7 +101,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                 ),
-              ),
+              ),*/
             ],
           ),
         ],

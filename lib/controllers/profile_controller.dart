@@ -1,5 +1,6 @@
 import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/models/post_model.dart';
+import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -45,14 +46,17 @@ class ProfileController extends GetxController {
     loadProfile();
   }
 
-  String formatBirthday(String isoString) {
-    try {
-      DateTime parsed = DateTime.parse(isoString);
-      return DateFormat('dd.MM.yyyy').format(parsed);
-    } catch (e) {
-      return '';
-    }
+String formatSimpleDate(String dateStr) {
+  if (dateStr.isEmpty) return '';
+  try {
+    DateTime parsedDate = DateTime.parse(dateStr);
+    return DateFormat('dd.MM.yyyy').format(parsedDate);
+  } catch (e) {
+    return ''; // veya istersen 'Geçersiz Tarih'
   }
+}
+
+
 
   Future<void> loadProfile() async {
     try {
@@ -67,7 +71,8 @@ class ProfileController extends GetxController {
       profileImage.value = data.avatarUrl;
       coverImage.value = data.bannerUrl;
       bio.value = data.description ?? '';
-      birthDate.value = formatBirthday(data.birthDate);
+   birthDate.value = data.birthDate;
+
       lessons.value = data.lessons;
 
       // 📌 Okul ve Bölüm Bilgileri
@@ -103,8 +108,9 @@ class ProfileController extends GetxController {
     Get.toNamed("/userSettings");
   }
 
-  void getToPeopleProfileScreen() async {
-    Get.toNamed("/peopleProfile");
+  void getToPeopleProfileScreen(String username) async {
+    Get.to(() =>
+            PeopleProfileScreen(username: username)); // ✅ burada userId eklenmeli
   }
 
   void updateProfile(String name, String newBio) {

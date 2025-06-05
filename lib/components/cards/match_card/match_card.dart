@@ -25,7 +25,7 @@ class _MatchCardState extends State<MatchCard> {
 
       return GestureDetector(
         onTap: () {
-          profileController.getToPeopleProfileScreen();
+          profileController.getToPeopleProfileScreen(match.username);
         },
         onPanUpdate: (details) {
           setState(() {

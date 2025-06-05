@@ -1,3 +1,4 @@
+import 'package:edusocial/components/widgets/user_tree_point_bottom_sheet_post.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import '../widgets/tree_point_bottom_sheet.dart';
 class PostCard extends StatefulWidget {
   final int postId;
   final String profileImage;
+  final String name;
   final String userName;
   final String postDate;
   final String postDescription;
@@ -20,19 +22,21 @@ class PostCard extends StatefulWidget {
   final int likeCount;
   final int commentCount;
   final bool isLiked;
+  final bool isOwner;
 
-  const PostCard({
-    super.key,
-    required this.profileImage,
-    required this.postId,
-    required this.userName,
-    required this.postDate,
-    required this.postDescription,
-    required this.mediaUrls,
-    required this.likeCount,
-    required this.commentCount,
-    required this.isLiked,
-  });
+  const PostCard(
+      {super.key,
+      required this.profileImage,
+      required this.postId,
+      required this.userName,
+      required this.name,
+      required this.postDate,
+      required this.postDescription,
+      required this.mediaUrls,
+      required this.likeCount,
+      required this.commentCount,
+      required this.isLiked,
+      required this.isOwner});
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -80,8 +84,12 @@ class _PostCardState extends State<PostCard> {
                 Row(
                   children: [
                     InkWell(
-                        onTap: () =>
-                            profileController.getToPeopleProfileScreen(),
+                        onTap: () {
+                          if (widget.isOwner == false) {
+                            profileController
+                                .getToPeopleProfileScreen(widget.userName);
+                          }
+                        },
                         child: CircleAvatar(
                           radius: 20,
                           backgroundColor: Colors.grey.shade300, // Gri arkaplan
@@ -98,7 +106,7 @@ class _PostCardState extends State<PostCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.userName,
+                            widget.name,
                             style: GoogleFonts.inter(
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
@@ -118,20 +126,39 @@ class _PostCardState extends State<PostCard> {
                     ),
                     InkWell(
                       onTap: () {
-                        showModalBottomSheet(
-                          backgroundColor: Colors.white,
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(25)),
-                          ),
-                          builder: (_) => const TreePointBottomSheet(),
-                        );
+                        if (widget.isOwner == false) {
+                          showModalBottomSheet(
+                            backgroundColor: Colors.white,
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25)),
+                            ),
+                            builder: (_) => const TreePointBottomSheet(),
+                          );
+                        }
+                        if (widget.isOwner == true) {
+                          showModalBottomSheet(
+                            backgroundColor: Colors.white,
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25)),
+                            ),
+                            builder: (_) => UserTreePointBottomSheet(
+                              postId: widget.postId,
+                            ),
+                          );
+                        }
                       },
-                      child: SvgPicture.asset(
-                        "images/icons/tree_dot.svg",
-                        colorFilter: const ColorFilter.mode(
-                            Color(0xff414751), BlendMode.srcIn),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: SvgPicture.asset(
+                          "images/icons/tree_dot.svg",
+                          colorFilter: const ColorFilter.mode(
+                              Color(0xff414751), BlendMode.srcIn),
+                        ),
                       ),
                     ),
                   ],

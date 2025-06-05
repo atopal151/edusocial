@@ -85,6 +85,7 @@ class UserStoryCard extends StatelessWidget {
                     backgroundColor: Colors.white,
                     child: CircleAvatar(
                       radius: 30,
+                    backgroundColor: Colors.white,
                       backgroundImage: NetworkImage(story!.profileImage),
                     ),
                   ),

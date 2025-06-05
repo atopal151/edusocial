@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/controllers/group_controller/create_group_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -104,13 +105,31 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                       radius: 40,
                                       backgroundColor: Colors.white,
                                       backgroundImage: createGroupController
+                                                  .profileImageFile.value ==
+                                              null
+                                          ? null
+                                          : FileImage(createGroupController
+                                              .profileImageFile
+                                              .value!) as ImageProvider,
+                                      child: createGroupController
                                                   .profileImageFile.value !=
                                               null
-                                          ? FileImage(createGroupController
-                                              .profileImageFile.value!)
-                                          : const NetworkImage(
-                                              "https://randomuser.me/api/portraits/women/2.jpg",
-                                            ) as ImageProvider,
+                                          ? ClipOval(
+                                              child: Image.file(
+                                                createGroupController
+                                                    .profileImageFile.value!,
+                                                fit: BoxFit.cover,
+                                                width: 80,
+                                                height: 80,
+                                              ),
+                                            )
+                                          : SvgPicture.asset(
+                                              "images/icons/group_icon.svg",
+                                              colorFilter: ColorFilter.mode(
+                                                Color(0xff9ca3ae),
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
                                     ),
                                   ),
                                   Container(

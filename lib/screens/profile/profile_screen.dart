@@ -167,13 +167,15 @@ class _ProfileScreenState extends State<ProfileScreen>
           return PostCard(
             postId: post.id,
             profileImage: post.profileImage,
-            userName: post.userName,
+            userName: post.username,
+            name: post.name,
             postDate: post.postDate,
             postDescription: post.postDescription,
             mediaUrls: post.mediaUrls,
             likeCount: post.likeCount,
             commentCount: post.commentCount,
             isLiked: post.isLiked,
+            isOwner: post.isOwner,
           );
         },
       ),
