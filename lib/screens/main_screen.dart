@@ -35,6 +35,11 @@ class MainScreen extends StatelessWidget {
     Get.put(GroupController());
 
     final token = GetStorage().read('token');
+    debugPrint('Token: $token');
+
+    // 🌐 Socket Service
+    Get.lazyPut<SocketService>(() => SocketService());
+
     //debugPrint('Verilen Token: $token');
     SocketService.to.connectSocket(token);
     return Scaffold(

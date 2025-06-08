@@ -21,8 +21,8 @@ class MatchServices {
         body: jsonEncode({"name": lessonName}), // 🔥 Düzeltildi: "name" olmalı
       );
 
-      debugPrint("📥 Lesson Add Response: ${response.statusCode}");
-      debugPrint("📥 Lesson Add Body: ${response.body}");
+     // debugPrint("📥 Lesson Add Response: ${response.statusCode}");
+     // debugPrint("📥 Lesson Add Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -77,8 +77,8 @@ class MatchServices {
         },
       );
 
-      debugPrint("📥 Match Response: ${response.statusCode}");
-      debugPrint("📥 Match Body: ${response.body}");
+     // debugPrint("📥 Match Response: ${response.statusCode}");
+      //debugPrint("📥 Match Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final dynamic data = jsonDecode(response.body)['data'];

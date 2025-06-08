@@ -50,11 +50,11 @@ class GroupSuggestionListView extends StatelessWidget {
                       ),
                       child: InkWell(
                         onTap: () {
-                          groupController.joinSuggestionGroup(group.id);
+                          groupController.joinGroup(group.id);
                         },
                         child: Center(
                             child: Text(
-                          "Katıl",
+                          group.isMember ? "Katıldınız" : 'Katıl',
                           style: GoogleFonts.inter(
                               color: Color(0xffffffff),
                               fontSize: 10,

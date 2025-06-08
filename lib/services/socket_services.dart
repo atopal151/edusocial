@@ -11,7 +11,7 @@ class SocketService extends GetxService {
   bool get isConnected => _isConnected.value;
 
   // Socket URL (Backend tarafından 443 portu için onaylanmış)
-  final String _socketUrl = 'wss://stageapi.edusocial.pl';
+  final String _socketUrl = 'https://stageapi.edusocial.pl';
 
   // Socket bağlantısını başlat
   void connectSocket(String token) {

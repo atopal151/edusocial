@@ -84,13 +84,7 @@ class GroupController extends GetxController {
   }
 //--------------------------------------------------------------
 
-  void joinSuggestionGroup(String id) {
-    final index = suggestionGroups.indexWhere((group) => group.id == id);
-    if (index != -1) {
-      Get.snackbar(
-          "Katıldın", "${suggestionGroups[index].groupName} grubuna katıldın");
-    }
-  }
+
 
   void requestToJoinGroup(String groupId) async {
     isGroupLoading.value = true;
