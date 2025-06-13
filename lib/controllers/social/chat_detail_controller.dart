@@ -4,6 +4,7 @@ import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/models/chat_models/conversation_model.dart';
 import 'package:edusocial/models/chat_models/sender_model.dart';
+import 'package:edusocial/models/chat_models/detail_document_model.dart';
 import 'package:edusocial/services/chat_service.dart';
 import 'package:edusocial/services/socket_services.dart';
 import 'package:file_picker/file_picker.dart';
@@ -12,13 +13,20 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/chat_models/chat_detail_model.dart';
 import '../../models/user_chat_detail_model.dart';
+import '../../models/document_model.dart';
+import '../../models/link_model.dart';
 
 class ChatDetailController extends GetxController {
-  RxList<MessageModel> messages = <MessageModel>[].obs;
-  final ScrollController scrollController = ScrollController();
+  final isLoading = false.obs;
+  final messages = <MessageModel>[].obs;
+  final documents = <String>[].obs;
+  final links = <String>[].obs;
+  final photoUrls = <String>[].obs;
+  final documentModels = <DetailDocumentModel>[].obs;
+  final userChatDetail = Rxn<UserChatDetailModel>();
+  final scrollController = ScrollController();
+  int? currentChatId;
 
-  var userChatDetail = Rxn<UserChatDetailModel>();
-  var isLoading = false.obs;
   RxString pollQuestion = ''.obs;
   RxList<String> pollOptions = <String>[].obs;
   RxMap<String, int> pollVotes = <String, int>{}.obs;
@@ -27,57 +35,187 @@ class ChatDetailController extends GetxController {
   Rx<File?> selectedImage = Rx<File?>(null);
   TextEditingController pollTitleController = TextEditingController();
 
-  late int currentChatId;
   final ProfileController profileController = Get.find<ProfileController>();
   final SocketService socketService = Get.find<SocketService>();
 
-@override
-void onInit() {
-  super.onInit();
-
-    // Socket Listener'ı sadece 1 kez ekliyoruz
-   /* socketService.onPrivateMessage((data) {
-      onNewPrivateMessage(data);
-    });*/
-}
-
-
   @override
-  void onClose() {
-    stopListeningToNewMessages();
-    super.onClose();
+  void onInit() {
+    super.onInit();
+    _initializeScrollController();
+    _setupSocketListeners();
+    _loadInitialData();
   }
 
-  void onNewPrivateMessage(dynamic data) {
-    final conversationId = data['conversation_id'];
-    if (conversationId == currentChatId) {
-      messages.add(MessageModel.fromJson(data));
-      messages.refresh();
-      scrollToBottom();
+  void _initializeScrollController() {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        // Son sayfaya gelindiğinde yeni mesajları yükle
+      }
+    });
+  }
+
+  void _setupSocketListeners() {
+    final socketService = Get.find<SocketService>();
+    socketService.onNewPrivateMessage(_onNewPrivateMessage);
+  }
+
+  void _loadInitialData() {
+    if (currentChatId != null) {
+      fetchConversationMessages(currentChatId!);
     }
   }
 
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
+  }
+
+  Future<void> loadUserChatDetail(int chatId) async {
+    try {
+      debugPrint('🔍 ChatDetailController - loadUserChatDetail başladı');
+      debugPrint('  - chatId: $chatId');
+      
+      isLoading.value = true;
+      currentChatId = chatId;
+
+      // Örnek veri - gerçek uygulamada API'den gelecek
+      userChatDetail.value = UserChatDetailModel(
+        id: chatId.toString(),
+        name: "Kullanıcı Adı",
+        follower: "0",
+        following: "0",
+        imageUrl: "https://via.placeholder.com/150",
+        memberImageUrls: const [],
+        documents: const [],
+        links: const [],
+        photoUrls: const [],
+      );
+
+      debugPrint('✅ ChatDetailController - userChatDetail yüklendi:');
+      debugPrint('  - ID: ${userChatDetail.value?.id}');
+      debugPrint('  - Name: ${userChatDetail.value?.name}');
+      debugPrint('  - Follower: ${userChatDetail.value?.follower}');
+      debugPrint('  - Following: ${userChatDetail.value?.following}');
+
+      // Mesajları yükle
+      await fetchConversationMessages(chatId);
+
+      // Belge, link ve fotoğrafları userChatDetail'e ekle
+      if (userChatDetail.value != null) {
+        userChatDetail.value = UserChatDetailModel(
+          id: userChatDetail.value!.id,
+          name: userChatDetail.value!.name,
+          follower: userChatDetail.value!.follower,
+          following: userChatDetail.value!.following,
+          imageUrl: userChatDetail.value!.imageUrl,
+          memberImageUrls: userChatDetail.value!.memberImageUrls,
+          documents: documentModels.map((doc) => DocumentModel(
+            name: doc.name,
+            url: doc.url,
+            sizeMb: 0.0,
+            date: DateTime.now(),
+          )).toList(),
+          links: links.map((link) => LinkModel(
+            url: link,
+            title: "Link",
+          )).toList(),
+          photoUrls: photoUrls,
+        );
+        
+        debugPrint('✅ ChatDetailController - userChatDetail güncellendi:');
+        debugPrint('  - Documents Count: ${userChatDetail.value?.documents.length}');
+        debugPrint('  - Links Count: ${userChatDetail.value?.links.length}');
+        debugPrint('  - PhotoUrls Count: ${userChatDetail.value?.photoUrls.length}');
+      }
+
+      userChatDetail.refresh();
+    } catch (e) {
+      debugPrint('❌ ChatDetailController - Hata: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _onNewPrivateMessage(dynamic data) {
+    try {
+      if (data is Map<String, dynamic>) {
+        final message = MessageModel.fromJson(data);
+        if (message.conversationId == currentChatId) {
+          messages.add(message);
+          // Yeni mesaj geldiğinde kullanıcı bilgilerini güncelle
+          if (message.sender != null) {
+            final sender = message.sender!;
+            userChatDetail.value = UserChatDetailModel(
+              id: sender.id.toString(),
+              name: '${sender.name} ${sender.surname}',
+              follower: '0', // API'den gelmiyor
+              following: '0', // API'den gelmiyor
+              imageUrl: sender.avatarUrl,
+              memberImageUrls: const [],
+              documents: const [],
+              links: const [],
+              photoUrls: const [],
+            );
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ _onNewPrivateMessage error: $e');
+    }
+  }
 
   void startListeningToNewMessages(int chatId) {
     currentChatId = chatId;
   }
 
   void stopListeningToNewMessages() {
-   // socketService.removeAllListeners();
+    // socketService.removeAllListeners();
   }
 
- void fetchConversationMessages(int chatId) async {
+  Future<void> fetchConversationMessages(int chatId) async {
     try {
       isLoading.value = true;
+      currentChatId = chatId;
+      
       final fetchedMessages = await ChatServices.fetchConversationMessages(chatId);
-      messages.assignAll(fetchedMessages);
-      messages.refresh();
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
-    } catch (e, stackTrace) {
-      debugPrint("🛑 Mesajlar getirilemedi: $e");
-      debugPrint(stackTrace.toString());
+      messages.clear();
+      messages.addAll(fetchedMessages);
+
+      // İlk mesajdan kullanıcı bilgilerini yükle
+      if (messages.isNotEmpty && messages.first.sender != null) {
+        final sender = messages.first.sender!;
+        userChatDetail.value = UserChatDetailModel(
+          id: sender.id.toString(),
+          name: '${sender.name} ${sender.surname}',
+          follower: '0', // API'den gelmiyor
+          following: '0', // API'den gelmiyor
+          imageUrl: sender.avatarUrl,
+          memberImageUrls: const [],
+          documents: const [],
+          links: const [],
+          photoUrls: const [],
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ fetchConversationMessages error: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void scrollToBottom({bool animated = true}) {
+    if (scrollController.hasClients) {
+      final position = scrollController.position.maxScrollExtent + 100;
+      if (animated) {
+        scrollController.animateTo(
+          position,
+          duration: const Duration(milliseconds: 1),
+          curve: Curves.easeOut,
+        );
+      } else {
+        scrollController.jumpTo(position);
+      }
     }
   }
 
@@ -103,8 +241,10 @@ void onInit() {
                   hintText: "Anket Başlığı",
                   filled: true,
                   fillColor: const Color(0xfff5f5f5),
-                  hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  hintStyle:
+                      const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
@@ -188,7 +328,8 @@ void onInit() {
   }
 
   void pickImageFromGallery() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       selectedImage.value = File(pickedFile.path);
       debugPrint("📸 Seçilen resim: ${pickedFile.path}");
@@ -211,53 +352,19 @@ void onInit() {
       debugPrint("Belge seçme hatası: $e");
     }
   }
-  void sendMessage(String text) async {
+
+  Future<void> sendMessage(String message) async {
+    if (currentChatId == null) return;
+    
     try {
-      isLoading.value = true;
-      List<File> mediaFilesToSend = [];
-      if (selectedImage.value != null) {
-        mediaFilesToSend.add(selectedImage.value!);
-      }
-
       await ChatServices.sendMessage(
-        currentChatId,
-        text,
-        mediaFiles: mediaFilesToSend.isNotEmpty ? mediaFilesToSend : null,
+        currentChatId!,
+        message,
       );
-
-      messages.add(MessageModel(
-        id: 0,
-        conversationId: currentChatId,
-        senderId: 0,
-        message: text,
-        isRead: true,
-        isMe: true,
-        createdAt: DateTime.now().toIso8601String(),
-        updatedAt: DateTime.now().toIso8601String(),
-        sender: SenderModel.empty(),
-        conversation: ConversationModel.empty(),
-        messageMedia: [],
-        messageLink: [],
-        senderAvatarUrl: '',
-      ));
-
-      messages.refresh();
-      selectedImage.value = null;
-      scrollToBottom();
+      // Mesaj gönderildikten sonra mesajları yeniden yükle
+      await fetchConversationMessages(currentChatId!);
     } catch (e) {
       debugPrint("🛑 Mesaj gönderilemedi: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  void scrollToBottom() {
-    if (scrollController.hasClients) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent + 100,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
     }
   }
 }

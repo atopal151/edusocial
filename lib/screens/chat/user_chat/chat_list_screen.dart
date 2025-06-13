@@ -75,7 +75,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   friend.id,
                                   name: friend.name,
                                   avatarUrl: friend.profileImage,
-                                  isOnline: friend.isOnline,
+                                  isOnline: friend.isOnline, username: friend.username,
                                 );
                               },
                               child: Column(
@@ -176,7 +176,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                   chat.id,
                   name: chat.name,
                   avatarUrl: chat.avatar,
-                  isOnline: chat.isOnline,
+                  isOnline: chat.isOnline, username: chat.username,
                 );
               },
               child: Padding(

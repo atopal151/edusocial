@@ -1,8 +1,10 @@
 import 'package:edusocial/components/widgets/chat_widget/message_widget_factory.dart';
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/message_input_field.dart';
 import '../../../controllers/social/chat_detail_controller.dart';
+import '../../../models/user_chat_detail_model.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key});
@@ -13,9 +15,12 @@ class ChatDetailScreen extends StatefulWidget {
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   // Controller'ı permanent olarak Get.put ile register ettik
-  final ChatDetailController controller = Get.put(ChatDetailController(), permanent: true);
+  final ChatDetailController controller =
+      Get.put(ChatDetailController(), permanent: true);
 
+  final ProfileController profileController = Get.find<ProfileController>();
   late String name;
+    late String username;
   late String avatarUrl;
   late bool isOnline;
   late int chatId;
@@ -24,16 +29,20 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   void initState() {
     super.initState();
 
-    // Chat ID ve diğer bilgileri al
     chatId = Get.arguments['chatId'];
     name = Get.arguments['name'] ?? 'Bilinmiyor';
+    username = Get.arguments['username'] ?? '';
     avatarUrl = Get.arguments['avatarUrl'] ?? '';
     isOnline = Get.arguments['isOnline'] ?? false;
 
     debugPrint('Chat ID: $chatId');
 
-    // Mesajları yükle ve dinlemeye başla
-    controller.fetchConversationMessages(chatId);
+    controller.fetchConversationMessages(chatId).then((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.scrollToBottom(animated: false);
+      });
+    });
+
     controller.startListeningToNewMessages(chatId);
   }
 
@@ -51,7 +60,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         surfaceTintColor: const Color(0xffffffff),
         title: InkWell(
           onTap: () {
-            Get.toNamed("/peopleProfile");
+            profileController.getToPeopleProfileScreen(username);
           },
           child: Row(
             children: [
@@ -60,11 +69,13 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   CircleAvatar(
                     radius: 20,
                     backgroundColor: Colors.grey[300],
-                    backgroundImage: (avatarUrl.isNotEmpty && !avatarUrl.endsWith('/0'))
-                        ? NetworkImage(avatarUrl)
-                        : null,
+                    backgroundImage:
+                        (avatarUrl.isNotEmpty && !avatarUrl.endsWith('/0'))
+                            ? NetworkImage(avatarUrl)
+                            : null,
                     child: (avatarUrl.isEmpty || avatarUrl.endsWith('/0'))
-                        ? const Icon(Icons.person, color: Colors.white, size: 20)
+                        ? const Icon(Icons.person,
+                            color: Colors.white, size: 20)
                         : null,
                   ),
                   Positioned(
@@ -74,7 +85,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       width: 15,
                       height: 15,
                       decoration: BoxDecoration(
-                        color: isOnline ? const Color(0xff65d384) : const Color(0xffd9d9d9),
+                        color: isOnline
+                            ? const Color(0xff65d384)
+                            : const Color(0xffd9d9d9),
                         borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: Colors.white, width: 2),
                       ),
@@ -89,12 +102,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   Text(
                     name,
                     style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xff414751)),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff414751)),
                   ),
                   Text(
                     isOnline ? "Çevrimiçi" : "Çevrimdışı",
                     style: const TextStyle(
-                        fontSize: 12, color: Color(0xff9ca3ae), fontWeight: FontWeight.w400),
+                        fontSize: 12,
+                        color: Color(0xff9ca3ae),
+                        fontWeight: FontWeight.w400),
                   ),
                 ],
               ),
@@ -103,9 +120,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         ),
         actions: [
           InkWell(
-            onTap: () {
-              Get.toNamed("/user_chat_detail");
-            },
+            onTap: _onUserDetailTap,
             child: const Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(Icons.more_horiz),
@@ -133,7 +148,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             Container(
               decoration: const BoxDecoration(color: Color(0xffffffff)),
               child: Padding(
-                padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8, bottom: 20),
+                padding: const EdgeInsets.only(
+                    left: 16.0, right: 16, top: 8, bottom: 20),
                 child: buildMessageInputField(),
               ),
             ),
@@ -141,5 +157,40 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         ),
       ),
     );
+  }
+
+  void _onUserDetailTap() {
+    debugPrint('🔍 ChatDetailScreen - _onUserDetailTap çağrıldı');
+    debugPrint('  - currentChatId: ${controller.currentChatId}');
+    debugPrint('  - userChatDetail: ${controller.userChatDetail.value != null ? 'Var' : 'Null'}');
+
+    if (controller.userChatDetail.value == null) {
+      debugPrint('❌ ChatDetailScreen - userChatDetail null');
+      Get.snackbar('Hata', 'Kullanıcı bilgileri yüklenemedi!');
+      return;
+    }
+
+    final userDetail = UserChatDetailModel(
+      id: controller.currentChatId.toString(),
+      name: controller.userChatDetail.value?.name ?? '',
+      follower: controller.userChatDetail.value?.follower ?? '0',
+      following: controller.userChatDetail.value?.following ?? '0',
+      imageUrl: controller.userChatDetail.value?.imageUrl ?? '',
+      memberImageUrls: controller.userChatDetail.value?.memberImageUrls ?? [],
+      documents: controller.userChatDetail.value?.documents ?? [],
+      links: controller.userChatDetail.value?.links ?? [],
+      photoUrls: controller.userChatDetail.value?.photoUrls ?? [],
+    );
+    
+    debugPrint('✅ ChatDetailScreen - UserDetail Model oluşturuldu:');
+    debugPrint('  - ID: ${userDetail.id}');
+    debugPrint('  - Name: ${userDetail.name}');
+    debugPrint('  - Follower: ${userDetail.follower}');
+    debugPrint('  - Following: ${userDetail.following}');
+    
+    Get.toNamed('/user_chat_detail', arguments: {
+      'chatId': controller.currentChatId,
+      'userDetail': userDetail,
+    });
   }
 }

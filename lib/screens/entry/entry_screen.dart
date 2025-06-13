@@ -133,58 +133,43 @@ class _EntryScreenState extends State<EntryScreen> {
           ),
 
           // 📄 Entry Listesi
-          Obx(() {
-            return Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  final searchText = entrySearchController.text.toLowerCase();
-                  filteredEntries.assignAll(
-                    entryController.entryList.where((entry) {
-                      return entry.content
-                              .toLowerCase()
-                              .contains(searchText) ||
-                          entry.content
-                              .toLowerCase()
-                              .contains(searchText);
-                    }).toList(),
+          Expanded(
+            child: Obx(() {
+              final topic = entryController.currentTopic.value;
+              final topicName = topic?.name;
+              final categoryTitle = topic?.category.title;
+              return ListView.separated(
+                itemCount: filteredEntries.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  final entry = filteredEntries[index];
+                  return EntryCard(
+                    entry: entry,
+                    topicName: topicName,
+                    categoryTitle: categoryTitle,
+                    onPressedProfile: () {
+                      Get.toNamed("/peopleProfile");
+                    },
+                    onPressed: () {
+                      Get.toNamed("/entryDetail", arguments: entry);
+                    },
+                    onUpvote: () => entryController.voteEntry(entry.id, "up"),
+                    onDownvote: () => entryController.voteEntry(entry.id, "down"),
+                    onShare: () {
+                      final String shareText = entry.content;
+                      showModalBottomSheet(
+                        context: context,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                        ),
+                        builder: (_) => ShareOptionsBottomSheet(postText: shareText),
+                      );
+                    },
                   );
                 },
-                child: ListView.separated(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  itemCount: filteredEntries.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final entry = filteredEntries[index];
-                    return EntryCard(
-                      entry: entry,
-                      onPressedProfile: () {
-                        Get.toNamed("/peopleProfile");
-                      },
-                      onPressed: () {
-                        Get.toNamed("/entryDetail", arguments: entry);
-                      },
-                      onUpvote: (){},
-                      onDownvote: () {},
-                      onShare: () {
-                        final String shareText =
-                            "";
-                        showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(25)),
-                          ),
-                          builder: (_) =>
-                              ShareOptionsBottomSheet(postText: shareText),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            );
-          }),
+              );
+            }),
+          ),
         ],
       ),
     );

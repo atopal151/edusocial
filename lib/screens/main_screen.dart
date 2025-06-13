@@ -34,14 +34,27 @@ class MainScreen extends StatelessWidget {
     Get.put(PostController());
     Get.put(GroupController());
 
-    final token = GetStorage().read('token');
-    debugPrint('Token: $token');
-
     // 🌐 Socket Service
-    Get.lazyPut<SocketService>(() => SocketService());
+    final socketService = Get.put(SocketService());
 
-    //debugPrint('Verilen Token: $token');
-    SocketService.to.connectSocket(token);
+    // Token kontrolü ve socket bağlantısı
+    final token = GetStorage().read('token');
+    if (token != null && token.isNotEmpty) {
+      debugPrint('🔑 Token bulundu, socket bağlantısı başlatılıyor...');
+      // Token'ı temizle ve kontrol et
+      final cleanToken = token.trim();
+      if (cleanToken.length > 10) { // Minimum token uzunluğu kontrolü
+        // Socket bağlantısını başlat
+        Future.delayed(const Duration(milliseconds: 500), () {
+          socketService.connectSocket(cleanToken);
+        });
+      } else {
+        debugPrint('⚠️ Token geçersiz uzunlukta: ${cleanToken.length}');
+      }
+    } else {
+      debugPrint('⚠️ Token bulunamadı, socket bağlantısı kurulamıyor.');
+    }
+
     return Scaffold(
       body: Obx(() {
         return IndexedStack(

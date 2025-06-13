@@ -2,6 +2,7 @@ import 'sender_model.dart';
 import 'conversation_model.dart';
 import 'message_media_model.dart';
 import 'message_link_model.dart';
+import 'detail_document_model.dart';
 
 class MessageModel {
   final int id;
@@ -16,7 +17,8 @@ class MessageModel {
   final ConversationModel conversation;
   final List<MessageMediaModel> messageMedia;
   final List<MessageLinkModel> messageLink;
-  final String? senderAvatarUrl; // 💡 Yeni alan
+  final List<DetailDocumentModel>? messageDocument;
+  final String? senderAvatarUrl;
 
   MessageModel({
     required this.id,
@@ -31,7 +33,8 @@ class MessageModel {
     required this.conversation,
     required this.messageMedia,
     required this.messageLink,
-    this.senderAvatarUrl, // 💡 Yeni alan
+    this.messageDocument,
+    this.senderAvatarUrl,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
@@ -67,9 +70,12 @@ class MessageModel {
               ?.map((e) => MessageLinkModel.fromJson(e))
               .toList() ??
           [],
+      messageDocument: (json['message_document'] as List<dynamic>?)
+              ?.map((e) => DetailDocumentModel.fromJson(e))
+              .toList(),
       senderAvatarUrl: senderJson != null
           ? senderJson['avatar_url'] ?? ""
-          : "", // 💡 Avatar URL'yi çek
+          : "",
     );
   }
 }

@@ -13,6 +13,7 @@ import '../../components/profile_tabbar/profile_tabbar.dart';
 import '../../components/profile_tabbar/toggle_tab_bar.dart';
 import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
+import '../../components/sheets/share_options_bottom_sheet.dart';
 
 class PeopleProfileScreen extends StatefulWidget {
   final String username;
@@ -220,11 +221,27 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
           return Container(
             color: const Color(0xfffafafa),
             child: EntryCard(
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed("/entryDetail", arguments: entry);
+              },
               entry: entry,
-              onUpvote: () {},
-              onDownvote: () {},
-              onShare: () {},
+              topicName: entry.topic?.name,
+              categoryTitle: entry.topic?.category?.title,
+              onPressedProfile: () {
+                Get.toNamed("/peopleProfile");
+              },
+              onUpvote: () => entryController.voteEntry(entry.id, "up"),
+              onDownvote: () => entryController.voteEntry(entry.id, "down"),
+              onShare: () {
+                final String shareText = entry.content;
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                  ),
+                  builder: (_) => ShareOptionsBottomSheet(postText: shareText),
+                );
+              },
             ),
           );
         },

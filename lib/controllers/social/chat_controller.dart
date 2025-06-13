@@ -1,4 +1,3 @@
-
 import 'package:edusocial/models/chat_models/chat_user_model.dart';
 import 'package:edusocial/models/chat_models/last_message_model.dart';
 import 'package:edusocial/services/chat_service.dart';
@@ -23,12 +22,11 @@ class ChatController extends GetxController {
   /// Socket servisi
   final SocketService _socketService = Get.find<SocketService>();
   final GetStorage _box = GetStorage();
-@override
-void onInit() {
-  super.onInit();
-  fetchChatList();
-  fetchOnlineFriends();
-
+  @override
+  void onInit() {
+    super.onInit();
+    fetchChatList();
+    fetchOnlineFriends();
 
     // Token'ı GetStorage'dan al
     String? token = _box.read('token');
@@ -40,11 +38,9 @@ void onInit() {
       debugPrint('⚠️ Storage token bulunamadı. Socket bağlanmadı.');
     }
 
-  // Şimdi socket bağlantısını başlatalım:
-  //initSocketConnection(token);
-}
-
-
+    // Şimdi socket bağlantısını başlatalım:
+    //initSocketConnection(token);
+  }
 
   /// 🔥 Online arkadaşları getir
   Future<void> fetchOnlineFriends() async {
@@ -77,6 +73,7 @@ void onInit() {
       isLoading(false);
     }
   }
+
 /*
   /// 🔌 Socket bağlantısını başlat
   void initSocketConnection(String token) {
@@ -182,11 +179,13 @@ void onInit() {
   /// 📃 Chat detay sayfasına yönlendir
   void getChatDetailPage(int chatId,
       {required String name,
+      required String username,
       required String avatarUrl,
       required bool isOnline}) {
     Get.toNamed('/chat_detail', arguments: {
       'chatId': chatId,
       'name': name,
+      'username': username,
       'avatarUrl': avatarUrl,
       'isOnline': isOnline,
     });

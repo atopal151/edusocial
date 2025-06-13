@@ -9,49 +9,54 @@ class EntryController extends GetxController {
   var entryPersonList = <EntryModel>[].obs;
   final RxList<EntryModel> filteredByCategoryList = <EntryModel>[].obs;
   final RxList<EntryModel> filteredEntries = <EntryModel>[].obs;
-var currentTopic = Rxn<TopicModel>();
+  var currentTopic = Rxn<TopicModel>();
 
   RxMap<String, int> categoryMap = <String, int>{}.obs; // 🔁 Kategori adı -> id
-  RxList<String> categoryEntry = <String>[].obs; // UI’da gösterilecek kategori adları
+  RxList<String> categoryEntry = <String>[].obs; // UI'da gösterilecek kategori adları
   RxString selectedCategory = "".obs;
 
   var isEntryLoading = false.obs;
   final TextEditingController titleEntryController = TextEditingController();
   final TextEditingController bodyEntryController = TextEditingController();
-final RxString topicName = ''.obs;
+  final RxString topicName = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchTopicCategories(); // 🔁 Kategori listesini dinamik çek
-      /// 🔁 Kategori değiştiğinde entry'leri otomatik getir
-  ever(selectedCategory, (_) {
-    fetchEntriesForSelectedCategory();
-  });
+    /// 🔁 Kategori değiştiğinde entry'leri otomatik getir
+    ever(selectedCategory, (_) {
+      fetchEntriesForSelectedCategory();
+    });
   }
 
-Future<void> fetchEntriesForSelectedCategory() async {
-  final categoryName = selectedCategory.value;
-  final categoryId = getCategoryIdFromName(categoryName);
+  Future<void> fetchEntriesForSelectedCategory() async {
+    final categoryName = selectedCategory.value;
+    final categoryId = getCategoryIdFromName(categoryName);
 
-  isEntryLoading.value = true;
+    isEntryLoading.value = true;
 
-  final response = await EntryServices.fetchEntriesByTopicId(categoryId);
+    final response = await EntryServices.fetchEntriesByTopicId(categoryId);
 
-  if (response != null) {
-    topicName.value = response.topic.name;
-    entryList.value = response.entries;
-    filteredByCategoryList.value = response.entries;
-  } else {
-    entryList.clear();
-    filteredByCategoryList.clear();
-    topicName.value = "";
+    if (response != null) {
+      currentTopic.value = response.topic; // currentTopic'i ana topic ile güncelle
+      topicName.value = response.topic.name;
+
+      final List<EntryModel> entriesWithTopic = response.entries.map((entry) {
+        return entry.copyWith(topic: response.topic); // Her entry'ye ana topic bilgisini ata
+      }).toList();
+
+      entryList.value = entriesWithTopic;
+      filteredByCategoryList.value = entriesWithTopic;
+    } else {
+      entryList.clear();
+      filteredByCategoryList.clear();
+      currentTopic.value = null; // Topic bilgisini temizle
+      topicName.value = "";
+    }
+
+    isEntryLoading.value = false;
   }
-
-  isEntryLoading.value = false;
-}
-
-
 
   /// 🔁 Backend'den kategori listesini al
   void fetchTopicCategories() async {
@@ -64,42 +69,42 @@ Future<void> fetchEntriesForSelectedCategory() async {
   }
 
   /// 📤 Entry oluştur
-void shareEntryPost() async {
-  final title = titleEntryController.text.trim();
-  final body = bodyEntryController.text.trim();
-  final categoryName = selectedCategory.value;
+  void shareEntryPost() async {
+    final title = titleEntryController.text.trim();
+    final body = bodyEntryController.text.trim();
+    final categoryName = selectedCategory.value;
 
-  if (title.isEmpty || body.isEmpty || categoryName.isEmpty) {
-    Get.snackbar("Eksik Bilgi", "Lütfen tüm alanları doldurun");
-    return;
+    if (title.isEmpty || body.isEmpty || categoryName.isEmpty) {
+      Get.snackbar("Eksik Bilgi", "Lütfen tüm alanları doldurun");
+      return;
+    }
+
+    isEntryLoading.value = true;
+
+    final topicCategoryId = getCategoryIdFromName(categoryName);
+
+    // 🐞 DEBUG: Kontrol için kategori adı ve ID yazdır
+    debugPrint("🟡 Seçilen Kategori: $categoryName");
+    debugPrint("🟡 Gönderilen topicCategoryId: $topicCategoryId");
+
+    final success = await EntryServices.createTopicWithEntry(
+      name: title,
+      content: body,
+      topicCategoryId: topicCategoryId,
+    );
+
+    isEntryLoading.value = false;
+
+    if (success) {
+      Get.back();
+      Get.snackbar("Başarılı", "Konu başarıyla oluşturuldu");
+      titleEntryController.clear();
+      bodyEntryController.clear();
+      selectedCategory.value = "";
+    } else {
+      Get.snackbar("Hata", "Konu oluşturulamadı");
+    }
   }
-
-  isEntryLoading.value = true;
-
-  final topicCategoryId = getCategoryIdFromName(categoryName);
-
-  // 🐞 DEBUG: Kontrol için kategori adı ve ID yazdır
-  debugPrint("🟡 Seçilen Kategori: $categoryName");
-  debugPrint("🟡 Gönderilen topicCategoryId: $topicCategoryId");
-
-  final success = await EntryServices.createTopicWithEntry(
-    name: title,
-    content: body,
-    topicCategoryId: topicCategoryId,
-  );
-
-  isEntryLoading.value = false;
-
-  if (success) {
-    Get.back();
-    Get.snackbar("Başarılı", "Konu başarıyla oluşturuldu");
-    titleEntryController.clear();
-    bodyEntryController.clear();
-    selectedCategory.value = "";
-  } else {
-    Get.snackbar("Hata", "Konu oluşturulamadı");
-  }
-}
 
   /// Kategori adına göre ID döndür
   int getCategoryIdFromName(String name) {
@@ -109,24 +114,42 @@ void shareEntryPost() async {
   void shareEntry() {
     Get.toNamed("/entryShare");
   }
-/*
-  void upvotePersonEntry(int index) {
-    entryPersonList[index].upvoteCount++;
-    entryPersonList.refresh();
+
+  // Vote Entry
+  Future<void> voteEntry(int entryId, String vote) async {
+    final success = await EntryServices.voteEntry(
+      vote: vote,
+      entryId: entryId,
+    );
+
+    if (success) {
+      // Başarılı oylama sonrası entry listesini güncelle
+      await fetchEntriesForSelectedCategory();
+    } else {
+      Get.snackbar("Hata", "Oylama işlemi başarısız oldu");
+    }
   }
 
-  void downvotePersonEntry(int index) {
-    entryPersonList[index].downvoteCount++;
-    entryPersonList.refresh();
+  // Send Entry To Topic
+  Future<void> sendEntryToTopic(int topicId, String content) async {
+    final success = await EntryServices.sendEntryToTopic(
+      topicId: topicId,
+      content: content,
+    );
+
+    if (success) {
+      // Başarılı entry gönderimi sonrası listeyi güncelle
+      await fetchEntriesForSelectedCategory();
+      Get.back();
+      Get.snackbar("Başarılı", "Entry başarıyla gönderildi");
+    } else {
+      Get.snackbar("Hata", "Entry gönderilemedi");
+    }
   }
 
-  void upvoteEntry(int index) {
-    entryList[index].upvoteCount++;
-    entryList.refresh();
+  // Fetch Topic Categories With Topics
+  Future<void> fetchTopicCategoriesWithTopics() async {
+    final data = await EntryServices.fetchTopicCategoriesWithTopics();
+    // TODO: Implement topic categories with topics data handling
   }
-
-  void downvoteEntry(int index) {
-    entryList[index].downvoteCount++;
-    entryList.refresh();
-  }*/
 }

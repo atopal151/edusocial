@@ -1,10 +1,15 @@
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
+import 'package:get/get.dart';
+import '../../controllers/entry_controller.dart';
 
 class EntryCard extends StatelessWidget {
   final EntryModel entry;
+  final String? topicName;
+  final String? categoryTitle;
   final VoidCallback onUpvote;
   final VoidCallback onDownvote;
   final VoidCallback onShare;
@@ -14,6 +19,8 @@ class EntryCard extends StatelessWidget {
   const EntryCard({
     super.key,
     required this.entry,
+    this.topicName,
+    this.categoryTitle,
     required this.onUpvote,
     required this.onDownvote,
     required this.onShare,
@@ -41,7 +48,6 @@ class EntryCard extends StatelessWidget {
               children: [
                 // Profil Fotoğrafı + Çevrimiçi Durumu
                 Stack(
-                  
                   children: [
                     InkWell(
                       onTap: onPressedProfile,
@@ -79,11 +85,9 @@ class EntryCard extends StatelessWidget {
                           color: Color(0xff414751)),
                     ),
                     Text(
-                      formatSimpleDateClock(entry.createdAt),
+                      entry.human_created_at,
                       style: const TextStyle(
-                          fontSize: 10,
-                          color: Color(0xff9ca3ae),
-                          fontWeight: FontWeight.w500),
+                          color: Color(0xff9ca3ae), fontSize: 10),
                     ),
                   ],
                 ),
@@ -94,7 +98,7 @@ class EntryCard extends StatelessWidget {
 
             //  Entry Başlığı
             Text(
-              entry.content,
+              topicName ?? entry.topic?.name ?? "Başlıksız",
               style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 13.28,
@@ -132,7 +136,7 @@ class EntryCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    entry.upvoteCount.toString(),
+                    entry.upvotes_count.toString(),
                     style: const TextStyle(fontSize: 10),
                   ),
                 ),
@@ -150,7 +154,7 @@ class EntryCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    entry.downvoteCount.toString(),
+                    entry.downvotes_count.toString(),
                     style: const TextStyle(fontSize: 10),
                   ),
                 ),
@@ -183,8 +187,8 @@ class EntryCard extends StatelessWidget {
                 SizedBox(
                   width: 10,
                 ),
-                //  Okul İlişkileri Butonu
-               GestureDetector(
+                //  Kategori Butonu
+                GestureDetector(
                   onTap: () {
                     // Butona tıklanınca yapılacak işlemi buraya ekleyin
                   },
@@ -195,8 +199,8 @@ class EntryCard extends StatelessWidget {
                       border: Border.all(width: 0.1),
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child:  Text(
-                      entry.content,
+                    child: Text(
+                      categoryTitle ?? entry.topic?.category?.title ?? "Kategori Yok",
                       style: TextStyle(fontSize: 12, color: Color(0xff9ca3ae)),
                     ),
                   ),

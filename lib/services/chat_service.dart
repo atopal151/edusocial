@@ -98,31 +98,39 @@ class ChatServices {
     }
   }
 
-  /// Mesaj detaylarını getir (Show Conversation)
-  static Future<List<MessageModel>> fetchConversationMessages(
-      int chatId) async {
-    final token = _box.read('token');
-    final response = await http.get(
-      Uri.parse('${AppConstants.baseUrl}/conversation/$chatId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
-    );
+/// Mesaj detaylarını getir (Show Conversation)
+static Future<List<MessageModel>> fetchConversationMessages(int chatId) async {
+  final token = _box.read('token');
+  final response = await http.get(
+    Uri.parse('${AppConstants.baseUrl}/conversation/$chatId'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    },
+  );
 
-    //debugPrint('Gönderilen chatId:$chatId');
-    //debugPrint("✅ Show Conversation JSON: ${response.body}", wrapWidth: 1024);
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      final List<dynamic> messagesJson = body['data'];
+  debugPrint('Gönderilen chatId: $chatId');
 
-      return messagesJson
-          .map((json) => MessageModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } else {
-      throw Exception('Mesajlar getirilemedi!');
-    }
+  // JSON pretty-print
+  try {
+    final decodedJson = jsonDecode(response.body);
+    final prettyJson = const JsonEncoder.withIndent('  ').convert(decodedJson);
+    debugPrint("✅ Pretty JSON (Show Conversation):\n$prettyJson", wrapWidth: 1024);
+  } catch (e) {
+    debugPrint("🛑 JSON parse error: $e");
   }
+
+  if (response.statusCode == 200) {
+    final body = jsonDecode(response.body);
+    final List<dynamic> messagesJson = body['data'];
+
+    return messagesJson
+        .map((json) => MessageModel.fromJson(json as Map<String, dynamic>))
+        .toList();
+  } else {
+    throw Exception('Mesajlar getirilemedi!');
+  }
+}
 
   /// Birebir mesaj listesi çek
   static Future<List<ChatModel>> fetchChatList() async {

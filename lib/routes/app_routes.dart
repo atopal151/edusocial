@@ -1,5 +1,6 @@
 import 'package:edusocial/bindings/calendar_binding.dart';
 import 'package:edusocial/bindings/chat_binding.dart';
+import 'package:edusocial/bindings/chat_detail_binding.dart';
 import 'package:edusocial/bindings/entry_binding.dart';
 import 'package:edusocial/bindings/event_binding.dart';
 import 'package:edusocial/bindings/group_binding.dart';
@@ -197,6 +198,7 @@ class Routes {
     GetPage(
       name: userChatDetail,
       page: () => UserChatDetailScreen(),
+      binding: ChatDetailBinding(),
     ),
     GetPage(
       name: notifications,

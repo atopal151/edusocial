@@ -11,6 +11,7 @@ import '../../components/profile_tabbar/toggle_tab_bar.dart';
 import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
 import '../../controllers/profile_controller.dart';
+import '../../components/sheets/share_options_bottom_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -203,9 +204,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                 Get.toNamed("/entryDetail", arguments: entry);
               },
               entry: entry,
-              onUpvote: () {},
-              onDownvote: () {},
-              onShare: () {},
+              topicName: entry.topic?.name,
+              categoryTitle: entry.topic?.category?.title,
+              onPressedProfile: () {
+                Get.toNamed("/peopleProfile");
+              },
+              onUpvote: () => entryController.voteEntry(entry.id, "up"),
+              onDownvote: () => entryController.voteEntry(entry.id, "down"),
+              onShare: () {
+                final String shareText = entry.content;
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+                  ),
+                  builder: (_) => ShareOptionsBottomSheet(postText: shareText),
+                );
+              },
             ),
           );
         },
