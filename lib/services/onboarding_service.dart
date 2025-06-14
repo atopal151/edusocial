@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:edusocial/models/group_models/group_model.dart';
 import 'package:edusocial/utils/constants.dart';
-import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 

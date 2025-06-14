@@ -6,13 +6,8 @@ import '../models/entry_model.dart';
 import '../models/user_model.dart';
 import 'package:edusocial/controllers/profile_controller.dart'; // Import ProfileController
 import 'package:edusocial/models/profile_model.dart'; // Import ProfileModel
-import 'package:edusocial/controllers/entry_detail_controller.dart'; // Import EntryDetailController
-import 'package:edusocial/models/topic_category_model.dart';
-import 'package:edusocial/models/display_entry_item.dart'; // Import DisplayEntryItem
-import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:edusocial/utils/constants.dart';
+import 'package:edusocial/controllers/entry_detail_controller.dart'; 
+import 'package:edusocial/models/display_entry_item.dart'; //
 
 class EntryController extends GetxController {
   var entryList = <EntryModel>[].obs;

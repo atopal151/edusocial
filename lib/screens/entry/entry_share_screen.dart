@@ -90,7 +90,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
               Obx(
                 () => CustomDropDown(
                   label: "Kategori",
-                  items: categoryList.map((e) => e.title!).toList(),
+                  items: categoryList.map((e) => e.title).toList(),
                   selectedItem: selectedTopicCategory.value?.title ?? (categoryList.isNotEmpty ? categoryList.first.title : ""),
                   onChanged: (value) {
                     if (value != null) {

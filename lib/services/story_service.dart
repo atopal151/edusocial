@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:edusocial/utils/constants.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import 'package:http_parser/http_parser.dart';
@@ -93,7 +92,7 @@ class StoryService {
       final response = await request.send();
 
       // Cevabı oku
-      final responseBody = await response.stream.bytesToString();
+    
 
       // debugPrint("📥 Story Upload Status: ${response.statusCode}");
       // debugPrint("�� Story Upload Body: $responseBody");

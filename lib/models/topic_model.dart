@@ -2,7 +2,6 @@
 import 'topic_category_model.dart';
 import 'entry_model.dart';
 import 'user_model.dart';
-import 'package:flutter/foundation.dart';
 
 class TopicModel {
   final int id;

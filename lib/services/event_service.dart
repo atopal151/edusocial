@@ -3,7 +3,6 @@ import 'package:edusocial/models/event_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart';
 
 class EventServices {
   Future<List<EventModel>> fetchEvents() async {

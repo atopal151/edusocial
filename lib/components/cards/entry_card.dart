@@ -1,10 +1,7 @@
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
-import 'package:get/get.dart';
-import '../../controllers/entry_controller.dart';
 
 class EntryCard extends StatelessWidget {
   final EntryModel entry;

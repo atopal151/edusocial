@@ -20,7 +20,7 @@ class EntryDetailController extends GetxController {
     debugPrint("🔄 EntryDetailController: Yorumlar çekiliyor...");
     if (currentTopic.value?.id != null) {
       final response = await EntryServices.fetchEntriesByTopicId(currentTopic.value!.id);
-      debugPrint("📥 EntryDetailController: fetchEntriesByTopicId yanıtı: ${response?.topic?.name} - entries count: ${response?.entries.length}");
+      debugPrint("📥 EntryDetailController: fetchEntriesByTopicId yanıtı: ${response?.topic.name} - entries count: ${response?.entries.length}");
       if (response != null && response.entries.isNotEmpty) {
         // İlk entry ana entry, geri kalanlar yorumlar
         entryComments.value = response.entries.skip(1).toList();
