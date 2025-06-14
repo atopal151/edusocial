@@ -133,8 +133,10 @@ class GroupController extends GetxController {
     Get.toNamed("/group_detail_screen");
   }
 
-  void getToGroupChatDetail() {
-    Get.toNamed("/group_chat_detail");
+  void getToGroupChatDetail(String groupId) {
+    Get.toNamed("/group_chat_detail", arguments: {
+      'groupId': groupId,
+    });
   }
 
   void updateFilteredGroups() {

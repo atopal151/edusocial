@@ -58,7 +58,7 @@ class GroupListScreen extends StatelessWidget {
                     final group = controller.userGroups[index];
                     return InkWell(
                       onTap: () {
-                        controller.getToGroupChatDetail();
+                        controller.getToGroupChatDetail(group.id);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),

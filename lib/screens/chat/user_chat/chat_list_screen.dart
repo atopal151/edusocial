@@ -274,7 +274,7 @@ class _ChatListScreenState extends State<ChatListScreen>
             final group = groupController.userGroups[index];
             return GestureDetector(
               onTap: () {
-                chatController.getGroupChatPage();
+                chatController.getGroupChatPage(group.id);
               },
               child: Padding(
                 padding:

@@ -5,22 +5,87 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../models/chat_models/group_message_model.dart';
+import '../../models/group_models/group_model.dart';
+import '../../services/group_services/group_service.dart';
 
 class GroupChatDetailController extends GetxController {
-  RxList<GroupMessageModel> groupmessages = <GroupMessageModel>[].obs;
+  final GroupServices _groupServices = GroupServices();
+  final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
+  final RxBool isLoading = false.obs;
+  final RxString currentGroupId = ''.obs;
+  final Rx<GroupModel?> groupData = Rx<GroupModel?>(null);
+  final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
 
   RxString pollQuestion = ''.obs;
   RxList<String> pollOptions = <String>[].obs;
   RxMap<String, int> pollVotes = <String, int>{}.obs;
   RxString selectedPollOption = ''.obs;
-  var isLoading = false.obs;
   TextEditingController pollTitleController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
+    debugPrint('Group chat detail arguments: ${Get.arguments}');
+    if (Get.arguments != null && Get.arguments['groupId'] != null) {
+      currentGroupId.value = Get.arguments['groupId'];
+      debugPrint('Current group ID: ${currentGroupId.value}');
+      fetchGroupDetails();
+      fetchGroupMessages();
+    } else {
+      debugPrint('❌ No group ID provided in arguments');
+      Get.snackbar(
+        'Error',
+        'No group selected',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      // Navigate back if no group ID is provided
+      Get.back();
+    }
     simulateIncomingMessages();
+  }
+
+  Future<void> fetchGroupDetails() async {
+    if (currentGroupId.value.isEmpty) {
+      debugPrint('❌ Cannot fetch group details: No group ID provided');
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      debugPrint('🔍 Fetching group details for group ID: ${currentGroupId.value}');
+      
+      final group = await _groupServices.fetchGroupDetail(currentGroupId.value);
+      groupData.value = group;
+      
+      debugPrint('✅ Group details loaded successfully');
+    } catch (e) {
+      debugPrint('❌ Error fetching group details: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to fetch group details',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchGroupMessages() async {
+    try {
+      isLoading.value = true;
+      debugPrint('Fetching messages for group: ${currentGroupId.value}');
+      
+    } catch (e) {
+      debugPrint('Error fetching messages: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to fetch messages',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void openPollBottomSheet() {
@@ -147,7 +212,7 @@ class GroupChatDetailController extends GetxController {
   }
 
   void sendPoll(String question, List<String> options) {
-    groupmessages.add(GroupMessageModel(
+    messages.add(GroupMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: "me",
       receiverId: "user123",
@@ -166,7 +231,7 @@ class GroupChatDetailController extends GetxController {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      groupmessages.add(GroupMessageModel(
+      messages.add(GroupMessageModel(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         senderId: "me",
         receiverId: "user123",name: "Ali",
@@ -192,7 +257,7 @@ class GroupChatDetailController extends GetxController {
         final filePath = result.files.single.path!;
         debugPrint("Seçilen dosya: $filePath");
 
-        groupmessages.add(GroupMessageModel(
+        messages.add(GroupMessageModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           senderId: "me",
           receiverId: "user123",
@@ -212,7 +277,7 @@ class GroupChatDetailController extends GetxController {
   }
 
   void sendMessage(String text) {
-    groupmessages.add(GroupMessageModel(
+    messages.add(GroupMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: "me",
       receiverId: "user123",
@@ -336,7 +401,7 @@ class GroupChatDetailController extends GetxController {
         break;
     }
 
-    groupmessages.add(newMessage);
+    messages.add(newMessage);
     scrollToBottom();
   });
 }

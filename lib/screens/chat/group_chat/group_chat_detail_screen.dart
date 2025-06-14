@@ -22,6 +22,14 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
       Get.put(GroupChatDetailController());
 
   TextEditingController messageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('🚀 GroupChatDetailScreen initialized');
+    controller.fetchGroupDetails();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,41 +40,81 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           onTap: () {
             controller.getToGrupDetailScreen();
           },
-          child: Row(
-            children: [
-              CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://randomuser.me/api/portraits/men/7.jpg")),
-              SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Obx(() {
+            final group = controller.groupData.value;
+            if (group == null) {
+              return Row(
                 children: [
-                  Text("Murata Hayranlar Grubu",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff414751))),
-                  Row(
+                  CircleAvatar(
+                    backgroundColor: Colors.grey[300],
+                    child: Icon(Icons.group, color: Colors.grey[600]),
+                  ),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.person,
-                        color: Colors.red,
-                        size: 15,
-                      ),
-                      SizedBox(
-                        width: 3,
-                      ),
-                      Text("223",
+                      Text("Loading...",
                           style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xff9ca3ae),
-                              fontWeight: FontWeight.w400)),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff414751))),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person,
+                            color: Colors.red,
+                            size: 15,
+                          ),
+                          SizedBox(
+                            width: 3,
+                          ),
+                          Text("0",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xff9ca3ae),
+                                  fontWeight: FontWeight.w400)),
+                        ],
+                      ),
                     ],
                   ),
                 ],
-              ),
-            ],
-          ),
+              );
+            }
+            return Row(
+              children: [
+                CircleAvatar(
+                    backgroundImage: NetworkImage(group.avatarUrl ?? "https://stageapi.edusocial.pl/storage/avatars/a25YweIb75P9UdftcMr1b0Sa1fC75fDKAcTK7ZWf.png")),
+                SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(group.name,
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff414751))),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person,
+                          color: Colors.red,
+                          size: 15,
+                        ),
+                        SizedBox(
+                          width: 3,
+                        ),
+                        Text(group.userCountWithAdmin.toString(),
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xff9ca3ae),
+                                fontWeight: FontWeight.w400)),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
         ),
         actions: [
           InkWell(
@@ -94,10 +142,10 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
             Expanded(
               child: Obx(() => ListView.builder(
                     controller: controller.scrollController,
-                    itemCount: controller.groupmessages.length,
+                    itemCount: controller.messages.length,
                     padding: EdgeInsets.only(bottom: 75),
                     itemBuilder: (context, index) {
-                      final message = controller.groupmessages[index];
+                      final message = controller.messages[index];
                       if (message.messageType == GroupMessageType.text) {
                         return GroupTextMessageWidget(message: message);
                       } else if (message.messageType == GroupMessageType.document) {

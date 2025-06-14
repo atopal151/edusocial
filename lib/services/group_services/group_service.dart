@@ -236,4 +236,53 @@ class GroupServices {
       return false;
     }
   }
+
+  Future<GroupModel> fetchGroupDetail(String groupId) async {
+    final box = GetStorage();
+    try {
+      debugPrint('🔍 Fetching details for group: $groupId');
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/group-detail/$groupId'),
+        headers: {
+          'Authorization': 'Bearer ${box.read('token')}',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      debugPrint('📥 Response status code: ${response.statusCode}');
+      debugPrint('📦 Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        if (jsonBody['status'] == true && jsonBody['data'] != null) {
+          final groupData = jsonBody['data']['group'];
+          
+          debugPrint('✅ Group details fetched successfully:');
+          debugPrint('  - ID: ${groupData['id']}');
+          debugPrint('  - Name: ${groupData['name']}');
+          debugPrint('  - Description: ${groupData['description']}');
+          debugPrint('  - User Count (with admin): ${groupData['user_count_with_admin']}');
+          debugPrint('  - User Count (without admin): ${groupData['user_count_without_admin']}');
+          debugPrint('  - Message Count: ${groupData['message_count']}');
+          debugPrint('  - Is Private: ${groupData['is_private']}');
+          debugPrint('  - Is Founder: ${groupData['is_founder']}');
+          debugPrint('  - Is Member: ${groupData['is_member']}');
+          debugPrint('  - Is Pending: ${groupData['is_pending']}');
+          debugPrint('  - Avatar URL: ${groupData['avatar_url']}');
+          debugPrint('  - Banner URL: ${groupData['banner_url']}');
+          debugPrint('  - Created At: ${groupData['created_at']}');
+          debugPrint('  - Human Created At: ${groupData['human_created_at']}');
+          
+          return GroupModel.fromJson(groupData);
+        }
+        throw Exception('No group data found');
+      } else {
+        debugPrint('❌ Failed to fetch group details. Status: ${response.statusCode}');
+        throw Exception('Failed to fetch group details');
+      }
+    } catch (e) {
+      debugPrint('💥 Error fetching group details: $e');
+      rethrow;
+    }
+  }
 }

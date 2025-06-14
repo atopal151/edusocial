@@ -191,8 +191,10 @@ class ChatController extends GetxController {
     });
   }
 
-  void getGroupChatPage() {
-    Get.toNamed("/group_chat_detail");
+  void getGroupChatPage(String groupId) {
+    Get.toNamed("/group_chat_detail", arguments: {
+      'groupId': groupId,
+    });
   }
 
   /// 🔍 Arama filtresi
