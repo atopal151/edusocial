@@ -15,17 +15,13 @@ class UserChatDetailScreen extends StatefulWidget {
 
 class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
   late final ChatDetailController chatController;
-  late final ScrollController documentsScrollController;
-  late final ScrollController linksScrollController;
-  late final ScrollController photosScrollController;
+  late final ScrollController scrollController;
 
   @override
   void initState() {
     super.initState();
     chatController = Get.find<ChatDetailController>();
-    documentsScrollController = ScrollController();
-    linksScrollController = ScrollController();
-    photosScrollController = ScrollController();
+    scrollController = ScrollController();
 
     final args = Get.arguments as Map<String, dynamic>?;
     debugPrint('🔍 UserChatDetailScreen - Gelen Arguments: $args');
@@ -64,9 +60,7 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
 
   @override
   void dispose() {
-    documentsScrollController.dispose();
-    linksScrollController.dispose();
-    photosScrollController.dispose();
+    scrollController.dispose();
     super.dispose();
   }
 

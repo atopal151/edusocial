@@ -25,6 +25,9 @@ class ChatDetailController extends GetxController {
   final documentModels = <DetailDocumentModel>[].obs;
   final userChatDetail = Rxn<UserChatDetailModel>();
   final scrollController = ScrollController();
+  final documentsScrollController = ScrollController();
+  final linksScrollController = ScrollController();
+  final photosScrollController = ScrollController();
   int? currentChatId;
 
   RxString pollQuestion = ''.obs;
@@ -49,7 +52,8 @@ class ChatDetailController extends GetxController {
   void _initializeScrollController() {
     scrollController.addListener(() {
       if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-        // Son sayfaya gelindiğinde yeni mesajları yükle
+        // Son mesajlara gelindiğinde yeni mesajları yükle
+        _loadMoreMessages();
       }
     });
   }
@@ -65,9 +69,16 @@ class ChatDetailController extends GetxController {
     }
   }
 
+  void _loadMoreMessages() {
+    // Daha fazla mesaj yükleme işlemi
+  }
+
   @override
   void onClose() {
     scrollController.dispose();
+    documentsScrollController.dispose();
+    linksScrollController.dispose();
+    photosScrollController.dispose();
     super.onClose();
   }
 
@@ -79,54 +90,76 @@ class ChatDetailController extends GetxController {
       isLoading.value = true;
       currentChatId = chatId;
 
-      // Örnek veri - gerçek uygulamada API'den gelecek
-      userChatDetail.value = UserChatDetailModel(
-        id: chatId.toString(),
-        name: "Kullanıcı Adı",
-        follower: "0",
-        following: "0",
-        imageUrl: "https://via.placeholder.com/150",
-        memberImageUrls: const [],
-        documents: const [],
-        links: const [],
-        photoUrls: const [],
-      );
-
-      debugPrint('✅ ChatDetailController - userChatDetail yüklendi:');
-      debugPrint('  - ID: ${userChatDetail.value?.id}');
-      debugPrint('  - Name: ${userChatDetail.value?.name}');
-      debugPrint('  - Follower: ${userChatDetail.value?.follower}');
-      debugPrint('  - Following: ${userChatDetail.value?.following}');
-
       // Mesajları yükle
-      await fetchConversationMessages(chatId);
+      final fetchedMessages = await ChatServices.fetchConversationMessages(chatId);
+      messages.clear();
+      messages.addAll(fetchedMessages);
 
-      // Belge, link ve fotoğrafları userChatDetail'e ekle
-      if (userChatDetail.value != null) {
+      // İlk mesajdan kullanıcı bilgilerini yükle
+      if (messages.isNotEmpty && messages.first.sender != null) {
+        final sender = messages.first.sender!;
+        
+        debugPrint('✅ ChatDetailController - Sender bilgileri:');
+        debugPrint('  - ID: ${sender.id}');
+        debugPrint('  - Name: ${sender.name}');
+        debugPrint('  - Surname: ${sender.surname}');
+        
+        // Kullanıcı detaylarını getir
+        final userDetails = await ChatServices.fetchUserDetails(sender.id);
+        
+        // Belge, link ve fotoğrafları topla
+        final allDocuments = <DetailDocumentModel>[];
+        final allLinks = <LinkModel>[];
+        final allPhotos = <String>[];
+
+        for (var message in messages) {
+          // Belgeleri topla
+          if (message.messageDocument != null) {
+            allDocuments.addAll(message.messageDocument!);
+          }
+
+          // Linkleri topla
+          for (var link in message.messageLink) {
+            allLinks.add(LinkModel(
+              url: link.link,
+              title: link.linkTitle,
+            ));
+          }
+
+          // Fotoğrafları topla
+          for (var media in message.messageMedia) {
+            allPhotos.add(media.path);
+          }
+        }
+
+        // Kullanıcı detaylarını güncelle
         userChatDetail.value = UserChatDetailModel(
-          id: userChatDetail.value!.id,
-          name: userChatDetail.value!.name,
-          follower: userChatDetail.value!.follower,
-          following: userChatDetail.value!.following,
-          imageUrl: userChatDetail.value!.imageUrl,
-          memberImageUrls: userChatDetail.value!.memberImageUrls,
-          documents: documentModels.map((doc) => DocumentModel(
+          id: userDetails.id,
+          name: userDetails.name,
+          follower: userDetails.follower,
+          following: userDetails.following,
+          imageUrl: userDetails.imageUrl,
+          memberImageUrls: const [],
+          documents: allDocuments.map((doc) => DocumentModel(
             name: doc.name,
             url: doc.url,
             sizeMb: 0.0,
-            date: DateTime.now(),
+            date: DateTime.parse(doc.date),
           )).toList(),
-          links: links.map((link) => LinkModel(
-            url: link,
-            title: "Link",
-          )).toList(),
-          photoUrls: photoUrls,
+          links: allLinks,
+          photoUrls: allPhotos,
         );
         
         debugPrint('✅ ChatDetailController - userChatDetail güncellendi:');
+        debugPrint('  - ID: ${userChatDetail.value?.id}');
+        debugPrint('  - Name: ${userChatDetail.value?.name}');
+        debugPrint('  - Follower: ${userChatDetail.value?.follower}');
+        debugPrint('  - Following: ${userChatDetail.value?.following}');
         debugPrint('  - Documents Count: ${userChatDetail.value?.documents.length}');
         debugPrint('  - Links Count: ${userChatDetail.value?.links.length}');
         debugPrint('  - PhotoUrls Count: ${userChatDetail.value?.photoUrls.length}');
+      } else {
+        debugPrint('❌ ChatDetailController - Mesaj veya gönderen bulunamadı');
       }
 
       userChatDetail.refresh();
@@ -178,24 +211,74 @@ class ChatDetailController extends GetxController {
       isLoading.value = true;
       currentChatId = chatId;
       
+      // Mesajları yükle
       final fetchedMessages = await ChatServices.fetchConversationMessages(chatId);
       messages.clear();
       messages.addAll(fetchedMessages);
 
-      // İlk mesajdan kullanıcı bilgilerini yükle
+      // Belge, link ve fotoğrafları topla
+      final allDocuments = <DetailDocumentModel>[];
+      final allLinks = <LinkModel>[];
+      final allPhotos = <String>[];
+
+      for (var message in messages) {
+        // Belgeleri topla
+        if (message.messageDocument != null && message.messageDocument!.isNotEmpty) {
+          debugPrint('📄 Belge bulundu: ${message.messageDocument!.length} adet');
+          allDocuments.addAll(message.messageDocument!);
+        }
+
+        // Linkleri topla
+        if (message.messageLink.isNotEmpty) {
+          debugPrint('🔗 Link bulundu: ${message.messageLink.length} adet');
+          for (var link in message.messageLink) {
+            allLinks.add(LinkModel(
+              url: link.link,
+              title: link.linkTitle,
+            ));
+          }
+        }
+
+        // Fotoğrafları topla
+        if (message.messageMedia.isNotEmpty) {
+          debugPrint('📸 Fotoğraf bulundu: ${message.messageMedia.length} adet');
+          for (var media in message.messageMedia) {
+            allPhotos.add(media.path);
+          }
+        }
+      }
+
+      debugPrint('📊 Toplanan veriler:');
+      debugPrint('  - Belgeler: ${allDocuments.length} adet');
+      debugPrint('  - Linkler: ${allLinks.length} adet');
+      debugPrint('  - Fotoğraflar: ${allPhotos.length} adet');
+
+      // Kullanıcı detaylarını güncelle
       if (messages.isNotEmpty && messages.first.sender != null) {
         final sender = messages.first.sender!;
         userChatDetail.value = UserChatDetailModel(
           id: sender.id.toString(),
           name: '${sender.name} ${sender.surname}',
-          follower: '0', // API'den gelmiyor
-          following: '0', // API'den gelmiyor
+          follower: '0',
+          following: '0',
           imageUrl: sender.avatarUrl,
           memberImageUrls: const [],
-          documents: const [],
-          links: const [],
-          photoUrls: const [],
+          documents: allDocuments.map((doc) => DocumentModel(
+            name: doc.name,
+            url: doc.url,
+            sizeMb: 0.0,
+            date: DateTime.parse(doc.date),
+          )).toList(),
+          links: allLinks,
+          photoUrls: allPhotos,
         );
+
+        debugPrint('✅ ChatDetailController - userChatDetail güncellendi:');
+        debugPrint('  - ID: ${userChatDetail.value?.id}');
+        debugPrint('  - Name: ${userChatDetail.value?.name}');
+        debugPrint('  - Belgeler: ${userChatDetail.value?.documents.length} adet');
+        debugPrint('  - Linkler: ${userChatDetail.value?.links.length} adet');
+        debugPrint('  - Fotoğraflar: ${userChatDetail.value?.photoUrls.length} adet');
       }
     } catch (e) {
       debugPrint('❌ fetchConversationMessages error: $e');

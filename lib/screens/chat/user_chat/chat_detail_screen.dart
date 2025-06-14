@@ -171,11 +171,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     }
 
     final userDetail = UserChatDetailModel(
-      id: controller.currentChatId.toString(),
-      name: controller.userChatDetail.value?.name ?? '',
+      id: controller.userChatDetail.value?.id ?? '',
+      name: name,
       follower: controller.userChatDetail.value?.follower ?? '0',
       following: controller.userChatDetail.value?.following ?? '0',
-      imageUrl: controller.userChatDetail.value?.imageUrl ?? '',
+      imageUrl: avatarUrl,
       memberImageUrls: controller.userChatDetail.value?.memberImageUrls ?? [],
       documents: controller.userChatDetail.value?.documents ?? [],
       links: controller.userChatDetail.value?.links ?? [],
@@ -189,7 +189,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     debugPrint('  - Following: ${userDetail.following}');
     
     Get.toNamed('/user_chat_detail', arguments: {
-      'chatId': controller.currentChatId,
+      'chatId': chatId,
       'userDetail': userDetail,
     });
   }

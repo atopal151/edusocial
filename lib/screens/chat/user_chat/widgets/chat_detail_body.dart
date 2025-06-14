@@ -4,9 +4,46 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:edusocial/models/user_chat_detail_model.dart';
+import 'package:edusocial/models/document_model.dart';
+import 'package:edusocial/models/link_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ChatDetailBody extends StatelessWidget {
+class ChatDetailBody extends StatefulWidget {
   const ChatDetailBody({super.key});
+
+  @override
+  State<ChatDetailBody> createState() => _ChatDetailBodyState();
+}
+
+class _ChatDetailBodyState extends State<ChatDetailBody> {
+  late final ScrollController documentsScrollController;
+  late final ScrollController linksScrollController;
+  late final ScrollController photosScrollController;
+  
+  // Base URL for images
+  static const String baseUrl = 'https://stageapi.edusocial.pl/storage/';
+
+  String getFullUrl(String path) {
+    if (path.startsWith('http')) return path;
+    return '$baseUrl$path';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    documentsScrollController = ScrollController();
+    linksScrollController = ScrollController();
+    photosScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    documentsScrollController.dispose();
+    linksScrollController.dispose();
+    photosScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +64,9 @@ class ChatDetailBody extends StatelessWidget {
                   height: 117,
                   width: 117,
                   child: CircleAvatar(
+                    backgroundColor: Color(0xffffffff),
                     radius: 50,
-                    backgroundImage: NetworkImage(userChatDetail.imageUrl),
+                    backgroundImage: NetworkImage(getFullUrl(userChatDetail.imageUrl)),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -54,6 +92,9 @@ class ChatDetailBody extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
+         
+          const SizedBox(height: 24),
+
           SizedBox(
             width: 150,
             child: Center(
@@ -61,77 +102,6 @@ class ChatDetailBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-
-          // KURULUŞ TARİHİ VE ÜYE SAYISI
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xffffffff),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Takipçi",
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 10,
-                            color: const Color(0xff9ca3ae),
-                          ),
-                        ),
-                        Text(
-                          userChatDetail.follower,
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13.28,
-                            color: const Color(0xff414751),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xffffffff),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Takip Edilen",
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 10,
-                            color: const Color(0xff9ca3ae),
-                          ),
-                        ),
-                        Text(
-                          userChatDetail.following,
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13.28,
-                            color: const Color(0xff414751),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
 
           // TABS: Belgeler / Bağlantılar / Fotoğraflar
           DefaultTabController(
@@ -169,13 +139,13 @@ class ChatDetailBody extends StatelessWidget {
                       children: [
                         // BELGELER
                         Scrollbar(
-                          controller: chatController.scrollController,
+                          controller: documentsScrollController,
                           trackVisibility: true,
                           thumbVisibility: true,
                           thickness: 5,
                           radius: const Radius.circular(15),
                           child: ListView.builder(
-                            controller: chatController.scrollController,
+                            controller: documentsScrollController,
                             itemCount: userChatDetail.documents.length,
                             itemBuilder: (context, index) {
                               final doc = userChatDetail.documents[index];
@@ -217,13 +187,13 @@ class ChatDetailBody extends StatelessWidget {
 
                         // BAĞLANTILAR
                         Scrollbar(
-                          controller: chatController.scrollController,
+                          controller: linksScrollController,
                           trackVisibility: true,
                           thumbVisibility: true,
                           thickness: 5,
                           radius: const Radius.circular(15),
                           child: ListView.builder(
-                            controller: chatController.scrollController,
+                            controller: linksScrollController,
                             itemCount: userChatDetail.links.length,
                             itemBuilder: (context, index) {
                               final link = userChatDetail.links[index];
@@ -265,7 +235,7 @@ class ChatDetailBody extends StatelessWidget {
 
                         // FOTOĞRAFLAR
                         Scrollbar(
-                          controller: chatController.scrollController,
+                          controller: photosScrollController,
                           trackVisibility: true,
                           thumbVisibility: true,
                           thickness: 5,
@@ -284,7 +254,7 @@ class ChatDetailBody extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: GridView.builder(
-                                  controller: chatController.scrollController,
+                                  controller: photosScrollController,
                                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3,
                                   ),
@@ -293,8 +263,12 @@ class ChatDetailBody extends StatelessWidget {
                                     return Padding(
                                       padding: const EdgeInsets.all(0.6),
                                       child: Image.network(
-                                        userChatDetail.photoUrls[index],
+                                        getFullUrl(userChatDetail.photoUrls[index]),
                                         fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          debugPrint('Error loading image: $error');
+                                          return const Icon(Icons.error);
+                                        },
                                       ),
                                     );
                                   },
@@ -323,7 +297,7 @@ class ChatDetailBody extends StatelessWidget {
             left: i * 20.0,
             child: CircleAvatar(
               radius: 15,
-              backgroundImage: NetworkImage(memberImageUrls[i]),
+              backgroundImage: NetworkImage(getFullUrl(memberImageUrls[i])),
             ),
           ),
       ],

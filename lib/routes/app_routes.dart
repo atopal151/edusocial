@@ -197,7 +197,7 @@ class Routes {
     ),
     GetPage(
       name: userChatDetail,
-      page: () => UserChatDetailScreen(),
+      page: () => const UserChatDetailScreen(),
       binding: ChatDetailBinding(),
     ),
     GetPage(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../components/user_appbar/user_appbar.dart';
 import '../../../controllers/social/chat_controller.dart';
+import '../../../controllers/group_controller/group_controller.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -15,6 +16,7 @@ class ChatListScreen extends StatefulWidget {
 class _ChatListScreenState extends State<ChatListScreen>
     with SingleTickerProviderStateMixin {
   final ChatController chatController = Get.put(ChatController());
+  final GroupController groupController = Get.put(GroupController());
 
   late TabController _tabController;
 
@@ -267,9 +269,9 @@ class _ChatListScreenState extends State<ChatListScreen>
   /// 👥 Grup Mesajları Listesi
   Widget _buildGroupMessages() {
     return Obx(() => ListView.builder(
-          itemCount: chatController.filteredGroupChatList.length,
+          itemCount: groupController.userGroups.length,
           itemBuilder: (context, index) {
-            final group = chatController.filteredGroupChatList[index];
+            final group = groupController.userGroups[index];
             return GestureDetector(
               onTap: () {
                 chatController.getGroupChatPage();
@@ -287,7 +289,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                     children: [
                       CircleAvatar(
                         radius: 25,
-                        backgroundImage: NetworkImage(group.groupImage),
+                        backgroundImage: NetworkImage(group.avatarUrl),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -295,12 +297,12 @@ class _ChatListScreenState extends State<ChatListScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              group.groupName,
+                              group.name,
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 13),
                             ),
                             Text(
-                              group.lastMessage,
+                              group.description,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -312,17 +314,17 @@ class _ChatListScreenState extends State<ChatListScreen>
                       Column(
                         children: [
                           Text(
-                            group.lastMessageTime,
+                            group.humanCreatedAt,
                             style: const TextStyle(
                                 fontSize: 10, color: Colors.grey),
                           ),
                           const SizedBox(height: 8),
-                          if (group.unreadCount > 0)
+                          if (group.messageCount > 0)
                             CircleAvatar(
                               radius: 10,
                               backgroundColor: Colors.red,
                               child: Text(
-                                group.unreadCount.toString(),
+                                group.messageCount.toString(),
                                 style: const TextStyle(
                                     fontSize: 10, color: Colors.white),
                               ),

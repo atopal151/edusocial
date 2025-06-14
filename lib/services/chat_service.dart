@@ -9,6 +9,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/chat_models/chat_model.dart';
+import '../models/user_chat_detail_model.dart';
 
 class ChatServices {
   static final _box = GetStorage();
@@ -167,6 +168,53 @@ static Future<List<MessageModel>> fetchConversationMessages(int chatId) async {
     } catch (e) {
       debugPrint("❌ Chat listesi çekilirken hata: $e");
       rethrow;
+    }
+  }
+
+  /// Kullanıcı detaylarını getir
+  static Future<UserChatDetailModel> fetchUserDetails(int userId) async {
+    try {
+      debugPrint('🔍 fetchUserDetails - Başladı');
+      final token = await _box.read('token');
+      final url = '${AppConstants.baseUrl}/api/user/$userId';
+      
+      debugPrint('  - URL: $url');
+      debugPrint('  - UserID: $userId');
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      debugPrint('📥 fetchUserDetails - API Yanıtı:');
+      debugPrint('  - Status Code: ${response.statusCode}');
+      debugPrint('  - Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == true) {
+          final userData = data['data'];
+          return UserChatDetailModel(
+            id: userData['id'].toString(),
+            name: '${userData['name']} ${userData['surname']}',
+            follower: userData['follower_count']?.toString() ?? '0',
+            following: userData['following_count']?.toString() ?? '0',
+            imageUrl: userData['avatar'] ?? '',
+            memberImageUrls: const [],
+            documents: const [],
+            links: const [],
+            photoUrls: const [],
+          );
+        }
+      }
+      throw Exception('Kullanıcı bilgileri getirilemedi!');
+    } catch (e) {
+      debugPrint('❌ fetchUserDetails - Hata: $e');
+      debugPrint('  - Hata Mesajı: ${e.toString()}');
+      throw Exception('Kullanıcı bilgileri getirilemedi!');
     }
   }
 }

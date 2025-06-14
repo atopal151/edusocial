@@ -1,9 +1,23 @@
 class LinkModel {
-  final String title;
   final String url;
+  final String title;
 
   LinkModel({
-    required this.title,
     required this.url,
+    required this.title,
   });
+
+  factory LinkModel.fromJson(Map<String, dynamic> json) {
+    return LinkModel(
+      url: json['url']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'title': title,
+    };
+  }
 }
