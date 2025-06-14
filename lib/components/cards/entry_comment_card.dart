@@ -49,22 +49,29 @@ class EntryCommentCard extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: () {
-                        onUpvote(); // Fonksiyon çağrısı eklendi
+                        onUpvote();
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xff53be51).withAlpha(50),
+                          color: (entry.is_like ?? false)
+                              ? Colors.green.withAlpha(50)
+                              : const Color(0xfff6f6f6),
                           borderRadius: BorderRadius.circular(50),
                         ),
-                        child: const Icon(Icons.keyboard_arrow_up,
-                            color: Color(0xff53be51), size: 18),
+                        child: Icon(
+                          Icons.keyboard_arrow_up,
+                          color: (entry.is_like ?? false)
+                              ? Colors.green
+                              : const Color(0xff414751),
+                          size: 18,
+                        ),
                       ),
                     ),
                     SizedBox(
                       width: 5,
                     ),
                     Text(
-                      entry.upvotes_count.toString(), // upvotes_count kullanıldı
+                      entry.upvotes_count.toString(),
                       style: GoogleFonts.inter(fontSize: 10, color: Color(0xff9ca3ae)),
                     ),
                     SizedBox(
@@ -72,15 +79,22 @@ class EntryCommentCard extends StatelessWidget {
                     ),
                     InkWell(
                       onTap: () {
-                        onDownvote(); // Fonksiyon çağrısı eklendi
+                        onDownvote();
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xfff6f6f6),
+                          color: (entry.is_dislike ?? false)
+                              ? Colors.red.withAlpha(50)
+                              : const Color(0xfff6f6f6),
                           borderRadius: BorderRadius.circular(50),
                         ),
-                        child: const Icon(Icons.keyboard_arrow_down,
-                            color: Color(0xff414751), size: 18),
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: (entry.is_dislike ?? false)
+                              ? Colors.red
+                              : const Color(0xff414751),
+                          size: 18,
+                        ),
                       ),
                     ),
                     SizedBox(

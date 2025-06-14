@@ -92,4 +92,37 @@ class UserModel {
       isSelf: json['is_self'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'account_type': accountType,
+      'language_id': languageId,
+      'avatar': avatar,
+      'banner': banner,
+      'description': description,
+      'school_id': schoolId,
+      'school_department_id': schoolDepartmentId,
+      'name': name,
+      'surname': surname,
+      'username': username,
+      'email': email,
+      'phone': phone,
+      'birthday': birthday?.toIso8601String(),
+      'instagram': instagram,
+      'tiktok': tiktok,
+      'twitter': twitter,
+      'facebook': facebook,
+      'linkedin': linkedin,
+      'notification_email': notificationEmail,
+      'notification_mobile': notificationMobile,
+      'is_active': isActive,
+      'is_online': isOnline,
+      'avatar_url': avatarUrl,
+      'banner_url': bannerUrl,
+      'is_following': isFollowing,
+      'is_following_pending': isFollowingPending,
+      'is_self': isSelf,
+    };
+  }
 }

@@ -18,8 +18,8 @@ class EventServices {
         },
       );
 
-     // debugPrint("📥 Events Response: ${response.statusCode}", wrapWidth: 1024);
-      //debugPrint("📥 Events Body: ${response.body}", wrapWidth: 1024);
+      /*debugPrint("📥 Events Response: ${response.statusCode}", wrapWidth: 1024);
+      debugPrint("📥 Events Body: ${response.body}", wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -29,7 +29,7 @@ class EventServices {
         return [];
       }
     } catch (e) {
-      debugPrint("❗ Events çekilirken hata: $e", wrapWidth: 1024);
+      /*debugPrint("❗ Events çekilirken hata: $e", wrapWidth: 1024);*/
       return [];
     }
   }

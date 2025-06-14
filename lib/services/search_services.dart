@@ -24,8 +24,8 @@ class SearchServices {
         },
       );
 
-      debugPrint("🔎 Search Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("🔎 Search Body: ${response.body}",wrapWidth: 1024);
+      /*debugPrint("🔎 Search Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("🔎 Search Body: ${response.body}",wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body)['data'];
@@ -47,7 +47,7 @@ class SearchServices {
         return SearchResult.empty();
       }
     } catch (e) {
-      debugPrint("❗ Search error: $e",wrapWidth: 1024);
+      /*debugPrint("❗ Search error: $e",wrapWidth: 1024);*/
       return SearchResult.empty();
     }
   }

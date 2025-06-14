@@ -19,15 +19,15 @@ class ProfileService {
       },
     );
 
-    // debugPrint("📥 kullanıcı HTTP Status Code: ${response.statusCode}",
-    //   wrapWidth: 1024);
-    //debugPrint("📦 Kullanıcı Bilgileri Body:\n${response.body}",
-    //  wrapWidth: 1024);
-    //final jsonBody = json.decode(response.body);
-    //final pretty = const JsonEncoder.withIndent('  ').convert(jsonBody);
-    //debugPrint(pretty, wrapWidth: 1024); // Konsol kesmesin diye
-    //debugPrint("Kullanıcı HTTP Status Code: ${response.statusCode}");
-    //debugPrint("Kullanıcı Bilgileri Body: ${response.body}");
+    /*debugPrint("📥 kullanıcı HTTP Status Code: ${response.statusCode}",
+      wrapWidth: 1024);
+    debugPrint("📦 Kullanıcı Bilgileri Body:\n${response.body}",
+      wrapWidth: 1024);
+    final jsonBody = json.decode(response.body);
+    final pretty = const JsonEncoder.withIndent('  ').convert(jsonBody);
+    debugPrint(pretty, wrapWidth: 1024); // Konsol kesmesin diye
+    debugPrint("Kullanıcı HTTP Status Code: ${response.statusCode}");
+    debugPrint("Kullanıcı Bilgileri Body: ${response.body}");*/
 
     if (response.statusCode == 200) {
       final jsonBody = json.decode(response.body);

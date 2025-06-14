@@ -222,7 +222,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
             color: const Color(0xfffafafa),
             child: EntryCard(
               onPressed: () {
-                Get.toNamed("/entryDetail", arguments: entry);
+                Get.toNamed("/entryDetail", arguments: {'entry': entry});
               },
               entry: entry,
               topicName: entry.topic?.name,

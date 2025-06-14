@@ -53,7 +53,12 @@ class EntryCard extends StatelessWidget {
                       onTap: onPressedProfile,
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundImage: NetworkImage(entry.user.avatarUrl),
+                        backgroundImage: entry.user.avatarUrl != null
+                            ? NetworkImage(entry.user.avatarUrl)
+                            : null,
+                        child: entry.user.avatarUrl == null
+                            ? const Icon(Icons.person, size: 20)
+                            : null,
                       ),
                     ),
                     Positioned(
@@ -78,14 +83,14 @@ class EntryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      entry.user.name,
+                      entry.user.name ?? 'Bilinmeyen Kullanıcı',
                       style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                           color: Color(0xff414751)),
                     ),
                     Text(
-                      entry.human_created_at,
+                      formatSimpleDateClock(entry.human_created_at),
                       style: const TextStyle(
                           color: Color(0xff9ca3ae), fontSize: 10),
                     ),
@@ -119,38 +124,43 @@ class EntryCard extends StatelessWidget {
             //  Beğeni, Beğenmeme, Paylaş
             Row(
               children: [
-                Expanded(
-                  child: IconButton(
-                    icon: Container(
-                      decoration: BoxDecoration(
-                          color: Color(0xff53be51).withAlpha(50),
-                          borderRadius: BorderRadius.all(Radius.circular(50))),
-                      child: const Icon(
-                        Icons.keyboard_arrow_up,
-                        color: Color(0xff53be51),
-                        size: 18,
-                      ),
+                IconButton(
+                  icon: Container(
+                    decoration: BoxDecoration(
+                        color: (entry.is_like ?? false)
+                            ? Colors.green.withAlpha(50)
+                            : const Color(0xfff6f6f6),
+                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                    child: Icon(
+                      Icons.keyboard_arrow_up,
+                      color: (entry.is_like ?? false)
+                          ? Colors.green
+                          : const Color(0xff414751),
+                      size: 18,
                     ),
-                    onPressed: onUpvote,
                   ),
+                  onPressed: onUpvote,
                 ),
-                Expanded(
-                  child: Text(
-                    entry.upvotes_count.toString(),
-                    style: const TextStyle(fontSize: 10),
-                  ),
+                Text(
+                  entry.upvotes_count.toString(),
+                  style: const TextStyle(fontSize: 10),
                 ),
-                Expanded(
-                  child: IconButton(
-                    icon: Container(
-                      decoration: BoxDecoration(
-                          color: Color(0xfff6f6f6),
-                          borderRadius: BorderRadius.all(Radius.circular(50))),
-                      child: const Icon(Icons.keyboard_arrow_down,
-                          color: Color(0xff414751), size: 18),
+                IconButton(
+                  icon: Container(
+                    decoration: BoxDecoration(
+                        color: (entry.is_dislike ?? false)
+                            ? Colors.red.withAlpha(50)
+                            : const Color(0xfff6f6f6),
+                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                    child: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: (entry.is_dislike ?? false)
+                          ? Colors.red
+                          : const Color(0xff414751),
+                      size: 18,
                     ),
-                    onPressed: onDownvote,
                   ),
+                  onPressed: onDownvote,
                 ),
                 Expanded(
                   child: Text(
@@ -166,7 +176,7 @@ class EntryCard extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(50))),
                       child: SvgPicture.asset(
                         "images/icons/share.svg",
-                        colorFilter: ColorFilter.mode(
+                        colorFilter: const ColorFilter.mode(
                           Color(0xff9ca3ae),
                           BlendMode.srcIn,
                         ),
@@ -184,7 +194,7 @@ class EntryCard extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 //  Kategori Butonu

@@ -3,6 +3,7 @@ import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/controllers/entry_detail_controller.dart';
 import 'package:edusocial/controllers/entry_controller.dart';
 import 'package:edusocial/models/entry_model.dart';
+import 'package:edusocial/models/topic_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -12,7 +13,8 @@ import '../../components/cards/entry_comment_card.dart';
 import '../../components/sheets/share_options_bottom_sheet.dart';
 
 class EntryDetailScreen extends StatefulWidget {
-  const EntryDetailScreen({super.key});
+  final EntryModel entry;
+  const EntryDetailScreen({super.key, required this.entry});
 
   @override
   State<EntryDetailScreen> createState() => _EntryDetailScreenState();
@@ -22,25 +24,38 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   final EntryDetailController entryDetailController =
       Get.find<EntryDetailController>();
   final EntryController entryController = Get.find<EntryController>();
-  final EntryModel entry = Get.arguments as EntryModel;
   final TextEditingController commentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    entryDetailController.setSelectedEntry(entry);
+    // Eğer entry'nin bir topic'i varsa, onu ayarla.
+    if (widget.entry.topic != null) {
+      entryDetailController.setCurrentTopic(widget.entry.topic!);
+    } else {
+      // Eğer topic hala null ise, bu bir veri eksikliğidir.
+      // Bu durumda EntryDetailController'da null bir topic ile devam edilebilir
+      // veya hata mesajı gösterilebilir.
+      debugPrint("⚠️ EntryDetailScreen: Topic bilgisi bulunamadı!");
+      entryDetailController.setCurrentTopic(null); // veya varsayılan bir TopicModel
+    }
+
     entryDetailController.fetchEntryComments();
   }
 
   @override
+  void dispose() {
+    debugPrint("⚠️ EntryDetailScreen dispose: Widget yok ediliyor ve yorumlar temizleniyor.");
+    entryDetailController.entryComments.clear(); // Yorum listesini doğrudan burada temizle
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    debugPrint("--- EntryDetailScreen Debug Start ---");
-    debugPrint("Entry from arguments - Topic Name: ${entry.topic?.name}");
-    debugPrint("Entry from arguments - Category Title: ${entry.topic?.category?.title}");
-    debugPrint("Entry from arguments - Content: ${entry.content}");
-    debugPrint("Controller currentTopic - Topic Name: ${entryController.currentTopic.value?.name}");
-    debugPrint("Controller currentTopic - Category Title: ${entryController.currentTopic.value?.category?.title}");
-    debugPrint("--- EntryDetailScreen Debug End ---");
+    // debugPrint("--- EntryDetailScreen Debug Start ---");
+    // debugPrint("Topic from arguments - Topic Name: ${topic.name}");
+    // debugPrint("Topic from arguments - Category Title: ${topic.category?.title}");
+    // debugPrint("--- EntryDetailScreen Debug End ---");
 
     return Scaffold(
       backgroundColor: const Color(0xfffafafa),
@@ -48,13 +63,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ana Entry ve Detayları
+          // Ana Topic ve Detayları
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Okul İlişkileri Butonu (Kategori)
+                // Kategori Butonu
                 GestureDetector(
                   onTap: () {
                     // Butona tıklanınca yapılacak işlemi buraya ekleyin
@@ -66,7 +81,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      entryController.currentTopic.value?.category?.title ?? "Kategori Yok",
+                      widget.entry.topic?.category?.title ?? "Kategori Yok",
                       style: GoogleFonts.inter(
                           fontSize: 12, color: const Color(0xff272727)),
                     ),
@@ -74,9 +89,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Entry İçeriği
+                // Topic Başlığı
                 Text(
-                  entry.content,
+                  widget.entry.topic?.name ?? "Konu Bilgisi Yok",
                   style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -87,18 +102,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             ),
           ),
 
-          // Yorumlar Listesi
+          // Yorumlar Listesi (Entry'ler)
           Expanded(
             child: Obx(() {
               if (entryDetailController.entryComments.isEmpty) {
                 return Center(
-                  child: Text(
-                    "Henüz yorum yapılmamış",
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: const Color(0xff9ca3ae),
-                    ),
-                  ),
+                  child: CircularProgressIndicator(backgroundColor: Color(0xff9ca3ae),color: Color(0xfffafafa),)
                 );
               }
               return ListView.builder(
@@ -138,7 +147,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     child: TextField(
                       controller: commentController,
                       decoration: InputDecoration(
-                        hintText: "Entry paylaşın",
+                        hintText: "Bu konuya entry paylaşın",
                         hintStyle: GoogleFonts.inter(
                             color: const Color(0xff9ca3ae), fontSize: 13.28),
                         border: OutlineInputBorder(
@@ -179,7 +188,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     onPressed: () {
                       if (commentController.text.isNotEmpty) {
                         entryController.sendEntryToTopic(
-                          entry.topic?.id ?? 0,
+                          widget.entry.topic?.id ?? 0,
                           commentController.text,
                         ).then((_) {
                           entryDetailController.fetchEntryComments();

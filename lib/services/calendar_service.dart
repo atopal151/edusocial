@@ -22,8 +22,8 @@ class CalendarService {
         },
       );
 
-     // debugPrint("📥 Calendar Response: ${response.statusCode}",wrapWidth: 1024);
-      //debugPrint("📥 Calendar Body: ${response.body}",wrapWidth: 1024);
+      /*debugPrint("📥 Calendar Response: ${response.statusCode}",wrapWidth: 1024);
+      debugPrint("📥 Calendar Body: ${response.body}",wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
@@ -35,7 +35,7 @@ class CalendarService {
             "Takvim verileri alınamadı. Status code: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("❗ getReminders hatası: $e");
+      /*debugPrint("❗ getReminders hatası: $e");*/
       rethrow;
     }
   }

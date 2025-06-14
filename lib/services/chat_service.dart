@@ -109,15 +109,15 @@ static Future<List<MessageModel>> fetchConversationMessages(int chatId) async {
     },
   );
 
-  debugPrint('Gönderilen chatId: $chatId');
+  /*debugPrint('Gönderilen chatId: $chatId');*/
 
   // JSON pretty-print
   try {
     final decodedJson = jsonDecode(response.body);
     final prettyJson = const JsonEncoder.withIndent('  ').convert(decodedJson);
-    debugPrint("✅ Pretty JSON (Show Conversation):\n$prettyJson", wrapWidth: 1024);
+    /*debugPrint("✅ Pretty JSON (Show Conversation):\n$prettyJson", wrapWidth: 1024);*/
   } catch (e) {
-    debugPrint("🛑 JSON parse error: $e");
+    /*debugPrint("🛑 JSON parse error: $e");*/
   }
 
   if (response.statusCode == 200) {

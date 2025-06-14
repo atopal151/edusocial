@@ -20,8 +20,8 @@ class StoryService {
         },
       );
 
-      //debugPrint("📥 Storyy Response: ${response.statusCode}", wrapWidth: 1024);
-      //debugPrint("📥 Story Body: ${response.body}", wrapWidth: 1024);
+      // debugPrint("📥 Storyy Response: ${response.statusCode}", wrapWidth: 1024);
+      // debugPrint("📥 Story Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -31,45 +31,45 @@ class StoryService {
         return [];
       }
     } catch (e) {
-      debugPrint("❗ Story çekilirken hata: $e", wrapWidth: 1024);
+      // debugPrint("❗ Story çekilirken hata: $e", wrapWidth: 1024);
       return [];
     }
   }
-static Future<List<String>> fetchStoriesByUserId(String userId) async {
-  final token = GetStorage().read('token');
 
-  try {
-    final response = await http.get(
-      Uri.parse("${AppConstants.baseUrl}/timeline/stories/$userId"),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
+  static Future<List<String>> fetchStoriesByUserId(String userId) async {
+    final token = GetStorage().read('token');
 
-/*    debugPrint("📥 Story uıd: $userId");
-    debugPrint("📥 Story Detail Response: ${response.statusCode}");
-    debugPrint("📥 Story Detail Body: ${response.body}");*/
+    try {
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/timeline/stories/$userId"),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
+      // debugPrint("📥 Story uıd: $userId");
+      // debugPrint("📥 Story Detail Response: ${response.statusCode}");
+      // debugPrint("📥 Story Detail Body: ${response.body}");
 
-      final userBlock = body["data"];
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
 
-      // Eğer data doğrudan stories listesi ise:
-      final stories = userBlock["stories"] ?? [];
+        final userBlock = body["data"];
 
-      return stories.map<String>((item) => item["path"].toString()).toList();
-    } else {
+        // Eğer data doğrudan stories listesi ise:
+        final stories = userBlock["stories"] ?? [];
+
+        return stories.map<String>((item) => item["path"].toString()).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      // debugPrint("❗ fetchStoriesByUserId() hatası: $e");
       return [];
     }
-  } catch (e) {
-    debugPrint("❗ fetchStoriesByUserId() hatası: $e");
-    return [];
   }
-}
 
-
- static Future<bool> createStory(File mediaFile) async {
+  static Future<bool> createStory(File mediaFile) async {
     final token = box.read('token');
     final uri = Uri.parse("${AppConstants.baseUrl}/timeline/stories");
 
@@ -95,18 +95,18 @@ static Future<List<String>> fetchStoriesByUserId(String userId) async {
       // Cevabı oku
       final responseBody = await response.stream.bytesToString();
 
-      debugPrint("📥 Story Upload Status: ${response.statusCode}");
-      debugPrint("📥 Story Upload Body: $responseBody");
+      // debugPrint("📥 Story Upload Status: ${response.statusCode}");
+      // debugPrint("�� Story Upload Body: $responseBody");
 
       if (response.statusCode == 200) {
-        debugPrint("✅ Hikaye başarıyla yüklendi.");
+        // debugPrint("✅ Hikaye başarıyla yüklendi.");
         return true;
       } else {
-        debugPrint("❌ Hikaye yükleme başarısız. Status: ${response.statusCode}");
+        // debugPrint("❌ Hikaye yükleme başarısız. Status: ${response.statusCode}");
         return false;
       }
     } catch (e) {
-      debugPrint("❗ createStory hatası: $e");
+      // debugPrint("❗ createStory hatası: $e");
       return false;
     }
   }

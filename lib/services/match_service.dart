@@ -21,9 +21,6 @@ class MatchServices {
         body: jsonEncode({"name": lessonName}), // 🔥 Düzeltildi: "name" olmalı
       );
 
-     // debugPrint("📥 Lesson Add Response: ${response.statusCode}");
-     // debugPrint("📥 Lesson Add Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         return body["status"] == true;
@@ -31,7 +28,6 @@ class MatchServices {
         return false;
       }
     } catch (e) {
-      debugPrint("❌ Ders eklenirken hata: $e");
       return false;
     }
   }
@@ -50,9 +46,6 @@ class MatchServices {
         body: jsonEncode({"user_id": userId}),
       );
 
-      //debugPrint("📥 Match Follow Response: ${response.statusCode}");
-      //debugPrint("📥 Match Follow Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         return body["status"] == true;
@@ -60,7 +53,6 @@ class MatchServices {
         return false;
       }
     } catch (e) {
-      debugPrint("❌ Match follow error: $e", wrapWidth: 1024);
       return false;
     }
   }
@@ -77,9 +69,6 @@ class MatchServices {
         },
       );
 
-     // debugPrint("📥 Match Response: ${response.statusCode}");
-      //debugPrint("📥 Match Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final dynamic data = jsonDecode(response.body)['data'];
         if (data == null) return [];
@@ -90,7 +79,6 @@ class MatchServices {
         return [];
       }
     } catch (e) {
-      debugPrint("❗ Match verileri alınamadı: $e");
       return [];
     }
   }

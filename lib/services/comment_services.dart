@@ -19,27 +19,27 @@ static Future<List<CommentModel>> fetchComments(String postId) async {
       },
     );
 
-    debugPrint('🟡 Post ID: $postId');
+    /*debugPrint('🟡 Post ID: $postId');*/
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
 
       final commentsData = body['data']?['post']?['comments'];
 
-      debugPrint("📦 Yorum verisi:\n${const JsonEncoder.withIndent('  ').convert(commentsData)}");
+      /*debugPrint("📦 Yorum verisi:\n${const JsonEncoder.withIndent('  ').convert(commentsData)}");*/
 
       if (commentsData is List) {
         return commentsData.map((e) => CommentModel.fromJson(e)).toList();
       } else {
-        debugPrint('⚠️ comments listesi boş ya da format hatalı');
+        /*debugPrint('⚠️ comments listesi boş ya da format hatalı');*/
         return [];
       }
     } else {
-      debugPrint('🔴 Hata: ${response.statusCode}');
+      /*debugPrint('🔴 Hata: ${response.statusCode}');*/
       return [];
     }
   } catch (e) {
-    debugPrint("❌ fetchComments hatası: $e");
+    /*debugPrint("❌ fetchComments hatası: $e");*/
     return [];
   }
 }

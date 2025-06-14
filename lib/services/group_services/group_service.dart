@@ -31,7 +31,7 @@ class GroupServices {
         return [];
       }
     } catch (e) {
-      debugPrint("❗ Group Suggestion error: $e", wrapWidth: 1024);
+      /*debugPrint("❗ Group Suggestion error: $e", wrapWidth: 1024);*/
       return [];
     }
   }
@@ -40,12 +40,12 @@ class GroupServices {
     final box = GetStorage();
     final token = box.read('token');
 
-    //debugPrint("🚀 fetchUserGroups() çağrıldı");
-    //debugPrint("🔑 Token: $token");
+    /*debugPrint("🚀 fetchUserGroups() çağrıldı");
+    debugPrint("🔑 Token: $token");*/
 
     try {
       final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
-      //debugPrint("🌐 İstek Atılıyor: $uri");
+      /*debugPrint("🌐 İstek Atılıyor: $uri");*/
 
       final response = await http.get(
         uri,
@@ -55,7 +55,7 @@ class GroupServices {
         },
       );
 
-      /* debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
+      /*debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
        wrapWidth: 1024);
       debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
       wrapWidth: 1024);*/
@@ -64,8 +64,8 @@ class GroupServices {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        //  debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
-        //    wrapWidth: 1024);
+        /*debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
+          wrapWidth: 1024);*/
 
         final userGroupList = data.map((item) {
           final group = GroupModel(

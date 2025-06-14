@@ -22,8 +22,8 @@ class NotificationService {
         },
       );
 
-      debugPrint("📥 notifications Response: ${response.statusCode}", wrapWidth: 1024);
-      debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
+      /*debugPrint("📥 notifications Response: ${response.statusCode}", wrapWidth: 1024);
+      debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);*/
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
@@ -43,7 +43,7 @@ class NotificationService {
         throw Exception('Bildirimler alınamadı. Status Code: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint("❗ Bildirim servisi hatası: $e", wrapWidth: 1024);
+      /*debugPrint("❗ Bildirim servisi hatası: $e", wrapWidth: 1024);*/
       rethrow;
     }
   }

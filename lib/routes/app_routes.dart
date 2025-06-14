@@ -173,7 +173,7 @@ class Routes {
     ),
     GetPage(
       name: entryDetail,
-      page: () => EntryDetailScreen(),
+      page: () => EntryDetailScreen(entry: Get.arguments['entry']),
       binding: EntryBinding(),
     ),
     GetPage(

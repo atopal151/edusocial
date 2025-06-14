@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_multiline_textfield.dart';
+import '../../models/topic_category_model.dart';
+import '../../services/entry_services.dart';
 
 class EntryShareScreen extends StatefulWidget {
   const EntryShareScreen({super.key});
@@ -16,12 +18,16 @@ class EntryShareScreen extends StatefulWidget {
 
 class _EntryShareScreenState extends State<EntryShareScreen> {
   final EntryController entryController = Get.find<EntryController>();
+  final EntryServices entryServices = EntryServices();
   int currentCharCount = 0;
+  final RxList<TopicCategoryModel> categoryList = <TopicCategoryModel>[].obs;
+  final Rxn<TopicCategoryModel> selectedTopicCategory = Rxn<TopicCategoryModel>();
 
   @override
   void initState() {
     super.initState();
     entryController.bodyEntryController.addListener(_entryTextListener);
+    _fetchTopicCategories();
   }
 
   void _entryTextListener() {
@@ -29,6 +35,19 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
       setState(() {
         currentCharCount = entryController.bodyEntryController.text.length;
       });
+    }
+  }
+
+  Future<void> _fetchTopicCategories() async {
+    final List<TopicCategoryModel> data = await entryServices.fetchTopicCategories();
+    categoryList.assignAll(data);
+    if (categoryList.isNotEmpty) {
+      final gunceCategory = categoryList.firstWhereOrNull((element) => element.title == "Güncem");
+      if (gunceCategory != null) {
+        selectedTopicCategory.value = gunceCategory;
+      } else {
+        selectedTopicCategory.value = categoryList.first;
+      }
     }
   }
 
@@ -71,17 +90,11 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
               Obx(
                 () => CustomDropDown(
                   label: "Kategori",
-                  items: entryController.categoryEntry,
-                  selectedItem: entryController.categoryEntry.isNotEmpty
-                      ? (entryController.categoryEntry.contains(
-                                  entryController.selectedCategory.value) &&
-                              entryController.selectedCategory.value.isNotEmpty
-                          ? entryController.selectedCategory.value
-                          : entryController.categoryEntry.first)
-                      : "",
+                  items: categoryList.map((e) => e.title!).toList(),
+                  selectedItem: selectedTopicCategory.value?.title ?? (categoryList.isNotEmpty ? categoryList.first.title : ""),
                   onChanged: (value) {
                     if (value != null) {
-                      entryController.selectedCategory.value = value;
+                      selectedTopicCategory.value = categoryList.firstWhereOrNull((element) => element.title == value);
                     }
                   },
                 ),
@@ -94,7 +107,11 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
                 borderRadius: 15,
                 text: "+ Konuyu Aç",
                 onPressed: () {
-                  entryController.shareEntryPost();
+                  entryController.shareEntryPost(
+                    topicName: entryController.titleEntryController.text,
+                    content: entryController.bodyEntryController.text,
+                    topicCategoryId: selectedTopicCategory.value?.id ?? 0,
+                  );
                 },
                 isLoading: entryController.isEntryLoading,
                 backgroundColor: Color(0xfffb535c),

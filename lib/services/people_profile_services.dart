@@ -22,17 +22,17 @@ class PeopleProfileService {
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
-        //final bodyString = const JsonEncoder.withIndent('  ').convert(body);
-        //debugPrint('🔍 Userdata:\n$bodyString');
+        /*final bodyString = const JsonEncoder.withIndent('  ').convert(body);
+        debugPrint('🔍 Userdata:\n$bodyString');*/
 
         return PeopleProfileModel.fromJson(body['data']);
       } else {
-        debugPrint(
-            "❌ [fetchUserByUsername] API başarısız: ${response.statusCode}");
+        /*debugPrint(
+            "❌ [fetchUserByUsername] API başarısız: ${response.statusCode}");*/
         return null;
       }
     } catch (e) {
-      debugPrint("❌ fetchUserByUsername error: $e");
+      /*debugPrint("❌ fetchUserByUsername error: $e");*/
       return null;
     }
   }

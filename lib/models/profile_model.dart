@@ -1,6 +1,7 @@
 import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/models/school_department_model.dart';
 import 'package:edusocial/models/school_model.dart';
+import 'package:edusocial/models/user_model.dart';
 
 class ProfileModel {
   final int id;
@@ -173,4 +174,37 @@ class ProfileModel {
   );
 }
 
+  // ProfileModel'den UserModel'e dönüşüm
+  UserModel toUserModel() {
+    return UserModel(
+      id: id,
+      accountType: accountType,
+      languageId: languageId != null ? int.tryParse(languageId!) ?? 0 : 0,
+      avatar: avatar,
+      banner: banner,
+      description: description,
+      schoolId: schoolId != null ? int.tryParse(schoolId!) ?? 0 : 0,
+      schoolDepartmentId: schoolDepartmentId != null ? int.tryParse(schoolDepartmentId!) ?? 0 : 0,
+      name: name,
+      surname: surname,
+      username: username,
+      email: email,
+      phone: phone,
+      birthday: birthDate.isNotEmpty ? DateTime.tryParse(birthDate) : null,
+      instagram: instagram,
+      tiktok: tiktok,
+      twitter: twitter,
+      facebook: facebook,
+      linkedin: linkedin,
+      notificationEmail: notificationEmail,
+      notificationMobile: notificationMobile,
+      isActive: isActive,
+      isOnline: isOnline,
+      avatarUrl: avatarUrl,
+      bannerUrl: bannerUrl,
+      isFollowing: isFollowing,
+      isFollowingPending: isFollowingPending,
+      isSelf: isSelf,
+    );
+  }
 }
