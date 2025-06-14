@@ -16,6 +16,13 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
   final MatchController controller = Get.find();
 
   @override
+  void initState() {
+    super.initState();
+    // Sayfa açıldığında eşleşmeleri getir
+    controller.findMatches();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: UserAppBar(),
@@ -24,37 +31,22 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Obx(() {
           if (controller.matches.isEmpty) {
-            // 👇 Eşleşme yoksa butonu göster
-            return Center(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: IconButton(
-                  onPressed: () {
-                    controller.findMatches();
-                  },
-                  icon: const Icon(Icons.refresh,
-                      color: Color(0xff9ca3ae), size: 20),
+            return const Center(
+              child: Text(
+                'Henüz eşleşme bulunamadı',
+                style: TextStyle(
+                  color: Color(0xff9ca3ae),
+                  fontSize: 16,
                 ),
               ),
             );
           } else {
-            // 👇 Eşleşme varsa kartı göster
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 MatchCard(),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  child: IconButton(
-                    onPressed: () {
-                      controller.findMatches();
-                    },
-                    icon: const Icon(Icons.refresh,
-                        color: Color(0xff9ca3ae), size: 20),
-                  ),
-                ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: CustomButton(

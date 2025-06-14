@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../models/match_model.dart';
-import 'nav_bar_controller.dart';
 
 class MatchController extends GetxController {
   final TextEditingController textFieldController = TextEditingController();
@@ -11,8 +10,6 @@ class MatchController extends GetxController {
   var isLoading = false.obs;
   var matches = <MatchModel>[].obs;
   var currentIndex = 0.obs;
-
-  final NavigationController navigationController = Get.find();
 
   MatchModel get currentMatch => matches[currentIndex.value];
 
@@ -68,7 +65,22 @@ class MatchController extends GetxController {
     Get.toNamed("/match");
   }
 
-  void _loadMockData() {}
+  void findMatches() async {
+    isLoading.value = true;
+    try {
+      final fetchedMatches = await MatchServices.findMatches();
+      matches.value = fetchedMatches;
+      debugPrint("✅ Eşleşmeler başarıyla yüklendi: ${matches.length} adet");
+    } catch (e) {
+      debugPrint("❗ Eşleşmeler yüklenirken hata: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _loadMockData() {
+    // Mock data yükleme işlemi
+  }
 
   void startChat() {
     Get.toNamed("/chat_detail");
@@ -91,35 +103,5 @@ class MatchController extends GetxController {
 
   void removeTopic(String topic) {
     savedTopics.remove(topic);
-  }
-
-  void findMatches() async {
-    isLoading.value = true;
-
-    final fetchedMatches = await MatchServices.fetchMatches();
-
-    // ✅ Şu satırı yorum satırına aldık:
-    // final filteredMatches = fetchedMatches.where((match) => match.isFollowing == false).toList();
-
-    // 👇 Tüm listeyi kullan
-    final allMatches = fetchedMatches;
-
-    // 👇 Her eşleşmeyi debug için yazdır (gerekirse kaldır)
-    for (var match in allMatches) {
-      debugPrint("🔍 Match: ${match.name}, isFollowing: ${match.isFollowing}");
-    }
-
-    if (allMatches.isNotEmpty) {
-      matches.assignAll(allMatches);
-    } else {
-      Get.snackbar(
-        "Bilgi",
-        "Hiç eşleşme bulunamadı.",
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      Get.back();
-    }
-
-    isLoading.value = false;
   }
 }

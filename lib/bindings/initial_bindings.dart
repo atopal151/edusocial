@@ -1,4 +1,3 @@
-
 import 'package:get/get.dart';
 import 'package:edusocial/controllers/login_controller.dart';
 import 'package:edusocial/controllers/match_controller.dart';
@@ -21,19 +20,16 @@ import '../controllers/social/chat_controller.dart';
 class InitialBindings extends Bindings {
   @override
   void dependencies() {
-
     // Global controller'lar (uygulama boyunca hep açık kalacaklar)
-
     Get.put(LoginController(), permanent: true);
+    Get.put(MatchController(), permanent: true);
     Get.put(NavigationController(), permanent: true);
     Get.put(OnboardingController(), permanent: true);
-    Get.put(MatchController(), permanent: true);
     Get.put(AppBarController(), permanent: true);
     Get.put(ProfileController(), permanent: true);
     Get.put(GroupController(), permanent: true);
     Get.put(GetMaterialController(), permanent: true);
     Get.put(StoryController(), permanent: true);
-
 
     // İhtiyaç anında yüklenecek olanlar (lazy yükleme)
     Get.lazyPut(() => EventController());
