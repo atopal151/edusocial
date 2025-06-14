@@ -3,19 +3,11 @@ import 'package:edusocial/components/cards/entry_card.dart';
 import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:edusocial/models/entry_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../components/user_appbar/user_appbar.dart';
 import '../../components/sheets/share_options_bottom_sheet.dart';
 import '../../controllers/entry_controller.dart';
-import '../../models/topic_model.dart';
-import '../../models/user_model.dart';
-import '../../models/topic_category_model.dart';
-import '../../services/entry_services.dart';
-import '../entry/entry_detail_screen.dart';
 import '../profile/people_profile_screen.dart';
-import 'package:edusocial/models/display_entry_item.dart';
 import 'package:edusocial/routes/app_routes.dart';
 
 // Yeni sınıf: Entry ve ilişkili görüntüleme verilerini tutar

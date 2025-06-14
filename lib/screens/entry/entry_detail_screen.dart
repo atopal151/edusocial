@@ -3,7 +3,6 @@ import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/controllers/entry_detail_controller.dart';
 import 'package:edusocial/controllers/entry_controller.dart';
 import 'package:edusocial/models/entry_model.dart';
-import 'package:edusocial/models/topic_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';

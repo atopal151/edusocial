@@ -4,12 +4,7 @@ import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_app_bar.dar
 import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_body.dart';
 // import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_bottom.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
-
-import '../../../components/cards/members_avatar.dart';
 
 class UserChatDetailScreen extends StatefulWidget {
   const UserChatDetailScreen({super.key});

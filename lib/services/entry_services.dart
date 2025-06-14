@@ -9,7 +9,6 @@ import '../models/topic_model.dart';
 import '../models/topic_category_model.dart';
 import '../models/user_model.dart';
 import 'package:dio/dio.dart';
-import 'package:edusocial/services/api_service.dart';
 
 class EntryServices {
   final Dio dio = Dio(
@@ -55,7 +54,7 @@ class EntryServices {
         // debugPrint("⚠️ Topic entries failed: ${response.statusCode}");
         return null;
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       // debugPrint("❗ fetchEntriesByTopicId error: $e");
       // debugPrint("❗ StackTrace: $stackTrace");
       return null;

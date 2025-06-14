@@ -1,6 +1,4 @@
 import 'package:edusocial/models/entry_model.dart';
-import 'package:edusocial/models/topic_model.dart';
-import 'package:edusocial/models/topic_category_model.dart';
 
 // Entry ve ilişkili görüntüleme verilerini tutar
 class DisplayEntryItem {
