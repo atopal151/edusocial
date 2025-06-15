@@ -141,10 +141,11 @@ class ChatDetailController extends GetxController {
           imageUrl: userDetails.imageUrl,
           memberImageUrls: const [],
           documents: allDocuments.map((doc) => DocumentModel(
+            id: doc.id,
             name: doc.name,
-            url: doc.url,
             sizeMb: 0.0,
-            date: DateTime.parse(doc.date),
+            humanCreatedAt: doc.date,
+            createdAt: DateTime.parse(doc.date),
           )).toList(),
           links: allLinks,
           photoUrls: allPhotos,
@@ -186,7 +187,13 @@ class ChatDetailController extends GetxController {
               following: '0', // API'den gelmiyor
               imageUrl: sender.avatarUrl,
               memberImageUrls: const [],
-              documents: const [],
+              documents: message.messageDocument?.map((doc) => DocumentModel(
+                id: doc.id,
+                name: doc.name,
+                sizeMb: 0.0,
+                humanCreatedAt: doc.date,
+                createdAt: DateTime.parse(doc.date),
+              )).toList() ?? [],
               links: const [],
               photoUrls: const [],
             );
@@ -264,10 +271,11 @@ class ChatDetailController extends GetxController {
           imageUrl: sender.avatarUrl,
           memberImageUrls: const [],
           documents: allDocuments.map((doc) => DocumentModel(
+            id: doc.id,
             name: doc.name,
-            url: doc.url,
             sizeMb: 0.0,
-            date: DateTime.parse(doc.date),
+            humanCreatedAt: doc.date,
+            createdAt: DateTime.parse(doc.date),
           )).toList(),
           links: allLinks,
           photoUrls: allPhotos,

@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../models/chat_models/group_message_model.dart';
-import '../../models/group_models/group_model.dart';
+import '../../models/group_models/group_detail_model.dart';
 import '../../services/group_services/group_service.dart';
 
 class GroupChatDetailController extends GetxController {
@@ -13,7 +13,7 @@ class GroupChatDetailController extends GetxController {
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxString currentGroupId = ''.obs;
-  final Rx<GroupModel?> groupData = Rx<GroupModel?>(null);
+  final groupData = Rx<GroupDetailModel?>(null);
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
 
@@ -303,7 +303,10 @@ class GroupChatDetailController extends GetxController {
   }
 
   void getToGrupDetailScreen() {
-    Get.toNamed("/groupDetailScreen");
+    debugPrint('🔍 Navigating to group detail screen with group ID: ${currentGroupId.value}');
+    Get.toNamed("/groupDetailScreen", arguments: {
+      'groupId': currentGroupId.value,
+    });
   }
 
   void simulateIncomingMessages() {

@@ -1,31 +1,34 @@
 class DocumentModel {
+  final String id;
   final String name;
-  final String url;
   final double sizeMb;
-  final DateTime date;
+  final String humanCreatedAt;
+  final DateTime createdAt;
 
   DocumentModel({
+    required this.id,
     required this.name,
-    required this.url,
     required this.sizeMb,
-    required this.date,
+    required this.humanCreatedAt,
+    required this.createdAt,
   });
 
   factory DocumentModel.fromJson(Map<String, dynamic> json) {
     return DocumentModel(
-      name: json['name']?.toString() ?? '',
-      url: json['url']?.toString() ?? '',
-      sizeMb: (json['sizeMb'] as num?)?.toDouble() ?? 0.0,
-      date: json['date'] != null ? DateTime.parse(json['date']) : DateTime.now(),
+      id: json['id'].toString(),
+      name: json['name'],
+      sizeMb: (json['size_mb'] as num).toDouble(),
+      humanCreatedAt: json['human_created_at'] ?? '',
+      createdAt: DateTime.parse(json['created_at']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'url': url,
       'sizeMb': sizeMb,
-      'date': date.toIso8601String(),
+      'humanCreatedAt': humanCreatedAt,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 }

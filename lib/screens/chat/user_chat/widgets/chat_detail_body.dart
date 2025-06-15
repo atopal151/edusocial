@@ -173,7 +173,7 @@ class _ChatDetailBodyState extends State<ChatDetailBody> {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  "${doc.sizeMb} Mb • ${DateFormat('dd.MM.yyyy').format(doc.date)}",
+                                  "${doc.sizeMb} Mb • ${DateFormat('dd.MM.yyyy').format(doc.createdAt)}",
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,

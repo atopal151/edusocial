@@ -22,12 +22,34 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   late ScrollController documentsScrollController;
   late ScrollController linksScrollController;
   late ScrollController photosScrollController;
+
   @override
   void initState() {
     super.initState();
     documentsScrollController = ScrollController();
     linksScrollController = ScrollController();
     photosScrollController = ScrollController();
+
+    // Get group ID from arguments
+    final groupId = Get.arguments?['groupId'];
+    if (groupId != null) {
+      debugPrint('🔍 Fetching details for group: $groupId');
+      // Use Future.microtask to avoid build-time state updates
+      Future.microtask(() {
+        groupController.fetchGroupDetail(groupId);
+      });
+    } else {
+      debugPrint('❌ No group ID provided in arguments');
+      // Use Future.microtask to avoid build-time navigation
+      Future.microtask(() {
+        Get.snackbar(
+          'Error',
+          'No group selected',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        Get.back();
+      });
+    }
   }
 
   @override
@@ -42,7 +64,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     if (count >= 10000) {
       return '${(count / 1000).floor()}k';
     } else {
-      // binlik ayraç eklemek için
       return count.toString().replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.');
     }
@@ -69,7 +90,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 shape: BoxShape.circle,
               ),
               child: Padding(
-                padding: const EdgeInsets.only(left: 8), // soldan biraz boşluk
+                padding: const EdgeInsets.only(left: 8),
                 child: const Icon(
                   Icons.arrow_back_ios,
                   size: 18,
@@ -101,9 +122,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
               ),
             ),
           ),
-          SizedBox(
-            width: 10,
-          )
+          SizedBox(width: 10)
         ],
       ),
       body: Obx(
@@ -124,20 +143,21 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       Stack(
                         clipBehavior: Clip.none,
                         children: [
-                          /// Kapak fotoğrafı
+                          // Kapak fotoğrafı
                           Container(
                             height: 95,
                             width: double.infinity,
                             decoration: BoxDecoration(
+                              color: Color(0xffffffff),
                               borderRadius: BorderRadius.circular(20),
                               image: DecorationImage(
-                                image: NetworkImage(group.coverImageUrl),
+                                image: NetworkImage(group.bannerUrl ?? ''),
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
 
-                          /// Profil fotoğrafı
+                          // Profil fotoğrafı
                           Positioned(
                             bottom: -30,
                             left: MediaQuery.of(context).size.width / 2 - 55,
@@ -146,7 +166,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                               backgroundColor: Colors.white,
                               child: CircleAvatar(
                                 radius: 36,
-                                backgroundImage: NetworkImage(group.imageUrl),
+                                backgroundImage:
+                                    NetworkImage(group.avatarUrl ?? ''),
                               ),
                             ),
                           ),
@@ -154,7 +175,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       ),
                       const SizedBox(height: 48),
 
-                      /// Grup adı + doğrulama
+                      // Grup adı + doğrulama
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -165,9 +186,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.check_circle,
-                              color: Color(0xff2c96ff), size: 18),
+                          if (group.isFounder) ...[
+                            const SizedBox(width: 6),
+                            const Icon(Icons.check_circle,
+                                color: Color(0xff2c96ff), size: 18),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -176,14 +199,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 ),
                 SizedBox(height: 16),
 
+                // Üye avatarları
                 InkWell(
                   onTap: () {
                     Get.toNamed("/followers");
                   },
                   child: SizedBox(
-                    width: 150, // genişlik ihtiyacına göre ayarlanabilir
+                    width: 150,
                     child: Center(
-                      child: buildMemberAvatars(group.memberImageUrls),
+                      child: buildMemberAvatars([]),
                     ),
                   ),
                 ),
@@ -223,8 +247,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 ),
                               ),
                               Text(
-                                DateFormat('dd.MM.yyyy')
-                                    .format(group.createdAt),
+                                group.humanCreatedAt,
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13.28,
@@ -236,9 +259,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
+                    SizedBox(width: 10),
                     Expanded(
                       child: InkWell(
                         onTap: () {
@@ -261,7 +282,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                   ),
                                 ),
                                 Text(
-                                  formatMemberCount(group.memberCount),
+                                  formatMemberCount(group.userCountWithAdmin),
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 13.28,
@@ -296,8 +317,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                             indicator: UnderlineTabIndicator(
                               borderSide: BorderSide(
                                   width: 2.0, color: Color(0xffef5050)),
-                              insets: EdgeInsets.symmetric(
-                                  horizontal: 16.0), // genişlik daraltma
+                              insets: EdgeInsets.symmetric(horizontal: 16.0),
                             ),
                             labelStyle: GoogleFonts.inter(
                                 fontWeight: FontWeight.w600, fontSize: 13.28),
@@ -311,134 +331,171 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           child: TabBarView(
                             children: [
                               // BELGELER
-                              Scrollbar(
-                                controller: documentsScrollController,
-                                trackVisibility: true,
-                                thumbVisibility: true,
-                                thickness: 5,
-                                radius: Radius.circular(15),
-                                child: ListView.builder(
+                              if (group.documents != null &&
+                                  group.documents.isNotEmpty)
+                                Scrollbar(
                                   controller: documentsScrollController,
-                                  itemCount: group.documents.length,
-                                  itemBuilder: (context, index) {
-                                    final doc = group.documents[index];
-                                    return ListTile(
-                                      leading: Container(
-                                          padding: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                              color: Color(0xfff5f6f7),
-                                              borderRadius:
-                                                  BorderRadius.circular(50)),
-                                          child: SvgPicture.asset(
-                                          "images/icons/document_icon.svg",
-                                          colorFilter: ColorFilter.mode(
-                                            Color(0xff9ca3ae),
-                                            BlendMode.srcIn,
-                                          ),
-                                        ),),
-                                      title: Text(
-                                        doc.name,
-                                        style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xff414751)),
-                                      ),
-                                      subtitle: Text(
-                                        "${doc.sizeMb} Mb • ${DateFormat('dd.MM.yyyy').format(doc.date)}",
-                                        style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xff9ca3ae)),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-
-                              // BAĞLANTILAR
-                              Scrollbar(
-                                controller: linksScrollController,
-                                trackVisibility: true,
-                                thumbVisibility: true,
-                                thickness: 5,
-                                radius: Radius.circular(15),
-                                child: ListView.builder(
-                                  controller: linksScrollController,
-                                  itemCount: group.links.length,
-                                  itemBuilder: (context, index) {
-                                    final link = group.links[index];
-                                    return ListTile(
-                                      leading: Container(
-                                          padding: EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                              color: Color(0xfff5f6f7),
-                                              borderRadius:
-                                                  BorderRadius.circular(50)),
-                                          child: Transform.rotate(
-                                              angle: -45 *
-                                                  3.1415926535 /
-                                                  180, // -45 dereceyi radyana çevirdik
-                                              child: Icon(
-                                                Icons.link,
-                                                color: Color(0xff9ca3ae),
-                                              ))),
-                                      title: Text(
-                                        link.title,
-                                        style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xff414751)),
-                                      ),
-                                      subtitle: Text(
-                                        link.url,
-                                        style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: Color(0xff9ca3ae)),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-
-                              // FOTOĞRAFLAR
-                              Scrollbar(
-                                controller: photosScrollController,
-                                trackVisibility: true,
-                                thumbVisibility: true,
-                                thickness: 5,
-                                radius: Radius.circular(15),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, right: 16, top: 8, bottom: 8),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        20), // Container ile aynı radius
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: GridView.builder(
-                                        controller: photosScrollController,
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
+                                  trackVisibility: true,
+                                  thumbVisibility: true,
+                                  thickness: 5,
+                                  radius: Radius.circular(15),
+                                  child: ListView.builder(
+                                    controller: documentsScrollController,
+                                    itemCount: group.documents.length,
+                                    itemBuilder: (context, index) {
+                                      final doc = group.documents[index];
+                                      return ListTile(
+                                        leading: Container(
+                                            padding: EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                                color: Color(0xfff5f6f7),
+                                                borderRadius:
+                                                    BorderRadius.circular(50)),
+                                            child: SvgPicture.asset(
+                                              "images/icons/document_icon.svg",
+                                              colorFilter: ColorFilter.mode(
+                                                Color(0xff9ca3ae),
+                                                BlendMode.srcIn,
+                                              ),
+                                            )),
+                                        title: Text(
+                                          doc.name,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff414751)),
                                         ),
-                                        itemCount: group.photoUrls.length,
-                                        itemBuilder: (context, index) {
-                                          return Padding(
-                                            padding: const EdgeInsets.all(0.6),
-                                            child: Image.network(
-                                              group.photoUrls[index],
-                                              fit: BoxFit.cover,
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                        subtitle: Text(
+                                          "${doc.sizeMb} Mb • ${doc.humanCreatedAt}",
+                                          style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff9ca3ae)),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                              else
+                                Center(
+                                  child: Text(
+                                    "Henüz belge eklenmemiş",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: Color(0xff9ca3ae),
                                     ),
                                   ),
                                 ),
-                              )
+
+                              // BAĞLANTILAR
+                              if (group.links != null && group.links.isNotEmpty)
+                                Scrollbar(
+                                  controller: linksScrollController,
+                                  trackVisibility: true,
+                                  thumbVisibility: true,
+                                  thickness: 5,
+                                  radius: Radius.circular(15),
+                                  child: ListView.builder(
+                                    controller: linksScrollController,
+                                    itemCount: group.links.length,
+                                    itemBuilder: (context, index) {
+                                      final link = group.links[index];
+                                      return ListTile(
+                                        leading: Container(
+                                            padding: EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                                color: Color(0xfff5f6f7),
+                                                borderRadius:
+                                                    BorderRadius.circular(50)),
+                                            child: Transform.rotate(
+                                                angle: -45 * 3.1415926535 / 180,
+                                                child: Icon(
+                                                  Icons.link,
+                                                  color: Color(0xff9ca3ae),
+                                                ))),
+                                        title: Text(
+                                          link.title,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff414751)),
+                                        ),
+                                        subtitle: Text(
+                                          link.url,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff9ca3ae)),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                              else
+                                Center(
+                                  child: Text(
+                                    "Henüz bağlantı eklenmemiş",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: Color(0xff9ca3ae),
+                                    ),
+                                  ),
+                                ),
+
+                              // FOTOĞRAFLAR
+                              if (group.photoUrls != null &&
+                                  group.photoUrls.isNotEmpty)
+                                Scrollbar(
+                                  controller: photosScrollController,
+                                  trackVisibility: true,
+                                  thumbVisibility: true,
+                                  thickness: 5,
+                                  radius: Radius.circular(15),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0,
+                                        right: 16,
+                                        top: 8,
+                                        bottom: 8),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: GridView.builder(
+                                          controller: photosScrollController,
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 3,
+                                          ),
+                                          itemCount: group.photoUrls.length,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(0.6),
+                                              child: Image.network(
+                                                group.photoUrls[index],
+                                                fit: BoxFit.cover,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              else
+                                Center(
+                                  child: Text(
+                                    "Henüz fotoğraf eklenmemiş",
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: Color(0xff9ca3ae),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         )
@@ -450,30 +507,32 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 SizedBox(height: 24),
 
                 // ETKİNLİKLER
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Grup Etkinlikleri",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: group.events.length,
-                      itemBuilder: (context, index) {
-                        final event = group.events[index];
-                        return EventCard(
-                            eventTitle: event.title,
-                            eventDescription: event.title,
-                            eventDate: event.endTime,
-                            eventImage: event.bannerUrl,
-                            onShare: () {},
-                            onLocation: () {});
-                      },
-                    ),
-                  ],
-                ),
+                if (group.events != null && group.events.isNotEmpty) ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Grup Etkinlikleri",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 8),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: group.events.length,
+                        itemBuilder: (context, index) {
+                          final event = group.events[index];
+                          return EventCard(
+                              eventTitle: event.title,
+                              eventDescription: event.description,
+                              eventDate: event.humanStartTime,
+                              eventImage: event.bannerUrl,
+                              onShare: () {},
+                              onLocation: () {});
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           );

@@ -18,7 +18,7 @@ class GroupController extends GetxController {
   var isGroupLoading = false.obs;
 
   var selectedCategory = "All".obs;
-  var groupDetail = Rxn<GroupDetailModel>();
+  final Rx<GroupDetailModel?> groupDetail = Rx<GroupDetailModel?>(null);
   var filteredGroups = <GroupModel>[].obs;
 
   var categories = ['All'].obs;
@@ -151,6 +151,22 @@ class GroupController extends GetxController {
       filteredGroups.value = allGroups
           .where((group) => group.groupAreaId.toString() == selectedId)
           .toList();
+    }
+  }
+
+  Future<void> fetchGroupDetail(String groupId) async {
+    try {
+      debugPrint('🔍 Fetching group detail for ID: $groupId');
+      final group = await _groupServices.fetchGroupDetail(groupId);
+      groupDetail.value = group as GroupDetailModel?;
+      debugPrint('✅ Group details loaded successfully');
+    } catch (e) {
+      debugPrint('❌ Error fetching group detail: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to load group details',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }

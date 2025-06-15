@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../../models/group_models/group_model.dart';
+import '../../models/group_models/group_detail_model.dart';
 
 class GroupServices {
 //ana sayfa içerisinde çıkacak olan önerilen group alanı endpointi
@@ -237,7 +238,7 @@ class GroupServices {
     }
   }
 
-  Future<GroupModel> fetchGroupDetail(String groupId) async {
+  Future<GroupDetailModel> fetchGroupDetail(String groupId) async {
     final box = GetStorage();
     try {
       debugPrint('🔍 Fetching details for group: $groupId');
@@ -255,25 +256,25 @@ class GroupServices {
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
-          final groupData = jsonBody['data']['group'];
+          final groupData = jsonBody['data'];
           
           debugPrint('✅ Group details fetched successfully:');
-          debugPrint('  - ID: ${groupData['id']}');
-          debugPrint('  - Name: ${groupData['name']}');
-          debugPrint('  - Description: ${groupData['description']}');
-          debugPrint('  - User Count (with admin): ${groupData['user_count_with_admin']}');
-          debugPrint('  - User Count (without admin): ${groupData['user_count_without_admin']}');
-          debugPrint('  - Message Count: ${groupData['message_count']}');
-          debugPrint('  - Is Private: ${groupData['is_private']}');
-          debugPrint('  - Is Founder: ${groupData['is_founder']}');
-          debugPrint('  - Is Member: ${groupData['is_member']}');
-          debugPrint('  - Is Pending: ${groupData['is_pending']}');
-          debugPrint('  - Avatar URL: ${groupData['avatar_url']}');
-          debugPrint('  - Banner URL: ${groupData['banner_url']}');
-          debugPrint('  - Created At: ${groupData['created_at']}');
-          debugPrint('  - Human Created At: ${groupData['human_created_at']}');
+          debugPrint('  - ID: ${groupData['group']['id']}');
+          debugPrint('  - Name: ${groupData['group']['name']}');
+          debugPrint('  - Description: ${groupData['group']['description']}');
+          debugPrint('  - User Count (with admin): ${groupData['group']['user_count_with_admin']}');
+          debugPrint('  - User Count (without admin): ${groupData['group']['user_count_without_admin']}');
+          debugPrint('  - Message Count: ${groupData['group']['message_count']}');
+          debugPrint('  - Is Private: ${groupData['group']['is_private']}');
+          debugPrint('  - Is Founder: ${groupData['group']['is_founder']}');
+          debugPrint('  - Is Member: ${groupData['group']['is_member']}');
+          debugPrint('  - Is Pending: ${groupData['group']['is_pending']}');
+          debugPrint('  - Avatar URL: ${groupData['group']['avatar_url']}');
+          debugPrint('  - Banner URL: ${groupData['group']['banner_url']}');
+          debugPrint('  - Created At: ${groupData['group']['created_at']}');
+          debugPrint('  - Human Created At: ${groupData['group']['human_created_at']}');
           
-          return GroupModel.fromJson(groupData);
+          return GroupDetailModel.fromJson(groupData);
         }
         throw Exception('No group data found');
       } else {
