@@ -2,6 +2,7 @@ import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:email_validator/email_validator.dart';
 
 import '../components/widgets/edusocial_dialog.dart';
 import '../services/auth_service.dart';
@@ -22,51 +23,75 @@ class LoginController extends GetxController {
     passwordController = TextEditingController();
   }
 
-  void login() async {
+  bool _isValidEmail(String email) {
+    return EmailValidator.validate(email);
+  }
+
+  String? _validateInputs() {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      return "Lütfen tüm alanları doldurun.";
+    }
+
+    // Eğer e-posta formatında ise kontrol et
+    if (emailController.text.contains('@') && !_isValidEmail(emailController.text)) {
+      return "Geçerli bir e-posta adresi giriniz.";
+    }
+
+    return null;
+  }
+
+  void login() async {
+    final validationError = _validateInputs();
+    if (validationError != null) {
       EduSocialDialogs.showError(
         title: "Uyarı!",
-        message: "Lütfen tüm alanları doldurun.",
+        message: validationError,
       );
       return;
     }
 
     isLoading.value = true;
-    final user =
-        await _authService.login(emailController.text, passwordController.text);
-    isLoading.value = false;
+    try {
+      final user = await _authService.login(
+        emailController.text.trim(),
+        passwordController.text,
+      );
 
-    if (user != null) {
-      final schoolId = user['school_id'];
-      final departmentId = user['school_department_id'];
+      if (user != null) {
+        final schoolId = user['school_id'];
+        final departmentId = user['school_department_id'];
 
-      if (schoolId == null || departmentId == null) {
-        /// İlk giriş, onboarding'e git
-        final onboardingController = Get.find<OnboardingController>();
-        onboardingController.userEmail = emailController.text;
-        onboardingController.loadSchoolList();
-
-        Future.delayed(Duration(milliseconds: 200), () {
+        if (schoolId == null || departmentId == null) {
+          /// İlk giriş, onboarding'e git
+          final onboardingController = Get.find<OnboardingController>();
+          onboardingController.userEmail = emailController.text;
+          onboardingController.loadSchoolList();
           Get.offAllNamed('/step1');
-        });
-      } else {
-        /// Zaten onboarding tamamlamış, ana ekrana
-        Future.delayed(Duration(milliseconds: 200), () {
+        } else {
+          /// Zaten onboarding tamamlamış, ana ekrana
           final storyController = Get.find<StoryController>();
           storyController.fetchStories();
           Get.offAllNamed('/main');
-        });
+        }
+      } else {
+        EduSocialDialogs.showError(
+          title: "Uyarı!",
+          message: "Giriş işlemi başarısız. Lütfen bilgilerinizi kontrol edin.",
+        );
       }
-    } else {
+    } catch (e) {
       EduSocialDialogs.showError(
-        title: "Uyarı!",
-        message: "Giriş işlemi başarısız. Lütfen bilgilerinizi kontrol edin.",
+        title: "Hata!",
+        message: "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 
   void loginPasswordUpgrade() {
-    Get.snackbar("Mesaj", "Şifre Yenileme Alanına Yönlendirileceksiniz.");
+    // TODO: Implement password reset functionality
+    Get.toNamed('/forgot-password');
   }
 
   @override

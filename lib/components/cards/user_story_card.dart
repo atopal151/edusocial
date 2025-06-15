@@ -61,35 +61,56 @@ class UserStoryCard extends StatelessWidget {
           padding: const EdgeInsets.only(top: 10.0),
           child: Obx(() {
             return InkWell(
-              onLongPress: () {
-                Get.toNamed('/addStory');
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-                padding: const EdgeInsets.all(1),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: story!.isViewed.value
-                      ? LinearGradient(
-                          colors: [Colors.grey.shade400, Colors.grey.shade200])
-                      : const LinearGradient(
-                          colors: [Color(0xfffb535c), Color(0xfffb535c)]),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    Get.to(() => const StoryViewerPage(initialIndex: 0));
-                    story!.isViewed.value = true;
-                  },
-                  child: CircleAvatar(
-                    radius: 32,
-                    backgroundColor: Colors.white,
-                    child: CircleAvatar(
-                      radius: 30,
-                    backgroundColor: Colors.white,
-                      backgroundImage: NetworkImage(story!.profileImage),
+              
+              child: Stack(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    padding: const EdgeInsets.all(1),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: story!.isViewed.value
+                          ? LinearGradient(
+                              colors: [Colors.grey.shade400, Colors.grey.shade200])
+                          : const LinearGradient(
+                              colors: [Color(0xfffb535c), Color(0xfffb535c)]),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        Get.to(() => const StoryViewerPage(initialIndex: 0));
+                        story!.isViewed.value = true;
+                      },
+                      child: CircleAvatar(
+                        radius: 32,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.white,
+                          backgroundImage: NetworkImage(story!.profileImage),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Positioned(
+                    bottom: 0,
+                    right: 5,
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed('/addStory');
+                      },
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.add_circle_rounded,
+                            size: 18, color: Colors.black),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           }),

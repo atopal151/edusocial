@@ -4,6 +4,7 @@ import 'package:edusocial/services/post_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/post_model.dart';
+import '../components/snackbars/custom_snackbar.dart';
 
 class PostController extends GetxController {
   final ProfileController profileController = Get.find<ProfileController>();
@@ -59,19 +60,28 @@ class PostController extends GetxController {
 //post create
   Future<void> createPost(String content, List<File> mediaFiles) async {
     try {
-      isLoading.value = true;
       final success = await PostServices.createPost(content, mediaFiles);
       if (success) {
-        Get.back();
-        Get.snackbar("Başarılı", "Gönderi paylaşıldı");
+        CustomSnackbar.show(
+          title: "Başarılı",
+          message: "Gönderi paylaşıldı",
+          type: SnackbarType.success,
+        );
+        
         fetchHomePosts(); // Yeni postu listeye eklemek için
       } else {
-        Get.snackbar("Hata", "Gönderi paylaşılamadı");
+        CustomSnackbar.show(
+          title: "Hata",
+          message: "Gönderi paylaşılamadı",
+          type: SnackbarType.error,
+        );
       }
     } catch (e) {
-      Get.snackbar("Hata", "Bir hata oluştu: $e");
-    } finally {
-      isLoading.value = false;
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Bir hata oluştu: $e",
+        type: SnackbarType.error,
+      );
     }
   }
 
@@ -80,7 +90,37 @@ class PostController extends GetxController {
   Future<void> toggleLike(String postId) async {
     final success = await PostServices.toggleLike(postId);
     if (!success) {
-      Get.snackbar("Hata", "Beğeni işlemi başarısız oldu.");
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Beğeni işlemi başarısız oldu.",
+        type: SnackbarType.error,
+      );
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    try {
+      final success = await PostServices.deletePost(postId);
+      if (success) {
+        CustomSnackbar.show(
+          title: "Başarılı",
+          message: "Gönderi başarıyla silindi",
+          type: SnackbarType.success,
+        );
+        fetchHomePosts(); // Listeyi güncelle
+      } else {
+        CustomSnackbar.show(
+          title: "Hata",
+          message: "Gönderi silinemedi",
+          type: SnackbarType.error,
+        );
+      }
+    } catch (e) {
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Bir hata oluştu: $e",
+        type: SnackbarType.error,
+      );
     }
   }
 }

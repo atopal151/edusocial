@@ -16,7 +16,6 @@ class MatchController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadMockData();
     findMatches();
   }
 
@@ -68,18 +67,31 @@ class MatchController extends GetxController {
   void findMatches() async {
     isLoading.value = true;
     try {
+      debugPrint("🔄 Eşleşmeler yükleniyor...");
       final fetchedMatches = await MatchServices.findMatches();
+      debugPrint("✅ ${fetchedMatches.length} eşleşme bulundu");
+      
+      if (fetchedMatches.isEmpty) {
+        debugPrint("ℹ️ Hiç eşleşme bulunamadı");
+        Get.snackbar(
+          'Bilgi',
+          'Henüz eşleşme bulunamadı. Daha fazla ders ekleyerek eşleşme bulma şansınızı artırabilirsiniz.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+      
       matches.value = fetchedMatches;
-      debugPrint("✅ Eşleşmeler başarıyla yüklendi: ${matches.length} adet");
+      currentIndex.value = 0;
     } catch (e) {
-      debugPrint("❗ Eşleşmeler yüklenirken hata: $e");
+      debugPrint("❌ Eşleşmeler yüklenirken hata: $e");
+      Get.snackbar(
+        'Hata',
+        'Eşleşmeler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } finally {
       isLoading.value = false;
     }
-  }
-
-  void _loadMockData() {
-    // Mock data yükleme işlemi
   }
 
   void startChat() {

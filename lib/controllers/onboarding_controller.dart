@@ -79,15 +79,34 @@ class OnboardingController extends GetxController {
   void joinGroup(String groupName) async {
     int index = groups.indexWhere((group) => group.name == groupName);
     if (index != -1) {
-      final groupId = int.tryParse(groups[index].id) ?? 0;
+      final group = groups[index];
+      
+      // Önce grup durumunu kontrol et
+      if (group.isMember) {
+        Get.snackbar("Uyarı", "Zaten bu grubun üyesisiniz.");
+        return;
+      }
+      
+      if (group.isPending) {
+        Get.snackbar("Uyarı", "Bu grup için zaten bekleyen bir katılım isteğiniz var.");
+        return;
+      }
+
+      final groupId = int.tryParse(group.id) ?? 0;
+      if (groupId == 0) {
+        Get.snackbar("Hata", "Geçersiz grup ID'si.");
+        return;
+      }
+
       final success = await OnboardingServices.requestGroupJoin(groupId);
 
       if (success) {
-        final updatedGroup = groups[index].copyWith(isJoined: true);
+        final updatedGroup = group.copyWith(isPending: true);
         groups[index] = updatedGroup;
         groups.refresh();
+        Get.snackbar("Başarılı", "Gruba katılım isteğiniz gönderildi.");
       } else {
-        Get.snackbar("İşlem Başarısız", "Gruba katılım isteği gönderilemedi.");
+        Get.snackbar("Hata", "Gruba katılım isteği gönderilemedi. Lütfen daha sonra tekrar deneyin.");
       }
     }
   }

@@ -73,6 +73,7 @@ class GroupModel {
 
   GroupModel copyWith({
     bool? isJoined,
+    bool? isPending,
   }) {
     return GroupModel(
       id: id,
@@ -90,7 +91,7 @@ class GroupModel {
       messageCount: messageCount,
       isFounder: isFounder,
       isMember: isJoined ?? isMember,
-      isPending: isPending,
+      isPending: isPending ?? this.isPending,
       avatarUrl: avatarUrl,
       bannerUrl: bannerUrl,
       humanCreatedAt: humanCreatedAt,

@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../../../controllers/story_controller.dart';
+import '../../../components/snackbars/custom_snackbar.dart';
 
 class AddStoryScreen extends StatefulWidget {
   const AddStoryScreen({super.key});
@@ -15,6 +16,7 @@ class AddStoryScreen extends StatefulWidget {
 class _AddStoryScreenState extends State<AddStoryScreen> {
   final List<XFile> _selectedImages = [];
   final ImagePicker picker = ImagePicker();
+  var isPosting = false.obs;
 
   Future<void> pickImages() async {
     try {
@@ -34,62 +36,90 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         }
       }
     } catch (e) {
-      debugPrint("Hata: $e",wrapWidth: 1024);
+      debugPrint("Hata: $e", wrapWidth: 1024);
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Fotoğraf seçilirken bir hata oluştu",
+        type: SnackbarType.error,
+      );
     }
   }
 
   Future<void> pickFromCamera() async {
-    final photo = await picker.pickImage(source: ImageSource.camera);
-    if (photo != null) {
-      setState(() {
-        _selectedImages.add(photo);
-      });
+    try {
+      final photo = await picker.pickImage(source: ImageSource.camera);
+      if (photo != null) {
+        setState(() {
+          _selectedImages.add(photo);
+        });
+      }
+    } catch (e) {
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Kamera açılırken bir hata oluştu",
+        type: SnackbarType.error,
+      );
     }
   }
 
-void shareStory() async {
-  if (_selectedImages.isNotEmpty) {
-    final StoryController storyController = Get.find<StoryController>();
-
-    final File imageFile = File(_selectedImages.first.path);
-
-    await storyController.createStory(imageFile);
-
-    debugPrint("✅ Hikaye yüklendi ve güncellendi.");
-    Get.back();
+  void shareStory() async {
+    if (_selectedImages.isNotEmpty) {
+      try {
+        isPosting.value = true;
+        final StoryController storyController = Get.find<StoryController>();
+        final File imageFile = File(_selectedImages.first.path);
+        await storyController.createStory(imageFile);
+        isPosting.value = false;
+        Get.back();
+      } catch (e) {
+        isPosting.value = false;
+        CustomSnackbar.show(
+          title: "Hata",
+          message: "Hikaye paylaşılırken bir hata oluştu",
+          type: SnackbarType.error,
+        );
+      }
+    } else {
+      CustomSnackbar.show(
+        title: "Uyarı",
+        message: "Lütfen bir fotoğraf seçin",
+        type: SnackbarType.warning,
+      );
+    }
   }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // 🔥 siyah arka plan
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Align(
-            alignment: Alignment.center,
-            child: const Text("Hikayeye Ekle",
-                style: TextStyle(color: Colors.white,fontSize: 18.72,fontWeight: FontWeight.w600))),
-        iconTheme: const IconThemeData(color: Colors.white),
-        leading: InkWell(onTap: () {
-          Get.back();
-        }, child: Icon(Icons.arrow_back_ios)),
-        actions: [Icon(Icons.settings)],
+        backgroundColor: Colors.white,
+        title: Text(
+          "Hikayeye Ekle",
+          style: GoogleFonts.inter(
+            color: const Color(0xFF414751),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFF414751)),
+        leading: InkWell(
+          onTap: () => Get.back(),
+          child: const Icon(Icons.close),
+        ),
       ),
       body: Column(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             alignment: Alignment.centerLeft,
-            child: const Text(
+            child: Text(
               "Yakınlardakiler",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white),
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF414751),
+              ),
             ),
           ),
           Expanded(
@@ -103,25 +133,51 @@ void shareStory() async {
               ),
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  // Kamera kutusu
                   return GestureDetector(
                     onTap: pickFromCamera,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[900],
+                        color: const Color(0xFFF5F5F5),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Center(
-                        child: Icon(Icons.camera_alt_rounded,
-                            size: 32, color: Colors.white),
+                        child: Icon(
+                          Icons.camera_alt_rounded,
+                          size: 32,
+                          color: Color(0xFFF26B6B),
+                        ),
                       ),
                     ),
                   );
                 } else {
                   final file = File(_selectedImages[index - 1].path);
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.file(file, fit: BoxFit.cover),
+                  return Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(file, fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectedImages.removeAt(index - 1);
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(Icons.close,
+                                size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }
               },
@@ -129,34 +185,73 @@ void shareStory() async {
           ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[850],
-                  foregroundColor: Colors.white,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF5F5F5),
+                      foregroundColor: const Color(0xFFF26B6B),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: pickImages,
+                    icon: const Icon(Icons.photo_library, color: Color(0xFFF26B6B)),
+                    label: Text(
+                      "Galeriden Seç",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFFF26B6B),
+                      ),
+                    ),
+                  ),
                 ),
-                onPressed: pickImages,
-                icon: const Icon(Icons.photo_library),
-                label: const Text("Galeriden Seç"),
-              ),
+              ],
             ),
           ),
           if (_selectedImages.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(bottom: 16,left: 16,right: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: shareStory,
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                  child: const Text("Paylaş",
-                      style: TextStyle(color: Colors.black)),
-                ),
-              ),
+              padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+              child: Obx(() => SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isPosting.value ? null : shareStory,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isPosting.value
+                            ? Colors.grey
+                            : const Color(0xFFF26B6B),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: isPosting.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : Text(
+                              "Paylaş",
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  )),
             ),
-            SizedBox(height: 20,)
+          const SizedBox(height: 20),
         ],
       ),
     );

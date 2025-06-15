@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:edusocial/components/buttons/icon_button.dart';
+import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final List<XFile> _selectedImages = [];
   final ImagePicker picker = ImagePicker();
   final TextEditingController textController = TextEditingController();
-  var isLoading = false.obs;
+  var isPosting = false.obs;
 
   Future<void> pickImages() async {
     final pickedFiles = await picker.pickMultiImage();
@@ -46,23 +47,38 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     });
   }
 
-  void sharePost() {
+  void sharePost() async {
     if (textController.text.isNotEmpty) {
-      final content = textController.text;
-      final mediaFiles =
-          _selectedImages.map((xfile) => File(xfile.path)).toList();
-      postController.createPost(content, mediaFiles);
+      try {
+        isPosting.value = true;
+        final content = textController.text;
+        final mediaFiles = _selectedImages.map((xfile) => File(xfile.path)).toList();
+        await postController.createPost(content, mediaFiles);
+        isPosting.value = false;
+        Get.back();
+      } catch (e) {
+        isPosting.value = false;
+        CustomSnackbar.show(
+          title: "Hata",
+          message: "Gönderi paylaşılırken bir hata oluştu.",
+          type: SnackbarType.error,
+        );
+      }
     } else {
-      Get.snackbar("Uyarı", "Lütfen gönderi içeriği girin.");
+      CustomSnackbar.show(
+        title: "Uyarı",
+        message: "Lütfen gönderi içeriği girin.",
+        type: SnackbarType.warning,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xfffafafa),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+      backgroundColor: Color(0xfffafafa),
         iconTheme: const IconThemeData(color: Color(0xff414751)),
         leading: InkWell(
           onTap: () => Get.back(),
@@ -74,35 +90,42 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             child: SizedBox(
               width: 100,
               height: 33,
-              child: GestureDetector(
-                onTap: () {
-                  sharePost();
-                },
+              child: Obx(() => GestureDetector(
+                onTap: isPosting.value ? null : sharePost,
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: Color(0xFFF26B6B),
+                    color: isPosting.value ? Colors.grey : Color(0xFFF26B6B),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize:
-                        MainAxisSize.min, // Buton içinde sıkışmaması için
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        "Gönderi",
-                        style: GoogleFonts.inter(
-                          color: Color(0xffffffff),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                      if (isPosting.value)
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      else
+                        Text(
+                          "Gönderi",
+                          style: GoogleFonts.inter(
+                            color: Color(0xffffffff),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
-              ),
+              )),
             ),
           ),
         ],
@@ -186,7 +209,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   ),
           ),
           Container(
-            color: Colors.white,
+            color: Color(0xfffafafa),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -195,6 +218,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     iconColor: Color(0xFFF26B6B), onPressed: () {
                   pickFromCamera();
                 }),
+                SizedBox(width: 10),
                 buildIconButton(Icon(Icons.photo_outlined),
                     iconColor: Color(0xFFF26B6B), onPressed: () {
                   pickImages();

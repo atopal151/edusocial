@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:edusocial/controllers/post_controller.dart';
+import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 
 class UserTreePointBottomSheet extends StatelessWidget {
-  final int postId; // 🔥 postId parametresi eklendi
+  final int postId;
 
   const UserTreePointBottomSheet({super.key, required this.postId});
 
   @override
   Widget build(BuildContext context) {
+    final PostController postController = Get.find();
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -34,8 +39,8 @@ class UserTreePointBottomSheet extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                // 🔥 Burada postId ile ilgili aksiyonları çalıştırabilirsin
-                debugPrint("Delete tapped for Post ID: $postId");
+                Get.back(); // Bottom sheet'i kapat
+                postController.deletePost(postId.toString());
               },
             ),
             ListTile(
@@ -52,8 +57,12 @@ class UserTreePointBottomSheet extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                // 🔥 Burada postId ile ilgili aksiyonları çalıştırabilirsin
-                debugPrint("Report tapped for Post ID: $postId");
+                Get.back(); // Bottom sheet'i kapat
+                CustomSnackbar.show(
+                  title: "Bilgi",
+                  message: "Şikayet özelliği yakında eklenecek",
+                  type: SnackbarType.info,
+                );
               },
             ),
           ],

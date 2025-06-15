@@ -3,6 +3,7 @@ import 'package:edusocial/models/group_models/group_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class OnboardingServices {
   static final _box = GetStorage();
@@ -118,7 +119,16 @@ class OnboardingServices {
   //-------------------------------------------------------------//
   static Future<bool> requestGroupJoin(int groupId) async {
     final token = _box.read('token');
+    if (token == null) {
+      debugPrint("❗ Token bulunamadı! Grup katılım isteği gönderilemedi.");
+      return false;
+    }
+
     try {
+      debugPrint("🟢 Grup katılım isteği gönderiliyor...");
+      debugPrint("🟢 Group ID: $groupId");
+      debugPrint("🟢 Token: $token");
+
       final response = await http.post(
         Uri.parse('${AppConstants.baseUrl}/groups/join'),
         headers: {
@@ -129,12 +139,19 @@ class OnboardingServices {
         body: jsonEncode({"group_id": groupId}),
       );
 
-      // debugPrint("🟢 Grup katılım response: ${response.statusCode}",wrapWidth: 1024);
-      // debugPrint("🟢 Body: ${response.body}",wrapWidth: 1024);
+      debugPrint("🟢 Grup katılım response: ${response.statusCode}");
+      debugPrint("🟢 Response body: ${response.body}");
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint("✅ Grup katılım isteği başarılı!");
+        return true;
+      } else {
+        debugPrint("❌ Grup katılım isteği başarısız! Status: ${response.statusCode}");
+        debugPrint("❌ Hata detayı: ${response.body}");
+        return false;
+      }
     } catch (e) {
-      // debugPrint("❗ Join işlemi hatası: $e",wrapWidth: 1024);
+      debugPrint("❗ Join işlemi hatası: $e");
       return false;
     }
   }

@@ -152,5 +152,26 @@ class PostServices {
     }
   }
 
-//delete post
+  //delete post
+  static Future<bool> deletePost(String postId) async {
+    final token = _box.read('token');
+
+    try {
+      final response = await http.delete(
+        Uri.parse('${AppConstants.baseUrl}/timeline/posts/$postId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      debugPrint("📤 Delete Post Response: ${response.statusCode}");
+      debugPrint("📤 Delete Post Body: ${response.body}");
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("❌ deletePost Hatası: $e");
+      return false;
+    }
+  }
 }

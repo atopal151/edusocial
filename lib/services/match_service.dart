@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../../utils/constants.dart'; // AppConstants burada
 import '../../models/match_model.dart';
+import 'package:flutter/foundation.dart';
 
 class MatchServices {
   static final _box = GetStorage(); // GetStorage ile token al
@@ -48,6 +49,9 @@ class MatchServices {
 
   static Future<List<MatchModel>> fetchMatches() async {
     final token = _box.read('token');
+    if (token == null) {
+      throw Exception('Token bulunamadı');
+    }
 
     try {
       final response = await http.get(
@@ -58,16 +62,26 @@ class MatchServices {
         },
       );
 
+      debugPrint("🟢 Fetch matches response status: ${response.statusCode}");
+      debugPrint("🟢 Fetch matches response body: ${response.body}");
+
       if (response.statusCode == 200) {
         final dynamic data = jsonDecode(response.body)['data'];
         if (data == null) return [];
 
-        final match = MatchModel.fromJson(data);
-        return [match];
+        // Eğer data bir liste ise, tüm eşleşmeleri işle
+        if (data is List) {
+          return data.map((match) => MatchModel.fromJson(match)).toList();
+        } 
+        // Eğer data tek bir obje ise, onu liste içinde döndür
+        else {
+          return [MatchModel.fromJson(data)];
+        }
       } else {
         return [];
       }
     } catch (e) {
+      debugPrint("❗ Fetch matches error: $e");
       return [];
     }
   }
@@ -78,22 +92,36 @@ class MatchServices {
       throw Exception('Token bulunamadı');
     }
 
-    final response = await http.get(
-      Uri.parse('${AppConstants.baseUrl}/match-user'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/match-user'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final dynamic data = json.decode(response.body)['data'];
-      if (data == null) return [];
-      
-      final match = MatchModel.fromJson(data);
-      return [match];
-    } else {
-      throw Exception('Eşleşmeler yüklenirken bir hata oluştu: ${response.statusCode}');
+      debugPrint("🟢 Match response status: ${response.statusCode}");
+      debugPrint("🟢 Match response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final dynamic data = json.decode(response.body)['data'];
+        if (data == null) return [];
+        
+        // Eğer data bir liste ise, tüm eşleşmeleri işle
+        if (data is List) {
+          return data.map((match) => MatchModel.fromJson(match)).toList();
+        } 
+        // Eğer data tek bir obje ise, onu liste içinde döndür
+        else {
+          return [MatchModel.fromJson(data)];
+        }
+      } else {
+        throw Exception('Eşleşmeler yüklenirken bir hata oluştu: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint("❗ Match fetch error: $e");
+      throw Exception('Eşleşmeler yüklenirken bir hata oluştu: $e');
     }
   }
 }

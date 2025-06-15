@@ -45,7 +45,7 @@ class Step3View extends StatelessWidget {
                     child: GroupCard(
                       action: group.isMember
                           ? "Katıldınız"
-                          : (group.isPending ? "Katılım Bekleniyor" : ""),
+                          : (group.isPending ? "Katılım Bekleniyor" : "Katıl"),
                       imageUrl: group.bannerUrl,
                       groupName: group.name,
                       groupDescription: group.description,
