@@ -46,4 +46,62 @@ class NotificationService {
       rethrow;
     }
   }
+
+  /// Takip isteğini kabul veya reddet
+  static Future<bool> acceptOrDeclineFollowRequest({
+    required String userId,
+    required String decision, // "accept" veya "decline"
+  }) async {
+    final token = _box.read('token');
+    final uri = Uri.parse("${AppConstants.baseUrl}/follow-invitation");
+
+    final response = await http.post(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "user_id": int.tryParse(userId) ?? userId,
+        "decision": decision,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Takip isteği onaylanamadı: \\${response.body}');
+    }
+  }
+
+  /// Grup katılma isteğini kabul veya reddet
+  static Future<bool> acceptOrDeclineGroupJoinRequest({
+    required String userId,
+    required String groupId,
+    required String decision, // "accept" veya "decline"
+  }) async {
+    final token = _box.read('token');
+    final uri = Uri.parse("${AppConstants.baseUrl}/group-invitation");
+
+    final response = await http.post(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "user_id": int.tryParse(userId) ?? userId,
+        "group_id": int.tryParse(groupId) ?? groupId,
+        "decision": decision,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Grup katılma isteği onaylanamadı: \\${response.body}');
+    }
+  }
 }

@@ -7,6 +7,7 @@ class NotificationModel {
   final String message;
   final DateTime timestamp;
   final bool isRead;
+  final String? groupId;
 
   NotificationModel({
     required this.id,
@@ -17,6 +18,7 @@ class NotificationModel {
     required this.message,
     required this.timestamp,
     required this.isRead,
+    this.groupId,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,21 @@ class NotificationModel {
       message: fullData['text'] ?? '',
       timestamp: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       isRead: json['is_read'] == true || json['is_read'] == 1,
+      groupId: fullData['group_id']?.toString(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'userName': userName,
+      'profileImageUrl': profileImageUrl,
+      'type': type,
+      'message': message,
+      'timestamp': timestamp.toIso8601String(),
+      'isRead': isRead,
+      'groupId': groupId,
+    };
   }
 }

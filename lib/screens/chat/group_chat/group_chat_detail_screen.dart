@@ -9,6 +9,7 @@ import '../../../components/widgets/group_chat_widget/group_text_message_widget.
 import '../../../components/widgets/tree_point_bottom_sheet.dart';
 import '../../../controllers/social/group_chat_detail_controller.dart';
 import '../../../models/chat_models/group_message_model.dart';
+import '../../../components/widgets/custom_loading_indicator.dart';
 
 class GroupChatDetailScreen extends StatefulWidget {
   const GroupChatDetailScreen({super.key});
@@ -45,36 +46,16 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
             if (group == null) {
               return Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.grey[300],
-                    child: Icon(Icons.group, color: Colors.grey[600]),
-                  ),
-                  SizedBox(width: 10),
+                  
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Loading...",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff414751))),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.person,
-                            color: Colors.red,
-                            size: 15,
-                          ),
-                          SizedBox(
-                            width: 3,
-                          ),
-                          Text("0",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xff9ca3ae),
-                                  fontWeight: FontWeight.w400)),
-                        ],
+                      const CustomLoadingIndicator(
+                        size: 26,
+                        color: Color(0xFFFF7C7C),
+                        strokeWidth: 2,
                       ),
+                   
                     ],
                   ),
                 ],
@@ -83,7 +64,8 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
             return Row(
               children: [
                 CircleAvatar(
-                    backgroundImage: NetworkImage(group.avatarUrl ?? "https://stageapi.edusocial.pl/storage/avatars/a25YweIb75P9UdftcMr1b0Sa1fC75fDKAcTK7ZWf.png")),
+                    backgroundImage: NetworkImage(group.avatarUrl ??
+                        "https://stageapi.edusocial.pl/storage/avatars/a25YweIb75P9UdftcMr1b0Sa1fC75fDKAcTK7ZWf.png")),
                 SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,9 +130,11 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                       final message = controller.messages[index];
                       if (message.messageType == GroupMessageType.text) {
                         return GroupTextMessageWidget(message: message);
-                      } else if (message.messageType == GroupMessageType.document) {
+                      } else if (message.messageType ==
+                          GroupMessageType.document) {
                         return GroupDocumentMessageWidget(message: message);
-                      } else if (message.messageType == GroupMessageType.image) {
+                      } else if (message.messageType ==
+                          GroupMessageType.image) {
                         return GroupImageMessageWidget(message: message);
                       } else if (message.messageType == GroupMessageType.link) {
                         return GroupLinkMessageWidget(message: message);

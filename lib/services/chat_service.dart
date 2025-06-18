@@ -32,8 +32,8 @@ class ChatServices {
 
     // Linkleri ekle
     if (links != null && links.isNotEmpty) {
-      for (var link in links) {
-        request.fields['links[]'] = link;
+      for (var i = 0; i < links.length; i++) {
+        request.fields['links[$i]'] = links[i];
       }
     }
 
@@ -42,23 +42,28 @@ class ChatServices {
       for (var file in mediaFiles) {
         request.files.add(
           await http.MultipartFile.fromPath(
-            'media[]', // backend burada 'media' veya 'media[]' mi bekliyor kontrol et
+            'media[]',
             file.path,
-            contentType: MediaType('image', 'jpeg'), // veya dosya tipine göre
+            contentType: MediaType('image', 'jpeg'),
           ),
         );
       }
     }
 
-    var streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
+    try {
+      var streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
-    //debugPrint("✅ Send Message Response: ${response.body}");
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      debugPrint("✅ Mesaj başarıyla gönderildi!");
-    } else {
-      throw Exception("❌ Mesaj gönderilemedi: ${response.statusCode}");
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint("✅ Mesaj başarıyla gönderildi!");
+      } else {
+        debugPrint('❌ Mesaj gönderilemedi: ${response.statusCode}');
+        debugPrint('❌ Response body: ${response.body}');
+        throw Exception('Mesaj gönderilemedi');
+      }
+    } catch (e) {
+      debugPrint('❌ Mesaj gönderme hatası: $e');
+      rethrow;
     }
   }
 

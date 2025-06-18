@@ -19,6 +19,10 @@ class NotificationController extends GetxController {
     isLoading.value = true;
     try {
       final fetched = await NotificationService.fetchMobileNotifications();
+      debugPrint('--- APIden gelen notification verileri (toJson) ---');
+      for (var notif in fetched) {
+        debugPrint(notif.toJson().toString());
+      }
       notifications.value = fetched;
     } catch (e) {
       debugPrint("❗ Bildirimleri çekerken hata: $e");
@@ -34,6 +38,7 @@ class NotificationController extends GetxController {
     List<NotificationModel> today = [];
     List<NotificationModel> yesterday = [];
     List<NotificationModel> thisWeek = [];
+    List<NotificationModel> older = [];
 
     for (var notif in notifs) {
       final date = notif.timestamp;
@@ -44,6 +49,8 @@ class NotificationController extends GetxController {
         yesterday.add(notif);
       } else if (date.isAfter(now.subtract(const Duration(days: 7)))) {
         thisWeek.add(notif);
+      } else {
+        older.add(notif);
       }
     }
 
@@ -56,11 +63,41 @@ class NotificationController extends GetxController {
     if (thisWeek.isNotEmpty) {
       grouped.add(GroupedNotifications(label: "Son 7 Gün", notifications: thisWeek));
     }
+    if (older.isNotEmpty) {
+      grouped.add(GroupedNotifications(label: "Daha Önce", notifications: older));
+    }
 
     return grouped;
   }
 
   bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  /// Takip isteğini kabul veya reddet
+  Future<void> handleFollowRequest(String userId, String decision) async {
+    try {
+      await NotificationService.acceptOrDeclineFollowRequest(
+        userId: userId,
+        decision: decision,
+      );
+      fetchNotifications();
+    } catch (e) {
+      debugPrint("❗ Takip isteği onaylanamadı: $e");
+    }
+  }
+
+  /// Grup katılma isteğini kabul veya reddet
+  Future<void> handleGroupJoinRequest(String userId, String groupId, String decision) async {
+    try {
+      await NotificationService.acceptOrDeclineGroupJoinRequest(
+        userId: userId,
+        groupId: groupId,
+        decision: decision,
+      );
+      fetchNotifications();
+    } catch (e) {
+      debugPrint("❗ Grup katılma isteği onaylanamadı: $e");
+    }
   }
 }

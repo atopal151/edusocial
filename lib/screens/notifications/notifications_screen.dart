@@ -128,10 +128,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 text: isJoined.value ? "Katıldın" : "Onayla",
                 height: 32,
                 borderRadius: 8,
-                onPressed: () {
+                onPressed: () async {
                   if (!isJoined.value) {
                     isJoined.value = true;
-                    // Backend'e onay gönderilir
+                    await controller.handleGroupJoinRequest(notif.userId, notif.groupId!, "accept");
                   }
                 },
                 isLoading:
@@ -145,25 +145,29 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ),
             ));
 
-      case 'follow-request':
-        final isFollowing =
-            RxBool(false); // Backend'den gelen durum ile değiştirilebilir
+      case 'follow-join-request':
+        final isFollowing = RxBool(false);
         return Obx(() => SizedBox(
               width: 100,
               child: CustomButton(
                 text: isFollowing.value ? "Onaylandı" : "Onayla",
                 height: 32,
                 borderRadius: 8,
-                onPressed: () {
+                onPressed: () async {
                   if (!isFollowing.value) {
+                    debugPrint('Takip isteği onaylanıyor...');
                     isFollowing.value = true;
-                    // Backend'e takip isteği onayı gönderilir
+                    try {
+                      await controller.handleFollowRequest(notif.userId, "accept");
+                      debugPrint('Takip isteği onaylandı.');
+                    } catch (e) {
+                      debugPrint('Takip isteği onaylanamadı: $e');
+                      isFollowing.value = false;
+                    }
                   }
                 },
-                isLoading:
-                    RxBool(false), // API çağrısı sırasında true yapılabilir
-                backgroundColor:
-                    isFollowing.value ? Colors.grey : const Color(0xFFFF5050),
+                isLoading: RxBool(false),
+                backgroundColor: isFollowing.value ? Colors.grey : const Color(0xFFFF5050),
                 textColor: Colors.white,
                 icon: isFollowing.value
                     ? const Icon(Icons.check, color: Colors.white, size: 16)

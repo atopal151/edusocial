@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 import '../../components/cards/members_avatar.dart';
 import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
     show GroupDetailTreePointBottomSheet;
+import '../../controllers/social/group_chat_detail_controller.dart';
+import '../../models/chat_models/group_message_model.dart';
+import '../../components/widgets/group_chat_widget/group_text_message_widget.dart';
+import '../../components/widgets/group_chat_widget/group_document_message_widget.dart';
+import '../../components/widgets/group_chat_widget/group_image_message_widget.dart';
+import '../../components/widgets/group_chat_widget/group_link_messaje_widget.dart';
+import '../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   const GroupDetailScreen({super.key});
@@ -19,6 +25,7 @@ class GroupDetailScreen extends StatefulWidget {
 
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
   final GroupController groupController = Get.put(GroupController());
+  final GroupChatDetailController chatController = Get.put(GroupChatDetailController());
   late ScrollController documentsScrollController;
   late ScrollController linksScrollController;
   late ScrollController photosScrollController;
@@ -37,6 +44,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       // Use Future.microtask to avoid build-time state updates
       Future.microtask(() {
         groupController.fetchGroupDetail(groupId);
+        chatController.currentGroupId.value = groupId;
+        chatController.fetchGroupDetails();
+        chatController.fetchGroupMessages();
       });
     } else {
       debugPrint('❌ No group ID provided in arguments');
@@ -174,7 +184,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: 48),
-
                       // Grup adı + doğrulama
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -331,8 +340,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           child: TabBarView(
                             children: [
                               // BELGELER
-                              if (group.documents != null &&
-                                  group.documents.isNotEmpty)
+                              if (group.documents.isNotEmpty)
                                 Scrollbar(
                                   controller: documentsScrollController,
                                   trackVisibility: true,
@@ -388,7 +396,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 ),
 
                               // BAĞLANTILAR
-                              if (group.links != null && group.links.isNotEmpty)
+                              if (group.links.isNotEmpty)
                                 Scrollbar(
                                   controller: linksScrollController,
                                   trackVisibility: true,
@@ -443,8 +451,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 ),
 
                               // FOTOĞRAFLAR
-                              if (group.photoUrls != null &&
-                                  group.photoUrls.isNotEmpty)
+                              if (group.photoUrls.isNotEmpty)
                                 Scrollbar(
                                   controller: photosScrollController,
                                   trackVisibility: true,
@@ -533,6 +540,111 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                     ],
                   ),
                 ],
+
+                // GRUP SOHBET ALANI
+                SizedBox(height: 24),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "Grup Sohbeti",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 400,
+                        child: Obx(() {
+                          return ListView.builder(
+                            controller: chatController.scrollController,
+                            itemCount: chatController.messages.length,
+                            padding: EdgeInsets.only(bottom: 75),
+                            itemBuilder: (context, index) {
+                              final message = chatController.messages[index];
+                              if (message.messageType == GroupMessageType.text) {
+                                return GroupTextMessageWidget(message: message);
+                              } else if (message.messageType == GroupMessageType.document) {
+                                return GroupDocumentMessageWidget(message: message);
+                              } else if (message.messageType == GroupMessageType.image) {
+                                return GroupImageMessageWidget(message: message);
+                              } else if (message.messageType == GroupMessageType.link) {
+                                return GroupLinkMessageWidget(message: message);
+                              } else if (message.messageType == GroupMessageType.poll) {
+                                return GroupPollMessageWidget(
+                                  message: message,
+                                  pollVotes: chatController.pollVotes,
+                                  selectedOption: chatController.selectedPollOption,
+                                  onVote: chatController.votePoll,
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          );
+                        }),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.attach_file),
+                                onPressed: () {
+                                  chatController.pickDocument();
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.image),
+                                onPressed: () {
+                                  chatController.pickImageFromGallery();
+                                },
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: chatController.messageController,
+                                  decoration: InputDecoration(
+                                    hintText: "Mesajınızı yazın...",
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    filled: true,
+                                    fillColor: Color(0xfff5f6f7),
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.send),
+                                onPressed: () {
+                                  final text = chatController.messageController.text;
+                                  if (text.isNotEmpty) {
+                                    chatController.sendMessage(text);
+                                    chatController.messageController.clear();
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 24),
               ],
             ),
           );

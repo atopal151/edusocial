@@ -241,7 +241,6 @@ class GroupServices {
   Future<GroupDetailModel> fetchGroupDetail(String groupId) async {
     final box = GetStorage();
     try {
-      debugPrint('🔍 Fetching details for group: $groupId');
       final response = await http.get(
         Uri.parse('${AppConstants.baseUrl}/group-detail/$groupId'),
         headers: {
@@ -250,39 +249,41 @@ class GroupServices {
         },
       );
 
-      debugPrint('📥 Response status code: ${response.statusCode}');
-      debugPrint('📦 Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
-          final groupData = jsonBody['data'];
+          final groupData = jsonBody['data']['group'];
           
-          debugPrint('✅ Group details fetched successfully:');
-          debugPrint('  - ID: ${groupData['group']['id']}');
-          debugPrint('  - Name: ${groupData['group']['name']}');
-          debugPrint('  - Description: ${groupData['group']['description']}');
-          debugPrint('  - User Count (with admin): ${groupData['group']['user_count_with_admin']}');
-          debugPrint('  - User Count (without admin): ${groupData['group']['user_count_without_admin']}');
-          debugPrint('  - Message Count: ${groupData['group']['message_count']}');
-          debugPrint('  - Is Private: ${groupData['group']['is_private']}');
-          debugPrint('  - Is Founder: ${groupData['group']['is_founder']}');
-          debugPrint('  - Is Member: ${groupData['group']['is_member']}');
-          debugPrint('  - Is Pending: ${groupData['group']['is_pending']}');
-          debugPrint('  - Avatar URL: ${groupData['group']['avatar_url']}');
-          debugPrint('  - Banner URL: ${groupData['group']['banner_url']}');
-          debugPrint('  - Created At: ${groupData['group']['created_at']}');
-          debugPrint('  - Human Created At: ${groupData['group']['human_created_at']}');
+          debugPrint('📋 GRUP DETAY VERİLERİ:');
+          debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          debugPrint('ID: ${groupData['id']}');
+          debugPrint('Kullanıcı ID: ${groupData['user_id']}');
+          debugPrint('Grup Alan ID: ${groupData['group_area_id']}');
+          debugPrint('Grup Adı: ${groupData['name']}');
+          debugPrint('Açıklama: ${groupData['description']}');
+          debugPrint('Durum: ${groupData['status']}');
+          debugPrint('Gizli Mi: ${groupData['is_private']}');
+          debugPrint('Silinme Tarihi: ${groupData['deleted_at']}');
+          debugPrint('Oluşturulma Tarihi: ${groupData['created_at']}');
+          debugPrint('Güncellenme Tarihi: ${groupData['updated_at']}');
+          debugPrint('Admin Dahil Üye Sayısı: ${groupData['user_count_with_admin']}');
+          debugPrint('Admin Hariç Üye Sayısı: ${groupData['user_count_without_admin']}');
+          debugPrint('Mesaj Sayısı: ${groupData['message_count']}');
+          debugPrint('Kurucu Mu: ${groupData['is_founder']}');
+          debugPrint('Üye Mi: ${groupData['is_member']}');
+          debugPrint('Beklemede Mi: ${groupData['is_pending']}');
+          debugPrint('Avatar URL: ${groupData['avatar_url']}');
+          debugPrint('Banner URL: ${groupData['banner_url']}');
+          debugPrint('İnsan Tarafından Okunabilir Oluşturulma Tarihi: ${groupData['human_created_at']}');
+          debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           
-          return GroupDetailModel.fromJson(groupData);
+          return GroupDetailModel.fromJson(jsonBody['data']);
         }
         throw Exception('No group data found');
       } else {
-        debugPrint('❌ Failed to fetch group details. Status: ${response.statusCode}');
         throw Exception('Failed to fetch group details');
       }
     } catch (e) {
-      debugPrint('💥 Error fetching group details: $e');
       rethrow;
     }
   }
