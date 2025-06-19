@@ -40,11 +40,25 @@ class ChatServices {
     // Medya dosyalarını ekle
     if (mediaFiles != null && mediaFiles.isNotEmpty) {
       for (var file in mediaFiles) {
+        final fileExtension = file.path.split('.').last.toLowerCase();
+        String mimeType = 'application/octet-stream';
+        
+        // MIME type belirle
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension)) {
+          mimeType = 'image/$fileExtension';
+        } else if (['pdf'].contains(fileExtension)) {
+          mimeType = 'application/pdf';
+        } else if (['doc', 'docx'].contains(fileExtension)) {
+          mimeType = 'application/msword';
+        } else if (['txt'].contains(fileExtension)) {
+          mimeType = 'text/plain';
+        }
+        
         request.files.add(
           await http.MultipartFile.fromPath(
             'media[]',
             file.path,
-            contentType: MediaType('image', 'jpeg'),
+            contentType: MediaType.parse(mimeType),
           ),
         );
       }

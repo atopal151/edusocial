@@ -35,7 +35,9 @@ class ChatDetailController extends GetxController {
   RxMap<String, int> pollVotes = <String, int>{}.obs;
   RxString selectedPollOption = ''.obs;
 
-  Rx<File?> selectedImage = Rx<File?>(null);
+  // Media seçimi için yeni değişkenler
+  final RxList<File> selectedFiles = <File>[].obs;
+  final RxBool isSendingMessage = false.obs;
   TextEditingController pollTitleController = TextEditingController();
 
   final ProfileController profileController = Get.find<ProfileController>();
@@ -480,8 +482,10 @@ class ChatDetailController extends GetxController {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      selectedImage.value = File(pickedFile.path);
+      final file = File(pickedFile.path);
+      selectedFiles.add(file);
       debugPrint("📸 Seçilen resim: ${pickedFile.path}");
+      debugPrint("📁 Toplam seçilen dosya sayısı: ${selectedFiles.length}");
     }
   }
 
@@ -494,8 +498,10 @@ class ChatDetailController extends GetxController {
 
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
-        debugPrint("Seçilen dosya: $filePath");
-        scrollToBottom();
+        final file = File(filePath);
+        selectedFiles.add(file);
+        debugPrint("📄 Seçilen dosya: $filePath");
+        debugPrint("📁 Toplam seçilen dosya sayısı: ${selectedFiles.length}");
       }
     } catch (e) {
       debugPrint("Belge seçme hatası: $e");
@@ -504,6 +510,15 @@ class ChatDetailController extends GetxController {
 
   Future<void> sendMessage(String message) async {
     if (currentChatId == null) return;
+    if (isSendingMessage.value) return;
+    
+    // Eğer hiçbir şey seçilmemişse gönderme
+    if (message.isEmpty && selectedFiles.isEmpty) {
+      debugPrint('❌ Nothing to send');
+      return;
+    }
+    
+    isSendingMessage.value = true;
     
     try {
       // Text içinde link var mı kontrol et
@@ -525,6 +540,7 @@ class ChatDetailController extends GetxController {
         await ChatServices.sendMessage(
           currentChatId!,
           nonLinkText, // Sadece link olmayan text
+          mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
           links: normalizedUrls, // Linkleri ayrı parametrede gönder
         );
       } else {
@@ -534,13 +550,72 @@ class ChatDetailController extends GetxController {
         await ChatServices.sendMessage(
           currentChatId!,
           message,
+          mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
         );
       }
       
+      // Başarılı ise seçilen dosyaları temizle
+      selectedFiles.clear();
+      
       // Mesaj gönderildikten sonra mesajları yeniden yükle
       await fetchConversationMessages(currentChatId!);
+      
+      // Mesaj gönderildikten sonra en alta git
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToBottom(animated: true);
+      });
+      
     } catch (e) {
       debugPrint("🛑 Mesaj gönderilemedi: $e");
+      Get.snackbar(
+        'Hata',
+        'Mesaj gönderilemedi',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isSendingMessage.value = false;
     }
+  }
+
+  // Sadece media dosyalarını gönder (text olmadan)
+  Future<void> sendMediaOnly() async {
+    if (currentChatId == null) return;
+    if (isSendingMessage.value) return;
+    
+    debugPrint('📁 Sending media files only');
+    isSendingMessage.value = true;
+    
+    try {
+      await ChatServices.sendMessage(
+        currentChatId!,
+        '', // Boş text
+        mediaFiles: selectedFiles,
+      );
+      
+      debugPrint('✅ Media files sent successfully');
+      selectedFiles.clear();
+      
+      // Mesajları yeniden yükle
+      await fetchConversationMessages(currentChatId!);
+      
+      // Medya gönderildikten sonra en alta git
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToBottom(animated: true);
+      });
+      
+    } catch (e) {
+      debugPrint('💥 Media sending error: $e');
+      Get.snackbar(
+        'Hata',
+        'Dosyalar gönderilemedi',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isSendingMessage.value = false;
+    }
+  }
+
+  void clearSelectedItems() {
+    selectedFiles.clear();
   }
 }

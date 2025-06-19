@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'dart:io';
 
 import '../../controllers/social/chat_detail_controller.dart';
 
@@ -17,44 +18,64 @@ Widget buildMessageInputField() {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Görsel önizleme alanı
+        // Seçilen dosyaların önizlemesi
         Obx(() {
-          if (controller.selectedImage.value != null) {
-            return Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.file(
-                          controller.selectedImage.value!,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () {
-                            controller.selectedImage.value = null;
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
+          if (controller.selectedFiles.isNotEmpty) {
+            return Container(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                children: [
+                  ...controller.selectedFiles
+                      .map((file) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: _buildFilePreview(file),
+                                ),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        file.path.split('/').last,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        '${(file.lengthSync() / 1024).toStringAsFixed(1)} KB',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.close, size: 20),
+                                  onPressed: () {
+                                    controller.selectedFiles.remove(file);
+                                  },
+                                ),
+                              ],
                             ),
-                            child: const Icon(Icons.close,
-                                color: Colors.white, size: 20),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                          ))
+                      .toList(),
+                ],
+              ),
             );
           } else {
             return SizedBox.shrink();
@@ -65,13 +86,17 @@ Widget buildMessageInputField() {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap: () {
-                  controller.pickDocument();
-                },
+                onTap: controller.isSendingMessage.value
+                    ? null
+                    : () {
+                        controller.pickDocument();
+                      },
                 child: SvgPicture.asset(
                   "images/icons/selected_document.svg",
-                  colorFilter: const ColorFilter.mode(
-                    Color(0xffc9c9c9),
+                  colorFilter: ColorFilter.mode(
+                    controller.isSendingMessage.value
+                        ? Color(0xffe5e5e5)
+                        : Color(0xffc9c9c9),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -81,23 +106,35 @@ Widget buildMessageInputField() {
               child: TextField(
                 controller: messageController,
                 decoration: InputDecoration(
-                  hintText: "Bir mesaj yazınız...",
+                  hintText: controller.selectedFiles.isNotEmpty
+                      ? "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz..."
+                      : "Bir mesaj yazınız... ",
                   hintStyle:
                       TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
                   border: InputBorder.none,
                 ),
+                onSubmitted: (value) async {
+                  if (value.isNotEmpty || controller.selectedFiles.isNotEmpty) {
+                    await controller.sendMessage(value);
+                    messageController.clear();
+                  }
+                },
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap: () {
-                  controller.openPollBottomSheet();
-                },
+                onTap: controller.isSendingMessage.value
+                    ? null
+                    : () {
+                        controller.openPollBottomSheet();
+                      },
                 child: SvgPicture.asset(
                   "images/icons/poll_icon.svg",
-                  colorFilter: const ColorFilter.mode(
-                    Color(0xffc9c9c9),
+                  colorFilter: ColorFilter.mode(
+                    controller.isSendingMessage.value
+                        ? Color(0xffe5e5e5)
+                        : Color(0xffc9c9c9),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -106,13 +143,17 @@ Widget buildMessageInputField() {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap: () {
-                  controller.pickImageFromGallery();
-                },
+                onTap: controller.isSendingMessage.value
+                    ? null
+                    : () {
+                        controller.pickImageFromGallery();
+                      },
                 child: SvgPicture.asset(
                   "images/icons/camera.svg",
-                  colorFilter: const ColorFilter.mode(
-                    Color(0xffc9c9c9),
+                  colorFilter: ColorFilter.mode(
+                    controller.isSendingMessage.value
+                        ? Color(0xffe5e5e5)
+                        : Color(0xffc9c9c9),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -139,16 +180,47 @@ Widget buildMessageInputField() {
                   ),
                 ),
               ),
-              onPressed: () {
-                if (messageController.text.isNotEmpty) {
-                  controller.sendMessage(messageController.text);
-                  messageController.clear();
-                }
-              },
+              onPressed: controller.isSendingMessage.value
+                  ? null
+                  : () async {
+                      if (messageController.text.isNotEmpty ||
+                          controller.selectedFiles.isNotEmpty) {
+                        await controller.sendMessage(messageController.text);
+                        messageController.clear();
+                      }
+                    },
             ),
           ],
         ),
       ],
     ),
   );
+}
+
+Widget _buildFilePreview(File file) {
+  final fileName = file.path.toLowerCase();
+
+  if (fileName.endsWith('.jpg') ||
+      fileName.endsWith('.jpeg') ||
+      fileName.endsWith('.png') ||
+      fileName.endsWith('.gif') ||
+      fileName.endsWith('.webp')) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.file(
+        file,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.image, color: Colors.grey[400]),
+      ),
+    );
+  } else if (fileName.endsWith('.pdf')) {
+    return Icon(Icons.picture_as_pdf, color: Colors.red[400], size: 30);
+  } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+    return Icon(Icons.description, color: Colors.blue[400], size: 30);
+  } else if (fileName.endsWith('.txt')) {
+    return Icon(Icons.text_snippet, color: Colors.grey[400], size: 30);
+  } else {
+    return Icon(Icons.insert_drive_file, color: Colors.grey[400], size: 30);
+  }
 }

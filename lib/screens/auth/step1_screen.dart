@@ -1,4 +1,5 @@
 import 'package:edusocial/components/dropdowns/custom_dropdown.dart';
+import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
@@ -32,7 +33,16 @@ class Step1View extends StatelessWidget {
               SizedBox(height: 30),
               Obx(() {
                 if (controller.schools.isEmpty) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: GeneralLoadingIndicator(
+                        size: 32,
+                        showText: true,
+                        showIcon: false,
+                      ),
+                    ),
+                  );
                 }
                 return CustomDropDown(
                   label: "Okul",
@@ -50,7 +60,16 @@ class Step1View extends StatelessWidget {
               SizedBox(height: 20),
               Obx(() {
                 if (controller.departments.isEmpty) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: GeneralLoadingIndicator(
+                        size: 32,
+                        showText: true,
+                        showIcon: false,
+                      ),
+                    ),
+                  );
                 }
                 return CustomDropDown(
                   label: "Bölüm",

@@ -90,8 +90,6 @@ class LoginController extends GetxController {
   }
 
   void loginPasswordUpgrade() {
-    // TODO: Implement password reset functionality
-    Get.toNamed('/forgot-password');
   }
 
   @override

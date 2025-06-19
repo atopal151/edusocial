@@ -19,17 +19,13 @@ class PostHomeList extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 40),
             child: GeneralLoadingIndicator(
               size: 32,
-              showText: true,
               showIcon: false,
             ),
           ),
         );
       }
 
-      if (postController.postHomeList.isEmpty) {
-        return const Center(child: Text("Hiç gönderi bulunamadı."));
-      }
-
+      
       return Column(
         children: postController.postHomeList.map((post) {
           return Container(
