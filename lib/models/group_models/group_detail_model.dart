@@ -1,6 +1,7 @@
 import 'package:edusocial/models/document_model.dart';
 import 'package:edusocial/models/event_model.dart';
 import 'package:edusocial/models/link_model.dart';
+import 'group_chat_model.dart';
 
 class GroupDetailModel {
   final String id;
@@ -24,6 +25,7 @@ class GroupDetailModel {
   final List<LinkModel> links;
   final List<String> photoUrls;
   final List<EventModel> events;
+  final List<GroupChatModel> groupChats;
 
   GroupDetailModel({
     required this.id,
@@ -47,6 +49,7 @@ class GroupDetailModel {
     required this.links,
     required this.photoUrls,
     required this.events,
+    required this.groupChats,
   });
 
   factory GroupDetailModel.fromJson(Map<String, dynamic> json) {
@@ -85,6 +88,10 @@ class GroupDetailModel {
           [],
       events: (group['events'] as List<dynamic>?)
               ?.map((event) => EventModel.fromJson(event))
+              .toList() ??
+          [],
+      groupChats: (group['group_chats'] as List<dynamic>?)
+              ?.map((chat) => GroupChatModel.fromJson(chat))
               .toList() ??
           [],
     );

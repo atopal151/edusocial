@@ -19,7 +19,7 @@ class GroupServices {
           'Authorization': 'Bearer ${box.read('token')}',
         },
       );
-       /*debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
+      /*debugPrint("📥 Group Suggestion Response: ${response.statusCode}",
          wrapWidth: 1024);
       debugPrint("📥 Group Suggestion Body: ${response.body}", wrapWidth: 1024);*/
 
@@ -155,7 +155,7 @@ class GroupServices {
       );
 
       //debugPrint("📥 Group Status Code: ${response.statusCode}",
-        //  wrapWidth: 1024);
+      //  wrapWidth: 1024);
 
       // 🔽 Dönen cevabı aynen gösteriyoruz
       //debugPrint("📦 Group Response Body:", wrapWidth: 1024);
@@ -253,29 +253,11 @@ class GroupServices {
         final jsonBody = json.decode(response.body);
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
           final groupData = jsonBody['data']['group'];
-          
+
           debugPrint('📋 GRUP DETAY VERİLERİ:');
           debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           debugPrint('ID: ${groupData['id']}');
-          debugPrint('Kullanıcı ID: ${groupData['user_id']}');
-          debugPrint('Grup Alan ID: ${groupData['group_area_id']}');
-          debugPrint('Grup Adı: ${groupData['name']}');
-          debugPrint('Açıklama: ${groupData['description']}');
-          debugPrint('Durum: ${groupData['status']}');
-          debugPrint('Gizli Mi: ${groupData['is_private']}');
-          debugPrint('Silinme Tarihi: ${groupData['deleted_at']}');
-          debugPrint('Oluşturulma Tarihi: ${groupData['created_at']}');
-          debugPrint('Güncellenme Tarihi: ${groupData['updated_at']}');
-          debugPrint('Admin Dahil Üye Sayısı: ${groupData['user_count_with_admin']}');
-          debugPrint('Admin Hariç Üye Sayısı: ${groupData['user_count_without_admin']}');
-          debugPrint('Mesaj Sayısı: ${groupData['message_count']}');
-          debugPrint('Kurucu Mu: ${groupData['is_founder']}');
-          debugPrint('Üye Mi: ${groupData['is_member']}');
-          debugPrint('Beklemede Mi: ${groupData['is_pending']}');
-          debugPrint('Avatar URL: ${groupData['avatar_url']}');
-          debugPrint('Banner URL: ${groupData['banner_url']}');
-          debugPrint('İnsan Tarafından Okunabilir Oluşturulma Tarihi: ${groupData['human_created_at']}');
-          debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          debugPrint('ID: ${jsonBody['data']['group']['group_chats']}');
           
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
