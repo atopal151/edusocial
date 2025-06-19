@@ -7,6 +7,7 @@ class EntryModel {
   final int upvotes_count;
   final int downvotes_count;
   final String human_created_at;
+  final DateTime? created_at; // Tarih sıralaması için
   final UserModel user;
   final TopicModel? topic; // topic opsiyonel olabilir
   final bool? is_like; // Added for vote status
@@ -18,6 +19,7 @@ class EntryModel {
     required this.upvotes_count,
     required this.downvotes_count,
     required this.human_created_at,
+    this.created_at,
     required this.user,
     this.topic,
     this.is_like,
@@ -34,6 +36,7 @@ class EntryModel {
       upvotes_count: json['upvote_count'] ?? 0,
       downvotes_count: json['downvote_count'] ?? 0,
       human_created_at: json['human_created_at'] ?? '',
+      created_at: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
       user: UserModel.fromJson(userJson ?? {}),
       topic: topicJson != null ? TopicModel.fromJson(topicJson) : null,
       is_like: json['is_like'],
@@ -47,6 +50,7 @@ class EntryModel {
     int? upvotes_count,
     int? downvotes_count,
     String? human_created_at,
+    DateTime? created_at,
     UserModel? user,
     TopicModel? topic,
     bool? is_like,
@@ -58,6 +62,7 @@ class EntryModel {
       upvotes_count: upvotes_count ?? this.upvotes_count,
       downvotes_count: downvotes_count ?? this.downvotes_count,
       human_created_at: human_created_at ?? this.human_created_at,
+      created_at: created_at ?? this.created_at,
       user: user ?? this.user,
       topic: topic ?? this.topic,
       is_like: is_like ?? this.is_like,
@@ -72,6 +77,7 @@ class EntryModel {
       'upvotes_count': upvotes_count,
       'downvotes_count': downvotes_count,
       'human_created_at': human_created_at,
+      'created_at': created_at?.toIso8601String(),
       'user': user.toJson(),
       'topic': topic?.toJson(),
       'is_like': is_like,

@@ -23,8 +23,36 @@ class EntryDetailController extends GetxController {
       debugPrint("📥 EntryDetailController: fetchEntriesByTopicId yanıtı: ${response?.topic.name} - entries count: ${response?.entries.length}");
       if (response != null && response.entries.isNotEmpty) {
         // İlk entry ana entry, geri kalanlar yorumlar
-        entryComments.value = response.entries.skip(1).toList();
-        debugPrint("✅ EntryDetailController: Yorumlar güncellendi, yeni yorum sayısı: ${entryComments.length}");
+        final comments = response.entries.skip(1).toList();
+        
+        // Debug: Sıralama öncesi yorumları yazdır
+        debugPrint("📝 Sıralama öncesi yorumlar:");
+        for (int i = 0; i < comments.length; i++) {
+          final comment = comments[i];
+          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.created_at}, Upvotes: ${comment.upvotes_count}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
+        }
+        
+        // Yorumları tarihe göre sırala (en yeni en üstte)
+        comments.sort((a, b) {
+          final dateA = a.created_at;
+          final dateB = b.created_at;
+          
+          if (dateA == null && dateB == null) return 0;
+          if (dateA == null) return 1; // null değerler sona
+          if (dateB == null) return -1;
+          
+          return dateB.compareTo(dateA); // En yeni en üstte
+        });
+        
+        // Debug: Sıralama sonrası yorumları yazdır
+        debugPrint("📝 Sıralama sonrası yorumlar:");
+        for (int i = 0; i < comments.length; i++) {
+          final comment = comments[i];
+          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.created_at}, Upvotes: ${comment.upvotes_count}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
+        }
+        
+        entryComments.value = comments;
+        debugPrint("✅ EntryDetailController: Yorumlar tarihe göre sıralandı, yeni yorum sayısı: ${entryComments.length}");
       } else {
         debugPrint("⚠️ EntryDetailController: Yorum bulunamadı veya yanıt boş.");
         entryComments.clear(); // Eğer yorum yoksa listeyi temizle
@@ -33,6 +61,63 @@ class EntryDetailController extends GetxController {
       debugPrint("❌ EntryDetailController: currentTopic ID null, yorumlar çekilemedi.");
       entryComments.clear();
     }
+  }
+
+  // Yorum oy durumunu güncelle (yeniden yüklemeden)
+  Future<void> updateCommentVoteState(int entryId, String vote) async {
+    debugPrint("🔄 Yorum oy durumu güncelleniyor: Entry ID $entryId, Vote: $vote");
+    
+    final commentIndex = entryComments.indexWhere((comment) => comment.id == entryId);
+    if (commentIndex == -1) {
+      debugPrint("❌ Güncellenecek yorum bulunamadı: $entryId");
+      return;
+    }
+    
+    final currentComment = entryComments[commentIndex];
+    int newUpvotes = currentComment.upvotes_count;
+    int newDownvotes = currentComment.downvotes_count;
+    bool? newIsLike = currentComment.is_like;
+    bool? newIsDislike = currentComment.is_dislike;
+
+    if (vote == "up") {
+      if (newIsLike == true) {
+        // Already liked, unlike it
+        newUpvotes--;
+        newIsLike = false;
+      } else {
+        // Like it
+        newUpvotes++;
+        newIsLike = true;
+        if (newIsDislike == true) {
+          newDownvotes--;
+          newIsDislike = false;
+        }
+      }
+    } else if (vote == "down") {
+      if (newIsDislike == true) {
+        // Already disliked, undislike it
+        newDownvotes--;
+        newIsDislike = false;
+      } else {
+        // Dislike it
+        newDownvotes++;
+        newIsDislike = true;
+        if (newIsLike == true) {
+          newUpvotes--;
+          newIsLike = false;
+        }
+      }
+    }
+
+    final updatedComment = currentComment.copyWith(
+      upvotes_count: newUpvotes,
+      downvotes_count: newDownvotes,
+      is_like: newIsLike,
+      is_dislike: newIsDislike,
+    );
+
+    entryComments[commentIndex] = updatedComment;
+    debugPrint("✅ Yorum oy durumu güncellendi: Upvotes: $newUpvotes, Downvotes: $newDownvotes, IsLike: $newIsLike, IsDislike: $newIsDislike");
   }
 
   @override

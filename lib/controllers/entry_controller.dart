@@ -195,15 +195,14 @@ class EntryController extends GetxController {
         applySearchFilterToDisplayList();
       }
 
-      // Eğer detay ekranı açıksa, yorumları güncelle
+      // Detay ekranındaki yorumların oy durumunu güncelle (yeniden yüklemeden)
       if (Get.isRegistered<EntryDetailController>()) {
         final entryDetailController = Get.find<EntryDetailController>();
         if (entryDetailController.currentTopic.value?.id != null) {
-          debugPrint("🔄 EntryController: Detay ekranı açık, yorumlar güncelleniyor...");
-          entryDetailController.fetchEntryComments();
+          debugPrint("🔄 EntryController: Detay ekranındaki yorum oy durumu güncelleniyor...");
+          await entryDetailController.updateCommentVoteState(entryId, vote);
         }
       }
-      Get.snackbar("Başarılı", "Oylama işlemi başarılı oldu");
     } else {
       Get.snackbar("Hata", "Oylama işlemi başarısız oldu");
     }
@@ -217,12 +216,15 @@ class EntryController extends GetxController {
     );
 
     if (success) {
-      // Başarılı entry gönderimi sonrası listeyi güncelle (detay ekranından geliyorsa)
-      // EntryDetailScreen'deki fetchEntryComments'i tetiklemeliyiz.
-      // Ana ekrandaki listeyi de güncelleyebiliriz, eğer gönderilen entry bir first_entry ise
-      // Şimdilik sadece detay ekranı güncelleniyor.
-      Get.back();
-      Get.snackbar("Başarılı", "Entry başarıyla gönderildi");
+      // Başarılı entry gönderimi sonrası sadece yorumları güncelle
+      if (Get.isRegistered<EntryDetailController>()) {
+        final entryDetailController = Get.find<EntryDetailController>();
+        if (entryDetailController.currentTopic.value?.id != null) {
+          debugPrint("🔄 Yeni yorum eklendi, yorumlar güncelleniyor...");
+          await entryDetailController.fetchEntryComments();
+        }
+      }
+      // Back işlemi ve snackbar kaldırıldı
     } else {
       Get.snackbar("Hata", "Entry gönderilemedi");
     }

@@ -27,7 +27,7 @@ class EntryServices {
     try {
       // debugPrint("🔍 Fetching entries for topic ID: $topicId");
       final response = await http.get(
-        Uri.parse("${AppConstants.baseUrl}/timeline/topics/$topicId"),
+        Uri.parse("${AppConstants.baseUrl}/timeline/topics/$topicId?sort=latest"),
         headers: {
           "Authorization": "Bearer $token",
           "Accept": "application/json",
