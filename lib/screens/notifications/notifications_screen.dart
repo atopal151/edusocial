@@ -1,10 +1,11 @@
-import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
+import 'package:edusocial/components/buttons/custom_button.dart';
+import 'package:edusocial/components/widgets/general_loading_indicator.dart';
+import 'package:edusocial/controllers/notification_controller.dart';
+import 'package:edusocial/models/notification_model.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../../controllers/notification_controller.dart';
-import '../../models/notification_model.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -14,7 +15,7 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  final NotificationController controller = Get.put(NotificationController());
+  final NotificationController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Container(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: GeneralLoadingIndicator(
+              size: 32,
+              color: Color(0xFFFF7743),
+              icon: Icons.notifications,
+              showText: true,
+            ),
+          );
         }
 
         final grouped =

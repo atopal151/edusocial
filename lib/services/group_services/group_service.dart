@@ -1,10 +1,12 @@
 // group_services.dart
 import 'dart:convert';
+import 'dart:io';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import '../../models/group_models/group_model.dart';
 import '../../models/group_models/group_detail_model.dart';
 
@@ -268,6 +270,86 @@ class GroupServices {
       }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<bool> sendGroupMessage({
+    required String groupId,
+    String? message,
+    List<File>? mediaFiles,
+    List<String>? links,
+    List<String>? pollOptions,
+  }) async {
+    final box = GetStorage();
+    final token = box.read('token');
+
+    try {
+      final uri = Uri.parse('${AppConstants.baseUrl}/group-message');
+      var request = http.MultipartRequest('POST', uri);
+      
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['group_id'] = groupId;
+      
+      // Message alanını her zaman gönder (boş string olsa bile)
+      request.fields['message'] = message ?? '';
+
+      // Media dosyalarını ekle
+      if (mediaFiles != null && mediaFiles.isNotEmpty) {
+        for (int i = 0; i < mediaFiles.length; i++) {
+          final file = mediaFiles[i];
+          if (await file.exists()) {
+            final fileExtension = file.path.split('.').last.toLowerCase();
+            String mimeType = 'application/octet-stream';
+            
+            // MIME type belirle
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension)) {
+              mimeType = 'image/$fileExtension';
+            } else if (['pdf'].contains(fileExtension)) {
+              mimeType = 'application/pdf';
+            } else if (['doc', 'docx'].contains(fileExtension)) {
+              mimeType = 'application/msword';
+            } else if (['txt'].contains(fileExtension)) {
+              mimeType = 'text/plain';
+            }
+            
+            request.files.add(await http.MultipartFile.fromPath(
+              'media[]',
+              file.path,
+              contentType: MediaType.parse(mimeType),
+            ));
+          }
+        }
+      }
+
+      // Linkleri ekle
+      if (links != null && links.isNotEmpty) {
+        for (int i = 0; i < links.length; i++) {
+          request.fields['links[]'] = links[i];
+        }
+      }
+
+      // Poll seçeneklerini ekle
+      if (pollOptions != null && pollOptions.isNotEmpty) {
+        for (int i = 0; i < pollOptions.length; i++) {
+          request.fields['poll_options[]'] = pollOptions[i];
+        }
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('📤 Send Group Message Response: ${response.statusCode}');
+      debugPrint('📤 Send Group Message Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        debugPrint('❌ Send group message failed: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('💥 Send group message error: $e');
+      return false;
     }
   }
 }

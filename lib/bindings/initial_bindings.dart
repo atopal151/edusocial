@@ -14,8 +14,10 @@ import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/topics_controller.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_update_controller.dart';
+import 'package:edusocial/controllers/notification_controller.dart';
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/social/chat_controller.dart';
+import '../services/socket_services.dart';
 
 class InitialBindings extends Bindings {
   @override
@@ -30,6 +32,8 @@ class InitialBindings extends Bindings {
     Get.put(GroupController(), permanent: true);
     Get.put(GetMaterialController(), permanent: true);
     Get.put(StoryController(), permanent: true);
+    Get.put(SocketService(), permanent: true);
+    Get.put(NotificationController(), permanent: true);
 
     // İhtiyaç anında yüklenecek olanlar (lazy yükleme)
     Get.lazyPut(() => EventController());

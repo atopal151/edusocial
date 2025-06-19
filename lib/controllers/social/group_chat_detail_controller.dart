@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,11 +27,45 @@ class GroupChatDetailController extends GetxController {
   final RxList<LinkModel> groupLinks = <LinkModel>[].obs;
   final RxList<String> groupPhotos = <String>[].obs;
 
+  // Mesaj gönderme için seçilen dosyalar ve linkler
+  final RxList<File> selectedFiles = <File>[].obs;
+  final RxBool isSendingMessage = false.obs;
+
   RxString pollQuestion = ''.obs;
   RxList<String> pollOptions = <String>[].obs;
   RxMap<String, int> pollVotes = <String, int>{}.obs;
   RxString selectedPollOption = ''.obs;
   TextEditingController pollTitleController = TextEditingController();
+
+  // URL algılama için regex pattern
+  static final RegExp urlRegex = RegExp(
+    r'(https?://[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]{2,})',
+    caseSensitive: false,
+  );
+
+  // Link algılama fonksiyonu
+  List<String> extractUrlsFromText(String text) {
+    final matches = urlRegex.allMatches(text);
+    return matches.map((match) => match.group(0)!).toList();
+  }
+
+  // URL'yi normalize et (http:// ekle)
+  String normalizeUrl(String url) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return 'https://$url';
+    }
+    return url;
+  }
+
+  // Mesaj içeriğinde link var mı kontrol et
+  bool hasLinksInText(String text) {
+    return urlRegex.hasMatch(text);
+  }
+
+  // Link olmayan text'i çıkar
+  String extractNonLinkText(String text) {
+    return text.replaceAll(urlRegex, '').trim();
+  }
 
   @override
   void onInit() {
@@ -85,6 +120,9 @@ class GroupChatDetailController extends GetxController {
   void convertGroupChatsToMessages() {
     if (groupData.value?.groupChats == null) return;
     
+    // Mevcut mesajları temizle
+    messages.clear();
+    
     final groupChats = groupData.value!.groupChats;
     final currentUserId = Get.find<ProfileController>().userId.value;
     
@@ -94,6 +132,7 @@ class GroupChatDetailController extends GetxController {
       
       GroupMessageType messageType = GroupMessageType.text;
       String content = chat.message;
+      List<String>? links;
       
       // Mesaj türünü belirle
       if (chat.media.isNotEmpty) {
@@ -106,9 +145,19 @@ class GroupChatDetailController extends GetxController {
           content = media.fullPath; // Doküman URL'si
         }
       } else if (chat.groupChatLink.isNotEmpty) {
-        messageType = GroupMessageType.link;
-        final link = chat.groupChatLink.first;
-        content = link.link; // Link URL'si
+        // Link varsa
+        final chatLinks = chat.groupChatLink.map((link) => link.link).toList();
+        
+        if (chat.message.isNotEmpty) {
+          // Hem text hem link varsa
+          messageType = GroupMessageType.textWithLinks;
+          content = chat.message; // Text içeriği
+          links = chatLinks; // Linkleri ayrı tut
+        } else {
+          // Sadece link varsa
+          messageType = GroupMessageType.link;
+          content = chatLinks.first; // İlk link
+        }
       }
       
       final message = GroupMessageModel(
@@ -123,6 +172,7 @@ class GroupChatDetailController extends GetxController {
         timestamp: DateTime.parse(chat.createdAt),
         isSentByMe: isSentByMe,
         additionalText: chat.messageType == 'poll' ? chat.message : null,
+        links: links, // Link listesi eklendi
       );
       
       messages.add(message);
@@ -332,7 +382,7 @@ class GroupChatDetailController extends GetxController {
                       Get.back();
                     }
                   },
-                  isLoading: isLoading,
+                  isLoading: isSendingMessage,
                   backgroundColor: Color(0xffFFF6F6),
                   textColor: Color(0xffED7474)),
               const SizedBox(height: 20),
@@ -353,42 +403,56 @@ class GroupChatDetailController extends GetxController {
     selectedPollOption.value = option;
   }
 
-  void sendPoll(String question, List<String> options) {
-    messages.add(GroupMessageModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      senderId: "me",
-      receiverId: "user123",
-      content: question,name: "Ali",
-    surname: "Yılmaz",
-    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
-      messageType: GroupMessageType.poll,
-      timestamp: DateTime.now(),
-      isSentByMe: true,
-      pollOptions: options,
-    ));
-    scrollToBottom();
+  void sendPoll(String question, List<String> options) async {
+    if (isSendingMessage.value) return;
+    
+    isSendingMessage.value = true;
+    
+    try {
+      // Poll mesajını API'ye gönder
+      final success = await _groupServices.sendGroupMessage(
+        groupId: currentGroupId.value,
+        message: question,
+        pollOptions: options,
+      );
+      
+      if (success) {
+        // Başarılı ise mesajları yeniden yükle
+        await refreshMessagesOnly();
+        
+        // Poll gönderildikten sonra en alta git
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          scrollToBottom(animated: true);
+        });
+      } else {
+        Get.snackbar(
+          'Hata',
+          'Anket gönderilemedi',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      debugPrint('Anket gönderme hatası: $e');
+      Get.snackbar(
+        'Hata',
+        'Anket gönderilemedi',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isSendingMessage.value = false;
+    }
   }
 
   void pickImageFromGallery() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      messages.add(GroupMessageModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        senderId: "me",
-        receiverId: "user123",name: "Ali",
-    surname: "Yılmaz",
-    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
-        content: pickedFile.path,
-        messageType: GroupMessageType.image,
-        timestamp: DateTime.now(),
-        isSentByMe: true,
-      ));
-      scrollToBottom();
+      final file = File(pickedFile.path);
+      selectedFiles.add(file);
     }
   }
 
-  Future<void> pickDocument() async {
+  void pickDocument() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -397,41 +461,161 @@ class GroupChatDetailController extends GetxController {
 
       if (result != null && result.files.single.path != null) {
         final filePath = result.files.single.path!;
+        final file = File(filePath);
+        selectedFiles.add(file);
+        
         debugPrint("Seçilen dosya: $filePath");
-
-        messages.add(GroupMessageModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          senderId: "me",
-          receiverId: "user123",
-          content: filePath,name: "Ali",
-    surname: "Yılmaz",
-    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
-          messageType: GroupMessageType.document,
-          timestamp: DateTime.now(),
-          isSentByMe: true,
-        ));
-
-        scrollToBottom();
       }
     } catch (e) {
       debugPrint("Belge seçme hatası: $e",wrapWidth: 1024);
     }
   }
 
-  void sendMessage(String text) {
-    messages.add(GroupMessageModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      senderId: "me",
-      receiverId: "user123",
-      content: text,
-      name: "Ali",
-    surname: "Yılmaz",
-    profileImage: "https://randomuser.me/api/portraits/men/1.jpg",
-      messageType: GroupMessageType.text,
-      timestamp: DateTime.now(),
-      isSentByMe: true,
-    ));
-    scrollToBottom();
+  Future<void> sendMessage(String text) async {
+    if (isSendingMessage.value) return;
+    
+    // Debug log ekle
+    debugPrint('📤 Sending message:');
+    debugPrint('  - Text: "$text"');
+    debugPrint('  - Selected files: ${selectedFiles.length}');
+    
+    // Eğer hiçbir şey seçilmemişse gönderme
+    if (text.isEmpty && selectedFiles.isEmpty) {
+      debugPrint('❌ Nothing to send');
+      return;
+    }
+    
+    // Eğer sadece dosya seçilmişse ve text yoksa, dosyaları gönder
+    if (text.isEmpty && selectedFiles.isNotEmpty) {
+      debugPrint('📁 Sending only media files');
+      await sendMediaOnly();
+      return;
+    }
+    
+    isSendingMessage.value = true;
+    
+    try {
+      // Text içinde link var mı kontrol et
+      if (text.isNotEmpty && hasLinksInText(text)) {
+        debugPrint('🔗 Links detected in text, processing...');
+        
+        final urls = extractUrlsFromText(text);
+        final nonLinkText = extractNonLinkText(text);
+        
+        debugPrint('  - Detected URLs: $urls');
+        debugPrint('  - Non-link text: "$nonLinkText"');
+        
+        // Linkleri normalize et
+        final normalizedUrls = urls.map((url) => normalizeUrl(url)).toList();
+        
+        // Text ve linkleri birlikte gönder (user chat gibi)
+        debugPrint('  - Sending message with text and links together');
+        
+        final success = await _groupServices.sendGroupMessage(
+          groupId: currentGroupId.value,
+          message: nonLinkText, // Link olmayan text
+          mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
+          links: normalizedUrls, // Linkleri ayrı parametrede gönder
+        );
+        
+        if (!success) {
+          debugPrint('❌ Failed to send message with links');
+          Get.snackbar(
+            'Hata',
+            'Mesaj gönderilemedi',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      } else {
+        // Normal text mesajı gönder (link yok)
+        debugPrint('📝 Sending normal text message');
+        
+        final success = await _groupServices.sendGroupMessage(
+          groupId: currentGroupId.value,
+          message: text, // Boş string olsa bile gönder
+          mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
+          links: null,
+        );
+        
+        if (!success) {
+          debugPrint('❌ Failed to send message');
+          Get.snackbar(
+            'Hata',
+            'Mesaj gönderilemedi',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      }
+      
+      // Başarılı ise seçilen dosyaları temizle
+      selectedFiles.clear();
+      
+      // Mesajları hızlıca yeniden yükle
+      await refreshMessagesOnly();
+      
+      // Mesaj gönderildikten sonra en alta git
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToBottom(animated: true);
+      });
+      
+    } catch (e) {
+      debugPrint('💥 Message sending error: $e');
+      Get.snackbar(
+        'Hata',
+        'Mesaj gönderilemedi',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isSendingMessage.value = false;
+    }
+  }
+
+  // Sadece media dosyalarını gönder (text olmadan)
+  Future<void> sendMediaOnly() async {
+    if (isSendingMessage.value) return;
+    
+    debugPrint('📁 Sending media files only');
+    isSendingMessage.value = true;
+    
+    try {
+      final success = await _groupServices.sendGroupMessage(
+        groupId: currentGroupId.value,
+        message: '', // Boş text
+        mediaFiles: selectedFiles,
+        links: null,
+      );
+      
+      if (success) {
+        debugPrint('✅ Media files sent successfully');
+        selectedFiles.clear();
+        await refreshMessagesOnly();
+        
+        // Medya gönderildikten sonra en alta git
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          scrollToBottom(animated: true);
+        });
+      } else {
+        debugPrint('❌ Failed to send media files');
+        Get.snackbar(
+          'Hata',
+          'Dosyalar gönderilemedi',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      debugPrint('💥 Media sending error: $e');
+      Get.snackbar(
+        'Hata',
+        'Dosyalar gönderilemedi',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isSendingMessage.value = false;
+    }
+  }
+
+  void clearSelectedItems() {
+    selectedFiles.clear();
   }
 
   void scrollToBottom({bool animated = true}) {
@@ -462,6 +646,24 @@ class GroupChatDetailController extends GetxController {
     Get.toNamed("/groupDetailScreen", arguments: {
       'groupId': currentGroupId.value,
     });
+  }
+
+  // Hızlı mesaj güncelleme (sadece mesajları yeniden yükle)
+  Future<void> refreshMessagesOnly() async {
+    try {
+      debugPrint('🔄 Refreshing messages only...');
+      
+      // Sadece grup detaylarını yeniden yükle (mesajlar dahil)
+      final group = await _groupServices.fetchGroupDetail(currentGroupId.value);
+      groupData.value = group;
+      
+      // Group chats verilerini mesajlara dönüştür
+      convertGroupChatsToMessages();
+      
+      debugPrint('✅ Messages refreshed successfully');
+    } catch (e) {
+      debugPrint('❌ Error refreshing messages: $e');
+    }
   }
 
 }

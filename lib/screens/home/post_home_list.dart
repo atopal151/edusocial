@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/cards/post_card.dart';
+import '../../components/widgets/general_loading_indicator.dart';
 import '../../controllers/post_controller.dart';
 
 class PostHomeList extends StatelessWidget {
@@ -12,7 +13,17 @@ class PostHomeList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (postController.isHomeLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return Center(
+          
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: GeneralLoadingIndicator(
+              size: 32,
+              showText: true,
+              showIcon: false,
+            ),
+          ),
+        );
       }
 
       if (postController.postHomeList.isEmpty) {

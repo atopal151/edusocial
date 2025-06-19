@@ -41,6 +41,36 @@ class ChatDetailController extends GetxController {
   final ProfileController profileController = Get.find<ProfileController>();
   final SocketService socketService = Get.find<SocketService>();
 
+  // URL algılama için regex pattern
+  static final RegExp urlRegex = RegExp(
+    r'(https?://[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]{2,})',
+    caseSensitive: false,
+  );
+
+  // Link algılama fonksiyonu
+  List<String> extractUrlsFromText(String text) {
+    final matches = urlRegex.allMatches(text);
+    return matches.map((match) => match.group(0)!).toList();
+  }
+
+  // URL'yi normalize et (http:// ekle)
+  String normalizeUrl(String url) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return 'https://$url';
+    }
+    return url;
+  }
+
+  // Mesaj içeriğinde link var mı kontrol et
+  bool hasLinksInText(String text) {
+    return urlRegex.hasMatch(text);
+  }
+
+  // Link olmayan text'i çıkar
+  String extractNonLinkText(String text) {
+    return text.replaceAll(urlRegex, '').trim();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -476,10 +506,37 @@ class ChatDetailController extends GetxController {
     if (currentChatId == null) return;
     
     try {
-      await ChatServices.sendMessage(
-        currentChatId!,
-        message,
-      );
+      // Text içinde link var mı kontrol et
+      if (message.isNotEmpty && hasLinksInText(message)) {
+        debugPrint('🔗 Links detected in text, processing...');
+        
+        final urls = extractUrlsFromText(message);
+        final nonLinkText = extractNonLinkText(message);
+        
+        debugPrint('  - Detected URLs: $urls');
+        debugPrint('  - Non-link text: "$nonLinkText"');
+        
+        // Linkleri normalize et
+        final normalizedUrls = urls.map((url) => normalizeUrl(url)).toList();
+        
+        // Text alanında sadece link olmayan kısmı gönder, linkleri ayrı parametrede gönder
+        debugPrint('  - Sending message with separated text and links');
+        
+        await ChatServices.sendMessage(
+          currentChatId!,
+          nonLinkText, // Sadece link olmayan text
+          links: normalizedUrls, // Linkleri ayrı parametrede gönder
+        );
+      } else {
+        // Normal text mesajı gönder (link yok)
+        debugPrint('📝 Sending normal text message');
+        
+        await ChatServices.sendMessage(
+          currentChatId!,
+          message,
+        );
+      }
+      
       // Mesaj gönderildikten sonra mesajları yeniden yükle
       await fetchConversationMessages(currentChatId!);
     } catch (e) {

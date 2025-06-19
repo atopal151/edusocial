@@ -9,6 +9,23 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
 
   const LinkMediaTextMessageWidget({super.key, required this.message});
 
+  // Dosya türünü kontrol et
+  bool isImageFile(String url) {
+    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+    final lowerUrl = url.toLowerCase();
+    return imageExtensions.any((ext) => lowerUrl.endsWith(ext));
+  }
+
+  bool isPdfFile(String url) {
+    return url.toLowerCase().endsWith('.pdf');
+  }
+
+  bool isDocumentFile(String url) {
+    final documentExtensions = ['.pdf', '.doc', '.docx', '.txt', '.rtf'];
+    final lowerUrl = url.toLowerCase();
+    return documentExtensions.any((ext) => lowerUrl.endsWith(ext));
+  }
+
   @override
   Widget build(BuildContext context) {
     // 🔹 Media Path kontrolü
@@ -35,25 +52,84 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
     if (mediaUrl != null) {
       if (mediaUrl.startsWith('file://')) {
         final file = File(Uri.parse(mediaUrl).path);
-        mediaWidget = ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.file(
-            file,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.broken_image),
-          ),
-        );
+        if (isImageFile(mediaUrl)) {
+          mediaWidget = ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.file(
+              file,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image),
+            ),
+          );
+        } else {
+          // Dosya türü resim değilse dosya ikonu göster
+          mediaWidget = Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  isPdfFile(mediaUrl) ? Icons.picture_as_pdf : Icons.insert_drive_file,
+                  size: 32,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  mediaUrl.split('/').last,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
       } else {
-        mediaWidget = ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            mediaUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.broken_image),
-          ),
-        );
+        // Network dosyaları için
+        if (isImageFile(mediaUrl)) {
+          mediaWidget = ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              mediaUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image),
+            ),
+          );
+        } else {
+          // Dosya türü resim değilse dosya ikonu göster
+          mediaWidget = Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  isPdfFile(mediaUrl) ? Icons.picture_as_pdf : Icons.insert_drive_file,
+                  size: 32,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  mediaUrl.split('/').last,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
       }
     }
 

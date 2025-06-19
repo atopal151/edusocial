@@ -15,8 +15,8 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen>
     with SingleTickerProviderStateMixin {
-  final ChatController chatController = Get.put(ChatController());
-  final GroupController groupController = Get.put(GroupController());
+  final ChatController chatController = Get.find<ChatController>();
+  final GroupController groupController = Get.find<GroupController>();
 
   late TabController _tabController;
 
@@ -28,6 +28,7 @@ class _ChatListScreenState extends State<ChatListScreen>
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('🔍 ChatListScreen: Building chat list screen');
     return Scaffold(
       appBar: UserAppBar(),
       backgroundColor: const Color(0xFFFAFAFA),

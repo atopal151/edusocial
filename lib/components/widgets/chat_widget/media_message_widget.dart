@@ -8,6 +8,17 @@ class MediaMessageWidget extends StatelessWidget {
 
   const MediaMessageWidget({super.key, required this.message});
 
+  // Dosya türünü kontrol et
+  bool isImageFile(String url) {
+    final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+    final lowerUrl = url.toLowerCase();
+    return imageExtensions.any((ext) => lowerUrl.endsWith(ext));
+  }
+
+  bool isPdfFile(String url) {
+    return url.toLowerCase().endsWith('.pdf');
+  }
+
   @override
   Widget build(BuildContext context) {
     final rawMediaPath = message.messageMedia.first.path;
@@ -27,35 +38,93 @@ class MediaMessageWidget extends StatelessWidget {
     Widget imageWidget;
     if (mediaUrl.startsWith('file://')) {
       final file = File(Uri.parse(mediaUrl).path);
-      imageWidget = ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.file(
-          file,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-              const Icon(Icons.broken_image),
-        ),
-      );
+      if (isImageFile(mediaUrl)) {
+        imageWidget = ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.file(
+            file,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.broken_image),
+          ),
+        );
+      } else {
+        // Dosya türü resim değilse dosya ikonu göster
+        imageWidget = Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                isPdfFile(mediaUrl) ? Icons.picture_as_pdf : Icons.insert_drive_file,
+                size: 32,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                mediaUrl.split('/').last,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      }
     } else {
-      imageWidget = Padding(
-        padding: const EdgeInsets.all(3.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.5,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Image.network(
-              mediaUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image),
+      if (isImageFile(mediaUrl)) {
+        imageWidget = Padding(
+          padding: const EdgeInsets.all(3.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.5,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Image.network(
+                mediaUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image),
+              ),
             ),
           ),
-        ),
-      );
+        );
+      } else {
+        // Dosya türü resim değilse dosya ikonu göster
+        imageWidget = Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                isPdfFile(mediaUrl) ? Icons.picture_as_pdf : Icons.insert_drive_file,
+                size: 32,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                mediaUrl.split('/').last,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      }
     }
 
     return Column(

@@ -6,6 +6,7 @@ import '../../../components/widgets/group_chat_widget/group_image_message_widget
 import '../../../components/widgets/group_chat_widget/group_link_messaje_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_text_message_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_text_with_links_message_widget.dart';
 import '../../../components/widgets/tree_point_bottom_sheet.dart';
 import '../../../controllers/social/group_chat_detail_controller.dart';
 import '../../../models/chat_models/group_message_model.dart';
@@ -140,7 +141,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                 return ListView.builder(
                   controller: controller.scrollController,
                   itemCount: controller.messages.length,
-                  padding: EdgeInsets.only(bottom: 75),
+                  padding: EdgeInsets.only(bottom: 120),
                   itemBuilder: (context, index) {
                     final message = controller.messages[index];
                     if (message.messageType == GroupMessageType.text) {
@@ -153,6 +154,8 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                       return GroupImageMessageWidget(message: message);
                     } else if (message.messageType == GroupMessageType.link) {
                       return GroupLinkMessageWidget(message: message);
+                    } else if (message.messageType == GroupMessageType.textWithLinks) {
+                      return GroupTextWithLinksMessageWidget(message: message);
                     } else if (message.messageType == GroupMessageType.poll) {
                       return GroupPollMessageWidget(
                         message: message,

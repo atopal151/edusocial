@@ -1,9 +1,8 @@
-
-
 // 5. event_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/user_appbar/back_appbar.dart';
+import '../../components/widgets/general_loading_indicator.dart';
 import '../../controllers/event_controller.dart';
 import '../../components/cards/event_card.dart';
 
@@ -24,7 +23,15 @@ class _EventScreenState extends State<EventScreen> {
       appBar: BackAppBar(),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return Container(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: GeneralLoadingIndicator(
+              size: 32,
+              color: Color(0xFF4CAF50),
+              icon: Icons.event,
+              showText: true,
+            ),
+          );
         }
 
         return ListView.builder(

@@ -2,6 +2,8 @@ import 'package:edusocial/controllers/group_controller/group_controller.dart';
 import 'package:edusocial/controllers/home_controller.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
+import 'package:edusocial/controllers/topics_controller.dart';
+import 'package:edusocial/controllers/social/chat_controller.dart';
 import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/services/socket_services.dart';
@@ -33,6 +35,8 @@ class MainScreen extends StatelessWidget {
     Get.put(StoryController());
     Get.put(PostController());
     Get.put(GroupController());
+    Get.put(TopicsController());
+    Get.put(ChatController());
 
     // 🌐 Socket Service
     final socketService = Get.put(SocketService());

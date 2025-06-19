@@ -27,7 +27,7 @@ class ChatDetailBottom extends StatelessWidget {
             child: TextField(
               controller: textController,
               decoration: InputDecoration(
-                hintText: 'Mesaj yazın...',
+                hintText: 'Mesaj yazın... (Linkler otomatik algılanır)',
                 hintStyle: const TextStyle(
                   color: Color(0xff9ca3ae),
                   fontSize: 14,

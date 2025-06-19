@@ -35,15 +35,17 @@ class _NavbarMenuState extends State<NavbarMenu> {
               children: List.generate(5, (index) {
                 bool isSelected = controller.selectedIndex.value == index;
 
-                /// Orta butonu (index 2) Row’dan kaldır, sadece boşluk bırak
+                /// Orta butonu (index 2) Row'dan kaldır, sadece boşluk bırak
                 if (index == 2) {
                   return const SizedBox(width: centerButtonWidth);
                 }
 
                 return GestureDetector(
                   onTap: () {
+                    debugPrint('🔄 Navbar: Tapped on index $index (${icons[index]})');
                     controller.changeIndex(index);
                   },
+                  behavior: HitTestBehavior.opaque,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
