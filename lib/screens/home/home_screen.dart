@@ -8,6 +8,7 @@ import 'group_suggestion_list.dart';
 import '../../controllers/group_controller/group_controller.dart';
 import '../../controllers/home_controller.dart';
 import 'hot_topics_list.dart';
+import '../../controllers/topics_controller.dart';
 import 'story/my_story_list.dart';
 import 'post_home_list.dart';
 
@@ -15,6 +16,7 @@ class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
   final GroupController groupController = Get.find();
   final StoryController storyController = Get.find();
+  final TopicsController topicsController = Get.find<TopicsController>();
 
   HomeScreen({super.key});
 
@@ -62,18 +64,22 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                child: const Text("İlgini Çekebilecek Gruplar",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
-              ),
-              GroupSuggestionListView(),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                child: const Text("Gündemdeki Konular",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
-              ),
-              HotTopicsListView(),
+              if (groupController.suggestionGroups.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
+                  child: const Text("İlgini Çekebilecek Gruplar",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
+                ),
+                GroupSuggestionListView(),
+              ],
+              if (topicsController.hotTopics.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
+                  child: const Text("Gündemdeki Konular",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
+                ),
+                HotTopicsListView(),
+              ],
               PostHomeList(),
             ],
           ),

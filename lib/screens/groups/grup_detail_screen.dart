@@ -12,6 +12,7 @@ import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
     show GroupDetailTreePointBottomSheet;
 import '../../controllers/social/group_chat_detail_controller.dart';
 import '../../models/chat_models/group_message_model.dart';
+import '../../models/document_model.dart';
 import '../../components/widgets/group_chat_widget/group_text_message_widget.dart';
 import '../../components/widgets/group_chat_widget/group_document_message_widget.dart';
 import '../../components/widgets/group_chat_widget/group_image_message_widget.dart';
@@ -370,68 +371,99 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 child: TabBarView(
                                   children: [
                                     // GRUP CHAT BELGELERİ
-                                    Obx(() => chatController.groupDocuments.isNotEmpty
-                                        ? Scrollbar(
-                                            controller: documentsScrollController,
-                                            trackVisibility: true,
-                                            thumbVisibility: true,
-                                            thickness: 5,
-                                            radius: Radius.circular(15),
-                                            child: ListView.builder(
+                                    Obx(() {
+                                      // Hem grup chat verilerinden hem de grup mesajlarından belgeleri birleştir
+                                      final allDocuments = <DocumentModel>[];
+                                      
+                                      // Grup chat verilerinden belgeler
+                                      allDocuments.addAll(chatController.groupDocuments);
+                                      
+                                      // Grup mesajlarından document türündeki mesajları belge olarak ekle
+                                      for (final message in chatController.messages) {
+                                        if (message.messageType == GroupMessageType.document) {
+                                          // Mesaj ID'sini belge ID'si olarak kullan
+                                          final document = DocumentModel(
+                                            id: message.id,
+                                            name: 'Belge - ${message.name} ${message.surname}',
+                                            sizeMb: 0.0, // Boyut bilgisi yok
+                                            humanCreatedAt: DateFormat('dd.MM.yyyy HH:mm').format(message.timestamp),
+                                            createdAt: message.timestamp,
+                                            url: message.content, // Belge URL'si
+                                          );
+                                          
+                                          // Aynı belgeyi tekrar eklemeyi önle
+                                          if (!allDocuments.any((doc) => doc.id == document.id)) {
+                                            allDocuments.add(document);
+                                          }
+                                        }
+                                      }
+                                      
+                                      // Belgeleri tarihe göre sırala (en yeni önce)
+                                      allDocuments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+                                      
+                                      return allDocuments.isNotEmpty
+                                          ? Scrollbar(
                                               controller: documentsScrollController,
-                                              itemCount: chatController.groupDocuments.length,
-                                              itemBuilder: (context, index) {
-                                                final doc = chatController.groupDocuments[index];
-                                                return ListTile(
-                                                  onTap: () async {
-                                                    // Belgeyi açmak için URL'yi kullan
-                                                    if (doc.url != null && doc.url!.isNotEmpty) {
-                                                      final uri = Uri.parse(doc.url!);
-                                                      if (await canLaunchUrl(uri)) {
-                                                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                              trackVisibility: true,
+                                              thumbVisibility: true,
+                                              thickness: 5,
+                                              radius: Radius.circular(15),
+                                              child: ListView.builder(
+                                                controller: documentsScrollController,
+                                                itemCount: allDocuments.length,
+                                                itemBuilder: (context, index) {
+                                                  final doc = allDocuments[index];
+                                                  return ListTile(
+                                                    onTap: () async {
+                                                      // Belgeyi açmak için URL'yi kullan
+                                                      if (doc.url != null && doc.url!.isNotEmpty) {
+                                                        final uri = Uri.parse(doc.url!);
+                                                        if (await canLaunchUrl(uri)) {
+                                                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                                        }
                                                       }
-                                                    }
-                                                  },
-                                                  leading: Container(
-                                                      padding: EdgeInsets.all(8),
-                                                      decoration: BoxDecoration(
-                                                          color: Color(0xfff5f6f7),
-                                                          borderRadius:
-                                                              BorderRadius.circular(50)),
-                                                      child: SvgPicture.asset(
-                                                        "images/icons/document_icon.svg",
-                                                        colorFilter: ColorFilter.mode(
-                                                          Color(0xff9ca3ae),
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                      )),
-                                                  title: Text(
-                                                    doc.name,
-                                                    style: GoogleFonts.inter(
-                                                        fontSize: 12,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: Color(0xff414751)),
-                                                  ),
-                                                  subtitle: Text(
-                                                    "${doc.sizeMb} Mb • ${doc.humanCreatedAt}",
-                                                    style: GoogleFonts.inter(
-                                                        fontSize: 12,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: Color(0xff9ca3ae)),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          )
-                                        : Center(
-                                            child: Text(
-                                              "Henüz belge eklenmemiş",
-                                              style: GoogleFonts.inter(
-                                                fontSize: 12,
-                                                color: Color(0xff9ca3ae),
+                                                    },
+                                                    leading: Container(
+                                                        padding: EdgeInsets.all(8),
+                                                        decoration: BoxDecoration(
+                                                            color: Color(0xfff5f6f7),
+                                                            borderRadius:
+                                                                BorderRadius.circular(50)),
+                                                        child: SvgPicture.asset(
+                                                          "images/icons/document_icon.svg",
+                                                          colorFilter: ColorFilter.mode(
+                                                            Color(0xff9ca3ae),
+                                                            BlendMode.srcIn,
+                                                          ),
+                                                        )),
+                                                    title: Text(
+                                                      doc.name,
+                                                      style: GoogleFonts.inter(
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Color(0xff414751)),
+                                                    ),
+                                                    subtitle: Text(
+                                                      "${doc.sizeMb} Mb • ${doc.humanCreatedAt}",
+                                                      style: GoogleFonts.inter(
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Color(0xff9ca3ae)),
+                                                    ),
+                                                  );
+                                                },
                                               ),
-                                            ),
-                                          )),
+                                            )
+                                          : Center(
+                                              child: Text(
+                                                "Henüz belge eklenmemiş",
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 12,
+                                                  color: Color(0xff9ca3ae),
+                                                ),
+                                              ),
+                                            );
+                                    }),
 
                                     // GRUP CHAT BAĞLANTILARI
                                     Obx(() => chatController.groupLinks.isNotEmpty

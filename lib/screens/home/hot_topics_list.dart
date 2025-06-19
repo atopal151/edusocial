@@ -36,7 +36,10 @@ class HotTopicsListView extends StatelessWidget {
             final isSelected = selected == topic.title;
 
             return GestureDetector(
-              onTap: () => controller.selectTopic(topic.title),
+              onTap: () {
+                controller.selectTopic(topic.title);
+                controller.onHotTopicTap(topic);
+              },
               child: Container(
                 width: 230,
                 padding:

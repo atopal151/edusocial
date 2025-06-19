@@ -3,6 +3,7 @@ import 'package:edusocial/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import '../models/hot_topics_model.dart';
+import 'package:flutter/foundation.dart';
 
 class HotTopicsService {
 
@@ -19,8 +20,8 @@ class HotTopicsService {
         },
       );
 
-      /*debugPrint("📥 Topics Response: ${response.statusCode}",wrapWidth: 1024);
-      debugPrint("📥 Topics Body: ${response.body}",wrapWidth: 1024);*/
+      debugPrint("📥 Topics Response: ${response.statusCode}");
+      debugPrint("📥 Topics Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -32,7 +33,7 @@ class HotTopicsService {
         return [];
       }
     } catch (e) {
-      /*debugPrint("❗ Topics alınırken hata: $e",wrapWidth: 1024);*/
+      debugPrint("❗ Topics alınırken hata: $e");
       return [];
     }
   }
