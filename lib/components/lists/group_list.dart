@@ -2,6 +2,7 @@ import 'package:edusocial/models/group_models/group_search_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../controllers/search_text_controller.dart';
 
 class GroupListItem extends StatelessWidget {
   final GroupSearchModel group;
@@ -10,9 +11,21 @@ class GroupListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final SearchTextController controller = Get.find<SearchTextController>();
+    
     return GestureDetector(
       onTap: () {
-        Get.snackbar("Grup Seçildi", "${group.name} grubuna yönlendiriliyor.");
+        debugPrint('🔍 Group tapped: ${group.name}');
+        debugPrint('🔍 Is member: ${group.isMember}');
+        debugPrint('🔍 Group ID: ${group.id}');
+        
+        if (group.isMember) {
+          debugPrint('🚀 Navigating to group chat with ID: ${group.id}');
+          Get.toNamed('/group_chat_detail', arguments: {'groupId': group.id.toString()});
+        } else {
+          debugPrint('❌ User is not a member of this group');
+          Get.snackbar("Grup Seçildi", "${group.name} grubuna yönlendiriliyor.");
+        }
       },
       child: Container(
         padding: EdgeInsets.all(16),
@@ -23,7 +36,7 @@ class GroupListItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Stack(
               clipBehavior: Clip.none,
@@ -73,7 +86,7 @@ class GroupListItem extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     group.name,
@@ -85,7 +98,6 @@ class GroupListItem extends StatelessWidget {
                   SizedBox(height: 4), // Boşluk ekledim
                   Text(
                     group.description,
-
                     style: GoogleFonts.inter(
                         fontSize: 12, color: Color(0xff9CA3AE)),
                     maxLines: 2, // Çok uzun açıklamalarda taşmayı önlemek için
@@ -94,6 +106,42 @@ class GroupListItem extends StatelessWidget {
                 ],
               ),
             ),
+            // Katıl butonu - sadece üye değilse göster
+            if (!group.isMember && !group.isPending)
+              Container(
+                margin: EdgeInsets.only(left: 8),
+                child: InkWell(
+                  onTap: () => controller.joinGroup(group.id),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Color(0xffEF5050),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "Katıl",
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else if (group.isPending && group.isPrivate)
+              Container(
+                margin: EdgeInsets.only(left: 8),
+                child: Text(
+                  "Onay Bekliyor",
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff9CA3AE),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

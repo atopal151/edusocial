@@ -239,17 +239,7 @@ class _PostCardState extends State<PostCard> {
                     },
                   ),
                 ),
-                const SizedBox(height: 8),
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: widget.mediaUrls.length,
-                  effect: const WormEffect(
-                    dotHeight: 6,
-                    dotWidth: 6,
-                    activeDotColor: Color(0xff414751),
-                    dotColor: Color(0xffd1d5db),
-                  ),
-                ),
+               
               ],
             ),
 

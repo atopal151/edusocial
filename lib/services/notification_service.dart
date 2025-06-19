@@ -104,4 +104,36 @@ class NotificationService {
       throw Exception('Grup katılma isteği onaylanamadı: \\${response.body}');
     }
   }
+
+  /// Etkinlik oluşturma isteğini kabul veya reddet
+  static Future<bool> acceptOrDeclineEventCreateRequest({
+    required String userId,
+    required String groupId,
+    required String eventId,
+    required String decision, // "accept" veya "decline"
+  }) async {
+    final token = _box.read('token');
+    final uri = Uri.parse("${AppConstants.baseUrl}/event-invitation");
+
+    final response = await http.post(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "user_id": int.tryParse(userId) ?? userId,
+        "group_id": int.tryParse(groupId) ?? groupId,
+        "event_id": int.tryParse(eventId) ?? eventId,
+        "decision": decision,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Etkinlik oluşturma isteği onaylanamadı: \\${response.body}');
+    }
+  }
 }

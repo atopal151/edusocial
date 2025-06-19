@@ -64,7 +64,7 @@ class EntryServices {
   Future<List<TopicCategoryModel>> fetchTopicCategories() async {
     try {
       final response = await dio.get('/topic-categories');
-      debugPrint("📥 Topic Categories Raw Response: ${response.data}");
+      //debugPrint("📥 Topic Categories Raw Response: ${response.data}");
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['data'] ?? [];

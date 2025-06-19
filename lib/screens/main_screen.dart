@@ -44,7 +44,7 @@ class MainScreen extends StatelessWidget {
     // Token kontrolü ve socket bağlantısı
     final token = GetStorage().read('token');
     if (token != null && token.isNotEmpty) {
-      debugPrint('🔑 Token bulundu, socket bağlantısı başlatılıyor...');
+      //debugPrint('🔑 Token bulundu, socket bağlantısı başlatılıyor...');
       // Token'ı temizle ve kontrol et
       final cleanToken = token.trim();
       if (cleanToken.length > 10) { // Minimum token uzunluğu kontrolü

@@ -70,14 +70,21 @@ class GroupChatDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debugPrint('Group chat detail arguments: ${Get.arguments}');
+    debugPrint('🔍 Group chat detail controller onInit called');
+    debugPrint('🔍 Get.arguments: ${Get.arguments}');
+    debugPrint('🔍 Get.arguments type: ${Get.arguments.runtimeType}');
+    
     if (Get.arguments != null && Get.arguments['groupId'] != null) {
       currentGroupId.value = Get.arguments['groupId'];
-      debugPrint('Current group ID: ${currentGroupId.value}');
+      debugPrint('✅ Current group ID set to: ${currentGroupId.value}');
       fetchGroupDetails();
       fetchGroupMessages();
     } else {
       debugPrint('❌ No group ID provided in arguments');
+      debugPrint('❌ Get.arguments is null: ${Get.arguments == null}');
+      if (Get.arguments != null) {
+        debugPrint('❌ Get.arguments keys: ${Get.arguments.keys}');
+      }
       Get.snackbar(
         'Error',
         'No group selected',

@@ -28,7 +28,6 @@ class _ChatListScreenState extends State<ChatListScreen>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('🔍 ChatListScreen: Building chat list screen');
     return Scaffold(
       appBar: UserAppBar(),
       backgroundColor: const Color(0xFFFAFAFA),

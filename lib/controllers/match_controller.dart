@@ -67,9 +67,9 @@ class MatchController extends GetxController {
   void findMatches() async {
     isLoading.value = true;
     try {
-      debugPrint("🔄 Eşleşmeler yükleniyor...");
+      //debugPrint("🔄 Eşleşmeler yükleniyor...");
       final fetchedMatches = await MatchServices.findMatches();
-      debugPrint("✅ ${fetchedMatches.length} eşleşme bulundu");
+     // debugPrint("✅ ${fetchedMatches.length} eşleşme bulundu");
       
     
       matches.value = fetchedMatches;

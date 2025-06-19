@@ -19,10 +19,10 @@ class NotificationController extends GetxController {
     isLoading.value = true;
     try {
       final fetched = await NotificationService.fetchMobileNotifications();
-      debugPrint('--- APIden gelen notification verileri (toJson) ---');
-      for (var notif in fetched) {
-        debugPrint(notif.toJson().toString());
-      }
+      //debugPrint('--- APIden gelen notification verileri (toJson) ---');
+      //for (var notif in fetched) {
+        //debugPrint(notif.toJson().toString());
+      //}
       notifications.value = fetched;
     } catch (e) {
       debugPrint("❗ Bildirimleri çekerken hata: $e");
@@ -98,6 +98,21 @@ class NotificationController extends GetxController {
       fetchNotifications();
     } catch (e) {
       debugPrint("❗ Grup katılma isteği onaylanamadı: $e");
+    }
+  }
+
+  /// Etkinlik oluşturma isteğini kabul veya reddet
+  Future<void> handleEventCreateRequest(String userId, String groupId, String eventId, String decision) async {
+    try {
+      await NotificationService.acceptOrDeclineEventCreateRequest(
+        userId: userId,
+        groupId: groupId,
+        eventId: eventId,
+        decision: decision,
+      );
+      fetchNotifications();
+    } catch (e) {
+      debugPrint("❗ Etkinlik oluşturma isteği onaylanamadı: $e");
     }
   }
 }
