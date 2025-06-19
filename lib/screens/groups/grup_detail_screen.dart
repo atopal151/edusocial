@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/cards/members_avatar.dart';
 import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
@@ -541,7 +542,230 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                   ),
                 ],
 
-              
+                // GRUP ETKİNLİKLERİ (group_events)
+                if (group.groupEvents != null && group.groupEvents.isNotEmpty) ...[
+                  SizedBox(height: 24),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Grup Etkinlikleri",
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff414751),
+                          )),
+                      SizedBox(height: 12),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: group.groupEvents.length,
+                        itemBuilder: (context, index) {
+                          final event = group.groupEvents[index];
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Color(0xffffffff),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Event banner image
+                                if (event.bannerUrl.isNotEmpty)
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15),
+                                      topRight: Radius.circular(15),
+                                    ),
+                                    child: Image.network(
+                                      event.bannerUrl,
+                                      width: double.infinity,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Container(
+                                        height: 120,
+                                        color: Color(0xfff5f6f7),
+                                        child: Icon(
+                                          Icons.event,
+                                          color: Color(0xff9ca3ae),
+                                          size: 40,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Event title
+                                      Text(
+                                        event.title,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xff414751),
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      // Event description
+                                      if (event.description.isNotEmpty)
+                                        Text(
+                                          event.description,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                            color: Color(0xff9ca3ae),
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      SizedBox(height: 12),
+                                      // Event details row
+                                      Row(
+                                        children: [
+                                          // Date
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_today,
+                                                  size: 14,
+                                                  color: Color(0xff9ca3ae),
+                                                ),
+                                                SizedBox(width: 6),
+                                                Expanded(
+                                                  child: Text(
+                                                    event.humanStartTime,
+                                                    style: GoogleFonts.inter(
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w400,
+                                                      color: Color(0xff9ca3ae),
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // Location
+                                          if (event.location.isNotEmpty)
+                                            Expanded(
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.location_on,
+                                                    size: 14,
+                                                    color: Color(0xff9ca3ae),
+                                                  ),
+                                                  SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      "Konum",
+                                                      style: GoogleFonts.inter(
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w400,
+                                                        color: Color(0xff9ca3ae),
+                                                      ),
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 12),
+                                      // Action buttons
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: InkWell(
+                                              onTap: () {
+                                                // Share event
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xfff5f6f7),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.share,
+                                                      size: 14,
+                                                      color: Color(0xff9ca3ae),
+                                                    ),
+                                                    SizedBox(width: 6),
+                                                    Text(
+                                                      "Paylaş",
+                                                      style: GoogleFonts.inter(
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Color(0xff9ca3ae),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Expanded(
+                                            child: InkWell(
+                                              onTap: () async {
+                                                // Open location
+                                                if (event.location.isNotEmpty) {
+                                                  final uri = Uri.parse(event.location);
+                                                  if (await canLaunchUrl(uri)) {
+                                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                                  }
+                                                }
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xfff5f6f7),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.location_on,
+                                                      size: 14,
+                                                      color: Color(0xff9ca3ae),
+                                                    ),
+                                                    SizedBox(width: 6),
+                                                    Text(
+                                                      "Konum",
+                                                      style: GoogleFonts.inter(
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Color(0xff9ca3ae),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           );
