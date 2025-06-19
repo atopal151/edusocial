@@ -22,7 +22,6 @@ class MessageWidgetFactory {
         // Convert text message with URL to link message
         final urlMatch = urlRegex.firstMatch(message.message)!;
         final url = urlMatch.group(0)!;
-        final title = message.message.replaceAll(url, '').trim();
         
         return InkWell(
           onTap: () async {
