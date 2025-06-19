@@ -50,10 +50,10 @@ class EntryCard extends StatelessWidget {
                       onTap: onPressedProfile,
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundImage: entry.user.avatarUrl != null
+                        backgroundImage: entry.user.avatarUrl.isNotEmpty
                             ? NetworkImage(entry.user.avatarUrl)
                             : null,
-                        child: entry.user.avatarUrl == null
+                        child: entry.user.avatarUrl.isEmpty
                             ? const Icon(Icons.person, size: 20)
                             : null,
                       ),
@@ -80,7 +80,7 @@ class EntryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      entry.user.name ?? 'Bilinmeyen Kullanıcı',
+                      entry.user.name,
                       style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,

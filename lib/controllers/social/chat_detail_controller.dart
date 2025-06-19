@@ -128,8 +128,8 @@ class ChatDetailController extends GetxController {
       messages.addAll(fetchedMessages);
 
       // İlk mesajdan kullanıcı bilgilerini yükle
-      if (messages.isNotEmpty && messages.first.sender != null) {
-        final sender = messages.first.sender!;
+      if (messages.isNotEmpty) {
+        final sender = messages.first.sender;
         
         debugPrint('✅ ChatDetailController - Sender bilgileri:');
         debugPrint('  - ID: ${sender.id}');
@@ -210,26 +210,24 @@ class ChatDetailController extends GetxController {
         if (message.conversationId == currentChatId) {
           messages.add(message);
           // Yeni mesaj geldiğinde kullanıcı bilgilerini güncelle
-          if (message.sender != null) {
-            final sender = message.sender!;
-            userChatDetail.value = UserChatDetailModel(
-              id: sender.id.toString(),
-              name: '${sender.name} ${sender.surname}',
-              follower: '0', // API'den gelmiyor
-              following: '0', // API'den gelmiyor
-              imageUrl: sender.avatarUrl,
-              memberImageUrls: const [],
-              documents: message.messageDocument?.map((doc) => DocumentModel(
-                id: doc.id,
-                name: doc.name,
-                sizeMb: 0.0,
-                humanCreatedAt: doc.date,
-                createdAt: DateTime.parse(doc.date),
-              )).toList() ?? [],
-              links: const [],
-              photoUrls: const [],
-            );
-          }
+          final sender = message.sender;
+          userChatDetail.value = UserChatDetailModel(
+            id: sender.id.toString(),
+            name: '${sender.name} ${sender.surname}',
+            follower: '0', // API'den gelmiyor
+            following: '0', // API'den gelmiyor
+            imageUrl: sender.avatarUrl,
+            memberImageUrls: const [],
+            documents: message.messageDocument?.map((doc) => DocumentModel(
+              id: doc.id,
+              name: doc.name,
+              sizeMb: 0.0,
+              humanCreatedAt: doc.date,
+              createdAt: DateTime.parse(doc.date),
+            )).toList() ?? [],
+            links: const [],
+            photoUrls: const [],
+          );
         }
       }
     } catch (e) {
@@ -293,8 +291,8 @@ class ChatDetailController extends GetxController {
       debugPrint('  - Fotoğraflar: ${allPhotos.length} adet');
 
       // Kullanıcı detaylarını güncelle
-      if (messages.isNotEmpty && messages.first.sender != null) {
-        final sender = messages.first.sender!;
+      if (messages.isNotEmpty) {
+        final sender = messages.first.sender;
         userChatDetail.value = UserChatDetailModel(
           id: sender.id.toString(),
           name: '${sender.name} ${sender.surname}',

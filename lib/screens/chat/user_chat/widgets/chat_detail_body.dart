@@ -4,10 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:edusocial/models/user_chat_detail_model.dart';
-import 'package:edusocial/models/document_model.dart';
-import 'package:edusocial/models/link_model.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ChatDetailBody extends StatefulWidget {
   const ChatDetailBody({super.key});

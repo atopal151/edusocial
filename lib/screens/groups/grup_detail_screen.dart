@@ -13,11 +13,6 @@ import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
 import '../../controllers/social/group_chat_detail_controller.dart';
 import '../../models/chat_models/group_message_model.dart';
 import '../../models/document_model.dart';
-import '../../components/widgets/group_chat_widget/group_text_message_widget.dart';
-import '../../components/widgets/group_chat_widget/group_document_message_widget.dart';
-import '../../components/widgets/group_chat_widget/group_image_message_widget.dart';
-import '../../components/widgets/group_chat_widget/group_link_messaje_widget.dart';
-import '../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
 import '../../screens/groups/group_participants_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
@@ -594,7 +589,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 ],
 
                 // ETKİNLİKLER
-                if (group.groupEvents != null && group.groupEvents.isNotEmpty) ...[
+                if (group.groupEvents.isNotEmpty) ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

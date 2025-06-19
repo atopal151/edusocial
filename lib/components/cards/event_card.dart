@@ -8,7 +8,6 @@ import '../buttons/custom_button.dart';
 import '../buttons/icon_button.dart';
 import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
-import 'package:edusocial/utils/date_format.dart';
 
 class EventCard extends StatelessWidget {
   final String eventTitle;

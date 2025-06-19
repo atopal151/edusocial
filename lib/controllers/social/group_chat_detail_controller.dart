@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../models/chat_models/group_message_model.dart';
 import '../../models/group_models/group_detail_model.dart';
-import '../../models/group_models/group_chat_model.dart';
 import '../../models/document_model.dart';
 import '../../models/link_model.dart';
 import '../../services/group_services/group_service.dart';

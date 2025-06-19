@@ -1,9 +1,7 @@
 import 'package:get/get.dart';
 import '../models/hot_topics_model.dart';
 import '../services/hot_topics_service.dart';
-import '../models/topic_model.dart';
 import '../models/entry_model.dart';
-import '../models/topic_category_model.dart';
 import '../services/entry_services.dart';
 import 'package:flutter/foundation.dart';
 
