@@ -13,86 +13,96 @@ class GroupTextMessageWidget extends StatelessWidget {
     // 📌 `DateTime` → `String` formatına çeviriyoruz
     String formattedTime = DateFormat('HH:mm').format(message.timestamp);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-        crossAxisAlignment: message.isSentByMe
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
-        children: [
-          /// PROFIL FOTOĞRAFI
-          ///
-          SizedBox(
-            height: 4,
-          ),
-          if(message.isSentByMe==false)
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12),
-            child: Row(
-              mainAxisAlignment: message.isSentByMe
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: CircleAvatar(
-                    radius: 12,
-                    backgroundImage: NetworkImage(message.profileImage),
-                  ),
+    return Column(
+      crossAxisAlignment: message.isSentByMe
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
+      children: [
+        // 🔹 Kullanıcı Bilgileri ve Saat
+        Row(
+          mainAxisAlignment:
+              message.isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            if (!message.isSentByMe)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  radius: 12,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage: (message.profileImage.isNotEmpty &&
+                          !message.profileImage.endsWith('/0'))
+                      ? NetworkImage(message.profileImage)
+                      : null,
+                  child: (message.profileImage.isEmpty ||
+                          message.profileImage.endsWith('/0'))
+                      ? const Icon(Icons.person, color: Colors.white, size: 14)
+                      : null,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  "${message.name} ${message.surname}",
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF414751),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  formattedTime, // Buraya mesaj saatini ekliyoruz
-                  style: GoogleFonts.inter(fontSize: 9, color: Colors.grey),
-                ),
-              ],
+              ),
+            Text(
+              '${message.name} ${message.surname}',
+              style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
-          ),
-          // 🔹 **Mesaj Balonu**
-          Padding(
-            padding: const EdgeInsets.only(left:43.0),
-            child: Align(
-              alignment: message.isSentByMe
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                padding: const EdgeInsets.only(
-                    left: 12, right: 12, top: 12, bottom: 12),
-                decoration: BoxDecoration(
-                  color:
-                      message.isSentByMe ? const Color(0xFFFF7C7C) : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: message.isSentByMe
-                        ? const Radius.circular(20)
-                        : const Radius.circular(0),
-                    topRight: message.isSentByMe
-                        ? const Radius.circular(0)
-                        : const Radius.circular(20),
-                    bottomLeft: const Radius.circular(20),
-                    bottomRight: const Radius.circular(20),
-                  ),
+            const SizedBox(width: 5),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: Text(
+                formattedTime,
+                style: const TextStyle(fontSize: 10, color: Colors.grey),
+              ),
+            ),
+            if (message.isSentByMe)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  radius: 12,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage: (message.profileImage.isNotEmpty &&
+                          !message.profileImage.endsWith('/0'))
+                      ? NetworkImage(message.profileImage)
+                      : null,
+                  child: (message.profileImage.isEmpty ||
+                          message.profileImage.endsWith('/0'))
+                      ? const Icon(Icons.person, color: Colors.white, size: 14)
+                      : null,
                 ),
-                child: Text(
-                  message.content,
-                  style: TextStyle(
-                      color: message.isSentByMe ? Colors.white : Colors.black,
-                      fontSize: 12),
-                ),
+              ),
+          ],
+        ),
+        // 🔹 Mesaj Balonu
+        Align(
+          alignment: message.isSentByMe
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.6,
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 35, vertical: 4),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: message.isSentByMe ? const Color(0xFFFF7C7C) : Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: message.isSentByMe
+                    ? const Radius.circular(20)
+                    : const Radius.circular(0),
+                topRight: message.isSentByMe
+                    ? const Radius.circular(0)
+                    : const Radius.circular(20),
+                bottomLeft: const Radius.circular(20),
+                bottomRight: const Radius.circular(20),
+              ),
+            ),
+            child: Text(
+              message.content,
+              style: TextStyle(
+                color: message.isSentByMe ? Colors.white : const Color(0xff414751),
+                fontSize: 12,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

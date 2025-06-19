@@ -257,8 +257,8 @@ class GroupServices {
           debugPrint('📋 GRUP DETAY VERİLERİ:');
           debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           debugPrint('ID: ${groupData['id']}');
-          debugPrint('ID: ${jsonBody['data']['group']['group_chats']}');
-          
+          debugPrint('Group Chats: ${jsonBody['data']['group']['group_chats']}');
+          debugPrint('Group Event: ${jsonBody['data']['group']['group_events']}');
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
         throw Exception('No group data found');
