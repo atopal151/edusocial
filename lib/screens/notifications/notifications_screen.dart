@@ -127,354 +127,65 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget? _buildTrailingButton(NotificationModel notif) {
-    switch (notif.type) {
-      case 'group-join-request':
-      case 'follow-join-request':
-        final isJoined = RxBool(false);
-        
-        // Tip ve message içeriğine göre işlem belirleme
-        bool isFollowRequest = notif.type == 'follow-join-request' || 
-                              (notif.type == 'group-join-request' && 
-                               notif.message.contains('follow request') && 
-                               notif.groupId == null);
-        
-        bool isGroupRequest = notif.type == 'group-join-request' && 
-                             notif.message.contains('join') && 
-                             notif.groupId != null;
-        
-        debugPrint('🔍 Bildirim analizi:');
-        debugPrint('   Tip: ${notif.type}');
-        debugPrint('   Message: ${notif.message}');
-        debugPrint('   GroupId: ${notif.groupId}');
-        debugPrint('   IsFollowRequest: $isFollowRequest');
-        debugPrint('   IsGroupRequest: $isGroupRequest');
-        
-        return Obx(() => isJoined.value 
-          ? SizedBox(
-              width: 100,
-              child: CustomButton(
-                text: "Onaylandı",
-                height: 32,
-                borderRadius: 8,
-                onPressed: () {},
-                isLoading: RxBool(false),
-                backgroundColor: Colors.grey,
-                textColor: Colors.white,
-                icon: const Icon(Icons.check, color: Colors.white, size: 16),
-              ),
-            )
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 60,
-                  child: CustomButton(
-                    text: "Onayla",
-                    height: 32,
-                    borderRadius: 8,
-                    onPressed: () async {
-                      isJoined.value = true;
-                      try {
-                        if (isGroupRequest) {
-                          debugPrint('🚀 Grup katılma isteği onaylanıyor...');
-                          await controller.handleGroupJoinRequest(notif.userId, notif.groupId!, "accept");
-                          debugPrint('✅ Grup katılma isteği onaylandı.');
-                        } else if (isFollowRequest) {
-                          debugPrint('👤 Takip isteği onaylanıyor...');
-                          await controller.handleFollowRequest(notif.userId, "accept");
-                          debugPrint('✅ Takip isteği onaylandı.');
-                        } else {
-                          debugPrint('⚠️ Bilinmeyen istek tipi, işlem yapılmıyor.');
-                          isJoined.value = false;
-                        }
-                      } catch (e) {
-                        debugPrint('❌ İstek onaylanamadı: $e');
-                        // API hatası durumunda kullanıcıya bilgi ver
-                        if (e.toString().contains('not found')) {
-                          Get.snackbar(
-                            "Bilgi",
-                            "Bu istek zaten işlenmiş.",
-                            snackPosition: SnackPosition.TOP,
-                            backgroundColor: Colors.blue,
-                            colorText: Colors.white,
-                            duration: Duration(seconds: 2),
-                          );
-                        } else {
-                          Get.snackbar(
-                            "Hata",
-                            "İşlem gerçekleştirilemedi.",
-                            snackPosition: SnackPosition.TOP,
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            duration: Duration(seconds: 2),
-                          );
-                        }
-                        isJoined.value = false;
-                      }
-                    },
-                    isLoading: RxBool(false),
-                    backgroundColor: const Color(0xFFFF5050),
-                    textColor: Colors.white,
-                  ),
-                ),
-                SizedBox(width: 8),
-                IconButton(
-                  onPressed: () async {
-                    isJoined.value = true;
-                    try {
-                      if (isGroupRequest) {
-                        debugPrint('🚀 Grup katılma isteği reddediliyor...');
-                        await controller.handleGroupJoinRequest(notif.userId, notif.groupId!, "decline");
-                        debugPrint('✅ Grup katılma isteği reddedildi.');
-                      } else if (isFollowRequest) {
-                        debugPrint('👤 Takip isteği reddediliyor...');
-                        await controller.handleFollowRequest(notif.userId, "decline");
-                        debugPrint('✅ Takip isteği reddedildi.');
-                      } else {
-                        debugPrint('⚠️ Bilinmeyen istek tipi, işlem yapılmıyor.');
-                        isJoined.value = false;
-                      }
-                    } catch (e) {
-                      debugPrint('❌ İstek reddedilemedi: $e');
-                      // API hatası durumunda kullanıcıya bilgi ver
-                      if (e.toString().contains('not found')) {
-                        Get.snackbar(
-                          "Bilgi",
-                          "Bu istek zaten işlenmiş.",
-                          snackPosition: SnackPosition.TOP,
-                          backgroundColor: Colors.blue,
-                          colorText: Colors.white,
-                          duration: Duration(seconds: 2),
-                        );
-                      } else {
-                        Get.snackbar(
-                          "Hata",
-                          "İşlem gerçekleştirilemedi.",
-                          snackPosition: SnackPosition.TOP,
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                          duration: Duration(seconds: 2),
-                        );
-                      }
-                      isJoined.value = false;
-                    }
-                  },
-                  icon: Icon(Icons.close, color: Colors.white, size: 20),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey[400],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    minimumSize: Size(32, 32),
-                  ),
-                ),
-              ],
-            ));
-
-      case 'follow-request':
-        final isFollowing = RxBool(false);
-        
-        // Follow-request tipindeki bildirimler genellikle "started following you" mesajı içerir
-        bool isStartedFollowing = notif.message.contains('started following you');
-        
-        debugPrint('🔍 Follow-request analizi:');
-        debugPrint('   Message: ${notif.message}');
-        debugPrint('   IsStartedFollowing: $isStartedFollowing');
-        
-        return Obx(() => isFollowing.value
-          ? SizedBox(
-              width: 100,
-              child: CustomButton(
-                text: isStartedFollowing ? "Takip Edildi" : "Onaylandı",
-                height: 32,
-                borderRadius: 8,
-                onPressed: () {},
-                isLoading: RxBool(false),
-                backgroundColor: Colors.grey,
-                textColor: Colors.white,
-                icon: const Icon(Icons.check, color: Colors.white, size: 16),
-              ),
-            )
-          : Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 60,
-                  child: CustomButton(
-                    text: isStartedFollowing ? "Takip Et" : "Onayla",
-                    height: 32,
-                    borderRadius: 8,
-                    onPressed: () async {
-                      isFollowing.value = true;
-                      try {
-                        if (isStartedFollowing) {
-                          debugPrint('👤 Kullanıcı takip ediliyor...');
-                          await controller.handleFollowRequest(notif.userId, "accept");
-                          debugPrint('✅ Kullanıcı takip edildi.');
-                        } else {
-                          debugPrint('👤 Takip isteği onaylanıyor...');
-                          await controller.handleFollowRequest(notif.userId, "accept");
-                          debugPrint('✅ Takip isteği onaylandı.');
-                        }
-                      } catch (e) {
-                        debugPrint('❌ Takip işlemi başarısız: $e');
-                        // API hatası durumunda kullanıcıya bilgi ver
-                        if (e.toString().contains('not found')) {
-                          Get.snackbar(
-                            "Bilgi",
-                            "Bu istek zaten işlenmiş.",
-                            snackPosition: SnackPosition.TOP,
-                            backgroundColor: Colors.blue,
-                            colorText: Colors.white,
-                            duration: Duration(seconds: 2),
-                          );
-                        } else {
-                          Get.snackbar(
-                            "Hata",
-                            "İşlem gerçekleştirilemedi.",
-                            snackPosition: SnackPosition.TOP,
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            duration: Duration(seconds: 2),
-                          );
-                        }
-                        isFollowing.value = false;
-                      }
-                    },
-                    isLoading: RxBool(false),
-                    backgroundColor: const Color(0xFFFF5050),
-                    textColor: Colors.white,
-                  ),
-                ),
-                SizedBox(width: 8),
-                IconButton(
-                  onPressed: () async {
-                    isFollowing.value = true;
-                    try {
-                      debugPrint('👤 Takip isteği reddediliyor...');
-                      await controller.handleFollowRequest(notif.userId, "decline");
-                      debugPrint('✅ Takip isteği reddedildi.');
-                    } catch (e) {
-                      debugPrint('❌ Takip reddedilemedi: $e');
-                      // API hatası durumunda kullanıcıya bilgi ver
-                      if (e.toString().contains('not found')) {
-                        Get.snackbar(
-                          "Bilgi",
-                          "Bu istek zaten işlenmiş.",
-                          snackPosition: SnackPosition.TOP,
-                          backgroundColor: Colors.blue,
-                          colorText: Colors.white,
-                          duration: Duration(seconds: 2),
-                        );
-                      } else {
-                        Get.snackbar(
-                          "Hata",
-                          "İşlem gerçekleştirilemedi.",
-                          snackPosition: SnackPosition.TOP,
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                          duration: Duration(seconds: 2),
-                        );
-                      }
-                      isFollowing.value = false;
-                    }
-                  },
-                  icon: Icon(Icons.close, color: Colors.white, size: 20),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey[400],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    minimumSize: Size(32, 32),
-                  ),
-                ),
-              ],
-            ));
-
-      case 'create-group-event':
-        final isEventApproved = RxBool(false);
-        
-        // Message içeriğinden grup adını çıkar
-        String? groupName;
-        if (notif.message.contains('in the') && notif.message.contains('group')) {
-          final parts = notif.message.split('in the ');
-          if (parts.length > 1) {
-            groupName = parts[1].split(' group')[0];
-          }
-        }
-        
-        return Obx(() => isEventApproved.value
-          ? SizedBox(
-              width: 100,
-              child: CustomButton(
-                text: "Onaylandı",
-                height: 32,
-                borderRadius: 8,
-                onPressed: () {},
-                isLoading: RxBool(false),
-                backgroundColor: Colors.grey,
-                textColor: Colors.white,
-                icon: const Icon(Icons.check, color: Colors.white, size: 16),
-              ),
-            )
-          : groupName != null
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 60,
-                    child: CustomButton(
-                      text: "Onayla",
-                      height: 32,
-                      borderRadius: 8,
-                      onPressed: () async {
-                        debugPrint('Etkinlik oluşturma isteği onaylanıyor...');
-                        isEventApproved.value = true;
-                        try {
-                          // Bu durumda groupId ve eventId null olduğu için
-                          // sadece bildirim olarak işaretleyelim
-                          debugPrint('Etkinlik oluşturma isteği onaylandı (bildirim olarak).');
-                        } catch (e) {
-                          debugPrint('Etkinlik oluşturma isteği onaylanamadı: $e');
-                          isEventApproved.value = false;
-                        }
-                      },
-                      isLoading: RxBool(false),
-                      backgroundColor: const Color(0xFFFF5050),
-                      textColor: Colors.white,
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () async {
-                      debugPrint('Etkinlik oluşturma isteği reddediliyor...');
-                      isEventApproved.value = true;
-                      try {
-                        // Bu durumda groupId ve eventId null olduğu için
-                        // sadece bildirim olarak işaretleyelim
-                        debugPrint('Etkinlik oluşturma isteği reddedildi (bildirim olarak).');
-                      } catch (e) {
-                        debugPrint('Etkinlik oluşturma isteği reddedilemedi: $e');
-                        isEventApproved.value = false;
-                      }
-                    },
-                    icon: Icon(Icons.close, color: Colors.white, size: 20),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.grey[400],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      minimumSize: Size(32, 32),
-                    ),
-                  ),
-                ],
-              )
-            : SizedBox.shrink() // Grup adı çıkarılamazsa buton gösterme
-            );
-
-      default:
-        return null;
+    // Sadece belirli tiplerdeki bildirimlerde buton göster
+    if (notif.type != 'follow-join-request') {
+      return null;
     }
+
+    debugPrint("🔍 Building button for notification:");
+    debugPrint("🔍   - isFollowing: ${notif.isFollowing}");
+    debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending}");
+    debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
+
+    // Eğer kullanıcı zaten takip ediliyorsa
+    if (notif.isFollowing) {
+      return SizedBox(
+        width: 100,
+        child: CustomButton(
+          text: "Takibi Bırak",
+          height: 32,
+          borderRadius: 8,
+          onPressed: () {
+            controller.unfollowUser(notif.senderUserId);
+          },
+          isLoading: RxBool(false),
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+        ),
+      );
+    }
+
+    // Eğer takip isteği beklemedeyse
+    if (notif.isFollowingPending) {
+      return SizedBox(
+        width: 100,
+        child: CustomButton(
+          text: "Onay Bekliyor",
+          height: 32,
+          borderRadius: 8,
+          onPressed: () {}, // Tıklanamaz
+          isLoading: RxBool(false),
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+        ),
+      );
+    }
+
+    // Kullanıcıyı takip etmiyorsak ve istek beklemede değilse
+    return SizedBox(
+      width: 100,
+      child: CustomButton(
+        text: "Takip Et",
+        height: 32,
+        borderRadius: 8,
+        onPressed: () {
+          controller.followUser(notif.senderUserId);
+        },
+        isLoading: RxBool(false),
+        backgroundColor: const Color(0xFFEF5050),
+        textColor: Colors.white,
+      ),
+    );
   }
 
   IconData _getIcon(String type) {

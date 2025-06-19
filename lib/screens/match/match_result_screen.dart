@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../components/cards/match_card/match_card.dart';
 import '../../components/user_appbar/user_appbar.dart';
 import '../../controllers/match_controller.dart';
-import '../../components/buttons/custom_button.dart'; // CustomButton importunu unutma
 
 class MatchResultScreen extends StatefulWidget {
   const MatchResultScreen({super.key});

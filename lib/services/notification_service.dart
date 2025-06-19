@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../models/notification_model.dart';
@@ -21,15 +22,14 @@ class NotificationService {
         },
       );
 
-      /*debugPrint("📥 notifications Response: ${response.statusCode}", wrapWidth: 1024);
-      debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);*/
-
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
 
         final postNotifs = jsonBody['data']?['post_notifications'] ?? [];
         final invitationNotifs = jsonBody['data']?['invitation_notifications'] ?? [];
         final followerNotifs = jsonBody['data']?['follower_notifications'] ?? [];
+
+        debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
 
         final allNotifs = [
           ...postNotifs,
@@ -42,36 +42,129 @@ class NotificationService {
         throw Exception('Bildirimler alınamadı. Status Code: ${response.statusCode}');
       }
     } catch (e) {
-      /*debugPrint("❗ Bildirim servisi hatası: $e", wrapWidth: 1024);*/
+      debugPrint("❗ Bildirim servisi hatası: $e", wrapWidth: 1024);
       rethrow;
     }
   }
 
   /// Takip isteğini kabul veya reddet
-  static Future<bool> acceptOrDeclineFollowRequest({
+  static Future<Map<String, dynamic>> acceptOrDeclineFollowRequest({
     required String userId,
     required String decision, // "accept" veya "decline"
   }) async {
     final token = _box.read('token');
     final uri = Uri.parse("${AppConstants.baseUrl}/follow-invitation");
 
-    final response = await http.post(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "user_id": int.tryParse(userId) ?? userId,
-        "decision": decision,
-      }),
-    );
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "user_id": int.tryParse(userId) ?? userId,
+          "decision": decision,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      throw Exception('Takip isteği onaylanamadı: \\${response.body}');
+      debugPrint("📤 Follow request response: ${response.statusCode}");
+      debugPrint("📤 Follow request body: ${response.body}");
+
+      final jsonResponse = jsonDecode(response.body);
+      
+      // 422 hatası "already responded" durumu için
+      if (response.statusCode == 422) {
+        final message = jsonResponse['message'] ?? '';
+        if (message.contains('already.responded')) {
+          // Bu durumda başarılı olarak kabul et, çünkü istek zaten yanıtlanmış
+          return {
+            'status': true,
+            'message': 'İstek zaten yanıtlanmış',
+            'already_responded': true
+          };
+        }
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonResponse;
+      } else {
+        throw Exception('Takip isteği onaylanamadı: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("❗ Follow request error: $e");
+      rethrow;
+    }
+  }
+
+  /// Kullanıcıyı takip et
+  static Future<Map<String, dynamic>> followUser({
+    required String userId,
+  }) async {
+    final token = _box.read('token');
+    final uri = Uri.parse("${AppConstants.baseUrl}/user/follow");
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "user_id": int.tryParse(userId) ?? userId,
+        }),
+      );
+
+      debugPrint("📤 Follow user response: ${response.statusCode}");
+      debugPrint("📤 Follow user body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final jsonResponse = jsonDecode(response.body);
+        return jsonResponse;
+      } else {
+        throw Exception('Takip işlemi başarısız: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("❗ Follow user error: $e");
+      rethrow;
+    }
+  }
+
+  /// Kullanıcıyı takipten çıkar
+  static Future<Map<String, dynamic>> unfollowUser({
+    required String userId,
+  }) async {
+    final token = _box.read('token');
+    final uri = Uri.parse("${AppConstants.baseUrl}/user/unfollow");
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "user_id": int.tryParse(userId) ?? userId,
+        }),
+      );
+
+      debugPrint("📤 Unfollow user response: ${response.statusCode}");
+      debugPrint("📤 Unfollow user body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final jsonResponse = jsonDecode(response.body);
+        return jsonResponse;
+      } else {
+        throw Exception('Takipten çıkarma işlemi başarısız: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("❗ Unfollow user error: $e");
+      rethrow;
     }
   }
 
