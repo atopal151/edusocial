@@ -259,6 +259,7 @@ class GroupServices {
           debugPrint('ID: ${groupData['id']}');
           debugPrint('Group Chats: ${jsonBody['data']['group']['group_chats']}');
           debugPrint('Group Event: ${jsonBody['data']['group']['group_events']}');
+          debugPrint('Group users: ${jsonBody['data']['users']}');
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
         throw Exception('No group data found');

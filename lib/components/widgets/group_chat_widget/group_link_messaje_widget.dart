@@ -10,7 +10,8 @@ class GroupLinkMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String formattedTime = DateFormat('HH:mm').format(message.timestamp);
+    String formattedTime =
+        DateFormat('dd.MM.yyyy HH:mm').format(message.timestamp);
 
     return Column(
       crossAxisAlignment: message.isSentByMe
@@ -19,8 +20,9 @@ class GroupLinkMessageWidget extends StatelessWidget {
       children: [
         // 🔹 Kullanıcı Bilgileri ve Saat
         Row(
-          mainAxisAlignment:
-              message.isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: message.isSentByMe
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
           children: [
             if (!message.isSentByMe)
               Padding(
@@ -70,9 +72,8 @@ class GroupLinkMessageWidget extends StatelessWidget {
         ),
         // 🔹 Mesaj Balonu
         Align(
-          alignment: message.isSentByMe
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
+          alignment:
+              message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
           child: GestureDetector(
             onTap: () async {
               final uri = Uri.parse(message.content);
@@ -87,7 +88,8 @@ class GroupLinkMessageWidget extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 35, vertical: 4),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: message.isSentByMe ? const Color(0xFFFF7C7C) : Colors.white,
+                color:
+                    message.isSentByMe ? const Color(0xFFFF7C7C) : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: message.isSentByMe
                       ? const Radius.circular(20)
@@ -102,8 +104,9 @@ class GroupLinkMessageWidget extends StatelessWidget {
               child: Text(
                 message.content,
                 style: TextStyle(
-                  color: message.isSentByMe ? Colors.white : Colors.blue,
+                  color: Colors.blue,
                   decoration: TextDecoration.underline,
+                  decorationColor: Colors.blue,
                   fontSize: 12,
                 ),
               ),

@@ -7,6 +7,8 @@ import '../../components/buttons/custom_button.dart';
 import '../../models/chat_models/group_message_model.dart';
 import '../../models/group_models/group_detail_model.dart';
 import '../../models/group_models/group_chat_model.dart';
+import '../../models/document_model.dart';
+import '../../models/link_model.dart';
 import '../../services/group_services/group_service.dart';
 import '../profile_controller.dart';
 
@@ -18,6 +20,11 @@ class GroupChatDetailController extends GetxController {
   final groupData = Rx<GroupDetailModel?>(null);
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+
+  // Grup chat verilerinden çıkarılan belge, bağlantı ve fotoğraf listeleri
+  final RxList<DocumentModel> groupDocuments = <DocumentModel>[].obs;
+  final RxList<LinkModel> groupLinks = <LinkModel>[].obs;
+  final RxList<String> groupPhotos = <String>[].obs;
 
   RxString pollQuestion = ''.obs;
   RxList<String> pollOptions = <String>[].obs;
@@ -123,6 +130,87 @@ class GroupChatDetailController extends GetxController {
     
     // Mesajları tarihe göre sırala
     messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    
+    // Grup chat verilerinden belge, bağlantı ve fotoğraf verilerini çıkar
+    extractGroupChatMedia();
+    
+    // Mesajlar yüklendikten sonra en alta git - birden fazla deneme
+    _scrollToBottomWithRetry();
+  }
+
+  void _scrollToBottomWithRetry() {
+    // İlk deneme
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToBottom(animated: false);
+      
+      // İkinci deneme - biraz gecikmeyle
+      Future.delayed(Duration(milliseconds: 300), () {
+        scrollToBottom(animated: false);
+      });
+      
+      // Üçüncü deneme - daha uzun gecikmeyle
+      Future.delayed(Duration(milliseconds: 800), () {
+        scrollToBottom(animated: false);
+      });
+    });
+  }
+
+  void extractGroupChatMedia() {
+    if (groupData.value?.groupChats == null) return;
+    
+    final groupChats = groupData.value!.groupChats;
+    
+    // Listeleri temizle
+    groupDocuments.clear();
+    groupLinks.clear();
+    groupPhotos.clear();
+    
+    for (final chat in groupChats) {
+      // Belgeler ve fotoğraflar
+      for (final media in chat.media) {
+        if (media.type.startsWith('image/')) {
+          // Fotoğraf
+          if (!groupPhotos.contains(media.fullPath)) {
+            groupPhotos.add(media.fullPath);
+          }
+        } else {
+          // Belge
+          final document = DocumentModel(
+            id: media.id.toString(),
+            name: media.title,
+            sizeMb: double.tryParse(media.fileSize) ?? 0.0,
+            humanCreatedAt: media.humanCreatedAt,
+            createdAt: DateTime.parse(chat.createdAt),
+            url: media.fullPath,
+          );
+          
+          // Aynı belgeyi tekrar eklemeyi önle
+          if (!groupDocuments.any((doc) => doc.id == document.id)) {
+            groupDocuments.add(document);
+          }
+        }
+      }
+      
+      // Bağlantılar
+      for (final link in chat.groupChatLink) {
+        final linkModel = LinkModel(
+          url: link.link,
+          title: link.linkTitle,
+        );
+        
+        // Aynı bağlantıyı tekrar eklemeyi önle
+        if (!groupLinks.any((l) => l.url == linkModel.url)) {
+          groupLinks.add(linkModel);
+        }
+      }
+    }
+    
+    // Belgeleri tarihe göre sırala (en yeni önce)
+    groupDocuments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    
+    debugPrint('📁 Extracted ${groupDocuments.length} documents from group chats');
+    debugPrint('🔗 Extracted ${groupLinks.length} links from group chats');
+    debugPrint('📸 Extracted ${groupPhotos.length} photos from group chats');
   }
 
   Future<void> fetchGroupMessages() async {
@@ -346,13 +434,26 @@ class GroupChatDetailController extends GetxController {
     scrollToBottom();
   }
 
-  void scrollToBottom() {
+  void scrollToBottom({bool animated = true}) {
     if (scrollController.hasClients) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      try {
+        final maxScroll = scrollController.position.maxScrollExtent;
+        debugPrint('📜 Scrolling to bottom: maxScroll = $maxScroll');
+        
+        if (animated) {
+          scrollController.animateTo(
+            maxScroll,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        } else {
+          scrollController.jumpTo(maxScroll);
+        }
+      } catch (e) {
+        debugPrint('❌ Scroll error: $e');
+      }
+    } else {
+      debugPrint('⚠️ ScrollController has no clients yet');
     }
   }
 

@@ -4,11 +4,14 @@ Widget buildMemberAvatars(List<String> imageUrls) {
   int displayCount = 5;
   double overlap = 20;
 
+  // Boş olmayan avatar URL'lerini filtrele
+  final validImageUrls = imageUrls.where((url) => url.isNotEmpty).toList();
+
   return SizedBox(
     height: 40,
     child: Stack(
       children: [
-        for (int i = 0; i < imageUrls.length && i < displayCount; i++)
+        for (int i = 0; i < validImageUrls.length && i < displayCount; i++)
           Positioned(
             left: i * overlap,
             child: CircleAvatar(
@@ -16,11 +19,17 @@ Widget buildMemberAvatars(List<String> imageUrls) {
               backgroundColor: Colors.white,
               child: CircleAvatar(
                 radius: 18,
-                backgroundImage: NetworkImage(imageUrls[i]),
+                backgroundImage: NetworkImage(validImageUrls[i]),
+                onBackgroundImageError: (exception, stackTrace) {
+                  // Hata durumunda varsayılan ikon göster
+                },
+                child: validImageUrls[i].isEmpty 
+                    ? Icon(Icons.person, size: 16, color: Color(0xff9ca3ae))
+                    : null,
               ),
             ),
           ),
-        if (imageUrls.length > displayCount)
+        if (validImageUrls.length > displayCount)
           Positioned(
             left: displayCount * overlap,
             child: CircleAvatar(
@@ -30,7 +39,7 @@ Widget buildMemberAvatars(List<String> imageUrls) {
                 radius: 18,
                 backgroundColor: Colors.grey.shade200,
                 child: Text(
-                  '+${imageUrls.length - displayCount}',
+                  '+${validImageUrls.length - displayCount}',
                   style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700,color: Color(0xff414751)),
                 ),
               ),

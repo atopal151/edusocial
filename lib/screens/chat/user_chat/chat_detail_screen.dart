@@ -44,6 +44,13 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     });
 
     controller.startListeningToNewMessages(chatId);
+    
+    // Mesajlar yüklendikten sonra en alta git
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        controller.scrollToBottom(animated: false);
+      });
+    });
   }
 
   @override
@@ -133,8 +140,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         child: Column(
           children: [
             Expanded(
-              child: Obx(
-                () => ListView.builder(
+              child: Obx(() {
+                // Mesajlar yüklendiğinde en alta git
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (controller.messages.isNotEmpty) {
+                    controller.scrollToBottom(animated: false);
+                  }
+                });
+                
+                return ListView.builder(
                   controller: controller.scrollController,
                   itemCount: controller.messages.length,
                   padding: const EdgeInsets.only(bottom: 75),
@@ -142,8 +156,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     final message = controller.messages[index];
                     return MessageWidgetFactory.buildMessageWidget(message);
                   },
-                ),
-              ),
+                );
+              }),
             ),
             Container(
               decoration: const BoxDecoration(color: Color(0xffffffff)),

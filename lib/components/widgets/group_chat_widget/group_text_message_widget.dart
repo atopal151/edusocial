@@ -11,7 +11,7 @@ class GroupTextMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 📌 `DateTime` → `String` formatına çeviriyoruz
-    String formattedTime = DateFormat('HH:mm').format(message.timestamp);
+    String formattedTime = DateFormat('dd.MM.yyyy HH:mm').format(message.timestamp);
 
     return Column(
       crossAxisAlignment: message.isSentByMe

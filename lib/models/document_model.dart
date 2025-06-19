@@ -4,6 +4,7 @@ class DocumentModel {
   final double sizeMb;
   final String humanCreatedAt;
   final DateTime createdAt;
+  final String? url;
 
   DocumentModel({
     required this.id,
@@ -11,6 +12,7 @@ class DocumentModel {
     required this.sizeMb,
     required this.humanCreatedAt,
     required this.createdAt,
+    this.url,
   });
 
   factory DocumentModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class DocumentModel {
       sizeMb: (json['size_mb'] as num).toDouble(),
       humanCreatedAt: json['human_created_at'] ?? '',
       createdAt: DateTime.parse(json['created_at']),
+      url: json['url'],
     );
   }
 
@@ -29,6 +32,7 @@ class DocumentModel {
       'sizeMb': sizeMb,
       'humanCreatedAt': humanCreatedAt,
       'createdAt': createdAt.toIso8601String(),
+      'url': url,
     };
   }
 }

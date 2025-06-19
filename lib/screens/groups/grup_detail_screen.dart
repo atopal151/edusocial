@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 import '../../components/cards/members_avatar.dart';
 import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
@@ -16,6 +17,7 @@ import '../../components/widgets/group_chat_widget/group_document_message_widget
 import '../../components/widgets/group_chat_widget/group_image_message_widget.dart';
 import '../../components/widgets/group_chat_widget/group_link_messaje_widget.dart';
 import '../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
+import '../../screens/groups/group_participants_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   const GroupDetailScreen({super.key});
@@ -30,6 +32,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   late ScrollController documentsScrollController;
   late ScrollController linksScrollController;
   late ScrollController photosScrollController;
+
+  // Base URL for images
+  static const String baseUrl = 'https://stageapi.edusocial.pl/storage/';
+
+  String getFullUrl(String path) {
+    if (path.startsWith('http')) return path;
+    return '$baseUrl$path';
+  }
 
   @override
   void initState() {
@@ -212,12 +222,24 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 // Üye avatarları
                 InkWell(
                   onTap: () {
-                    Get.toNamed("/followers");
+                    Get.to(() => GroupParticipantsScreen());
                   },
                   child: SizedBox(
                     width: 150,
                     child: Center(
-                      child: buildMemberAvatars([]),
+                      child: Column(
+                        children: [
+                          buildMemberAvatars(
+                            group.users.map((user) => (user['avatar_url'] ?? '').toString()).toList(),
+                          ),
+                          // Debug bilgisi
+                          if (group.users.isEmpty)
+                            Text(
+                              'Katılımcı bulunamadı',
+                              style: TextStyle(fontSize: 10, color: Color(0xff9ca3ae)),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -273,7 +295,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                     Expanded(
                       child: InkWell(
                         onTap: () {
-                          Get.toNamed("/followers");
+                          Get.to(() => GroupParticipantsScreen());
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -309,210 +331,235 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 ),
                 SizedBox(height: 24),
 
-                // TABS: Belgeler / Bağlantılar / Fotoğraflar
-                DefaultTabController(
-                  length: 3,
-                  child: Container(
-                    height: 400,
-                    decoration: BoxDecoration(
-                        color: Color(0xffffffff),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Column(
-                      children: [
-                        TabBar(
-                            dividerColor: Color(0xfffafafa),
-                            dividerHeight: 3,
-                            labelColor: Color(0xffef5050),
-                            indicatorColor: Color(0xffef5050),
-                            indicator: UnderlineTabIndicator(
-                              borderSide: BorderSide(
-                                  width: 2.0, color: Color(0xffef5050)),
-                              insets: EdgeInsets.symmetric(horizontal: 16.0),
-                            ),
-                            labelStyle: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600, fontSize: 13.28),
-                            tabs: [
-                              Tab(text: "Belgeler"),
-                              Tab(text: "Bağlantılar"),
-                              Tab(text: "Fotoğraflar"),
-                            ]),
-                        SizedBox(
-                          height: 350,
-                          child: TabBarView(
+                // GRUP MESAJLAŞMA VERİLERİ: Belgeler / Bağlantılar / Fotoğraflar
+                if (chatController.groupDocuments.isNotEmpty || 
+                    chatController.groupLinks.isNotEmpty || 
+                    chatController.groupPhotos.isNotEmpty) ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                    
+                      DefaultTabController(
+                        length: 3,
+                        child: Container(
+                          height: 400,
+                          decoration: BoxDecoration(
+                              color: Color(0xffffffff),
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Column(
                             children: [
-                              // BELGELER
-                              if (group.documents.isNotEmpty)
-                                Scrollbar(
-                                  controller: documentsScrollController,
-                                  trackVisibility: true,
-                                  thumbVisibility: true,
-                                  thickness: 5,
-                                  radius: Radius.circular(15),
-                                  child: ListView.builder(
-                                    controller: documentsScrollController,
-                                    itemCount: group.documents.length,
-                                    itemBuilder: (context, index) {
-                                      final doc = group.documents[index];
-                                      return ListTile(
-                                        leading: Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                                color: Color(0xfff5f6f7),
-                                                borderRadius:
-                                                    BorderRadius.circular(50)),
-                                            child: SvgPicture.asset(
-                                              "images/icons/document_icon.svg",
-                                              colorFilter: ColorFilter.mode(
-                                                Color(0xff9ca3ae),
-                                                BlendMode.srcIn,
+                              TabBar(
+                                  dividerColor: Color(0xfffafafa),
+                                  dividerHeight: 3,
+                                  labelColor: Color(0xffef5050),
+                                  indicatorColor: Color(0xffef5050),
+                                  indicator: UnderlineTabIndicator(
+                                    borderSide: BorderSide(
+                                        width: 2.0, color: Color(0xffef5050)),
+                                    insets: EdgeInsets.symmetric(horizontal: 16.0),
+                                  ),
+                                  labelStyle: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w600, fontSize: 13.28),
+                                  tabs: [
+                                    Tab(text: "Belgeler"),
+                                    Tab(text: "Bağlantılar"),
+                                    Tab(text: "Fotoğraflar"),
+                                  ]),
+                              SizedBox(
+                                height: 350,
+                                child: TabBarView(
+                                  children: [
+                                    // GRUP CHAT BELGELERİ
+                                    Obx(() => chatController.groupDocuments.isNotEmpty
+                                        ? Scrollbar(
+                                            controller: documentsScrollController,
+                                            trackVisibility: true,
+                                            thumbVisibility: true,
+                                            thickness: 5,
+                                            radius: Radius.circular(15),
+                                            child: ListView.builder(
+                                              controller: documentsScrollController,
+                                              itemCount: chatController.groupDocuments.length,
+                                              itemBuilder: (context, index) {
+                                                final doc = chatController.groupDocuments[index];
+                                                return ListTile(
+                                                  onTap: () async {
+                                                    // Belgeyi açmak için URL'yi kullan
+                                                    if (doc.url != null && doc.url!.isNotEmpty) {
+                                                      final uri = Uri.parse(doc.url!);
+                                                      if (await canLaunchUrl(uri)) {
+                                                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                                      }
+                                                    }
+                                                  },
+                                                  leading: Container(
+                                                      padding: EdgeInsets.all(8),
+                                                      decoration: BoxDecoration(
+                                                          color: Color(0xfff5f6f7),
+                                                          borderRadius:
+                                                              BorderRadius.circular(50)),
+                                                      child: SvgPicture.asset(
+                                                        "images/icons/document_icon.svg",
+                                                        colorFilter: ColorFilter.mode(
+                                                          Color(0xff9ca3ae),
+                                                          BlendMode.srcIn,
+                                                        ),
+                                                      )),
+                                                  title: Text(
+                                                    doc.name,
+                                                    style: GoogleFonts.inter(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Color(0xff414751)),
+                                                  ),
+                                                  subtitle: Text(
+                                                    "${doc.sizeMb} Mb • ${doc.humanCreatedAt}",
+                                                    style: GoogleFonts.inter(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Color(0xff9ca3ae)),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        : Center(
+                                            child: Text(
+                                              "Henüz belge eklenmemiş",
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: Color(0xff9ca3ae),
                                               ),
-                                            )),
-                                        title: Text(
-                                          doc.name,
-                                          style: GoogleFonts.inter(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xff414751)),
-                                        ),
-                                        subtitle: Text(
-                                          "${doc.sizeMb} Mb • ${doc.humanCreatedAt}",
-                                          style: GoogleFonts.inter(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xff9ca3ae)),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                )
-                              else
-                                Center(
-                                  child: Text(
-                                    "Henüz belge eklenmemiş",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: Color(0xff9ca3ae),
-                                    ),
-                                  ),
-                                ),
+                                            ),
+                                          )),
 
-                              // BAĞLANTILAR
-                              if (group.links.isNotEmpty)
-                                Scrollbar(
-                                  controller: linksScrollController,
-                                  trackVisibility: true,
-                                  thumbVisibility: true,
-                                  thickness: 5,
-                                  radius: Radius.circular(15),
-                                  child: ListView.builder(
-                                    controller: linksScrollController,
-                                    itemCount: group.links.length,
-                                    itemBuilder: (context, index) {
-                                      final link = group.links[index];
-                                      return ListTile(
-                                        leading: Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                                color: Color(0xfff5f6f7),
-                                                borderRadius:
-                                                    BorderRadius.circular(50)),
-                                            child: Transform.rotate(
-                                                angle: -45 * 3.1415926535 / 180,
-                                                child: Icon(
-                                                  Icons.link,
-                                                  color: Color(0xff9ca3ae),
-                                                ))),
-                                        title: Text(
-                                          link.title,
-                                          style: GoogleFonts.inter(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xff414751)),
-                                        ),
-                                        subtitle: Text(
-                                          link.url,
-                                          style: GoogleFonts.inter(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xff9ca3ae)),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                )
-                              else
-                                Center(
-                                  child: Text(
-                                    "Henüz bağlantı eklenmemiş",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: Color(0xff9ca3ae),
-                                    ),
-                                  ),
-                                ),
-
-                              // FOTOĞRAFLAR
-                              if (group.photoUrls.isNotEmpty)
-                                Scrollbar(
-                                  controller: photosScrollController,
-                                  trackVisibility: true,
-                                  thumbVisibility: true,
-                                  thickness: 5,
-                                  radius: Radius.circular(15),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 8.0,
-                                        right: 16,
-                                        top: 8,
-                                        bottom: 8),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        child: GridView.builder(
-                                          controller: photosScrollController,
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3,
-                                          ),
-                                          itemCount: group.photoUrls.length,
-                                          itemBuilder: (context, index) {
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(0.6),
-                                              child: Image.network(
-                                                group.photoUrls[index],
-                                                fit: BoxFit.cover,
+                                    // GRUP CHAT BAĞLANTILARI
+                                    Obx(() => chatController.groupLinks.isNotEmpty
+                                        ? Scrollbar(
+                                            controller: linksScrollController,
+                                            trackVisibility: true,
+                                            thumbVisibility: true,
+                                            thickness: 5,
+                                            radius: Radius.circular(15),
+                                            child: ListView.builder(
+                                              controller: linksScrollController,
+                                              itemCount: chatController.groupLinks.length,
+                                              itemBuilder: (context, index) {
+                                                final link = chatController.groupLinks[index];
+                                                return ListTile(
+                                                  onTap: () async {
+                                                    final uri = Uri.parse(link.url);
+                                                    if (await canLaunchUrl(uri)) {
+                                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                                    }
+                                                  },
+                                                  leading: Container(
+                                                      padding: EdgeInsets.all(8),
+                                                      decoration: BoxDecoration(
+                                                          color: Color(0xfff5f6f7),
+                                                          borderRadius:
+                                                              BorderRadius.circular(50)),
+                                                      child: Transform.rotate(
+                                                          angle: -45 * 3.1415926535 / 180,
+                                                          child: Icon(
+                                                            Icons.link,
+                                                            color: Color(0xff9ca3ae),
+                                                          ))),
+                                                  title: Text(
+                                                    link.title,
+                                                    style: GoogleFonts.inter(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Color(0xff414751)),
+                                                  ),
+                                                  subtitle: Text(
+                                                    link.url,
+                                                    style: GoogleFonts.inter(
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w500,
+                                                        color: Color(0xff9ca3ae)),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        : Center(
+                                            child: Text(
+                                              "Henüz bağlantı eklenmemiş",
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: Color(0xff9ca3ae),
                                               ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              else
-                                Center(
-                                  child: Text(
-                                    "Henüz fotoğraf eklenmemiş",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: Color(0xff9ca3ae),
-                                    ),
-                                  ),
+                                            ),
+                                          )),
+
+                                    // GRUP CHAT FOTOĞRAFLARI
+                                    Obx(() => chatController.groupPhotos.isNotEmpty
+                                        ? Scrollbar(
+                                            controller: photosScrollController,
+                                            trackVisibility: true,
+                                            thumbVisibility: true,
+                                            thickness: 5,
+                                            radius: Radius.circular(15),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0,
+                                                  right: 16,
+                                                  top: 8,
+                                                  bottom: 8),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(20),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(20),
+                                                  ),
+                                                  child: GridView.builder(
+                                                    controller: photosScrollController,
+                                                    gridDelegate:
+                                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                                      crossAxisCount: 3,
+                                                    ),
+                                                    itemCount: chatController.groupPhotos.length,
+                                                    itemBuilder: (context, index) {
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(0.6),
+                                                        child: Image.network(
+                                                          getFullUrl(chatController.groupPhotos[index]),
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder: (context, error, stackTrace) {
+                                                            debugPrint('Error loading image: $error');
+                                                            return const Icon(Icons.error);
+                                                          },
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : Center(
+                                            child: Text(
+                                              "Henüz fotoğraf eklenmemiş",
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: Color(0xff9ca3ae),
+                                              ),
+                                            ),
+                                          )),
+                                  ],
                                 ),
+                              ),
                             ],
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-
-                SizedBox(height: 24),
+                  SizedBox(height: 24),
+                ],
 
                 // ETKİNLİKLER
                 if (group.groupEvents != null && group.groupEvents.isNotEmpty) ...[

@@ -29,6 +29,13 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
     super.initState();
     debugPrint('🚀 GroupChatDetailScreen initialized');
     controller.fetchGroupDetails();
+    
+    // Mesajlar yüklendikten sonra en alta git
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        controller.scrollToBottom(animated: false);
+      });
+    });
   }
 
   @override
@@ -122,34 +129,43 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
         child: Column(
           children: [
             Expanded(
-              child: Obx(() => ListView.builder(
-                    controller: controller.scrollController,
-                    itemCount: controller.messages.length,
-                    padding: EdgeInsets.only(bottom: 75),
-                    itemBuilder: (context, index) {
-                      final message = controller.messages[index];
-                      if (message.messageType == GroupMessageType.text) {
-                        return GroupTextMessageWidget(message: message);
-                      } else if (message.messageType ==
-                          GroupMessageType.document) {
-                        return GroupDocumentMessageWidget(message: message);
-                      } else if (message.messageType ==
-                          GroupMessageType.image) {
-                        return GroupImageMessageWidget(message: message);
-                      } else if (message.messageType == GroupMessageType.link) {
-                        return GroupLinkMessageWidget(message: message);
-                      } else if (message.messageType == GroupMessageType.poll) {
-                        return GroupPollMessageWidget(
-                          message: message,
-                          pollVotes: controller.pollVotes,
-                          selectedOption: controller.selectedPollOption,
-                          onVote: controller.votePoll,
-                        );
-                      } else {
-                        return Container();
-                      }
-                    },
-                  )),
+              child: Obx(() {
+                // Mesajlar yüklendiğinde en alta git
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (controller.messages.isNotEmpty) {
+                    controller.scrollToBottom(animated: false);
+                  }
+                });
+                
+                return ListView.builder(
+                  controller: controller.scrollController,
+                  itemCount: controller.messages.length,
+                  padding: EdgeInsets.only(bottom: 75),
+                  itemBuilder: (context, index) {
+                    final message = controller.messages[index];
+                    if (message.messageType == GroupMessageType.text) {
+                      return GroupTextMessageWidget(message: message);
+                    } else if (message.messageType ==
+                        GroupMessageType.document) {
+                      return GroupDocumentMessageWidget(message: message);
+                    } else if (message.messageType ==
+                        GroupMessageType.image) {
+                      return GroupImageMessageWidget(message: message);
+                    } else if (message.messageType == GroupMessageType.link) {
+                      return GroupLinkMessageWidget(message: message);
+                    } else if (message.messageType == GroupMessageType.poll) {
+                      return GroupPollMessageWidget(
+                        message: message,
+                        pollVotes: controller.pollVotes,
+                        selectedOption: controller.selectedPollOption,
+                        onVote: controller.votePoll,
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              }),
             ),
             Container(
               decoration: BoxDecoration(color: Color(0xffffffff)),

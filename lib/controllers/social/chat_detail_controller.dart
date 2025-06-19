@@ -287,6 +287,9 @@ class ChatDetailController extends GetxController {
         debugPrint('  - Belgeler: ${userChatDetail.value?.documents.length} adet');
         debugPrint('  - Linkler: ${userChatDetail.value?.links.length} adet');
         debugPrint('  - Fotoğraflar: ${userChatDetail.value?.photoUrls.length} adet');
+        
+        // Mesajlar yüklendikten sonra en alta git - birden fazla deneme
+        _scrollToBottomWithRetry();
       }
     } catch (e) {
       debugPrint('❌ fetchConversationMessages error: $e');
@@ -297,17 +300,42 @@ class ChatDetailController extends GetxController {
 
   void scrollToBottom({bool animated = true}) {
     if (scrollController.hasClients) {
-      final position = scrollController.position.maxScrollExtent + 100;
-      if (animated) {
-        scrollController.animateTo(
-          position,
-          duration: const Duration(milliseconds: 1),
-          curve: Curves.easeOut,
-        );
-      } else {
-        scrollController.jumpTo(position);
+      try {
+        final maxScroll = scrollController.position.maxScrollExtent;
+        debugPrint('📜 User Chat - Scrolling to bottom: maxScroll = $maxScroll');
+        
+        if (animated) {
+          scrollController.animateTo(
+            maxScroll,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        } else {
+          scrollController.jumpTo(maxScroll);
+        }
+      } catch (e) {
+        debugPrint('❌ User Chat - Scroll error: $e');
       }
+    } else {
+      debugPrint('⚠️ User Chat - ScrollController has no clients yet');
     }
+  }
+
+  void _scrollToBottomWithRetry() {
+    // İlk deneme
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToBottom(animated: false);
+      
+      // İkinci deneme - biraz gecikmeyle
+      Future.delayed(Duration(milliseconds: 300), () {
+        scrollToBottom(animated: false);
+      });
+      
+      // Üçüncü deneme - daha uzun gecikmeyle
+      Future.delayed(Duration(milliseconds: 800), () {
+        scrollToBottom(animated: false);
+      });
+    });
   }
 
   void openPollBottomSheet() {

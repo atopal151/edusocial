@@ -20,7 +20,8 @@ class GroupPollMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String formattedTime = DateFormat('HH:mm').format(message.timestamp);
+    // 📌 `DateTime` → `String` formatına çeviriyoruz
+    String formattedTime = DateFormat('dd.MM.yyyy HH:mm').format(message.timestamp);
     
     return Column(
       crossAxisAlignment: message.isSentByMe

@@ -27,6 +27,7 @@ class GroupDetailModel {
   final List<EventModel> events;
   final List<GroupChatModel> groupChats;
   final List<EventModel> groupEvents;
+  final List<Map<String, dynamic>> users;
 
   GroupDetailModel({
     required this.id,
@@ -52,6 +53,7 @@ class GroupDetailModel {
     required this.events,
     required this.groupChats,
     required this.groupEvents,
+    required this.users,
   });
 
   factory GroupDetailModel.fromJson(Map<String, dynamic> json) {
@@ -98,6 +100,10 @@ class GroupDetailModel {
           [],
       groupEvents: (group['group_events'] as List<dynamic>?)
               ?.map((event) => EventModel.fromJson(event))
+              .toList() ??
+          [],
+      users: (group['users'] as List<dynamic>?)
+              ?.map((user) => user as Map<String, dynamic>)
               .toList() ??
           [],
     );
