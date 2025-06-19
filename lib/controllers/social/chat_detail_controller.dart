@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
-import 'package:edusocial/models/chat_models/conversation_model.dart';
-import 'package:edusocial/models/chat_models/sender_model.dart';
 import 'package:edusocial/models/chat_models/detail_document_model.dart';
 import 'package:edusocial/services/chat_service.dart';
 import 'package:edusocial/services/socket_services.dart';
