@@ -31,14 +31,46 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Obx(() {
           if (controller.matches.isEmpty) {
-            return const Center(
-              child: Text(
-                'Henüz eşleşme bulunamadı',
-                style: TextStyle(
-                  color: Color(0xff9ca3ae),
-                  fontSize: 16,
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Henüz eşleşme bulunamadı',
+                  style: TextStyle(
+                    color: Color(0xff9ca3ae),
+                    fontSize: 16,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFF7743),
+                        Color(0xFFEF5050)
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Get.toNamed('/match');
+                    },
+                    child: Text(
+                      'Ders Ekle',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           } else {
             return Column(
@@ -47,18 +79,31 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
               children: [
                 MatchCard(),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  child: CustomButton(
-                    text: 'Ders Ekle',
-                    height: 30,
-                    borderRadius: 15,
-                    isLoading: controller.isLoading,
-                    backgroundColor: Colors.transparent,
-                    textColor: Color(0xff9ca3ae),
-                    onPressed: () {
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFF7743),
+                        Color(0xFFEF5050)
+                      ],
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: InkWell(
+                    onTap: () {
                       Get.toNamed('/match');
                     },
+                    child: Text(
+                      'Ders Ekle',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
               ],
