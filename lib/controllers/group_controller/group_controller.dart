@@ -38,11 +38,10 @@ class GroupController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchUserGroups();
-    fetchAllGroups();
-    fetchSuggestionGroups();
-
-    fetchGroupAreas();
+    // fetchUserGroups(); // Login sırasında manuel olarak çağrılacak
+    // fetchAllGroups(); // Login sırasında manuel olarak çağrılacak
+    // fetchSuggestionGroups(); // Login sırasında manuel olarak çağrılacak
+    // fetchGroupAreas(); // Login sırasında manuel olarak çağrılacak
     categoryGroup.value = [];
 
     ever(selectedCategory, (_) => updateFilteredGroups());
@@ -56,9 +55,17 @@ class GroupController extends GetxController {
   }
 
   void fetchSuggestionGroups() async {
+    debugPrint("🔄 GroupController.fetchSuggestionGroups() çağrıldı");
     isLoading.value = true;
-    suggestionGroups.value = await _groupServices.fetchSuggestionGroups();
-    isLoading.value = false;
+    try {
+      final groups = await _groupServices.fetchSuggestionGroups();
+      suggestionGroups.value = groups;
+      debugPrint("✅ Önerilen gruplar başarıyla yüklendi: ${groups.length} grup");
+    } catch (e) {
+      debugPrint("❌ Önerilen gruplar yüklenirken hata: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void fetchAllGroups() async {
@@ -156,12 +163,9 @@ class GroupController extends GetxController {
 
   Future<void> fetchGroupDetail(String groupId) async {
     try {
-      debugPrint('🔍 Fetching group detail for ID: $groupId');
       final group = await _groupServices.fetchGroupDetail(groupId);
       groupDetail.value = group as GroupDetailModel?;
-      debugPrint('✅ Group details loaded successfully');
     } catch (e) {
-      debugPrint('❌ Error fetching group detail: $e');
       Get.snackbar(
         'Error',
         'Failed to load group details',

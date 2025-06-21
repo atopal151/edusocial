@@ -9,6 +9,7 @@ import '../../controllers/group_controller/group_controller.dart';
 import '../../controllers/home_controller.dart';
 import 'hot_topics_list.dart';
 import '../../controllers/topics_controller.dart';
+import '../../controllers/post_controller.dart';
 import 'story/my_story_list.dart';
 import 'post_home_list.dart';
 
@@ -17,8 +18,26 @@ class HomeScreen extends StatelessWidget {
   final GroupController groupController = Get.find();
   final StoryController storyController = Get.find();
   final TopicsController topicsController = Get.find<TopicsController>();
+  final PostController postController = Get.find<PostController>();
 
   HomeScreen({super.key});
+
+  /// Ana sayfa verilerini yenile
+  Future<void> _refreshHomeData() async {
+    debugPrint("🔄 Ana sayfa verileri yenileniyor...");
+    
+    try {
+      // Tüm verileri sıralı olarak yenile
+      storyController.fetchStories();
+      groupController.fetchSuggestionGroups();
+      topicsController.fetchHotTopics();
+      postController.fetchHomePosts();
+      
+      debugPrint("✅ Ana sayfa verileri başarıyla yenilendi");
+    } catch (e) {
+      debugPrint("❌ Ana sayfa verileri yenilenirken hata: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,46 +64,55 @@ class HomeScreen extends StatelessWidget {
           child: Icon(Icons.add, color: Colors.white, size: 25),
         ),
       ),
-      body: Obx(() {
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                color: Colors.white,
-                height: 110,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  children: [
-                    
-                    MyStoryList(),
-                    SizedBox(width: 5),
-                    ...storyController.otherStories.map((story) => StoryCard(story: story)),
-                  ],
+      body: RefreshIndicator(
+        onRefresh: _refreshHomeData,
+        color: Color(0xFFEF5050),
+        backgroundColor: Color(0xfffafafa),
+        strokeWidth: 2.0,
+        displacement: 20.0,
+        edgeOffset: 10.0,
+        child: Obx(() {
+          return SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  color: Colors.white,
+                  height: 110,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: [
+                      MyStoryList(),
+                      SizedBox(width: 5),
+                      ...storyController.otherStories.map((story) => StoryCard(story: story)),
+                    ],
+                  ),
                 ),
-              ),
-              if (groupController.suggestionGroups.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                  child: const Text("İlgini Çekebilecek Gruplar",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
-                ),
-                GroupSuggestionListView(),
+                if (groupController.suggestionGroups.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
+                    child: const Text("İlgini Çekebilecek Gruplar",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
+                  ),
+                  GroupSuggestionListView(),
+                ],
+                if (topicsController.hotTopics.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
+                    child: const Text("Gündemdeki Konular",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
+                  ),
+                  HotTopicsListView(),
+                ],
+                PostHomeList(),
+                SizedBox(height: 100),
               ],
-              if (topicsController.hotTopics.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                  child: const Text("Gündemdeki Konular",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
-                ),
-                HotTopicsListView(),
-              ],
-              PostHomeList(),
-            ],
-          ),
-        );
-      }),
+            ),
+          );
+        }),
+      ),
     );
   }
 }

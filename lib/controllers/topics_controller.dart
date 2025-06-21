@@ -86,8 +86,16 @@ class TopicsController extends GetxController {
   }
 
   void fetchHotTopics() async {
+    debugPrint("🔄 TopicsController.fetchHotTopics() çağrıldı");
     isLoading.value = true;
-    hotTopics.value = await _service.fetchHotTopics();
-    isLoading.value = false;
+    try {
+      final topics = await _service.fetchHotTopics();
+      hotTopics.value = topics;
+      debugPrint("✅ Gündemdeki konular başarıyla yüklendi: ${topics.length} konu");
+    } catch (e) {
+      debugPrint("❌ Gündemdeki konular yüklenirken hata: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

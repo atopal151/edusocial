@@ -21,18 +21,21 @@ class StoryController extends GetxController {
     super.onInit();
 
     // Profil yüklendiğinde kendi story'yi de çek
-    ever(profileController.userId, (id) {
-      if (id.toString().isNotEmpty) {
-        fetchStories();
-      }
-    });
+    // ever(profileController.userId, (id) {
+    //   if (id.toString().isNotEmpty) {
+    //     fetchStories(); // Login sırasında manuel olarak çağrılacak
+    //   }
+    // });
   }
 
   Future<void> fetchStories() async {
+    debugPrint("🔄 StoryController.fetchStories() çağrıldı");
     try {
       isLoading.value = true;
 
       final allStories = await StoryService.fetchStories();
+      debugPrint("📦 API'den ${allStories.length} story alındı");
+      
       final currentUserIdStr = profileController.userId.value.trim();
 
       if (currentUserIdStr.isEmpty) {
@@ -60,6 +63,8 @@ class StoryController extends GetxController {
 
       myStory.value = my;
       otherStories.assignAll(others);
+      
+      debugPrint("✅ Story'ler başarıyla yüklendi - Benim: ${my != null ? 'Var' : 'Yok'}, Diğerleri: ${others.length}");
     } catch (e) {
       debugPrint("❗ fetchStories error: $e");
     } finally {

@@ -1,5 +1,10 @@
 import 'package:edusocial/controllers/onboarding_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
+import 'package:edusocial/controllers/profile_controller.dart';
+import 'package:edusocial/controllers/group_controller/group_controller.dart';
+import 'package:edusocial/controllers/notification_controller.dart';
+import 'package:edusocial/controllers/post_controller.dart';
+import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:email_validator/email_validator.dart';
@@ -40,6 +45,64 @@ class LoginController extends GetxController {
     return null;
   }
 
+  /// 🔄 Login başarılı olduğunda tüm verileri yeniden yükle
+  Future<void> _reloadAllData() async {
+    try {
+      debugPrint("🔄 Login sonrası veriler yeniden yükleniyor...");
+      
+      // Sadece mevcut controller'ları kullan
+      final profileController = Get.find<ProfileController>();
+      final groupController = Get.find<GroupController>();
+      final notificationController = Get.find<NotificationController>();
+      final appBarController = Get.find<AppBarController>();
+      final storyController = Get.find<StoryController>();
+
+      // Sıralı olarak tüm verileri yükle
+      profileController.loadProfile();
+      groupController.fetchUserGroups();
+      groupController.fetchAllGroups();
+      groupController.fetchSuggestionGroups();
+      groupController.fetchGroupAreas();
+      notificationController.fetchNotifications();
+      appBarController.fetchAndSetProfileImage();
+      storyController.fetchStories();
+
+      debugPrint("✅ Login sonrası veriler başarıyla yüklendi");
+      
+      // 3 saniye sonra verilerin yüklenip yüklenmediğini kontrol et
+      Future.delayed(const Duration(seconds: 3), () {
+        _checkDataLoaded();
+      });
+      
+    } catch (e) {
+      debugPrint("❌ Veri yeniden yükleme hatası: $e");
+    }
+  }
+
+  /// 🔍 Verilerin yüklenip yüklenmediğini kontrol et
+  void _checkDataLoaded() {
+    try {
+      final profileController = Get.find<ProfileController>();
+      final groupController = Get.find<GroupController>();
+      final notificationController = Get.find<NotificationController>();
+      final postController = Get.find<PostController>();
+      final appBarController = Get.find<AppBarController>();
+      final storyController = Get.find<StoryController>();
+
+      debugPrint("🔍 Veri yükleme kontrolü:");
+      debugPrint("   📊 Profil: ${profileController.profile.value != null ? '✅' : '❌'}");
+      debugPrint("   📊 Kullanıcı Grupları: ${groupController.userGroups.length} grup");
+      debugPrint("   📊 Tüm Gruplar: ${groupController.allGroups.length} grup");
+      debugPrint("   📊 Önerilen Gruplar: ${groupController.suggestionGroups.length} grup");
+      debugPrint("   📊 Bildirimler: ${notificationController.notifications.length} bildirim");
+      debugPrint("   📊 Postlar: ${postController.postHomeList.length} post");
+      debugPrint("   📊 AppBar Resmi: ${appBarController.profileImagePath.value.isNotEmpty ? '✅' : '❌'}");
+      debugPrint("   📊 Story'ler: ${storyController.otherStories.length} story");
+    } catch (e) {
+      debugPrint("❌ Veri kontrol hatası: $e");
+    }
+  }
+
   void login() async {
     final validationError = _validateInputs();
     if (validationError != null) {
@@ -69,8 +132,8 @@ class LoginController extends GetxController {
           Get.offAllNamed('/step1');
         } else {
           /// Zaten onboarding tamamlamış, ana ekrana
-          final storyController = Get.find<StoryController>();
-          storyController.fetchStories();
+          // Tüm verileri yeniden yükle
+          await _reloadAllData();
           Get.offAllNamed('/main');
         }
       } else {

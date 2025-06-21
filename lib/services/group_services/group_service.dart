@@ -70,33 +70,7 @@ class GroupServices {
         /*debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
           wrapWidth: 1024);*/
 
-        final userGroupList = data.map((item) {
-          final group = GroupModel(
-            id: item['id'].toString(),
-            userId: item['user_id'],
-            groupAreaId: item['group_area_id'],
-            name: item['name'] ?? '',
-            description: item['description'] ?? '',
-            status: item['status'] ?? '',
-            isPrivate: item['is_private'] ?? false,
-            deletedAt: item['deleted_at'],
-            createdAt: item['created_at'] ?? '',
-            updatedAt: item['updated_at'] ?? '',
-            userCountWithAdmin: item['user_count_with_admin'] ?? 0,
-            userCountWithoutAdmin: item['user_count_without_admin'] ?? 0,
-            messageCount: item['message_count'] ?? 0,
-            isFounder: item['is_founder'] ?? false,
-            isMember: item['is_member'] ?? false,
-            isPending: item['is_pending'] ?? false,
-            avatarUrl: item['avatar_url'] ?? '',
-            bannerUrl: item['banner_url'] ?? '',
-            humanCreatedAt: item['human_created_at'] ?? '',
-            pivotCreatedAt: item['pivot']?['created_at'] ?? '',
-            pivotUpdatedAt: item['pivot']?['updated_at'] ?? '',
-          );
-
-          return group;
-        }).toList();
+        final userGroupList = data.map((item) => GroupModel.fromJson(item)).toList();
 
         return userGroupList;
       } else {
@@ -141,12 +115,8 @@ class GroupServices {
     final box = GetStorage();
     final token = box.read('token');
 
-    /* debugPrint("🚀 fetchAllGroups() çağrıldı");
-    debugPrint("🔑 Token: $token", wrapWidth: 1024);*/
-
     try {
       final uri = Uri.parse("${AppConstants.baseUrl}/groups");
-      //debugPrint("🌐 İstek Atılıyor: $uri", wrapWidth: 1024);
 
       final response = await http.get(
         uri,
@@ -156,48 +126,12 @@ class GroupServices {
         },
       );
 
-      //debugPrint("📥 Group Status Code: ${response.statusCode}",
-      //  wrapWidth: 1024);
-
-      // 🔽 Dönen cevabı aynen gösteriyoruz
-      //debugPrint("📦 Group Response Body:", wrapWidth: 1024);
-      //debugPrint(response.body, wrapWidth: 1024);
-
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        //debugPrint("📦 Gelen Grup Sayısı: ${data.length}", wrapWidth: 1024);
-        final groupList = data.map((item) {
-          final group = GroupModel(
-            id: item['id'].toString(),
-            userId: item['user_id'],
-            groupAreaId: item['group_area_id'],
-            name: item['name'] ?? '',
-            description: item['description'] ?? '',
-            status: item['status'] ?? '',
-            isPrivate: item['is_private'] ?? false,
-            deletedAt: item['deleted_at'],
-            createdAt: item['created_at'] ?? '',
-            updatedAt: item['updated_at'] ?? '',
-            userCountWithAdmin: item['user_count_with_admin'] ?? 0,
-            userCountWithoutAdmin: item['user_count_without_admin'] ?? 0,
-            messageCount: item['message_count'] ?? 0,
-            isFounder: item['is_founder'] ?? false,
-            isMember: item['is_member'] ?? false,
-            isPending: item['is_pending'] ?? false,
-            avatarUrl: item['avatar_url'] ?? '',
-            bannerUrl: item['banner_url'] ?? '',
-            humanCreatedAt: item['human_created_at'] ?? '',
-            pivotCreatedAt: item['pivot']?['created_at'] ?? '',
-            pivotUpdatedAt: item['pivot']?['updated_at'] ?? '',
-          );
+        final groupList = data.map((item) => GroupModel.fromJson(item)).toList();
 
-          return group;
-        }).toList();
-
-        /* debugPrint("🎯 Toplam ${groupList.length} grup modele dönüştürüldü.",
-            wrapWidth: 1024);*/
         return groupList;
       } else {
         debugPrint("❌ Sunucudan beklenmeyen yanıt alındı.", wrapWidth: 1024);

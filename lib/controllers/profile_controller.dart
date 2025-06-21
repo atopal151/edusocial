@@ -1,4 +1,5 @@
 import 'package:edusocial/controllers/appbar_controller.dart';
+import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadProfile();
+    // loadProfile(); // Login sırasında manuel olarak çağrılacak
   }
 
 String formatSimpleDate(String dateStr) {
@@ -58,45 +59,73 @@ String formatSimpleDate(String dateStr) {
 
 
 
-  Future<void> loadProfile() async {
+  void loadProfile() async {
+    debugPrint("🔄 ProfileController.loadProfile() çağrıldı");
+    isLoading.value = true;
+    
     try {
-      isLoading.value = true;
-      final data = await _profileService.fetchProfileData();
-      profile.value = data;
-
-      // 📌 Temel veriler
-      userId.value = data.id.toString();
-      fullName.value = "${data.name} ${data.surname}";
-      username.value = "@${data.username}";
-      profileImage.value = data.avatarUrl;
-      coverImage.value = data.bannerUrl;
-      bio.value = data.description ?? '';
-   birthDate.value = data.birthDate;
-
-      lessons.value = data.lessons;
-
-      // 📌 Okul ve Bölüm Bilgileri
-      schoolName.value = data.school?.name ?? 'Okul bilgisi yok';
-      schoolDepartment.value =
-          data.schoolDepartment?.title ?? 'Bölüm bilgisi yok';
-
-      // 📌 Takipçi ve takip edilen sayıları
-      followers.value = data.followers.length;
-      following.value = data.followings.length;
-
-      // 📌 Takipçi ve Takip Edilen Listesi
-      followerList.assignAll(data.followers);
-      followingList.assignAll(data.followings);
-
-      // 📌 Postlar
-      postCount.value = data.posts.length;
-
-      // 📌 AppBar resmi güncelle
-      appBarController.updateProfileImage(profileImage.value);
+      final profileData = await _profileService.fetchProfileData();
+      if (profileData != null) {
+        debugPrint("✅ Profil verisi başarıyla yüklendi: ${profileData.name} ${profileData.surname}");
+        
+        // Ana profil verisi
+        profile.value = profileData;
+        userId.value = profileData.id.toString();
+        
+        // 📌 Temel veriler
+        fullName.value = "${profileData.name} ${profileData.surname}";
+        username.value = "@${profileData.username}";
+        profileImage.value = profileData.avatarUrl;
+        coverImage.value = profileData.bannerUrl;
+        bio.value = profileData.description ?? '';
+        birthDate.value = profileData.birthDate ?? '';
+        
+        lessons.value = profileData.lessons ?? [];
+        
+        // 📌 Okul ve Bölüm Bilgileri
+        schoolName.value = profileData.school?.name ?? 'Okul bilgisi yok';
+        schoolDepartment.value = profileData.schoolDepartment?.title ?? 'Bölüm bilgisi yok';
+        
+        // 📌 Takipçi ve takip edilen sayıları
+        followers.value = profileData.followers?.length ?? 0;
+        following.value = profileData.followings?.length ?? 0;
+        
+        // 📌 Takipçi ve Takip Edilen Listesi
+        followerList.assignAll(profileData.followers ?? []);
+        followingList.assignAll(profileData.followings ?? []);
+        
+        // 📌 Postlar
+        postCount.value = profileData.posts?.length ?? 0;
+        
+        // Profil yüklendikten sonra diğer verileri de güncelle
+        _updateRelatedData();
+      } else {
+        debugPrint("❌ Profil verisi null döndü");
+      }
     } catch (e) {
-      debugPrint("❌ Profil verisi yüklenemedi: $e", wrapWidth: 1024);
+      debugPrint("❌ Profil yükleme hatası: $e");
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Profil yüklendikten sonra ilgili verileri güncelle
+  void _updateRelatedData() {
+    debugPrint("🔄 İlgili veriler güncelleniyor...");
+    
+    // AppBar'daki profil resmini güncelle
+    try {
+      appBarController.fetchAndSetProfileImage();
+    } catch (e) {
+      debugPrint("❌ AppBar güncelleme hatası: $e");
+    }
+    
+    // Story'leri güncelle
+    try {
+      final storyController = Get.find<StoryController>();
+      storyController.fetchStories();
+    } catch (e) {
+      debugPrint("❌ Story güncelleme hatası: $e");
     }
   }
 

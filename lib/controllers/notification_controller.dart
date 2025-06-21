@@ -11,7 +11,7 @@ class NotificationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchNotifications();
+    // fetchNotifications(); // Login sırasında manuel olarak çağrılacak
   }
 
   /// Bildirimleri çek

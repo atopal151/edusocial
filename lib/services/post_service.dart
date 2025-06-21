@@ -60,6 +60,8 @@ class PostServices {
   /// Anasayfa gönderilerini getir
   static Future<List<PostModel>> fetchHomePosts() async {
     final token = _box.read('token');
+    debugPrint("🔄 PostServices.fetchHomePosts() çağrıldı");
+    debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
 
     try {
       final response = await http.get(
@@ -70,28 +72,31 @@ class PostServices {
         },
       );
 
-      /*debugPrint("📥 Postlar Response: ${response.statusCode}",
-       wrapWidth: 1024);
-      debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);*/
+      debugPrint("📥 Postlar Response: ${response.statusCode}", wrapWidth: 1024);
+      debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
         /// Debug için JSON'u ham olarak gör
-        /*debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}",
-          wrapWidth: 1024);*/
+        debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}", wrapWidth: 1024);
 
         final List posts = body['data']['data'];
+        debugPrint("📊 API'den ${posts.length} post alındı");
 
-        return posts.map((item) {
-          /*debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024);*/
+        final postList = posts.map((item) {
+          debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024);
           return PostModel.fromJson(item);
         }).toList();
+        
+        debugPrint("✅ ${postList.length} post başarıyla parse edildi");
+        return postList;
       } else {
+        debugPrint("❌ API yanıtı başarısız: ${response.statusCode}");
         return [];
       }
     } catch (e) {
-      /*debugPrint("❗ Postlar alınamadı: $e", wrapWidth: 1024);*/
+      debugPrint("❗ Postlar alınamadı: $e", wrapWidth: 1024);
       return [];
     }
   }

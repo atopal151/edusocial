@@ -4,6 +4,9 @@ import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/controllers/topics_controller.dart';
 import 'package:edusocial/controllers/social/chat_controller.dart';
+import 'package:edusocial/controllers/profile_controller.dart';
+import 'package:edusocial/controllers/notification_controller.dart';
+import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/services/socket_services.dart';
@@ -22,6 +25,80 @@ import '../utils/navbar_menu.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
+
+  /// Verilerin yüklenip yüklenmediğini kontrol et ve gerekirse yükle
+  void _checkAndLoadData() {
+    debugPrint("🔍 Veri kontrolü yapılıyor...");
+    
+    // ProfileController kontrolü
+    try {
+      final profileController = Get.find<ProfileController>();
+      if (profileController.profile.value == null) {
+        debugPrint("🔄 Profil verisi yüklenmemiş, yükleniyor...");
+        profileController.loadProfile();
+      }
+    } catch (e) {
+      debugPrint("❌ ProfileController hatası: $e");
+    }
+    
+    // GroupController kontrolü
+    try {
+      final groupController = Get.find<GroupController>();
+      if (groupController.userGroups.isEmpty) {
+        debugPrint("🔄 Grup verileri yüklenmemiş, yükleniyor...");
+        groupController.fetchUserGroups();
+        groupController.fetchAllGroups();
+        groupController.fetchSuggestionGroups();
+        groupController.fetchGroupAreas();
+      }
+    } catch (e) {
+      debugPrint("❌ GroupController hatası: $e");
+    }
+    
+    // NotificationController kontrolü
+    try {
+      final notificationController = Get.find<NotificationController>();
+      if (notificationController.notifications.isEmpty) {
+        debugPrint("🔄 Bildirimler yüklenmemiş, yükleniyor...");
+        notificationController.fetchNotifications();
+      }
+    } catch (e) {
+      debugPrint("❌ NotificationController hatası: $e");
+    }
+    
+    // AppBarController kontrolü
+    try {
+      final appBarController = Get.find<AppBarController>();
+      if (appBarController.profileImagePath.value.isEmpty) {
+        debugPrint("🔄 AppBar resmi yüklenmemiş, yükleniyor...");
+        appBarController.fetchAndSetProfileImage();
+      }
+    } catch (e) {
+      debugPrint("❌ AppBarController hatası: $e");
+    }
+    
+    // StoryController kontrolü
+    try {
+      final storyController = Get.find<StoryController>();
+      if (storyController.otherStories.isEmpty && storyController.myStory.value == null) {
+        debugPrint("🔄 Story'ler yüklenmemiş, yükleniyor...");
+        storyController.fetchStories();
+      }
+    } catch (e) {
+      debugPrint("❌ StoryController hatası: $e");
+    }
+    
+    // PostController kontrolü
+    try {
+      final postController = Get.find<PostController>();
+      if (postController.postHomeList.isEmpty) {
+        debugPrint("🔄 Postlar yüklenmemiş, yükleniyor...");
+        postController.fetchHomePosts();
+      }
+    } catch (e) {
+      debugPrint("❌ PostController hatası: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +135,11 @@ class MainScreen extends StatelessWidget {
     } else {
       debugPrint('⚠️ Token bulunamadı, socket bağlantısı kurulamıyor.');
     }
+
+    // Verilerin yüklenip yüklenmediğini kontrol et
+    Future.delayed(Duration(milliseconds: 100), () {
+      _checkAndLoadData();
+    });
 
     return Scaffold(
       body: Obx(() {

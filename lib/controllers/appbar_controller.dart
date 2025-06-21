@@ -14,10 +14,10 @@ class AppBarController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAndSetProfileImage(); // ⬅️ girişte çağrılır
+    // fetchAndSetProfileImage(); // Login sırasında manuel olarak çağrılacak
   }
 
-  /// 🔄 Avatar’ı backend'den al ve UI'ya yansıt
+  /// 🔄 Avatar'ı backend'den al ve UI'ya yansıt
   Future<void> fetchAndSetProfileImage() async {
     try {
       final profile = await _profileService.fetchProfileData();
