@@ -9,7 +9,7 @@ class ChatModel {
   final int conversationId;
   final bool isOnline;
   int unreadCount; // 🔥 final değil artık!
-  late final LastMessage? lastMessage;
+  LastMessage? lastMessage;
 
   ChatModel({
     required this.id,

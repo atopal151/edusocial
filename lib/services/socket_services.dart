@@ -1,9 +1,21 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService extends GetxService {
   IO.Socket? _socket;
   final RxBool isConnected = false.obs;
+
+  // Stream Controllers for broadcasting events
+  final _privateMessageController = StreamController<dynamic>.broadcast();
+  final _groupMessageController = StreamController<dynamic>.broadcast();
+  final _unreadMessageCountController = StreamController<dynamic>.broadcast();
+
+  // Public streams that other parts of the app can listen to
+  Stream<dynamic> get onPrivateMessage => _privateMessageController.stream;
+  Stream<dynamic> get onGroupMessage => _groupMessageController.stream;
+  Stream<dynamic> get onUnreadMessageCount => _unreadMessageCountController.stream;
 
   // Bağlantı adresi - farklı endpoint'leri deneyeceğiz
   static const String _socketUrl = 'https://stageapi.edusocial.pl';
@@ -106,18 +118,18 @@ class SocketService extends GetxService {
     print('🔌 Event dinleyicileri ayarlanıyor...');
     // 1. Birebir mesaj
     _socket!.on('conversation:new_message', (data) {
-      print('📨 Birebir mesaj geldi: $data');
-      if (onPrivateMessage != null) onPrivateMessage!(data);
+      print('📨 Birebir mesaj geldi (SocketService): $data');
+      _privateMessageController.add(data);
     });
     // 2. Grup mesajı
     _socket!.on('group_conversation:new_message', (data) {
-      print('📨 Grup mesajı geldi: $data');
-      if (onGroupMessage != null) onGroupMessage!(data);
+      print('📨 Grup mesajı geldi (SocketService): $data');
+      _groupMessageController.add(data);
     });
     // 3. Okunmamış mesaj sayısı
     _socket!.on('conversation:un_read_message_count', (data) {
-      print('📨 Okunmamış mesaj sayısı: $data');
-      if (onUnreadMessageCount != null) onUnreadMessageCount!(data);
+      print('📨 Okunmamış mesaj sayısı (SocketService): $data');
+      _unreadMessageCountController.add(data);
     });
 
     print('🔌 Socket bağlantısı başlatılıyor... ($urlName)');
@@ -131,11 +143,6 @@ class SocketService extends GetxService {
       print('🔍 _socket?.id: ${_socket?.id}');
     });
   }
-
-  // Callback fonksiyonları dışarıdan atanabilir
-  Function(dynamic)? onPrivateMessage;
-  Function(dynamic)? onGroupMessage;
-  Function(dynamic)? onUnreadMessageCount;
 
   // Mesaj gönderme
   void sendMessage(String event, dynamic data) {
@@ -163,5 +170,14 @@ class SocketService extends GetxService {
     print('🔌 Socket dinleyicileri temizleniyor...');
     _socket?.clearListeners();
     print('✅ Socket dinleyicileri temizlendi');
+  }
+
+  @override
+  void onClose() {
+    _privateMessageController.close();
+    _groupMessageController.close();
+    _unreadMessageCountController.close();
+    disconnect();
+    super.onClose();
   }
 }

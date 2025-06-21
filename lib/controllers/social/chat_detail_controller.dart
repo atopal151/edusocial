@@ -40,6 +40,7 @@ class ChatDetailController extends GetxController {
 
   final ProfileController profileController = Get.find<ProfileController>();
   late SocketService _socketService;
+  late StreamSubscription _privateMessageSubscription;
 
   // URL algılama için regex pattern
   static final RegExp urlRegex = RegExp(
@@ -91,9 +92,9 @@ class ChatDetailController extends GetxController {
 
   void _setupSocketListeners() {
     // Birebir mesaj dinleyicisi - sadece bu chat için
-    _socketService.onPrivateMessage = (data) {
+    _privateMessageSubscription = _socketService.onPrivateMessage.listen((data) {
       _onNewPrivateMessage(data);
-    };
+    });
   }
 
   void _loadInitialData() {
@@ -112,6 +113,7 @@ class ChatDetailController extends GetxController {
     documentsScrollController.dispose();
     linksScrollController.dispose();
     photosScrollController.dispose();
+    _privateMessageSubscription.cancel();
     super.onClose();
   }
 
@@ -234,7 +236,8 @@ class ChatDetailController extends GetxController {
   }
 
   void stopListeningToNewMessages() {
-    // Socket dinleyicilerini kaldır
+    // Bu artık onClose'da subscription.cancel() ile yapılıyor.
+    // İsterseniz bu metodu kaldırabiliriz veya özel bir durdurma/başlatma mantığı için tutabiliriz.
   }
 
   Future<void> fetchConversationMessages(int chatId) async {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:edusocial/models/chat_models/chat_user_model.dart';
 import 'package:edusocial/models/chat_models/last_message_model.dart';
 import 'package:edusocial/services/chat_service.dart';
@@ -21,13 +23,15 @@ class ChatController extends GetxController {
 
   final GetStorage _box = GetStorage();
   late SocketService _socketService;
+  late StreamSubscription _privateMessageSubscription;
+  late StreamSubscription _groupMessageSubscription;
+  late StreamSubscription _unreadCountSubscription;
   
   @override
   void onInit() {
     super.onInit();
     _socketService = Get.find<SocketService>();
     _setupSocketListeners();
-    _connectSocket();
     fetchChatList();
     fetchOnlineFriends();
   }
@@ -42,20 +46,17 @@ class ChatController extends GetxController {
 
   /// Socket event dinleyicilerini ayarla
   void _setupSocketListeners() {
-    // Birebir mesaj dinleyicisi
-    _socketService.onPrivateMessage = (data) {
+    _privateMessageSubscription = _socketService.onPrivateMessage.listen((data) {
       handleNewPrivateMessage(data);
-    };
+    });
 
-    // Grup mesajı dinleyicisi
-    _socketService.onGroupMessage = (data) {
+    _groupMessageSubscription = _socketService.onGroupMessage.listen((data) {
       handleNewGroupMessage(data);
-    };
+    });
 
-    // Okunmamış mesaj sayısı dinleyicisi
-    _socketService.onUnreadMessageCount = (data) {
+    _unreadCountSubscription = _socketService.onUnreadMessageCount.listen((data) {
       updateUnreadCount(data['count'] ?? 0);
-    };
+    });
   }
 
   /// 🔥 Online arkadaşları getir
@@ -96,37 +97,49 @@ class ChatController extends GetxController {
 
     try {
       final conversationId = data['conversation_id'] ?? 0;
-      final message = data['message'] ?? '';
+      final messageContent = data['message'] ?? '';
       final timestamp = data['created_at'] ?? '';
 
       final index =
           chatList.indexWhere((chat) => chat.conversationId == conversationId);
       if (index != -1) {
         // Var olan sohbeti güncelle
-        chatList[index].lastMessage = LastMessage(
-          message: message,
+        final chat = chatList[index];
+        
+        // Son mesajı ve okunmamış sayısını güncelle
+        chat.lastMessage = LastMessage(
+          message: messageContent,
           createdAt: timestamp,
         );
-        chatList[index].unreadCount += 1;
+        chat.unreadCount += 1;
+
+        // Güncellenen sohbeti listenin en başına taşı
+        chatList.removeAt(index);
+        chatList.insert(0, chat);
+
       } else {
         // Yeni sohbet ekle
-        chatList.add(ChatModel(
-          id: data['sender_id'] ?? 0,
-          name: data['sender']['name'] ?? '',
-          surname: data['sender']['surname'] ?? '',
-          username: data['sender']['username'] ?? '',
-          avatar: data['sender']['avatar_url'] ?? '',
+        final sender = data['sender'] ?? {};
+        final newChat = ChatModel(
+          id: sender['id'] ?? 0,
+          name: sender['name'] ?? '',
+          surname: sender['surname'] ?? '',
+          username: sender['username'] ?? '',
+          avatar: sender['avatar_url'] ?? '',
           conversationId: conversationId,
-          isOnline: true,
+          isOnline: true, // Yeni mesaj geldiyse online kabul edilebilir
           unreadCount: 1,
           lastMessage: LastMessage(
-            message: message,
+            message: messageContent,
             createdAt: timestamp,
           ),
-        ));
+        );
+        chatList.insert(0, newChat);
       }
 
-      filteredChatList.assignAll(chatList);
+      // Filtrelenmiş listeyi de güncelle
+      filterChatList(searchController.text);
+
     } catch (e) {
       debugPrint("❌ Hata handleNewPrivateMessage: $e");
     }
@@ -157,6 +170,9 @@ class ChatController extends GetxController {
     }
 
     filteredGroupChatList.assignAll(groupChatList);
+
+    // Filtrelenmiş listeyi de güncelle
+    filterChatList(searchController.text);
   }
 
   /// 🔴 Okunmamış mesaj sayısını güncelle
@@ -206,9 +222,9 @@ class ChatController extends GetxController {
 
   @override
   void onClose() {
-    _socketService.onPrivateMessage = null;
-    _socketService.onGroupMessage = null;
-    _socketService.onUnreadMessageCount = null;
+    _privateMessageSubscription.cancel();
+    _groupMessageSubscription.cancel();
+    _unreadCountSubscription.cancel();
     super.onClose();
   }
 }
