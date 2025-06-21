@@ -17,6 +17,7 @@ class ChatServices {
   static Future<void> sendMessage(
     int receiverId,
     String message, {
+    String? conversationId,
     List<File>? mediaFiles,
     List<String>? links,
   }) async {
@@ -28,6 +29,9 @@ class ChatServices {
 
     // Text alanları ekle
     request.fields['receiver_id'] = receiverId.toString();
+    if (conversationId != null) {
+      request.fields['conversation_id'] = conversationId;
+    }
     request.fields['message'] = message;
 
     // Linkleri ekle
@@ -119,19 +123,22 @@ class ChatServices {
   }
 
 /// Mesaj detaylarını getir (Show Conversation)
-static Future<List<MessageModel>> fetchConversationMessages(int chatId) async {
+static Future<List<MessageModel>> fetchConversationMessages(int conversationId) async {
   final token = _box.read('token');
+  final url = '${AppConstants.baseUrl}/conversation/$conversationId';
+  
+  debugPrint("Sohbet mesajları getiriliyor (2. deneme): $url");
+
   final response = await http.get(
-    Uri.parse('${AppConstants.baseUrl}/conversation/$chatId'),
+    Uri.parse(url),
     headers: {
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
     },
   );
 
-  /*debugPrint('Gönderilen chatId: $chatId');*/
-
-
+  debugPrint("Sohbet Mesajları Yanıt Kodu: ${response.statusCode}");
+  // debugPrint("Sohbet Mesajları Yanıt Body: ${response.body}");
 
   if (response.statusCode == 200) {
     final body = jsonDecode(response.body);

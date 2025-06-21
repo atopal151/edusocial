@@ -182,18 +182,22 @@ class ChatController extends GetxController {
     // Örneğin AppBar'da badge göstermek için
   }
 
-  /// 📃 Chat detay sayfasına yönlendir
-  void getChatDetailPage(int chatId,
-      {required String name,
-      required String username,
-      required String avatarUrl,
-      required bool isOnline}) {
+  /// 📃 Chat detay sayfasına git
+  void getChatDetailPage({
+    required int userId,
+    int? conversationId,
+    required String name,
+    required String avatarUrl,
+    required bool isOnline,
+    required String username,
+  }) {
     Get.toNamed('/chat_detail', arguments: {
-      'chatId': chatId,
+      'userId': userId,
+      'conversationId': conversationId,
       'name': name,
-      'username': username,
       'avatarUrl': avatarUrl,
       'isOnline': isOnline,
+      'username': username,
     });
   }
 

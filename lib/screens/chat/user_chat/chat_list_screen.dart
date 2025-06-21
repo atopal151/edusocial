@@ -72,12 +72,12 @@ class _ChatListScreenState extends State<ChatListScreen>
                             padding: const EdgeInsets.only(left: 10, right: 1),
                             child: GestureDetector(
                               onTap: () {
-                                //debugPrint('tıklanan chat id:${friend.id}');
                                 chatController.getChatDetailPage(
-                                  friend.id,
+                                  userId: friend.id,
                                   name: friend.name,
                                   avatarUrl: friend.profileImage,
-                                  isOnline: friend.isOnline, username: friend.username,
+                                  isOnline: friend.isOnline, 
+                                  username: friend.username,
                                 );
                               },
                               child: Column(
@@ -183,12 +183,14 @@ class _ChatListScreenState extends State<ChatListScreen>
               final chat = chatController.filteredChatList[index];
               return GestureDetector(
                 onTap: () {
-                  debugPrint('tıklanan chat id:${chat.id}');
+                  debugPrint('tıklanan user id:${chat.id}, conversation id:${chat.conversationId}');
                   chatController.getChatDetailPage(
-                    chat.id,
+                    userId: chat.id,
+                    conversationId: chat.conversationId,
                     name: chat.name,
                     avatarUrl: chat.avatar,
-                    isOnline: chat.isOnline, username: chat.username,
+                    isOnline: chat.isOnline,
+                    username: chat.username,
                   );
                 },
                 child: Padding(

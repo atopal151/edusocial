@@ -26,7 +26,7 @@ class _GroupParticipantsScreenState extends State<GroupParticipantsScreen> {
     final avatarUrl = user['avatar_url'] ?? '';
 
     chatController.getChatDetailPage(
-      userId,
+      userId: userId,
       name: '$name $surname',
       username: username,
       avatarUrl: avatarUrl,

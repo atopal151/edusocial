@@ -26,7 +26,9 @@ class ChatDetailController extends GetxController {
   final documentsScrollController = ScrollController();
   final linksScrollController = ScrollController();
   final photosScrollController = ScrollController();
-  int? currentChatId;
+  
+  final Rxn<int> currentChatId = Rxn<int>(); // This is the User ID
+  final Rxn<String> currentConversationId = Rxn<String>();
 
   RxString pollQuestion = ''.obs;
   RxList<String> pollOptions = <String>[].obs;
@@ -76,9 +78,32 @@ class ChatDetailController extends GetxController {
   void onInit() {
     super.onInit();
     _socketService = Get.find<SocketService>();
+    
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    if (arguments != null) {
+      final userId = arguments['userId'] as int?;
+      final conversationId = arguments['conversationId'];
+      
+      // conversationId can be int or String, convert to String
+      String? conversationIdString;
+      if (conversationId != null) {
+        conversationIdString = conversationId.toString();
+      }
+
+      currentChatId.value = userId;
+      currentConversationId.value = conversationIdString;
+      
+      debugPrint('ChatDetailController initialized:');
+      debugPrint('  - User ID: ${currentChatId.value}');
+      debugPrint('  - Conversation ID: ${currentConversationId.value}');
+
+      if (currentChatId.value != null) {
+        fetchConversationMessages();
+      }
+    }
+    
     _initializeScrollController();
     _setupSocketListeners();
-    _loadInitialData();
   }
 
   void _initializeScrollController() {
@@ -97,12 +122,6 @@ class ChatDetailController extends GetxController {
     });
   }
 
-  void _loadInitialData() {
-    if (currentChatId != null) {
-      fetchConversationMessages(currentChatId!);
-    }
-  }
-
   void _loadMoreMessages() {
     // Daha fazla mesaj yükleme işlemi
   }
@@ -117,104 +136,16 @@ class ChatDetailController extends GetxController {
     super.onClose();
   }
 
-  Future<void> loadUserChatDetail(int chatId) async {
-    try {
-      debugPrint('🔍 ChatDetailController - loadUserChatDetail başladı');
-      debugPrint('  - chatId: $chatId');
-      
-      isLoading.value = true;
-      currentChatId = chatId;
-
-      // Mesajları yükle
-      final fetchedMessages = await ChatServices.fetchConversationMessages(chatId);
-      messages.clear();
-      messages.addAll(fetchedMessages);
-
-      // İlk mesajdan kullanıcı bilgilerini yükle
-      if (messages.isNotEmpty) {
-        final sender = messages.first.sender;
-        
-        debugPrint('✅ ChatDetailController - Sender bilgileri:');
-        debugPrint('  - ID: ${sender.id}');
-        debugPrint('  - Name: ${sender.name}');
-        debugPrint('  - Surname: ${sender.surname}');
-        
-        // Kullanıcı detaylarını getir
-        final userDetails = await ChatServices.fetchUserDetails(sender.id);
-        
-        // Belge, link ve fotoğrafları topla
-        final allDocuments = <DetailDocumentModel>[];
-        final allLinks = <LinkModel>[];
-        final allPhotos = <String>[];
-
-        for (var message in messages) {
-          // Belgeleri topla
-          if (message.messageDocument != null) {
-            allDocuments.addAll(message.messageDocument!);
-          }
-
-          // Linkleri topla
-          for (var link in message.messageLink) {
-            allLinks.add(LinkModel(
-              url: link.link,
-              title: link.linkTitle,
-            ));
-          }
-
-          // Fotoğrafları topla
-          for (var media in message.messageMedia) {
-            allPhotos.add(media.path);
-          }
-        }
-
-        // Kullanıcı detaylarını güncelle
-        userChatDetail.value = UserChatDetailModel(
-          id: userDetails.id,
-          name: userDetails.name,
-          follower: userDetails.follower,
-          following: userDetails.following,
-          imageUrl: userDetails.imageUrl,
-          memberImageUrls: const [],
-          documents: allDocuments.map((doc) => DocumentModel(
-            id: doc.id,
-            name: doc.name,
-            sizeMb: 0.0,
-            humanCreatedAt: doc.date,
-            createdAt: DateTime.parse(doc.date),
-          )).toList(),
-          links: allLinks,
-          photoUrls: allPhotos,
-        );
-        
-        debugPrint('✅ ChatDetailController - userChatDetail güncellendi:');
-        debugPrint('  - ID: ${userChatDetail.value?.id}');
-        debugPrint('  - Name: ${userChatDetail.value?.name}');
-        debugPrint('  - Follower: ${userChatDetail.value?.follower}');
-        debugPrint('  - Following: ${userChatDetail.value?.following}');
-        debugPrint('  - Documents Count: ${userChatDetail.value?.documents.length}');
-        debugPrint('  - Links Count: ${userChatDetail.value?.links.length}');
-        debugPrint('  - PhotoUrls Count: ${userChatDetail.value?.photoUrls.length}');
-      } else {
-        debugPrint('❌ ChatDetailController - Mesaj veya gönderen bulunamadı');
-      }
-
-      userChatDetail.refresh();
-    } catch (e) {
-      debugPrint('❌ ChatDetailController - Hata: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   void _onNewPrivateMessage(dynamic data) {
     try {
       debugPrint('📡 ChatDetailController - Yeni mesaj geldi: $data');
       
       if (data is Map<String, dynamic>) {
-        final conversationId = data['conversation_id'];
+        // Gelen mesajın conversation_id'sini string olarak al
+        final incomingConversationId = data['conversation_id']?.toString();
         
         // Sadece bu chat için gelen mesajları işle
-        if (conversationId == currentChatId) {
+        if (incomingConversationId != null && incomingConversationId == currentConversationId.value) {
           final message = MessageModel.fromJson(data);
           messages.add(message);
           
@@ -224,6 +155,8 @@ class ChatDetailController extends GetxController {
           });
           
           debugPrint('✅ Yeni mesaj chat listesine eklendi');
+        } else {
+          debugPrint('📨 Gelen mesaj bu sohbete ait değil. Gelen: $incomingConversationId, Mevcut: ${currentConversationId.value}');
         }
       }
     } catch (e) {
@@ -231,22 +164,16 @@ class ChatDetailController extends GetxController {
     }
   }
 
-  void startListeningToNewMessages(int chatId) {
-    currentChatId = chatId;
-  }
-
-  void stopListeningToNewMessages() {
-    // Bu artık onClose'da subscription.cancel() ile yapılıyor.
-    // İsterseniz bu metodu kaldırabiliriz veya özel bir durdurma/başlatma mantığı için tutabiliriz.
-  }
-
-  Future<void> fetchConversationMessages(int chatId) async {
+  Future<void> fetchConversationMessages() async {
+    if (currentChatId.value == null) {
+      debugPrint('❌ fetchConversationMessages - currentChatId null, işlem iptal.');
+      return;
+    }
     try {
       isLoading.value = true;
-      currentChatId = chatId;
       
       // Mesajları yükle
-      final fetchedMessages = await ChatServices.fetchConversationMessages(chatId);
+      final fetchedMessages = await ChatServices.fetchConversationMessages(currentChatId.value!);
       messages.clear();
       messages.addAll(fetchedMessages);
 
@@ -504,7 +431,7 @@ class ChatDetailController extends GetxController {
   }
 
   Future<void> sendMessage(String message) async {
-    if (currentChatId == null) return;
+    if (currentChatId.value == null) return;
     if (isSendingMessage.value) return;
     
     // Eğer hiçbir şey seçilmemişse gönderme
@@ -533,8 +460,9 @@ class ChatDetailController extends GetxController {
         debugPrint('  - Sending message with separated text and links');
         
         await ChatServices.sendMessage(
-          currentChatId!,
+          currentChatId.value!,
           nonLinkText, // Sadece link olmayan text
+          conversationId: currentConversationId.value,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
           links: normalizedUrls, // Linkleri ayrı parametrede gönder
         );
@@ -543,8 +471,9 @@ class ChatDetailController extends GetxController {
         debugPrint('📝 Sending normal text message');
         
         await ChatServices.sendMessage(
-          currentChatId!,
+          currentChatId.value!,
           message,
+          conversationId: currentConversationId.value,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
         );
       }
@@ -553,7 +482,7 @@ class ChatDetailController extends GetxController {
       selectedFiles.clear();
       
       // Mesaj gönderildikten sonra mesajları yeniden yükle
-      await fetchConversationMessages(currentChatId!);
+      await fetchConversationMessages();
       
       // Mesaj gönderildikten sonra en alta git
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -574,7 +503,7 @@ class ChatDetailController extends GetxController {
 
   // Sadece media dosyalarını gönder (text olmadan)
   Future<void> sendMediaOnly() async {
-    if (currentChatId == null) return;
+    if (currentChatId.value == null) return;
     if (isSendingMessage.value) return;
     
     debugPrint('📁 Sending media files only');
@@ -582,8 +511,9 @@ class ChatDetailController extends GetxController {
     
     try {
       await ChatServices.sendMessage(
-        currentChatId!,
+        currentChatId.value!,
         '', // Boş text
+        conversationId: currentConversationId.value,
         mediaFiles: selectedFiles,
       );
       
@@ -591,7 +521,7 @@ class ChatDetailController extends GetxController {
       selectedFiles.clear();
       
       // Mesajları yeniden yükle
-      await fetchConversationMessages(currentChatId!);
+      await fetchConversationMessages();
       
       // Medya gönderildikten sonra en alta git
       WidgetsBinding.instance.addPostFrameCallback((_) {
