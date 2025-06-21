@@ -37,8 +37,17 @@ class MessageModel {
     this.senderAvatarUrl,
   });
 
-  factory MessageModel.fromJson(Map<String, dynamic> json) {
+  factory MessageModel.fromJson(Map<String, dynamic> json, {int? currentUserId}) {
     final senderJson = json['sender'];
+    final senderId = json['sender_id'] is int
+        ? json['sender_id']
+        : int.tryParse(json['sender_id'].toString()) ?? 0;
+        
+    bool isMeFlag = json['is_me'] == true || (json['is_me'] is int && json['is_me'] == 1);
+    if (currentUserId != null) {
+      isMeFlag = senderId == currentUserId;
+    }
+
     return MessageModel(
       id: json['id'] is int
           ? json['id']
@@ -46,14 +55,11 @@ class MessageModel {
       conversationId: json['conversation_id'] is int
           ? json['conversation_id']
           : int.tryParse(json['conversation_id'].toString()) ?? 0,
-      senderId: json['sender_id'] is int
-          ? json['sender_id']
-          : int.tryParse(json['sender_id'].toString()) ?? 0,
+      senderId: senderId,
       message: json['message'] ?? '',
       isRead: json['is_read'] == true ||
           (json['is_read'] is int && json['is_read'] == 1),
-      isMe:
-          json['is_me'] == true || (json['is_me'] is int && json['is_me'] == 1),
+      isMe: isMeFlag,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       sender: json['sender'] != null

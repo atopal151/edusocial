@@ -125,6 +125,7 @@ class ChatServices {
 /// Mesaj detaylarını getir (Show Conversation)
 static Future<List<MessageModel>> fetchConversationMessages(int conversationId) async {
   final token = _box.read('token');
+  final currentUserId = _box.read('userId');
   final url = '${AppConstants.baseUrl}/conversation/$conversationId';
   
   debugPrint("Sohbet mesajları getiriliyor (2. deneme): $url");
@@ -145,7 +146,7 @@ static Future<List<MessageModel>> fetchConversationMessages(int conversationId) 
     final List<dynamic> messagesJson = body['data'];
 
     return messagesJson
-        .map((json) => MessageModel.fromJson(json as Map<String, dynamic>))
+        .map((json) => MessageModel.fromJson(json as Map<String, dynamic>, currentUserId: currentUserId))
         .toList();
   } else {
     throw Exception('Mesajlar getirilemedi!');

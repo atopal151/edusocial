@@ -146,7 +146,13 @@ class ChatDetailController extends GetxController {
         
         // Sadece bu chat için gelen mesajları işle
         if (incomingConversationId != null && incomingConversationId == currentConversationId.value) {
-          final message = MessageModel.fromJson(data);
+          final currentUserId = profileController.profile.value?.id;
+          if (currentUserId == null) {
+            debugPrint('❌ _onNewPrivateMessage: Current user ID is null.');
+            return;
+          }
+          
+          final message = MessageModel.fromJson(data, currentUserId: currentUserId);
           messages.add(message);
           
           // Yeni mesaj geldiğinde en alta git
