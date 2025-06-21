@@ -167,176 +167,198 @@ class _ChatListScreenState extends State<ChatListScreen>
 
   /// 👥 Kişisel Mesajlar Listesi
   Widget _buildPrivateMessages() {
-    return Obx(() => ListView.builder(
-          itemCount: chatController.filteredChatList.length,
-          itemBuilder: (context, index) {
-            final chat = chatController.filteredChatList[index];
-            return GestureDetector(
-              onTap: () {
-                debugPrint('tıklanan chat id:${chat.id}');
-                chatController.getChatDetailPage(
-                  chat.id,
-                  name: chat.name,
-                  avatarUrl: chat.avatar,
-                  isOnline: chat.isOnline, username: chat.username,
-                );
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundImage: NetworkImage(chat.avatar),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              width: 15,
-                              height: 15,
-                              decoration: BoxDecoration(
-                                color: chat.isOnline
-                                    ? const Color(0xff65d384)
-                                    : const Color(0xffd9d9d9),
-                                borderRadius: BorderRadius.circular(50),
-                                border:
-                                    Border.all(color: Colors.white, width: 2),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+    return RefreshIndicator(
+      onRefresh: () async {
+        debugPrint("🔄 Kişisel mesajlar yenileniyor...");
+        await chatController.fetchChatList();
+        debugPrint("✅ Kişisel mesajlar başarıyla yenilendi");
+      },
+      color: Color(0xFFEF5050),
+      backgroundColor: Color(0xfffafafa),
+      strokeWidth: 2.0,
+      displacement: 10.0,
+      child: Obx(() => ListView.builder(
+            itemCount: chatController.filteredChatList.length,
+            itemBuilder: (context, index) {
+              final chat = chatController.filteredChatList[index];
+              return GestureDetector(
+                onTap: () {
+                  debugPrint('tıklanan chat id:${chat.id}');
+                  chatController.getChatDetailPage(
+                    chat.id,
+                    name: chat.name,
+                    avatarUrl: chat.avatar,
+                    isOnline: chat.isOnline, username: chat.username,
+                  );
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Stack(
                           children: [
-                            Text(
-                              chat.name,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 13),
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundImage: NetworkImage(chat.avatar),
                             ),
-                            Text(
-                              chat.lastMessage?.message ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 11, color: Colors.grey),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                width: 15,
+                                height: 15,
+                                decoration: BoxDecoration(
+                                  color: chat.isOnline
+                                      ? const Color(0xff65d384)
+                                      : const Color(0xffd9d9d9),
+                                  borderRadius: BorderRadius.circular(50),
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            formatSimpleDateClock(
-                                chat.lastMessage?.createdAt ?? ''),
-                            style: const TextStyle(
-                                fontSize: 10, color: Colors.grey),
-                          ),
-                          const SizedBox(height: 8),
-                          if (chat.unreadCount > 0)
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: Colors.red,
-                              child: Text(
-                                chat.unreadCount.toString(),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                chat.name,
                                 style: const TextStyle(
-                                    fontSize: 10, color: Colors.white),
+                                    fontWeight: FontWeight.w600, fontSize: 13),
                               ),
+                              Text(
+                                chat.lastMessage?.message ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 11, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              formatSimpleDateClock(
+                                  chat.lastMessage?.createdAt ?? ''),
+                              style: const TextStyle(
+                                  fontSize: 10, color: Colors.grey),
                             ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(height: 8),
+                            if (chat.unreadCount > 0)
+                              CircleAvatar(
+                                radius: 10,
+                                backgroundColor: Colors.red,
+                                child: Text(
+                                  chat.unreadCount.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 10, color: Colors.white),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        ));
+              );
+            },
+          )),
+    );
   }
 
   /// 👥 Grup Mesajları Listesi
   Widget _buildGroupMessages() {
-    return Obx(() => ListView.builder(
-          itemCount: groupController.userGroups.length,
-          itemBuilder: (context, index) {
-            final group = groupController.userGroups[index];
-            return GestureDetector(
-              onTap: () {
-                chatController.getGroupChatPage(group.id);
-              },
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundImage: NetworkImage(group.avatarUrl),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+    return RefreshIndicator(
+      onRefresh: () async {
+        debugPrint("🔄 Grup mesajları yenileniyor...");
+        await groupController.fetchUserGroups();
+        debugPrint("✅ Grup mesajları başarıyla yenilendi");
+      },
+      color: Color(0xFFEF5050),
+      backgroundColor: Color(0xfffafafa),
+      strokeWidth: 2.0,
+      displacement: 40.0,
+      child: Obx(() => ListView.builder(
+            itemCount: groupController.userGroups.length,
+            itemBuilder: (context, index) {
+              final group = groupController.userGroups[index];
+              return GestureDetector(
+                onTap: () {
+                  chatController.getGroupChatPage(group.id);
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 25,
+                          backgroundImage: NetworkImage(group.avatarUrl),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                group.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 13),
+                              ),
+                              Text(
+                                group.description,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 11, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
                           children: [
                             Text(
-                              group.name,
+                              group.humanCreatedAt,
                               style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 13),
+                                  fontSize: 10, color: Colors.grey),
                             ),
-                            Text(
-                              group.description,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontSize: 11, color: Colors.grey),
-                            ),
+                            const SizedBox(height: 8),
+                            if (group.messageCount > 0)
+                              CircleAvatar(
+                                radius: 10,
+                                backgroundColor: Colors.red,
+                                child: Text(
+                                  group.messageCount.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 10, color: Colors.white),
+                                ),
+                              ),
                           ],
                         ),
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            group.humanCreatedAt,
-                            style: const TextStyle(
-                                fontSize: 10, color: Colors.grey),
-                          ),
-                          const SizedBox(height: 8),
-                          if (group.messageCount > 0)
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: Colors.red,
-                              child: Text(
-                                group.messageCount.toString(),
-                                style: const TextStyle(
-                                    fontSize: 10, color: Colors.white),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        ));
+              );
+            },
+          )),
+    );
   }
 }

@@ -50,30 +50,41 @@ class _NotificationScreenState extends State<NotificationScreen> {
         final grouped =
             controller.groupNotificationsByDate(controller.notifications);
 
-        return ListView.builder(
-          itemCount: grouped.length,
-          itemBuilder: (context, index) {
-            final group = grouped[index];
+        return RefreshIndicator(
+          onRefresh: () async {
+            debugPrint("🔄 Bildirimler yenileniyor...");
+            await controller.fetchNotifications();
+            debugPrint("✅ Bildirimler başarıyla yenilendi");
+          },
+          color: Color(0xFFEF5050),
+          backgroundColor: Color(0xfffafafa),
+          strokeWidth: 2.0,
+          displacement: 40.0,
+          child: ListView.builder(
+            itemCount: grouped.length,
+            itemBuilder: (context, index) {
+              final group = grouped[index];
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
-                    group.label,
-                    style: const TextStyle(
-                      fontSize: 13.28,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff414751),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      group.label,
+                      style: const TextStyle(
+                        fontSize: 13.28,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff414751),
+                      ),
                     ),
                   ),
-                ),
-                ...group.notifications.map((n) => buildNotificationTile(n)),
-              ],
-            );
-          },
+                  ...group.notifications.map((n) => buildNotificationTile(n)),
+                ],
+              );
+            },
+          ),
         );
       }),
     );

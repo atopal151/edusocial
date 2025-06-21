@@ -74,78 +74,91 @@ class _ProfileScreenState extends State<ProfileScreen>
           )
         ],
       ),
-      body: DefaultTabController(
-        length: 2,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  buildProfileHeader(),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    width: 200,
-                    child: CustomButton(
-                      height: 40,
-                      borderRadius: 5,
-                      text: "Profili Düzenle",
-                      onPressed: () {
-                        controller.getToSettingScreen();
-                      },
-                      backgroundColor: const Color(0xfff4f4f5),
-                      textColor: const Color(0xff414751),
-                      icon: SvgPicture.asset(
-                        "images/icons/profile_edit_icon.svg",
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xff414751),
-                          BlendMode.srcIn,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          debugPrint("🔄 Profil verileri yenileniyor...");
+          await controller.loadProfile();
+          await postController.fetchHomePosts();
+          await entryController.fetchAllEntries();
+          debugPrint("✅ Profil verileri başarıyla yenilendi");
+        },
+        color: Color(0xFFEF5050),
+        backgroundColor: Color(0xfffafafa),
+        strokeWidth: 2.0,
+        displacement: 40.0,
+        child: DefaultTabController(
+          length: 2,
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    buildProfileHeader(),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: 200,
+                      child: CustomButton(
+                        height: 40,
+                        borderRadius: 5,
+                        text: "Profili Düzenle",
+                        onPressed: () {
+                          controller.getToSettingScreen();
+                        },
+                        backgroundColor: const Color(0xfff4f4f5),
+                        textColor: const Color(0xff414751),
+                        icon: SvgPicture.asset(
+                          "images/icons/profile_edit_icon.svg",
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xff414751),
+                            BlendMode.srcIn,
+                          ),
+                          width: 20,
+                          height: 20,
                         ),
-                        width: 20,
-                        height: 20,
+                        isLoading: controller.isPrLoading,
                       ),
-                      isLoading: controller.isPrLoading,
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  /// **✅ Üst TabBar (İkonlu)**
-                  ProfileTabBar(tabController: _tabController),
-                ],
-              ),
-            ),
-          ],
-          body: TabBarView(
-            controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
-            children: [
-              /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
-              Column(
-                children: [
-                  Container(
-                    color: Color(0xfffafafa),
-                    child: ToggleTabBar(
-                      selectedIndex: selectedTabIndex,
-                      onTabChanged: (index) {
-                        selectedTabIndex.value = index;
-                      },
+                    SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  Expanded(
-                    child: Obx(() {
-                      return selectedTabIndex.value == 0
-                          ? _buildPosts()
-                          : _buildEntries();
-                    }),
-                  ),
-                ],
-              ),
 
-              /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
-              buildProfileDetails(),
+                    /// **✅ Üst TabBar (İkonlu)**
+                    ProfileTabBar(tabController: _tabController),
+                  ],
+                ),
+              ),
             ],
+            body: TabBarView(
+              controller: _tabController,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
+                Column(
+                  children: [
+                    Container(
+                      color: Color(0xfffafafa),
+                      child: ToggleTabBar(
+                        selectedIndex: selectedTabIndex,
+                        onTabChanged: (index) {
+                          selectedTabIndex.value = index;
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: Obx(() {
+                        return selectedTabIndex.value == 0
+                            ? _buildPosts()
+                            : _buildEntries();
+                      }),
+                    ),
+                  ],
+                ),
+
+                /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
+                buildProfileDetails(),
+              ],
+            ),
           ),
         ),
       ),
@@ -162,6 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Container(
       decoration: BoxDecoration(color: Color(0xfffafafa)),
       child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
@@ -192,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       }
 
       return ListView.builder(
-        physics: const BouncingScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: entryController.entryPersonList.length,
         itemBuilder: (context, index) {

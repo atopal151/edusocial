@@ -15,7 +15,7 @@ class NotificationController extends GetxController {
   }
 
   /// Bildirimleri çek
-  void fetchNotifications() async {
+  Future<void> fetchNotifications() async {
     isLoading.value = true;
     try {
       final fetched = await NotificationService.fetchMobileNotifications();

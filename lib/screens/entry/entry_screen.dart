@@ -1,6 +1,7 @@
 import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/components/cards/entry_card.dart';
 import 'package:edusocial/components/input_fields/search_text_field.dart';
+import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/models/entry_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -49,94 +50,132 @@ class EntryScreenState extends State<EntryScreen> {
       child: Scaffold(
         backgroundColor: const Color(0xfffafafa),
         appBar: UserAppBar(),
-        body: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 🔍 Arama Alanı
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8),
-                child: SearchTextField(
-                  label: "Entry ara",
-                  controller: entryController.entrySearchController,
-                  onChanged: (value) {
-                    final query = value.toLowerCase();
-                    entryController.displayEntries.assignAll(
-                      entryController.allDisplayEntries.where((item) {
-                        return item.entry.content.toLowerCase().contains(query) ||
-                            (item.topicName?.toLowerCase().contains(query) ?? false) ||
-                            (item.categoryTitle?.toLowerCase().contains(query) ?? false);
-                      }).toList(),
-                    );
-                  },
+        body: RefreshIndicator(
+          
+          onRefresh: () async {
+            debugPrint("🔄 Entry verileri yenileniyor...");
+            await entryController.fetchAndPrepareEntries();
+            debugPrint("✅ Entry verileri başarıyla yenilendi");
+          },
+          color: Color(0xFFEF5050),
+          backgroundColor: Color(0xfffafafa),
+          strokeWidth: 2.0,
+          displacement: 120.0,
+          edgeOffset: 10.0,
+          child: Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 🔍 Arama Alanı
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8),
+                  child: SearchTextField(
+                    label: "Entry ara",
+                    controller: entryController.entrySearchController,
+                    onChanged: (value) {
+                      final query = value.toLowerCase();
+                      entryController.displayEntries.assignAll(
+                        entryController.allDisplayEntries.where((item) {
+                          return item.entry.content
+                                  .toLowerCase()
+                                  .contains(query) ||
+                              (item.topicName?.toLowerCase().contains(query) ??
+                                  false) ||
+                              (item.categoryTitle
+                                      ?.toLowerCase()
+                                      .contains(query) ??
+                                  false);
+                        }).toList(),
+                      );
+                    },
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // ➕ Yeni Konu Butonu
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: CustomButton(
-                  height: 45,
-                  borderRadius: 15,
-                  text: "+ Yeni Konu Aç",
-                  onPressed: () => entryController.shareEntry(),
-                  isLoading: entryController.isEntryLoading,
-                  backgroundColor: const Color(0xfffb535c),
-                  textColor: Colors.white,
+                // ➕ Yeni Konu Butonu
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomButton(
+                    height: 45,
+                    borderRadius: 15,
+                    text: "+ Yeni Konu Aç",
+                    onPressed: () => entryController.shareEntry(),
+                    isLoading: entryController.isEntryLoading,
+                    backgroundColor: const Color(0xfffb535c),
+                    textColor: Colors.white,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // 📄 Entry Listesi
-              Expanded(
-                child: entryController.isEntryLoading.value
-                    ? const Center(child: CircularProgressIndicator())
-                    : entryController.displayEntries.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "Gösterilecek entry bulunamadı.",
-                              style: TextStyle(color: Colors.grey),
+                // 📄 Entry Listesi
+                Expanded(
+                  child: entryController.isEntryLoading.value
+                      ? Center(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 40),
+                            child: GeneralLoadingIndicator(
+                              size: 32,
+                              showIcon: false,
                             ),
-                          )
-                        : ListView.builder(
-                            itemCount: entryController.displayEntries.length,
-                            itemBuilder: (context, index) {
-                              final displayItem = entryController.displayEntries[index];
-                              final EntryModel entry = displayItem.entry;
-
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                child: EntryCard(
-                                  entry: entry,
-                                  topicName: displayItem.topicName,
-                                  categoryTitle: displayItem.categoryTitle,
-                                  onUpvote: () => entryController.voteEntry(entry.id, "up"),
-                                  onDownvote: () => entryController.voteEntry(entry.id, "down"),
-                                  onShare: () {
-                                    final String shareText = entry.content;
-                                    showModalBottomSheet(
-                                      context: context,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                                      ),
-                                      builder: (_) => ShareOptionsBottomSheet(postText: shareText),
-                                    );
-                                  },
-                                  onPressed: () {
-                                    Get.toNamed(Routes.entryDetail, arguments: {'entry': entry});
-                                  },
-                                  onPressedProfile: () {
-                                    Get.to(() => PeopleProfileScreen(username: entry.user.username));
-                                  },
-                                ),
-                              );
-                            },
                           ),
-              ),
-            ],
+                        )
+                      : entryController.displayEntries.isEmpty
+                          ? const Center(
+                              child: Text(
+                                "Gösterilecek entry bulunamadı.",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          : ListView.builder(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              itemCount: entryController.displayEntries.length,
+                              itemBuilder: (context, index) {
+                                final displayItem =
+                                    entryController.displayEntries[index];
+                                final EntryModel entry = displayItem.entry;
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 8.0),
+                                  child: EntryCard(
+                                    entry: entry,
+                                    topicName: displayItem.topicName,
+                                    categoryTitle: displayItem.categoryTitle,
+                                    onUpvote: () => entryController.voteEntry(
+                                        entry.id, "up"),
+                                    onDownvote: () => entryController.voteEntry(
+                                        entry.id, "down"),
+                                    onShare: () {
+                                      final String shareText = entry.content;
+                                      showModalBottomSheet(
+                                        context: context,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(25)),
+                                        ),
+                                        builder: (_) => ShareOptionsBottomSheet(
+                                            postText: shareText),
+                                      );
+                                    },
+                                    onPressed: () {
+                                      Get.toNamed(Routes.entryDetail,
+                                          arguments: {'entry': entry});
+                                    },
+                                    onPressedProfile: () {
+                                      Get.to(() => PeopleProfileScreen(
+                                          username: entry.user.username));
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                ),
+                // RefreshIndicator için minimum yükseklik
+                SizedBox(height: 50),
+              ],
+            ),
           ),
         ),
       ),

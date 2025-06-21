@@ -59,7 +59,7 @@ String formatSimpleDate(String dateStr) {
 
 
 
-  void loadProfile() async {
+  Future<void> loadProfile() async {
     debugPrint("🔄 ProfileController.loadProfile() çağrıldı");
     isLoading.value = true;
     
@@ -96,6 +96,7 @@ String formatSimpleDate(String dateStr) {
         
         // 📌 Postlar
         postCount.value = profileData.posts?.length ?? 0;
+        profilePosts.assignAll(profileData.posts ?? []);
         
         // Profil yüklendikten sonra diğer verileri de güncelle
         _updateRelatedData();

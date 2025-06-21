@@ -1,4 +1,7 @@
 import 'dart:io';
+
+import 'package:edusocial/controllers/post_controller.dart';
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/models/language_model.dart';
 import 'package:edusocial/models/profile_model.dart';
 import 'package:edusocial/services/onboarding_service.dart';
@@ -8,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+
+import '../../components/snackbars/custom_snackbar.dart';
 
 class ProfileUpdateController extends GetxController {
   final _profileService = ProfileService();
@@ -289,10 +294,17 @@ class ProfileUpdateController extends GetxController {
         languageId: selectedLanguageId.value?.toString() ?? '',
       );
 
-      Get.snackbar("Başarılı", "Profil bilgileri güncellendi!");
-      await fetchUserProfile(); // Güncel verileri tekrar çek
+      // Başarılı snackbar'ı kaldırıldı.
+      // Ana profil sayfasındaki verileri güncelle.
+      await Get.find<ProfileController>().loadProfile();
+      // Post verilerini de güncelle
+      await Get.find<PostController>().fetchHomePosts();
+      Get.back(); // Bir önceki sayfaya dön.
     } catch (e) {
-      Get.snackbar("Hata", "Profil güncellenemedi: $e");
+      CustomSnackbar.show(
+          title: "Hata",
+          message: "Profil güncellenemedi: $e",
+          type: SnackbarType.error);
     } finally {
       isLoading.value = false;
     }

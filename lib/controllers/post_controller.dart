@@ -25,7 +25,7 @@ class PostController extends GetxController {
   }
 
 //POST GET
-  void fetchHomePosts() async {
+  Future<void> fetchHomePosts() async {
     debugPrint("🔄 PostController.fetchHomePosts() çağrıldı");
     isHomeLoading.value = true;
     try {

@@ -48,7 +48,7 @@ class GroupController extends GetxController {
   }
 
 //-------------------------------fetch-------------------------------
-  void fetchUserGroups() async {
+  Future<void> fetchUserGroups() async {
     isLoading.value = true;
     userGroups.value = await _groupServices.fetchUserGroups();
     isLoading.value = false;
