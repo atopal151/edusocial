@@ -28,13 +28,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Container(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: GeneralLoadingIndicator(
-              size: 32,
-              color: Color(0xFFFF7743),
-              icon: Icons.notifications,
-              showText: true,
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: GeneralLoadingIndicator(
+                    size: 32,
+                    color: Color(0xFFFF7743),
+                    icon: Icons.notifications,
+                    showText: true,
+                  ),
+                ),
+              ],
             ),
           );
         }
@@ -127,65 +135,170 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget? _buildTrailingButton(NotificationModel notif) {
-    // Sadece belirli tiplerdeki bildirimlerde buton göster
-    if (notif.type != 'follow-join-request') {
-      return null;
-    }
+    // Takip istekleri için butonlar
+    if (notif.type == 'follow-join-request') {
+      debugPrint("🔍 Building button for notification:");
+      debugPrint("🔍   - isFollowing: ${notif.isFollowing}");
+      debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending}");
+      debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
 
-    debugPrint("🔍 Building button for notification:");
-    debugPrint("🔍   - isFollowing: ${notif.isFollowing}");
-    debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending}");
-    debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
+      // ÖNCE: Eğer kullanıcı zaten takip ediliyorsa
+      if (notif.isFollowing) {
+        debugPrint("🔍   - User is already being followed, showing 'Takibi Bırak' button");
+        return SizedBox(
+          width: 100,
+          child: CustomButton(
+            text: "Takibi Bırak",
+            height: 32,
+            borderRadius: 15,
+            onPressed: () {
+              controller.unfollowUser(notif.senderUserId);
+            },
+            isLoading: RxBool(false),
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+          ),
+        );
+      }
 
-    // Eğer kullanıcı zaten takip ediliyorsa
-    if (notif.isFollowing) {
+      // SONRA: Eğer takip isteği beklemedeyse
+      if (notif.isFollowingPending) {
+        debugPrint("🔍   - Follow request is pending, showing 'Onay Bekliyor' button");
+        return SizedBox(
+          width: 100,
+          child: CustomButton(
+            text: "Onay Bekliyor",
+            height: 32,
+            borderRadius: 15,
+            onPressed: () {}, // Tıklanamaz
+            isLoading: RxBool(false),
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+          ),
+        );
+      }
+
+      // SON OLARAK: Kullanıcıyı takip etmiyorsak ve istek beklemede değilse
+      debugPrint("🔍   - User is not being followed, showing 'Takip Et' button");
       return SizedBox(
         width: 100,
         child: CustomButton(
-          text: "Takibi Bırak",
+          text: "Takip Et",
           height: 32,
-          borderRadius: 8,
+          borderRadius: 15,
           onPressed: () {
-            controller.unfollowUser(notif.senderUserId);
+            controller.followUser(notif.senderUserId);
           },
           isLoading: RxBool(false),
-          backgroundColor: Colors.grey,
+          backgroundColor: const Color(0xFFEF5050),
           textColor: Colors.white,
         ),
       );
     }
 
-    // Eğer takip isteği beklemedeyse
-    if (notif.isFollowingPending) {
-      return SizedBox(
-        width: 100,
-        child: CustomButton(
-          text: "Onay Bekliyor",
-          height: 32,
-          borderRadius: 8,
-          onPressed: () {}, // Tıklanamaz
-          isLoading: RxBool(false),
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-        ),
+    // Grup katılma istekleri için butonlar
+    if (notif.type == 'group-join-request' || notif.type == 'group-join') {
+      debugPrint("🔍 Building group join request button for notification:");
+      debugPrint("🔍   - type: ${notif.type}");
+      debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
+      debugPrint("🔍   - isRejected: ${notif.isRejected}");
+      debugPrint("🔍   - groupId: ${notif.groupId}");
+      debugPrint("🔍   - senderUserId: ${notif.senderUserId}");
+      debugPrint("🔍   - message: ${notif.message}");
+
+      // groupId null ise buton gösterme
+      if (notif.groupId == null) {
+        debugPrint("🔍   - groupId is null, not showing button");
+        return null;
+      }
+
+      // Eğer istek zaten onaylanmışsa
+      if (notif.isAccepted) {
+        debugPrint(
+            "🔍   - Request is already accepted, showing 'Onaylandı' button");
+        return SizedBox(
+          width: 100,
+          child: CustomButton(
+            text: "Onaylandı",
+            height: 32,
+            borderRadius: 15,
+            onPressed: () {}, // Tıklanamaz
+            isLoading: RxBool(false),
+            backgroundColor: Colors.grey[300]!,
+            textColor: Colors.grey[600]!,
+          ),
+        );
+      }
+
+      // Eğer istek reddedilmişse
+      if (notif.isRejected) {
+        debugPrint("🔍   - Request is rejected, showing 'Reddedildi' button");
+        return SizedBox(
+          width: 100,
+          child: CustomButton(
+            text: "Reddedildi",
+            height: 32,
+            borderRadius: 15,
+            onPressed: () {}, // Tıklanamaz
+            isLoading: RxBool(false),
+            backgroundColor: Color(0xffffd6d6),
+            textColor: Color(0xfffb535c),
+          ),
+        );
+      }
+
+      debugPrint("🔍   - Request is pending, showing accept/decline buttons");
+      // İstek beklemedeyse onaylama/reddetme butonları
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 100,
+            child: CustomButton(
+              text: "Onayla",
+              height: 32,
+              borderRadius: 15,
+              onPressed: () {
+                controller.handleGroupJoinRequest(
+                  notif.senderUserId,
+                  notif.groupId!,
+                  'accept',
+                );
+              },
+              isLoading: RxBool(false),
+              backgroundColor: const Color(0xFFEF5050),
+              textColor: Colors.white,
+            ),
+          ),
+          SizedBox(width: 8),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                Icons.close,
+                color: Colors.grey[600],
+                size: 18,
+              ),
+              onPressed: () {
+                controller.handleGroupJoinRequest(
+                  notif.senderUserId,
+                  notif.groupId!,
+                  'decline',
+                );
+              },
+            ),
+          ),
+        ],
       );
     }
 
-    // Kullanıcıyı takip etmiyorsak ve istek beklemede değilse
-    return SizedBox(
-      width: 100,
-      child: CustomButton(
-        text: "Takip Et",
-        height: 32,
-        borderRadius: 8,
-        onPressed: () {
-          controller.followUser(notif.senderUserId);
-        },
-        isLoading: RxBool(false),
-        backgroundColor: const Color(0xFFEF5050),
-        textColor: Colors.white,
-      ),
-    );
+    return null;
   }
 
   IconData _getIcon(String type) {

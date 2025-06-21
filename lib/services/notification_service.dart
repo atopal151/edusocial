@@ -169,7 +169,7 @@ class NotificationService {
   }
 
   /// Grup katılma isteğini kabul veya reddet
-  static Future<bool> acceptOrDeclineGroupJoinRequest({
+  static Future<Map<String, dynamic>> acceptOrDeclineGroupJoinRequest({
     required String userId,
     required String groupId,
     required String decision, // "accept" veya "decline"
@@ -177,24 +177,47 @@ class NotificationService {
     final token = _box.read('token');
     final uri = Uri.parse("${AppConstants.baseUrl}/group-invitation");
 
-    final response = await http.post(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "user_id": int.tryParse(userId) ?? userId,
-        "group_id": int.tryParse(groupId) ?? groupId,
-        "decision": decision,
-      }),
-    );
+    try {
+      final response = await http.post(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "user_id": int.tryParse(userId) ?? userId,
+          "group_id": int.tryParse(groupId) ?? groupId,
+          "decision": decision,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      throw Exception('Grup katılma isteği onaylanamadı: \\${response.body}');
+      debugPrint("📤 Group join request response: ${response.statusCode}");
+      debugPrint("📤 Group join request body: ${response.body}");
+
+      final jsonResponse = jsonDecode(response.body);
+      
+      // 422 hatası "already responded" durumu için
+      if (response.statusCode == 422) {
+        final message = jsonResponse['message'] ?? '';
+        if (message.contains('already.responded')) {
+          // Bu durumda başarılı olarak kabul et, çünkü istek zaten yanıtlanmış
+          return {
+            'status': true,
+            'message': 'İstek zaten yanıtlanmış',
+            'already_responded': true
+          };
+        }
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonResponse;
+      } else {
+        throw Exception('Grup katılma isteği onaylanamadı: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint("❗ Group join request error: $e");
+      rethrow;
     }
   }
 

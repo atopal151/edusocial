@@ -166,14 +166,63 @@ class NotificationController extends GetxController {
   Future<void> handleGroupJoinRequest(
       String userId, String groupId, String decision) async {
     try {
-      await NotificationService.acceptOrDeclineGroupJoinRequest(
+      final response = await NotificationService.acceptOrDeclineGroupJoinRequest(
         userId: userId,
         groupId: groupId,
         decision: decision,
       );
+
+      // Eğer istek zaten yanıtlanmışsa
+      if (response['already_responded'] == true) {
+        // Bildirimleri yenile
+        fetchNotifications();
+        return;
+      }
+
+      // Bildirimleri güncelle
+      final updatedNotifications = notifications.map((notif) {
+        if (notif.senderUserId == userId &&
+            notif.type == 'group-join-request' &&
+            notif.groupId == groupId) {
+          return NotificationModel(
+            id: notif.id,
+            userId: notif.userId,
+            senderUserId: notif.senderUserId,
+            userName: notif.userName,
+            profileImageUrl: notif.profileImageUrl,
+            type: notif.type,
+            message: notif.message,
+            timestamp: notif.timestamp,
+            isRead: notif.isRead,
+            groupId: notif.groupId,
+            eventId: notif.eventId,
+            groupName: notif.groupName,
+            isAccepted: decision == 'accept',
+            isRejected: decision == 'decline',
+            isFollowing: notif.isFollowing,
+            isFollowingPending: notif.isFollowingPending,
+          );
+        }
+        return notif;
+      }).toList();
+
+      notifications.value = updatedNotifications;
+
+      // Yeni bildirimleri çek
       fetchNotifications();
+
+      // Başarı mesajı göster
+      
     } catch (e) {
       debugPrint("❗ Grup katılma isteği onaylanamadı: $e");
+      Get.snackbar(
+        "Hata",
+        "Grup katılma isteği işlenemedi: ${e.toString()}",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 2),
+      );
     }
   }
 

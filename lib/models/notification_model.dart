@@ -16,6 +16,7 @@ class NotificationModel {
   final bool isAccepted;
   final bool isFollowing;
   final bool isFollowingPending;
+  final bool isRejected;
 
   NotificationModel({
     required this.id,
@@ -33,6 +34,7 @@ class NotificationModel {
     this.isAccepted = false,
     this.isFollowing = false,
     this.isFollowingPending = false,
+    this.isRejected = false,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -104,6 +106,7 @@ class NotificationModel {
     bool isFollowing = false;
     bool isFollowingPending = false;
     bool isAccepted = false;
+    bool isRejected = false;
     
     if (json['type'] == 'follow-join-request' || json['type'] == 'follow-request') {
       String answerStatus = answer['status']?.toString().toLowerCase() ?? '';
@@ -132,6 +135,50 @@ class NotificationModel {
         isFollowing = false;
         isFollowingPending = false;
         isAccepted = false;
+      }
+    } else if (json['type'] == 'group-join-request' || json['type'] == 'group-join') {
+      // Grup katılma istekleri için answer.status'a göre belirle
+      String answerStatus = answer['status']?.toString().toLowerCase() ?? '';
+      debugPrint("🔍 Group join request answer status: $answerStatus");
+      
+      if (answerStatus == 'approved') {
+        isAccepted = true;
+        isRejected = false;
+        isFollowing = false;
+        isFollowingPending = false;
+      } else if (answerStatus == 'rejected') {
+        isAccepted = false;
+        isRejected = true;
+        isFollowing = false;
+        isFollowingPending = false;
+      } else if (answerStatus == 'pending') {
+        isAccepted = false;
+        isRejected = false;
+        isFollowing = false;
+        isFollowingPending = false;
+      } else {
+        // group-join tipinde answer.status yoksa, grup durumuna göre belirle
+        if (json['type'] == 'group-join') {
+          String groupStatus = group['status']?.toString().toLowerCase() ?? '';
+          debugPrint("🔍 Group status: $groupStatus");
+          
+          if (groupStatus == 'approved') {
+            isAccepted = true;
+            isRejected = false;
+          } else if (groupStatus == 'rejected') {
+            isAccepted = false;
+            isRejected = true;
+          } else {
+            // pending veya diğer durumlar için varsayılan olarak beklemede
+            isAccepted = false;
+            isRejected = false;
+          }
+        } else {
+          isAccepted = false;
+          isRejected = false;
+        }
+        isFollowing = false;
+        isFollowingPending = false;
       }
     } else {
       // Diğer bildirim tipleri için user.is_following kullan
@@ -165,6 +212,7 @@ class NotificationModel {
       isAccepted: isAccepted,
       isFollowing: isFollowing,
       isFollowingPending: isFollowingPending,
+      isRejected: isRejected,
     );
   }
 
@@ -185,6 +233,7 @@ class NotificationModel {
       'isAccepted': isAccepted,
       'isFollowing': isFollowing,
       'isFollowingPending': isFollowingPending,
+      'isRejected': isRejected,
     };
   }
 }
