@@ -30,6 +30,12 @@ class ChatDetailController extends GetxController {
   final Rxn<int> currentChatId = Rxn<int>(); // This is the User ID
   final Rxn<String> currentConversationId = Rxn<String>();
 
+  // AppBar için anında gösterilecek veriler
+  final RxString name = ''.obs;
+  final RxString username = ''.obs;
+  final RxString avatarUrl = ''.obs;
+  final RxBool isOnline = false.obs;
+
   RxString pollQuestion = ''.obs;
   RxList<String> pollOptions = <String>[].obs;
   RxMap<String, int> pollVotes = <String, int>{}.obs;
@@ -81,8 +87,15 @@ class ChatDetailController extends GetxController {
     
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null) {
+      // Core IDs
       final userId = arguments['userId'] as int?;
       final conversationId = arguments['conversationId'];
+
+      // UI için veriler
+      final nameArg = arguments['name'] as String?;
+      final usernameArg = arguments['username'] as String?;
+      final avatarUrlArg = arguments['avatarUrl'] as String?;
+      final isOnlineArg = arguments['isOnline'] as bool?;
       
       // conversationId can be int or String, convert to String
       String? conversationIdString;
@@ -92,6 +105,12 @@ class ChatDetailController extends GetxController {
 
       currentChatId.value = userId;
       currentConversationId.value = conversationIdString;
+
+      // UI verilerini ata
+      name.value = nameArg ?? 'Bilinmiyor';
+      username.value = usernameArg ?? '';
+      avatarUrl.value = avatarUrlArg ?? '';
+      isOnline.value = isOnlineArg ?? false;
       
       debugPrint('ChatDetailController initialized:');
       debugPrint('  - User ID: ${currentChatId.value}');
