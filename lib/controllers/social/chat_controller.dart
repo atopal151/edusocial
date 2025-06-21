@@ -19,27 +19,43 @@ class ChatController extends GetxController {
 
   final TextEditingController searchController = TextEditingController();
 
-  /// Socket servisi
-  final SocketService _socketService = Get.find<SocketService>();
   final GetStorage _box = GetStorage();
+  late SocketService _socketService;
+  
   @override
   void onInit() {
     super.onInit();
+    _socketService = Get.find<SocketService>();
+    _setupSocketListeners();
+    _connectSocket();
     fetchChatList();
     fetchOnlineFriends();
+  }
 
-    // Token'ı GetStorage'dan al
-    String? token = _box.read('token');
-
+  /// Socket bağlantısını kur
+  void _connectSocket() {
+    final token = _box.read('token');
     if (token != null && token.isNotEmpty) {
-      //debugPrint('🔑 Storage token bulundu: $token');
-      _socketService.connectSocket(token);
-    } else {
-      debugPrint('⚠️ Storage token bulunamadı. Socket bağlanmadı.');
+      _socketService.connect(token);
     }
+  }
 
-    // Şimdi socket bağlantısını başlatalım:
-    //initSocketConnection(token);
+  /// Socket event dinleyicilerini ayarla
+  void _setupSocketListeners() {
+    // Birebir mesaj dinleyicisi
+    _socketService.onPrivateMessage = (data) {
+      handleNewPrivateMessage(data);
+    };
+
+    // Grup mesajı dinleyicisi
+    _socketService.onGroupMessage = (data) {
+      handleNewGroupMessage(data);
+    };
+
+    // Okunmamış mesaj sayısı dinleyicisi
+    _socketService.onUnreadMessageCount = (data) {
+      updateUnreadCount(data['count'] ?? 0);
+    };
   }
 
   /// 🔥 Online arkadaşları getir
@@ -74,35 +90,9 @@ class ChatController extends GetxController {
     }
   }
 
-/*
-  /// 🔌 Socket bağlantısını başlat
-  void initSocketConnection(String token) {
-    socketService.connectSocket(token);
-
-    socketService.onPrivateMessage((data) {
-      handleNewPrivateMessage(data);
-      if (Get.isRegistered<ChatDetailController>()) {
-        Get.find<ChatDetailController>().onNewPrivateMessage(data);
-      }
-    });
-
-    socketService.onGroupMessage((data) {
-      handleNewGroupMessage(data);
-    });
-
-    socketService.onUnreadMessageCount((data) {
-      updateUnreadCount(data['count']);
-    });
-  }
-  /// 🔌 Socket bağlantısını kapat
-  void disconnectSocket() {
-    socketService.disconnectSocket();
-    socketService.removeAllListeners();
-  }
-*/
   /// 📥 Yeni birebir mesaj geldiğinde listeyi güncelle
   void handleNewPrivateMessage(dynamic data) {
-    //debugPrint("📡 Yeni birebir mesaj payload: $data");
+    debugPrint("📡 Yeni birebir mesaj payload: $data");
 
     try {
       final conversationId = data['conversation_id'] ?? 0;
@@ -127,8 +117,7 @@ class ChatController extends GetxController {
           username: data['sender']['username'] ?? '',
           avatar: data['sender']['avatar_url'] ?? '',
           conversationId: conversationId,
-          isOnline:
-              true, // opsiyonel, backend'den çekilmiyorsa true/false atayabilirsin
+          isOnline: true,
           unreadCount: 1,
           lastMessage: LastMessage(
             message: message,
@@ -145,6 +134,8 @@ class ChatController extends GetxController {
 
   /// 📥 Yeni grup mesajı geldiğinde listeyi güncelle
   void handleNewGroupMessage(dynamic data) {
+    debugPrint("📡 Yeni grup mesajı payload: $data");
+    
     final groupId = data['group_id'];
     final message = data['message'];
     final timestamp = data['created_at'];
@@ -170,10 +161,9 @@ class ChatController extends GetxController {
 
   /// 🔴 Okunmamış mesaj sayısını güncelle
   void updateUnreadCount(int count) {
-    for (var chat in chatList) {
-      chat.unreadCount = count;
-    }
-    filteredChatList.assignAll(chatList);
+    debugPrint("📬 Okunmamış mesaj sayısı: $count");
+    // Burada genel okunmamış mesaj sayısını güncelleyebilirsin
+    // Örneğin AppBar'da badge göstermek için
   }
 
   /// 📃 Chat detay sayfasına yönlendir
@@ -212,5 +202,13 @@ class ChatController extends GetxController {
           .where((group) => group.groupName.toLowerCase().contains(query))
           .toList();
     }
+  }
+
+  @override
+  void onClose() {
+    _socketService.onPrivateMessage = null;
+    _socketService.onGroupMessage = null;
+    _socketService.onUnreadMessageCount = null;
+    super.onClose();
   }
 }

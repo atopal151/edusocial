@@ -46,15 +46,15 @@ class NotificationModel {
     final answer = fullData['answer'] ?? {};
 
     // Debug için API yanıtını logla
-    debugPrint("🔍 === NOTIFICATION DEBUG ===");
-    debugPrint("🔍 Notification type: ${json['type']}");
-    debugPrint("🔍 Full notification: ${json.toString()}");
-    debugPrint("🔍 User data: ${user.toString()}");
-    debugPrint("🔍 Answer data: ${answer.toString()}");
-    debugPrint("🔍 is_following: ${user['is_following']} (type: ${user['is_following'].runtimeType})");
-    debugPrint("🔍 is_following_pending: ${user['is_following_pending']} (type: ${user['is_following_pending'].runtimeType})");
-    debugPrint("🔍 is_self: ${user['is_self']}");
-    debugPrint("🔍 answer.status: ${answer['status']}");
+    //debugPrint("🔍 === NOTIFICATION DEBUG ===");
+    //debugPrint("🔍 Notification type: ${json['type']}");
+    //debugPrint("🔍 Full notification: ${json.toString()}");
+    //debugPrint("🔍 User data: ${user.toString()}");
+    //debugPrint("🔍 Answer data: ${answer.toString()}");
+    //debugPrint("🔍 is_following: ${user['is_following']} (type: ${user['is_following'].runtimeType})");
+    //debugPrint("🔍 is_following_pending: ${user['is_following_pending']} (type: ${user['is_following_pending'].runtimeType})");
+    //debugPrint("🔍 is_self: ${user['is_self']}");
+    //debugPrint("🔍 answer.status: ${answer['status']}");
 
     // Kullanıcı adını belirle
     String userName = 'Kullanıcı';
@@ -114,10 +114,10 @@ class NotificationModel {
       bool userIsFollowingPending = user['is_following_pending'] ?? false;
       String text = fullData['text']?.toString() ?? '';
       
-      debugPrint("🔍 Answer status: $answerStatus");
-      debugPrint("🔍 User is_following: $userIsFollowing");
-      debugPrint("🔍 User is_following_pending: $userIsFollowingPending");
-      debugPrint("🔍 Text: $text");
+      //debugPrint("🔍 Answer status: $answerStatus");
+      //debugPrint("🔍 User is_following: $userIsFollowing");
+      //debugPrint("🔍 User is_following_pending: $userIsFollowingPending");
+      //debugPrint("🔍 Text: $text");
       
       // Mantık: Eğer user.is_following true ise, kullanıcıyı takip ediyoruz
       // Eğer user.is_following_pending true ise, takip isteği beklemede
@@ -188,13 +188,13 @@ class NotificationModel {
     
     bool isSelf = user['is_self'] ?? false;
 
-    debugPrint("🔍 Final values:");
-    debugPrint("🔍   - isFollowing: $isFollowing");
-    debugPrint("🔍   - isFollowingPending: $isFollowingPending");
-    debugPrint("🔍   - isAccepted: $isAccepted");
-    debugPrint("🔍   - isSelf: $isSelf");
-    debugPrint("🔍   - senderUserId: $senderUserId");
-    debugPrint("🔍 === END DEBUG ===");
+    //debugPrint("🔍 Final values:");
+    //debugPrint("🔍   - isFollowing: $isFollowing");
+    //debugPrint("🔍   - isFollowingPending: $isFollowingPending");
+    //debugPrint("🔍   - isAccepted: $isAccepted");
+    //debugPrint("🔍   - isSelf: $isSelf");
+    //debugPrint("🔍   - senderUserId: $senderUserId");
+    //debugPrint("🔍 === END DEBUG ===");
 
     return NotificationModel(
       id: json['id'].toString(),

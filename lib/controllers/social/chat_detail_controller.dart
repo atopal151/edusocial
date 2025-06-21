@@ -39,7 +39,7 @@ class ChatDetailController extends GetxController {
   TextEditingController pollTitleController = TextEditingController();
 
   final ProfileController profileController = Get.find<ProfileController>();
-  final SocketService socketService = Get.find<SocketService>();
+  late SocketService _socketService;
 
   // URL algılama için regex pattern
   static final RegExp urlRegex = RegExp(
@@ -74,6 +74,7 @@ class ChatDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _socketService = Get.find<SocketService>();
     _initializeScrollController();
     _setupSocketListeners();
     _loadInitialData();
@@ -89,8 +90,10 @@ class ChatDetailController extends GetxController {
   }
 
   void _setupSocketListeners() {
-    final socketService = Get.find<SocketService>();
-    socketService.onNewPrivateMessage(_onNewPrivateMessage);
+    // Birebir mesaj dinleyicisi - sadece bu chat için
+    _socketService.onPrivateMessage = (data) {
+      _onNewPrivateMessage(data);
+    };
   }
 
   void _loadInitialData() {
@@ -203,29 +206,22 @@ class ChatDetailController extends GetxController {
 
   void _onNewPrivateMessage(dynamic data) {
     try {
+      debugPrint('📡 ChatDetailController - Yeni mesaj geldi: $data');
+      
       if (data is Map<String, dynamic>) {
-        final message = MessageModel.fromJson(data);
-        if (message.conversationId == currentChatId) {
+        final conversationId = data['conversation_id'];
+        
+        // Sadece bu chat için gelen mesajları işle
+        if (conversationId == currentChatId) {
+          final message = MessageModel.fromJson(data);
           messages.add(message);
-          // Yeni mesaj geldiğinde kullanıcı bilgilerini güncelle
-          final sender = message.sender;
-          userChatDetail.value = UserChatDetailModel(
-            id: sender.id.toString(),
-            name: '${sender.name} ${sender.surname}',
-            follower: '0', // API'den gelmiyor
-            following: '0', // API'den gelmiyor
-            imageUrl: sender.avatarUrl,
-            memberImageUrls: const [],
-            documents: message.messageDocument?.map((doc) => DocumentModel(
-              id: doc.id,
-              name: doc.name,
-              sizeMb: 0.0,
-              humanCreatedAt: doc.date,
-              createdAt: DateTime.parse(doc.date),
-            )).toList() ?? [],
-            links: const [],
-            photoUrls: const [],
-          );
+          
+          // Yeni mesaj geldiğinde en alta git
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            scrollToBottom(animated: true);
+          });
+          
+          debugPrint('✅ Yeni mesaj chat listesine eklendi');
         }
       }
     } catch (e) {
@@ -238,7 +234,7 @@ class ChatDetailController extends GetxController {
   }
 
   void stopListeningToNewMessages() {
-    // socketService.removeAllListeners();
+    // Socket dinleyicilerini kaldır
   }
 
   Future<void> fetchConversationMessages(int chatId) async {

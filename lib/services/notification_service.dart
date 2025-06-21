@@ -29,7 +29,7 @@ class NotificationService {
         final invitationNotifs = jsonBody['data']?['invitation_notifications'] ?? [];
         final followerNotifs = jsonBody['data']?['follower_notifications'] ?? [];
 
-        debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
+        //debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
 
         final allNotifs = [
           ...postNotifs,
@@ -69,8 +69,8 @@ class NotificationService {
         }),
       );
 
-      debugPrint("📤 Follow request response: ${response.statusCode}");
-      debugPrint("📤 Follow request body: ${response.body}");
+      //sdebugPrint("📤 Follow request response: ${response.statusCode}");
+      //debugPrint("📤 Follow request body: ${response.body}");
 
       final jsonResponse = jsonDecode(response.body);
       

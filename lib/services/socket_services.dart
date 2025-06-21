@@ -1,189 +1,167 @@
-
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService extends GetxService {
-  static SocketService get to => Get.find();
-
   IO.Socket? _socket;
-  final _isConnected = false.obs;
-  final _isConnecting = false.obs;
-  final _connectionAttempts = 0.obs;
-  static const int maxConnectionAttempts = 3;
+  final RxBool isConnected = false.obs;
 
-  bool get isConnected => _isConnected.value;
-  bool get isConnecting => _isConnecting.value;
+  // Bağlantı adresi - farklı endpoint'leri deneyeceğiz
+  static const String _socketUrl = 'https://stageapi.edusocial.pl';
+  static const String _socketUrlWithPort = 'https://stageapi.edusocial.pl:3000';
+  static const String _socketUrlWithPath = 'https://stageapi.edusocial.pl/socket.io';
 
-  // Socket URL ve Port
-  final String _socketUrl = 'https://stageapi.edusocial.pl';
-
-  // Socket bağlantısını başlat
-  Future<void> connectSocket(String? token) async {
-    if (token == null || token.isEmpty) {
-      /*debugPrint('❌ Token boş veya null, socket bağlantısı kurulamıyor.');*/
+  // Socket başlat
+  void connect(String jwtToken) {
+    print('🔌 SocketService.connect() çağrıldı');
+    print('🔌 Token: ${jwtToken.substring(0, 20)}...');
+    
+    if (_socket != null && _socket!.connected) {
+      print('🔌 Socket zaten bağlı, yeni bağlantı kurulmuyor');
       return;
     }
 
-    if (_isConnected.value) {
-      /*debugPrint('🔌 Socket zaten bağlı.');*/
-      return;
-    }
+    // Farklı URL'leri dene
+    _tryConnectWithUrl(_socketUrl, jwtToken, 'Ana URL');
+  }
 
-    if (_isConnecting.value) {
-      /*debugPrint('⏳ Socket bağlantısı zaten kuruluyor...');*/
-      return;
-    }
+  void _tryConnectWithUrl(String url, String jwtToken, String urlName) {
+    print('🔌 $urlName ile bağlantı deneniyor: $url');
+    
+    // Socket.IO options
+    final options = IO.OptionBuilder()
+        .setTransports(['websocket', 'polling']) // Hem websocket hem polling dene
+        .setAuth({
+          "auth": {
+            "token": jwtToken
+          }
+        })
+        .setExtraHeaders({
+          'Authorization': 'Bearer $jwtToken'
+        })
+        .disableAutoConnect() // Manuel bağlanacağız
+        .enableReconnection() // Yeniden bağlanmayı etkinleştir
+        .setReconnectionAttempts(3) // 3 kez dene
+        .setReconnectionDelay(2000) // 2 saniye bekle
+        .setReconnectionDelayMax(5000) // Max 5 saniye bekle
+        .setTimeout(10000) // 10 saniye timeout
+        .build();
 
-    if (_connectionAttempts.value >= maxConnectionAttempts) {
-      /*debugPrint('❌ Maksimum bağlantı denemesi aşıldı.');*/
-      return;
-    }
+    _socket = IO.io(url, options);
 
-    try {
-      _isConnecting.value = true;
-      _connectionAttempts.value++;
-      /*debugPrint('🔄 Socket bağlantısı başlatılıyor... (Deneme: ${_connectionAttempts.value})');*/
+    print('🔌 Socket event dinleyicileri ayarlanıyor...');
+    
+    // Bağlantı eventleri
+    _socket!.onConnect((_) {
+      isConnected.value = true;
+      print('✅ Socket bağlı! ($urlName)');
+      print('✅ Socket ID: ${_socket!.id}');
+    });
+    
+    _socket!.onDisconnect((_) {
+      isConnected.value = false;
+      print('❌ Socket bağlantısı kesildi! ($urlName)');
+    });
+    
+    _socket!.onConnectError((err) {
+      isConnected.value = false;
+      print('❌ Socket bağlantı hatası ($urlName): $err');
+      print('❌ Hata tipi: ${err.runtimeType}');
       
-      // Token'ı düzenle
-      final formattedToken = token.startsWith('Bearer ') ? token : 'Bearer $token';
-      /*debugPrint('🔑 Formatlanmış Token: ${formattedToken.substring(0, 20)}...');*/
-
-      // Önceki socket bağlantısını temizle
-      if (_socket != null) {
-        _socket!.disconnect();
-        _socket!.dispose();
-        _socket = null;
+      // Eğer bu URL başarısız olursa, diğer URL'leri dene
+      if (url == _socketUrl) {
+        print('🔄 Diğer URL\'ler deneniyor...');
+        Future.delayed(Duration(seconds: 2), () {
+          _tryConnectWithUrl(_socketUrlWithPort, jwtToken, 'Port 3000');
+        });
+      } else if (url == _socketUrlWithPort) {
+        print('🔄 Son URL deneniyor...');
+        Future.delayed(Duration(seconds: 2), () {
+          _tryConnectWithUrl(_socketUrlWithPath, jwtToken, 'Socket.io Path');
+        });
+      } else {
+        print('❌ Tüm URL\'ler başarısız oldu!');
+        print('🔍 Lütfen sunucu yöneticisi ile iletişime geçin.');
       }
+    });
+    
+    _socket!.onError((err) {
+      isConnected.value = false;
+      print('❌ Socket genel hata ($urlName): $err');
+    });
 
-      // Yeni socket bağlantısı oluştur
-      _socket = IO.io(
-        _socketUrl,
-        IO.OptionBuilder()
-            .setTransports(['websocket', 'polling'])
-            .enableForceNew()
-            .setAuth({'token': formattedToken})
-            .setTimeout(10000)
-            .disableAutoConnect()
-            .setExtraHeaders({
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            })
-            .setPath('/socket.io')
-            .setQuery({'token': formattedToken})
-            .build(),
-      );
+    // Reconnection events
+    _socket!.onReconnect((_) {
+      print('🔄 Socket yeniden bağlandı! ($urlName)');
+    });
+    
+    _socket!.onReconnectAttempt((attemptNumber) {
+      print('🔄 Yeniden bağlanma denemesi ($urlName): $attemptNumber');
+    });
+    
+    _socket!.onReconnectError((error) {
+      print('❌ Yeniden bağlanma hatası ($urlName): $error');
+    });
 
-      // Bağlantı sağlandığında
-      _socket!.onConnect((_) {
-        /*debugPrint('✅ Socket bağlantısı sağlandı.');
-        debugPrint('🟢 Socket ID: ${_socket!.id}');*/
-        _isConnected.value = true;
-        _isConnecting.value = false;
-        _connectionAttempts.value = 0;
-      });
+    // Event dinleyiciler
+    print('🔌 Event dinleyicileri ayarlanıyor...');
+    // 1. Birebir mesaj
+    _socket!.on('conversation:new_message', (data) {
+      print('📨 Birebir mesaj geldi: $data');
+      if (onPrivateMessage != null) onPrivateMessage!(data);
+    });
+    // 2. Grup mesajı
+    _socket!.on('group_conversation:new_message', (data) {
+      print('📨 Grup mesajı geldi: $data');
+      if (onGroupMessage != null) onGroupMessage!(data);
+    });
+    // 3. Okunmamış mesaj sayısı
+    _socket!.on('conversation:un_read_message_count', (data) {
+      print('📨 Okunmamış mesaj sayısı: $data');
+      if (onUnreadMessageCount != null) onUnreadMessageCount!(data);
+    });
 
-      // Bağlantı koparsa
-      _socket!.onDisconnect((_) {
-        /*debugPrint('❌ Socket bağlantısı kesildi.');*/
-        _isConnected.value = false;
-        _isConnecting.value = false;
-      });
+    print('🔌 Socket bağlantısı başlatılıyor... ($urlName)');
+    _socket!.connect();
+    
+    // Bağlantı durumunu kontrol et
+    Future.delayed(Duration(seconds: 5), () {
+      print('🔍 Socket bağlantı durumu kontrol ediliyor... ($urlName)');
+      print('🔍 isConnected.value: ${isConnected.value}');
+      print('🔍 _socket?.connected: ${_socket?.connected}');
+      print('🔍 _socket?.id: ${_socket?.id}');
+    });
+  }
 
-      // Bağlantı hatası alırsak
-      _socket!.onConnectError((data) {
-        /*debugPrint('⚠️ Socket bağlantı hatası: $data');*/
-        _isConnecting.value = false;
-      });
+  // Callback fonksiyonları dışarıdan atanabilir
+  Function(dynamic)? onPrivateMessage;
+  Function(dynamic)? onGroupMessage;
+  Function(dynamic)? onUnreadMessageCount;
 
-      // Genel hata yakalayıcı
-      _socket!.onError((data) {
-        /*debugPrint('❌ Socket genel hatası: $data');*/
-        _isConnecting.value = false;
-      });
-
-      // Birebir mesaj dinleyicisi
-      _socket!.on('conversation:new_message', (data) {
-        /*debugPrint('📥 Yeni birebir mesaj: $data');*/
-      });
-
-      // Grup mesajı dinleyicisi
-      _socket!.on('group_conversation:new_message', (data) {
-        /*debugPrint('👥 Yeni grup mesajı: $data');*/
-      });
-
-      // Okunmamış mesaj sayısı dinleyicisi
-      _socket!.on('conversation:un_read_message_count', (data) {
-        /*debugPrint('📬 Okunmamış mesaj sayısı: ${data['count']}');*/
-      });
-
-      // Manuel olarak bağlan
-      _socket!.connect();
-      
-      // Bağlantı durumunu kontrol et
-      /*debugPrint('🔍 Socket bağlantı durumu: ${_socket!.connected}');
-      debugPrint('🔍 Socket ID: ${_socket!.id}');*/
-
-      // 10 saniye sonra hala bağlantı kurulmadıysa
-      Future.delayed(const Duration(seconds: 10), () {
-        if (!_isConnected.value && _isConnecting.value) {
-          /*debugPrint('⚠️ Socket bağlantısı zaman aşımına uğradı.');*/
-          _isConnecting.value = false;
-          _socket?.disconnect();
-        }
-      });
-    } catch (e) {
-      /*debugPrint('🚨 Socket bağlantısı sırasında beklenmeyen hata: $e');*/
-      _isConnecting.value = false;
+  // Mesaj gönderme
+  void sendMessage(String event, dynamic data) {
+    print('📤 Mesaj gönderiliyor: $event');
+    print('📤 Data: $data');
+    if (_socket != null && _socket!.connected) {
+      _socket!.emit(event, data);
+      print('✅ Mesaj gönderildi');
+    } else {
+      print('❌ Socket bağlı değil, mesaj gönderilemedi');
+      print('❌ Socket durumu: ${_socket?.connected}');
     }
   }
 
-  // Mesaj gönderme örneği
-  void sendMessage(String eventName, dynamic message) {
-    if (_socket == null) {
-      /*debugPrint('❌ Socket bağlantısı yok, mesaj gönderilemedi.');*/
-      return;
-    }
-
-    try {
-      _socket!.emit(eventName, message);
-      /*debugPrint('📤 Mesaj gönderildi: $eventName => $message');*/
-    } catch (e) {
-      /*debugPrint('❌ Mesaj gönderilirken hata oluştu: $e');*/
-    }
+  // Bağlantıyı kapat
+  void disconnect() {
+    print('🔌 Socket bağlantısı kapatılıyor...');
+    _socket?.disconnect();
+    isConnected.value = false;
+    print('✅ Socket bağlantısı kapatıldı');
   }
 
-  // Yeni mesaj dinleyicisi
-  void onNewPrivateMessage(Function(dynamic) callback) {
-    if (_socket == null) {
-      /*debugPrint('❌ Socket bağlantısı yok, dinleyici eklenemedi.');*/
-      return;
-    }
-
-    try {
-      _socket!.on('conversation:new_message', callback);
-      /*debugPrint('👂 Yeni mesaj dinleyicisi eklendi.');*/
-    } catch (e) {
-      /*debugPrint('❌ Dinleyici eklenirken hata oluştu: $e');*/
-    }
-  }
-
-  // Socket bağlantısını kapat
-  void disconnectSocket() {
-    if (_socket != null) {
-      try {
-        _socket!.disconnect();
-        _isConnected.value = false;
-        _connectionAttempts.value = 0;
-        /*debugPrint('🔌 Socket bağlantısı kapatıldı.');*/
-      } catch (e) {
-        /*debugPrint('❌ Socket kapatılırken hata oluştu: $e');*/
-      }
-    }
-  }
-
-  @override
-  void onClose() {
-    disconnectSocket();
-    super.onClose();
+  // Dinleyicileri temizle
+  void removeAllListeners() {
+    print('🔌 Socket dinleyicileri temizleniyor...');
+    _socket?.clearListeners();
+    print('✅ Socket dinleyicileri temizlendi');
   }
 }

@@ -100,6 +100,23 @@ class MainScreen extends StatelessWidget {
     }
   }
 
+  /// Socket bağlantısını başlat
+  void _initializeSocket() {
+    try {
+      final socketService = Get.find<SocketService>();
+      final token = GetStorage().read('token');
+      
+      if (token != null && token.isNotEmpty) {
+        debugPrint('🔌 Socket bağlantısı başlatılıyor...');
+        socketService.connect(token);
+      } else {
+        debugPrint('⚠️ Token bulunamadı, socket bağlantısı kurulamıyor.');
+      }
+    } catch (e) {
+      debugPrint('❌ Socket başlatma hatası: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final NavigationController navigationController = Get.find();
@@ -115,26 +132,10 @@ class MainScreen extends StatelessWidget {
     Get.put(TopicsController());
     Get.put(ChatController());
 
-    // 🌐 Socket Service
-    final socketService = Get.put(SocketService());
-
-    // Token kontrolü ve socket bağlantısı
-    final token = GetStorage().read('token');
-    if (token != null && token.isNotEmpty) {
-      //debugPrint('🔑 Token bulundu, socket bağlantısı başlatılıyor...');
-      // Token'ı temizle ve kontrol et
-      final cleanToken = token.trim();
-      if (cleanToken.length > 10) { // Minimum token uzunluğu kontrolü
-        // Socket bağlantısını başlat
-        Future.delayed(const Duration(milliseconds: 500), () {
-          socketService.connectSocket(cleanToken);
-        });
-      } else {
-        debugPrint('⚠️ Token geçersiz uzunlukta: ${cleanToken.length}');
-      }
-    } else {
-      debugPrint('⚠️ Token bulunamadı, socket bağlantısı kurulamıyor.');
-    }
+    // Socket bağlantısını başlat
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _initializeSocket();
+    });
 
     // Verilerin yüklenip yüklenmediğini kontrol et
     Future.delayed(Duration(milliseconds: 100), () {

@@ -21,24 +21,24 @@ class PostController extends GetxController {
   void onInit() {
     super.onInit();
     // fetchHomePosts(); // Login sırasında manuel olarak çağrılacak
-    debugPrint("🔄 PostController onInit - postHomeList.length: ${postHomeList.length}");
+    //debugPrint("🔄 PostController onInit - postHomeList.length: ${postHomeList.length}");
   }
 
 //POST GET
   Future<void> fetchHomePosts() async {
-    debugPrint("🔄 PostController.fetchHomePosts() çağrıldı");
+    //debugPrint("🔄 PostController.fetchHomePosts() çağrıldı");
     isHomeLoading.value = true;
     try {
       final posts = await PostServices.fetchHomePosts();
-      debugPrint("📦 API'den ${posts.length} post alındı");
+    // debugPrint("📦 API'den ${posts.length} post alındı");
       postHomeList.assignAll(posts);
       
       // 🔍 Sadece bana ait gönderileri filtrele
       final myPosts = posts.where((post) => post.isOwner == true).toList();
-      debugPrint("👤 Kullanıcıya ait ${myPosts.length} post bulundu");
+      //debugPrint("👤 Kullanıcıya ait ${myPosts.length} post bulundu");
       profileController.profilePosts.assignAll(myPosts);
       
-      debugPrint("✅ Postlar başarıyla yüklendi");
+      //debugPrint("✅ Postlar başarıyla yüklendi");
     } catch (e) {
       debugPrint("❗ Post çekme hatası: $e", wrapWidth: 1024);
     } finally {
