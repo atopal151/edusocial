@@ -48,7 +48,7 @@ class CustomDropDown extends StatelessWidget {
                   value: value,
                   child: Text(value,
                       style: GoogleFonts.inter(
-                          fontSize: 13.28,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: Color(0xff414751))),
                 );

@@ -19,10 +19,7 @@ class GroupSuggestionListView extends StatelessWidget {
       }
 
       if (groupController.suggestionGroups.isEmpty) {
-        return const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text("Önerilen grup bulunamadı."),
-        );
+        return const Center();
       }
 
       return SizedBox(
@@ -54,7 +51,7 @@ class GroupSuggestionListView extends StatelessWidget {
                         },
                         child: Center(
                             child: Text(
-                          group.isMember ? "Katıldınız" : 'Katıl',
+                          group.isMember ? "Katıldınız" : group.isPrivate ? "Katılma İsteği Gönder" : 'Gruba Katıl',
                           style: GoogleFonts.inter(
                               color: Color(0xffffffff),
                               fontSize: 10,

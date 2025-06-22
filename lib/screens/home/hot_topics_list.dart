@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/topics_controller.dart';
 import 'package:get/get.dart';
 
@@ -18,10 +19,7 @@ class HotTopicsListView extends StatelessWidget {
       }
 
       if (controller.hotTopics.isEmpty) {
-        return const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text("Gündemde konu yok."),
-        );
+        return const Center();
       }
 
       return SizedBox(
@@ -90,7 +88,7 @@ class HotTopicsListView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         topic.title,
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: isSelected
                               ? Color(0xffffffff)
                               : Color(0xff414751),

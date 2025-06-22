@@ -21,6 +21,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final List<XFile> _selectedImages = [];
   final ImagePicker picker = ImagePicker();
   final TextEditingController textController = TextEditingController();
+  final List<String> _links = [];
   var isPosting = false.obs;
 
   Future<void> pickImages() async {
@@ -47,15 +48,51 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     });
   }
 
+  void removeLink(int index) {
+    setState(() {
+      _links.removeAt(index);
+    });
+  }
+
+  // URL tespit fonksiyonu
+  List<String> extractLinksFromText(String text) {
+    final RegExp urlRegex = RegExp(
+      r'https?://[^\s]+|www\.[^\s]+',
+      caseSensitive: false,
+    );
+    
+    final matches = urlRegex.allMatches(text);
+    return matches.map((match) => match.group(0)!).toList();
+  }
+
+  void onTextChanged(String text) {
+    setState(() {
+      _links.clear();
+      _links.addAll(extractLinksFromText(text));
+    });
+  }
+
   void sharePost() async {
     if (textController.text.isNotEmpty) {
       try {
         isPosting.value = true;
-        final content = textController.text;
+        
+        // Linkleri text'ten çıkar
+        String cleanContent = textController.text;
+        List<String> extractedLinks = extractLinksFromText(cleanContent);
+        
+        // Linkleri text'ten temizle
+        for (String link in extractedLinks) {
+          cleanContent = cleanContent.replaceAll(link, '').trim();
+        }
+        
+        // Fazla boşlukları temizle
+        cleanContent = cleanContent.replaceAll(RegExp(r'\s+'), ' ').trim();
+        
         final mediaFiles = _selectedImages.map((xfile) => File(xfile.path)).toList();
-        await postController.createPost(content, mediaFiles);
+        await postController.createPost(cleanContent, mediaFiles, links: extractedLinks);
         isPosting.value = false;
-        Get.back();
+        Get.offAllNamed('/main'); // Main screen'e git (navbar 0. index)
       } catch (e) {
         isPosting.value = false;
         CustomSnackbar.show(
@@ -158,6 +195,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         color: Color(0xff414751), fontSize: 13.28),
                     border: InputBorder.none,
                   ),
+                  onChanged: onTextChanged,
                 ),
               ),
             ],
@@ -208,6 +246,66 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                     },
                   ),
           ),
+          // Link ekleme alanı
+          if (_links.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Tespit Edilen Linkler (${_links.length}):",
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff414751),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ..._links.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final link = entry.value;
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Color(0xfff0f8ff),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Color(0xff007bff).withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.link,
+                            size: 16,
+                            color: Color(0xff007bff),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              link,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Color(0xff007bff),
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => removeLink(index),
+                            child: Icon(
+                              Icons.close,
+                              size: 16,
+                              color: Color(0xff9ca3ae),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
           Container(
             color: Color(0xfffafafa),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),

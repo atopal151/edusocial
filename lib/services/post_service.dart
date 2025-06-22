@@ -12,7 +12,7 @@ class PostServices {
   static final _box = GetStorage();
 
   /// Gönderi oluşturma fonksiyonu
-  static Future<bool> createPost(String content, List<File> mediaFiles) async {
+  static Future<bool> createPost(String content, List<File> mediaFiles, {List<String>? links}) async {
     final token = _box.read('token');
 
     var request = http.MultipartRequest(
@@ -26,6 +26,13 @@ class PostServices {
     });
 
     request.fields['content'] = content;
+
+    // Linkleri ekle
+    if (links != null && links.isNotEmpty) {
+      for (int i = 0; i < links.length; i++) {
+        request.fields['links[$i]'] = links[i];
+      }
+    }
 
     // 🔁 Her medya dosyası için MIME tipi ile yükleme
     for (var file in mediaFiles) {

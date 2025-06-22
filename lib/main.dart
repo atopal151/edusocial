@@ -28,6 +28,9 @@ void main() async {
   // TranslationService'i başlat ve Türkçe çevirileri yükle
   final translationService = Get.put(TranslationService());
   await translationService.loadTranslations('tr');
+  
+  // Debug: Çevirilerin yüklenip yüklenmediğini kontrol et
+  translationService.debugTranslations();
 
   runApp(MyApp(initialRoute: Routes.main));
 }

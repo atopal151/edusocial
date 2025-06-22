@@ -2,6 +2,7 @@
 import 'package:edusocial/components/user_appbar/user_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../components/cards/story_card.dart';
 import '../../controllers/story_controller.dart';
 import 'group_suggestion_list.dart';
@@ -61,7 +62,7 @@ class HomeScreen extends StatelessWidget {
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: Icon(Icons.add, color: Colors.white, size: 25),
+          child: Icon(Icons.add, color: Color(0xffffffff), size: 25),
         ),
       ),
       body: RefreshIndicator(
@@ -93,21 +94,21 @@ class HomeScreen extends StatelessWidget {
                 if (groupController.suggestionGroups.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                    child: const Text("İlgini Çekebilecek Gruplar",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
+                    child: Text("İlgini Çekebilecek Gruplar",
+                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff272727))),
                   ),
                   GroupSuggestionListView(),
                 ],
                 if (topicsController.hotTopics.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                    child: const Text("Gündemdeki Konular",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff1F1F1F))),
+                    child: Text("Gündemdeki Konular",
+                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff272727))),
                   ),
                   HotTopicsListView(),
                 ],
                 PostHomeList(),
-                SizedBox(height: 100),
+                SizedBox(height: 80),
               ],
             ),
           );

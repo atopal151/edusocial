@@ -57,7 +57,7 @@ class GroupCard extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Color(0xffffffff),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(

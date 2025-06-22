@@ -12,8 +12,9 @@ class PostHomeList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      debugPrint("🔄 PostHomeList build - Loading: ${postController.isHomeLoading.value}, Post count: ${postController.postHomeList.length}");
-      
+      debugPrint(
+          "🔄 PostHomeList build - Loading: ${postController.isHomeLoading.value}, Post count: ${postController.postHomeList.length}");
+
       if (postController.isHomeLoading.value) {
         return Center(
           child: Container(
@@ -27,14 +28,9 @@ class PostHomeList extends StatelessWidget {
       }
 
       if (postController.postHomeList.isEmpty) {
-        return Center(
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: Text("Henüz post bulunmuyor"),
-          ),
-        );
+        return Center();
       }
-      
+
       return Column(
         children: postController.postHomeList.map((post) {
           return Container(
@@ -49,7 +45,7 @@ class PostHomeList extends StatelessWidget {
               name: post.name,
               mediaUrls: post.mediaUrls, // ✅ doğru alan // 🔁 boş liste
               likeCount: post.likeCount,
-              commentCount: post.commentCount, 
+              commentCount: post.commentCount,
               isLiked: post.isLiked,
               isOwner: post.isOwner,
               slug: post.slug,

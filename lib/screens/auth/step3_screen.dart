@@ -40,19 +40,21 @@ class Step3View extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: controller.groups.map((group) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: GroupCard(
-                      action: group.isMember
-                          ? "Katıldınız"
-                          : (group.isPending ? "Katılım Bekleniyor" : "Katıl"),
-                      imageUrl: group.bannerUrl,
-                      groupName: group.name,
-                      groupDescription: group.description,
-                      memberCount: group.userCountWithAdmin,
-                      onJoinPressed: () {
-                        controller.joinGroup(group.name);
-                      },
+                  return Obx(
+                    () => Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: GroupCard(
+                        action: group.isMember
+                            ? "Katıldınız"
+                            : (group.isPending ? "Katılım Bekleniyor" : group.isPrivate ? "Katılma İsteği Gönder": 'Gruba Katıl'),
+                        imageUrl: group.bannerUrl,
+                        groupName: group.name,
+                        groupDescription: group.description,
+                        memberCount: group.userCountWithAdmin,
+                        onJoinPressed: () {
+                          controller.joinGroup(group.name);
+                        },
+                      ),
                     ),
                   );
                 }).toList(),

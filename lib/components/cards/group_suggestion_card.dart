@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/group_models/grup_suggestion_model.dart';
 
@@ -50,10 +51,10 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
           right: 8,
           child: Text(
             group.groupName,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            style:  GoogleFonts.inter(
+              color: Color(0xffffffff),
+              fontSize: 13.28,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -63,8 +64,8 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
           right: 8,
           child: Text(
             group.description,
-            style: const TextStyle(
-              color: Colors.white,
+            style:  GoogleFonts.inter(
+              color: Color(0xffffffff),
               fontSize: 10,
               fontWeight: FontWeight.w400,
             ),
@@ -88,8 +89,8 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
               const SizedBox(width: 3),
               Text(
                 group.memberCount.toString(),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: GoogleFonts.inter(
+                  color: Color(0xffffffff),
                   fontSize: 13.28,
                   fontWeight: FontWeight.w600,
                 ),

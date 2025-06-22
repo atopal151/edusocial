@@ -130,7 +130,7 @@ class OnboardingServices {
       debugPrint("🟢 Token: $token");
 
       final response = await http.post(
-        Uri.parse('${AppConstants.baseUrl}/groups/join'),
+        Uri.parse('${AppConstants.baseUrl}/group-join'),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',

@@ -29,7 +29,7 @@ class OnboardingHeader extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xff414751),
+                  color: Color(0xff272727),
                 ),
                 textAlign: TextAlign.center,
               ),

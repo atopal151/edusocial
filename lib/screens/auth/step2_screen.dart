@@ -25,7 +25,7 @@ class Step2View extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 40),
+                SizedBox(height: 100),
                 OnboardingHeader(
                   imagePath: "images/icons/Group.png",
                   title: "Bilgilerinizi Tamamlayın",

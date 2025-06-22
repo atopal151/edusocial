@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/comment_bottom_sheet.dart';
 import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
+import '../snackbars/custom_snackbar.dart';
 
 class PostCard extends StatefulWidget {
   final int postId;
@@ -72,7 +74,7 @@ class _PostCardState extends State<PostCard> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xffffffff),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -95,12 +97,12 @@ class _PostCardState extends State<PostCard> {
                         },
                         child: CircleAvatar(
                           radius: 20,
-                          backgroundColor: Colors.grey.shade300, // Gri arkaplan
+                          backgroundColor: Color(0xfff3f4f6), // Gri arkaplan
                           backgroundImage: widget.profileImage.isNotEmpty
                               ? NetworkImage(widget.profileImage)
                               : null, // Eğer profil resmi varsa kullan
                           child: widget.profileImage.isEmpty
-                              ? const Icon(Icons.person, color: Colors.white)
+                              ? const Icon(Icons.person, color: Color(0xffffffff))
                               : null, // Profil resmi yoksa ikon
                         )),
                     const SizedBox(width: 10),
@@ -121,6 +123,7 @@ class _PostCardState extends State<PostCard> {
                             widget.postDate,
                             style: GoogleFonts.inter(
                               fontSize: 10,
+                              fontWeight: FontWeight.w400,
                               color: const Color(0xff9CA3AE),
                             ),
                           ),
@@ -131,7 +134,7 @@ class _PostCardState extends State<PostCard> {
                       onTap: () {
                         if (widget.isOwner == false) {
                           showModalBottomSheet(
-                            backgroundColor: Colors.white,
+                            backgroundColor: Color(0xffffffff),
                             context: context,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
@@ -142,7 +145,7 @@ class _PostCardState extends State<PostCard> {
                         }
                         if (widget.isOwner == true) {
                           showModalBottomSheet(
-                            backgroundColor: Colors.white,
+                            backgroundColor: Color(0xffffffff),
                             context: context,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
@@ -186,17 +189,42 @@ class _PostCardState extends State<PostCard> {
                        
                         ...widget.links.map(
                           (link) => InkWell(
-                            onTap: () {
-                              // Linke tıklayınca açılabilir:
-                              // launchUrl(Uri.parse(link));
+                            onTap: () async {
+                              try {
+                                final Uri url = Uri.parse(link);
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                                } else {
+                                  // URL açılamadığında kullanıcıya bilgi ver
+                                  if (mounted) {
+                                    CustomSnackbar.show(
+                                      title: "Hata",
+                                      message: "Link açılamadı: $link",
+                                      type: SnackbarType.error,
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                // Geçersiz URL formatı durumunda
+                                if (mounted) {
+                                  CustomSnackbar.show(
+                                    title: "Hata",
+                                    message: "Geçersiz link formatı",
+                                    type: SnackbarType.error,
+                                  );
+                                }
+                              }
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2),
                               child: Text(
                                 link,
-                                style: const TextStyle(
+                                style: GoogleFonts.inter(
                                   fontSize: 10,
-                                  color: Colors.blue,
+                                  color: Color(0xff007bff),
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Color(0xff007bff),
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ),
@@ -309,10 +337,18 @@ class _PostCardState extends State<PostCard> {
                 const Spacer(),
                 InkWell(
                   onTap: () {
-                    final shareText =
-                        "${widget.userName} bir gönderi paylaştı:\n\n${widget.postDescription}";
+                    String shareText = "${widget.userName} bir gönderi paylaştı:\n\n${widget.postDescription}";
+                    
+                    // Eğer linkler varsa onları da ekle
+                    if (widget.links.isNotEmpty) {
+                      shareText += "\n\nLinkler:\n";
+                      for (String link in widget.links) {
+                        shareText += "$link\n";
+                      }
+                    }
+                    
                     showModalBottomSheet(
-                      backgroundColor: Colors.white,
+                      backgroundColor: Color(0xffffffff),
                       context: context,
                       shape: const RoundedRectangleBorder(
                         borderRadius:

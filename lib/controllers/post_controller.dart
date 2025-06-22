@@ -65,9 +65,9 @@ class PostController extends GetxController {
   }
 
 //post create
-  Future<void> createPost(String content, List<File> mediaFiles) async {
+  Future<void> createPost(String content, List<File> mediaFiles, {List<String>? links}) async {
     try {
-      final success = await PostServices.createPost(content, mediaFiles);
+      final success = await PostServices.createPost(content, mediaFiles, links: links);
       if (success) {
         CustomSnackbar.show(
           title: "Başarılı",

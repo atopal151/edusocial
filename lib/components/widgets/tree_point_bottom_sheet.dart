@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TreePointBottomSheet extends StatelessWidget {
   const TreePointBottomSheet({super.key});
@@ -16,38 +17,39 @@ class TreePointBottomSheet extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: Color(0xff9ca3ae),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
             ListTile(
-              leading:
-                  const Icon(Icons.person, color: Color(0xfffb535c)),
-              title: const Text(
+              leading: CircleAvatar(
+                radius: 18,
+                backgroundColor: Color(0xfffff5f5),
+                child: const Icon(Icons.person, color: Color(0xffef5050), size: 20),
+              ),
+              title:  Text(
                 "Hakkında",
-                style: TextStyle(
+                style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: Color(0xff414751)),
+                    color: Color(0xff272727)),
               ),
-              onTap: () {
-              },
+              onTap: () {},
             ),
             ListTile(
-              leading: const Icon(
-                Icons.warning_rounded,
-                color: Color(0xfffb535c),
+              leading: CircleAvatar(
+                radius: 18,
+                backgroundColor: Color(0xfffff5f5),
+                child: const Icon(Icons.warning_rounded, color: Color(0xffef5050), size: 20),
               ),
-              title: const Text("Şikayet Et",
-                  style: TextStyle(
+              title:  Text("Şikayet Et",
+                  style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xff414751))),
-              onTap: () {
-              },
+                      color: Color(0xff272727))),
+              onTap: () {},
             ),
-            
           ],
         ),
       ),

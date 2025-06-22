@@ -101,13 +101,13 @@ class LoginView extends StatelessWidget {
                               ),
                               SizedBox(height: 10),
                               CustomTextField(
-                                  textColor: Color(0xFF9CA3AF),
+                                  textColor: Color(0xFF9CA3AE),
                                   hintText: "Kullanıcı adı veya e-posta",
                                   controller: controller
                                       .emailController, 
                                   backgroundColor: Color(0xfff5f5f5)),
                               CustomTextField(
-                                  textColor: Color(0xFF9CA3AF),
+                                  textColor: Color(0xFF9CA3AE),
                                   hintText: "Şifre",
                                   isPassword: true,
                                   controller: controller
