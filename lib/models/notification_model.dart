@@ -109,15 +109,11 @@ class NotificationModel {
     bool isRejected = false;
     
     if (json['type'] == 'follow-join-request' || json['type'] == 'follow-request') {
-      String answerStatus = answer['status']?.toString().toLowerCase() ?? '';
       bool userIsFollowing = user['is_following'] ?? false;
       bool userIsFollowingPending = user['is_following_pending'] ?? false;
-      String text = fullData['text']?.toString() ?? '';
       
-      //debugPrint("🔍 Answer status: $answerStatus");
       //debugPrint("🔍 User is_following: $userIsFollowing");
       //debugPrint("🔍 User is_following_pending: $userIsFollowingPending");
-      //debugPrint("🔍 Text: $text");
       
       // Mantık: Eğer user.is_following true ise, kullanıcıyı takip ediyoruz
       // Eğer user.is_following_pending true ise, takip isteği beklemede
@@ -185,14 +181,11 @@ class NotificationModel {
       isFollowing = user['is_following'] ?? false;
       isFollowingPending = user['is_following_pending'] ?? false;
     }
-    
-    bool isSelf = user['is_self'] ?? false;
 
     //debugPrint("🔍 Final values:");
     //debugPrint("🔍   - isFollowing: $isFollowing");
     //debugPrint("🔍   - isFollowingPending: $isFollowingPending");
     //debugPrint("🔍   - isAccepted: $isAccepted");
-    //debugPrint("🔍   - isSelf: $isSelf");
     //debugPrint("🔍   - senderUserId: $senderUserId");
     //debugPrint("🔍 === END DEBUG ===");
 

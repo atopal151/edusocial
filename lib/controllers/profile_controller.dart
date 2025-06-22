@@ -78,25 +78,25 @@ String formatSimpleDate(String dateStr) {
         profileImage.value = profileData.avatarUrl;
         coverImage.value = profileData.bannerUrl;
         bio.value = profileData.description ?? '';
-        birthDate.value = profileData.birthDate ?? '';
+        birthDate.value = profileData.birthDate;
         
-        lessons.value = profileData.lessons ?? [];
+        lessons.value = profileData.lessons;
         
         // 📌 Okul ve Bölüm Bilgileri
         schoolName.value = profileData.school?.name ?? 'Okul bilgisi yok';
         schoolDepartment.value = profileData.schoolDepartment?.title ?? 'Bölüm bilgisi yok';
         
         // 📌 Takipçi ve takip edilen sayıları
-        followers.value = profileData.followers?.length ?? 0;
-        following.value = profileData.followings?.length ?? 0;
+        followers.value = profileData.followers.length;
+        following.value = profileData.followings.length;
         
         // 📌 Takipçi ve Takip Edilen Listesi
-        followerList.assignAll(profileData.followers ?? []);
-        followingList.assignAll(profileData.followings ?? []);
+        followerList.assignAll(profileData.followers);
+        followingList.assignAll(profileData.followings);
         
         // 📌 Postlar
-        postCount.value = profileData.posts?.length ?? 0;
-        profilePosts.assignAll(profileData.posts ?? []);
+        postCount.value = profileData.posts.length;
+        profilePosts.assignAll(profileData.posts);
         
         // Profil yüklendikten sonra diğer verileri de güncelle
         _updateRelatedData();
@@ -108,7 +108,7 @@ String formatSimpleDate(String dateStr) {
     } finally {
       isLoading.value = false;
     }
-  }
+  } 
 
   /// Profil yüklendikten sonra ilgili verileri güncelle
   void _updateRelatedData() {

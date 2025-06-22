@@ -6,7 +6,6 @@ import 'package:edusocial/services/chat_service.dart';
 import 'package:edusocial/services/socket_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import '../../models/chat_models/chat_model.dart';
 import '../../models/chat_models/group_chat_model.dart';
 
@@ -21,7 +20,6 @@ class ChatController extends GetxController {
 
   final TextEditingController searchController = TextEditingController();
 
-  final GetStorage _box = GetStorage();
   late SocketService _socketService;
   late StreamSubscription _privateMessageSubscription;
   late StreamSubscription _groupMessageSubscription;
@@ -36,13 +34,6 @@ class ChatController extends GetxController {
     fetchOnlineFriends();
   }
 
-  /// Socket bağlantısını kur
-  void _connectSocket() {
-    final token = _box.read('token');
-    if (token != null && token.isNotEmpty) {
-      _socketService.connect(token);
-    }
-  }
 
   /// Socket event dinleyicilerini ayarla
   void _setupSocketListeners() {
