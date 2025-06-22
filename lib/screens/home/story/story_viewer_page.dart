@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:edusocial/controllers/story_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class StoryViewerPage extends StatefulWidget {
   final int initialIndex;
@@ -125,16 +126,15 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   Widget build(BuildContext context) {
     if (allStories.isEmpty) {
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xff272727),
         body: Center(
-          child: Text("Story bulunamadı", style: TextStyle(color: Colors.white)),
         ),
       );
     }
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xff272727),
         body: PageView.builder(
           controller: _pageController,
           physics: NeverScrollableScrollPhysics(),
@@ -163,7 +163,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
-                                child: Icon(Icons.broken_image, color: Colors.white, size: 48),
+                                child: Icon(Icons.broken_image, color: Color(0xffffffff), size: 48),
                               );
                             },
                           )
@@ -210,13 +210,13 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(story.username,
-                                style: TextStyle(color: Colors.white, fontSize: 16)),
-                            Text(timeAgo(story.created_at), style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600)),
+                            Text(timeAgo(story.created_at), style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 10, fontWeight: FontWeight.w400)),
                           ],
                         ),
                         Spacer(),
                         IconButton(
-                          icon: Icon(Icons.close, color: Colors.white),
+                          icon: Icon(Icons.close, color: Color(0xffffffff)),
                           onPressed: () => Get.back(),
                         )
                       ],

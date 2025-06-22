@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/story_model.dart';
 import '../../screens/home/story/story_viewer_page.dart';
 
@@ -28,7 +29,7 @@ class UserStoryCard extends StatelessWidget {
                   height: 65,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.grey[300],
+                    color: Color(0xff9ca3ae),
                   ),
                 ),
                 Positioned(
@@ -48,7 +49,7 @@ class UserStoryCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text("@sen", style: TextStyle(fontSize: 12)),
+            Text("@Sen", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w400, color: Color(0xff272727))),
           ],
         ),
       );
@@ -71,7 +72,7 @@ class UserStoryCard extends StatelessWidget {
                       shape: BoxShape.circle,
                       gradient: story!.isViewed.value
                           ? LinearGradient(
-                              colors: [Colors.grey.shade400, Colors.grey.shade200])
+                              colors: [Color(0xff9ca3ae), Color(0xff9ca3ae)])
                           : const LinearGradient(
                               colors: [Color(0xfffb535c), Color(0xfffb535c)]),
                     ),
@@ -82,10 +83,10 @@ class UserStoryCard extends StatelessWidget {
                       },
                       child: CircleAvatar(
                         radius: 32,
-                        backgroundColor: Colors.white,
+                        backgroundColor: Color(0xffffffff),
                         child: CircleAvatar(
                           radius: 30,
-                          backgroundColor: Colors.white,
+                          backgroundColor: Color(0xffffffff),
                           backgroundImage: NetworkImage(story!.profileImage),
                         ),
                       ),
@@ -117,8 +118,8 @@ class UserStoryCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          story!.username,
-          style: const TextStyle(fontSize: 12),
+          '@${story!.username}',
+          style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w400, color: Color(0xff272727)),
           overflow: TextOverflow.ellipsis,
         )
       ],

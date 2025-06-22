@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/story_controller.dart';
 
 class MyStoryViewerPage extends StatefulWidget {
@@ -16,42 +16,40 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
   int _storyIndex = 0;
   AnimationController? _animationController;
 
-@override
-void initState() {
-  super.initState();
-  _storyIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    _storyIndex = 0;
 
-  final story = storyController.getMyStory();
-  if (story != null && story.storyUrls.length > 1) {
-    _startStory();
+    final story = storyController.getMyStory();
+    if (story != null && story.storyUrls.length > 1) {
+      _startStory();
+    }
   }
-}
 
+  void _startStory() {
+    _animationController?.stop();
+    _animationController?.dispose();
 
+    final story = storyController.getMyStory();
+    if (story == null || story.storyUrls.length <= 1)
+      return; // güvenlik kontrolü
 
-void _startStory() {
-  _animationController?.stop();
-  _animationController?.dispose();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    )
+      ..addListener(() {
+        setState(() {});
+      })
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          nextStory();
+        }
+      });
 
-  final story = storyController.getMyStory();
-  if (story == null || story.storyUrls.length <= 1) return; // güvenlik kontrolü
-
-  _animationController = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 10),
-  )
-    ..addListener(() {
-      setState(() {});
-    })
-    ..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        nextStory();
-      }
-    });
-
-  _animationController!.forward();
-}
-
+    _animationController!.forward();
+  }
 
   void _pauseStory() {
     _animationController?.stop();
@@ -61,37 +59,37 @@ void _startStory() {
     _animationController?.forward();
   }
 
-void nextStory() {
-  final story = storyController.getMyStory();
-  if (story == null) return;
+  void nextStory() {
+    final story = storyController.getMyStory();
+    if (story == null) return;
 
-  final total = story.storyUrls.length;
+    final total = story.storyUrls.length;
 
-  // Eğer son story ise → çık
-  if (_storyIndex >= total - 1) {
-    _animationController?.stop();
-    Get.back();
-    return;
-  }
+    // Eğer son story ise → çık
+    if (_storyIndex >= total - 1) {
+      _animationController?.stop();
+      Get.back();
+      return;
+    }
 
-  // Aksi halde bir sonraki story'ye geç
-  setState(() {
-    _storyIndex++;
-  });
-  _startStory();
-}
-
-void previousStory() {
-  if (_storyIndex > 0) {
+    // Aksi halde bir sonraki story'ye geç
     setState(() {
-      _storyIndex--;
+      _storyIndex++;
     });
     _startStory();
-  } else {
-    _animationController?.stop(); // güvenlik için
-    Get.back();
   }
-}
+
+  void previousStory() {
+    if (_storyIndex > 0) {
+      setState(() {
+        _storyIndex--;
+      });
+      _startStory();
+    } else {
+      _animationController?.stop(); // güvenlik için
+      Get.back();
+    }
+  }
 
   String timeAgo(DateTime date) {
     final now = DateTime.now();
@@ -117,11 +115,8 @@ void previousStory() {
 
     if (story == null || story.storyUrls.isEmpty) {
       return Scaffold(
-        backgroundColor: Colors.black,
-        body: const Center(
-          child: Text("Story bulunamadı",
-              style: TextStyle(color: Colors.white)),
-        ),
+        backgroundColor: Color(0xff272727),
+        body: const Center(),
       );
     }
 
@@ -146,8 +141,8 @@ void previousStory() {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const Center(
-                    child: Icon(Icons.broken_image,
-                        color: Colors.white, size: 48),
+                    child:
+                        Icon(Icons.broken_image, color: Color(0xffffffff), size: 48),
                   );
                 },
               ),
@@ -194,18 +189,18 @@ void previousStory() {
                       Text(
                         story.username,
                         style:
-                            const TextStyle(color: Colors.white, fontSize: 16),
+                            GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       Text(
                         timeAgo(story.created_at),
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 12),
+                        style: GoogleFonts.inter(
+                            color: Color(0xffffffff), fontSize: 10, fontWeight: FontWeight.w400),
                       ),
                     ],
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: const Icon(Icons.close, color: Color(0xffffffff)),
                     onPressed: () => Get.back(),
                   )
                 ],

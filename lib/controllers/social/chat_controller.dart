@@ -215,6 +215,13 @@ class ChatController extends GetxController {
     }
   }
 
+  /// 📊 Toplam okunmamış mesaj sayısını hesapla
+  int get totalUnreadCount {
+    int privateChatUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
+    int groupChatUnread = groupChatList.fold(0, (sum, group) => sum + group.unreadCount);
+    return privateChatUnread + groupChatUnread;
+  }
+
   @override
   void onClose() {
     _privateMessageSubscription.cancel();

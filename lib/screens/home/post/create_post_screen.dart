@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:edusocial/components/buttons/icon_button.dart';
 import 'package:edusocial/components/snackbars/custom_snackbar.dart';
+import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       r'https?://[^\s]+|www\.[^\s]+',
       caseSensitive: false,
     );
-    
+
     final matches = urlRegex.allMatches(text);
     return matches.map((match) => match.group(0)!).toList();
   }
@@ -76,21 +77,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     if (textController.text.isNotEmpty) {
       try {
         isPosting.value = true;
-        
+
         // Linkleri text'ten çıkar
         String cleanContent = textController.text;
         List<String> extractedLinks = extractLinksFromText(cleanContent);
-        
+
         // Linkleri text'ten temizle
         for (String link in extractedLinks) {
           cleanContent = cleanContent.replaceAll(link, '').trim();
         }
-        
+
         // Fazla boşlukları temizle
         cleanContent = cleanContent.replaceAll(RegExp(r'\s+'), ' ').trim();
-        
-        final mediaFiles = _selectedImages.map((xfile) => File(xfile.path)).toList();
-        await postController.createPost(cleanContent, mediaFiles, links: extractedLinks);
+
+        final mediaFiles =
+            _selectedImages.map((xfile) => File(xfile.path)).toList();
+        await postController.createPost(cleanContent, mediaFiles,
+            links: extractedLinks);
         isPosting.value = false;
         Get.offAllNamed('/main'); // Main screen'e git (navbar 0. index)
       } catch (e) {
@@ -115,7 +118,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: AppBar(
-      backgroundColor: Color(0xfffafafa),
+        backgroundColor: Color(0xfffafafa),
         iconTheme: const IconThemeData(color: Color(0xff414751)),
         leading: InkWell(
           onTap: () => Get.back(),
@@ -128,41 +131,44 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               width: 100,
               height: 33,
               child: Obx(() => GestureDetector(
-                onTap: isPosting.value ? null : sharePost,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isPosting.value ? Colors.grey : Color(0xFFF26B6B),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (isPosting.value)
-                        SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      else
-                        Text(
-                          "Gönderi",
-                          style: GoogleFonts.inter(
-                            color: Color(0xffffffff),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              )),
+                    onTap: isPosting.value ? null : sharePost,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isPosting.value
+                            ? Color(0xff9ca3ae)
+                            : Color(0xffef5050),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (isPosting.value)
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: GeneralLoadingIndicator(
+                                size: 16,
+                                color: Colors.white,
+                                showIcon: false,
+                              ),
+                            )
+                          else
+                            Text(
+                              "Gönderi",
+                              style: GoogleFonts.inter(
+                                color: Color(0xffffffff),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  )),
             ),
           ),
         ],
@@ -176,11 +182,18 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 padding: const EdgeInsets.all(12.0),
                 child: Obx(() => CircleAvatar(
                       radius: 20,
-                      backgroundImage: NetworkImage(
-                        profileController.profileImage.value.isNotEmpty
-                            ? profileController.profileImage.value
-                            : "https://i.pravatar.cc/150?img=1", // fallback
-                      ),
+                      backgroundColor: Color(0xffffeeee),
+                      backgroundImage: profileController
+                              .profileImage.value.isNotEmpty
+                          ? NetworkImage(profileController.profileImage.value)
+                          : null,
+                      child: profileController.profileImage.value.isEmpty
+                          ? Icon(
+                              Icons.person,
+                              color: Color(0xffef5050),
+                              size: 24,
+                            )
+                          : null,
                     )),
               ),
               const SizedBox(width: 12),
@@ -192,7 +205,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   decoration: InputDecoration(
                     hintText: "Neler oluyor?",
                     hintStyle: GoogleFonts.inter(
-                        color: Color(0xff414751), fontSize: 13.28),
+                        color: Color(0xff414751),
+                        fontSize: 13.28,
+                        fontWeight: FontWeight.w400),
                     border: InputBorder.none,
                   ),
                   onChanged: onTextChanged,
@@ -202,9 +217,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           ),
           Expanded(
             child: _selectedImages.isEmpty
-                ? Center(
-                    child: Text('Fotoğraf eklemedin',
-                        style: GoogleFonts.inter(color: Colors.grey)))
+                ? Center()
                 : GridView.builder(
                     padding: const EdgeInsets.all(12),
                     itemCount: _selectedImages.length,
@@ -254,7 +267,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Tespit Edilen Linkler (${_links.length}):",
+                    "Linkler (${_links.length}):",
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -269,16 +282,17 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Color(0xfff0f8ff),
+                        color: Color(0xffffeeee),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Color(0xff007bff).withOpacity(0.3)),
+                        border: Border.all(
+                            color: Color(0xffef5050).withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.link,
                             size: 16,
-                            color: Color(0xff007bff),
+                            color: Color(0xffef5050),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -286,8 +300,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                               link,
                               style: GoogleFonts.inter(
                                 fontSize: 12,
-                                color: Color(0xff007bff),
+                                color: Color(0xffef5050),
                                 decoration: TextDecoration.underline,
+                                decorationColor: Color(0xffef5050),
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ),
@@ -296,13 +312,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             child: Icon(
                               Icons.close,
                               size: 16,
-                              color: Color(0xff9ca3ae),
+                              color: Color(0xffef5050),
                             ),
                           ),
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),

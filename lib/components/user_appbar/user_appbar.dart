@@ -29,7 +29,7 @@ final GroupController groupController = Get.find<GroupController>();
 
               return CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: Color(0xffffffff),
                 child: (imagePath.isEmpty || imagePath == 'null')
                     ? null
                     : ClipOval(

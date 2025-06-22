@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/match_controller.dart';
+import '../controllers/social/chat_controller.dart';
 
 class NavbarMenu extends StatefulWidget {
   const NavbarMenu({super.key});
@@ -14,6 +16,7 @@ class NavbarMenu extends StatefulWidget {
 class _NavbarMenuState extends State<NavbarMenu> {
   final MatchController matchController = Get.find();
   final NavigationController controller = Get.find();
+  final ChatController chatController = Get.find();
 
   final List<String> icons = ["post", "chat", "match", "event", "profile"];
   static const double centerButtonWidth = 57;
@@ -24,46 +27,88 @@ class _NavbarMenuState extends State<NavbarMenu> {
       clipBehavior: Clip.none,
       children: [
         // ALT NAVBAR
-        Obx(
-          () => Container(
-            padding: EdgeInsets.only(top: 15, bottom: 30, left: 15, right: 15),
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(5, (index) {
-                bool isSelected = controller.selectedIndex.value == index;
-
-                /// Orta butonu (index 2) Row'dan kaldır, sadece boşluk bırak
-                if (index == 2) {
-                  return const SizedBox(width: centerButtonWidth);
-                }
-
-                return GestureDetector(
-                  onTap: () {
-                    debugPrint('🔄 Navbar: Tapped on index $index (${icons[index]})');
-                    controller.changeIndex(index);
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SvgPicture.asset(
-                        "images/icons/${icons[index]}.svg",
-                        colorFilter: ColorFilter.mode(
-                          isSelected
-                              ? const Color(0xFFEF5050)
-                              : const Color(0xFF9CA3AE),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ),
+        Container(
+          padding: EdgeInsets.only(top: 15, bottom: 30, left: 15, right: 15),
+          decoration: BoxDecoration(
+            color: Colors.white,
           ),
+          child: Obx(() => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(5, (index) {
+              bool isSelected = controller.selectedIndex.value == index;
+
+              /// Orta butonu (index 2) Row'dan kaldır, sadece boşluk bırak
+              if (index == 2) {
+                return const SizedBox(width: centerButtonWidth);
+              }
+
+              return GestureDetector(
+                onTap: () {
+                  debugPrint('🔄 Navbar: Tapped on index $index (${icons[index]})');
+                  controller.changeIndex(index);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        SvgPicture.asset(
+                          "images/icons/${icons[index]}.svg",
+                          colorFilter: ColorFilter.mode(
+                            isSelected
+                                ? const Color(0xFFEF5050)
+                                : const Color(0xFF9CA3AE),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        // Chat ikonu için badge göster
+                        if (index == 1) // Chat index'i
+                          Builder(builder: (context) {
+                            final unreadCount = chatController.totalUnreadCount;
+                            if (unreadCount > 0) {
+                              return Positioned(
+                                right: -8,
+                                top: -8,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffff565f),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                   
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: 20,
+                                    minHeight: 20,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      unreadCount > 99 ? '99+' : unreadCount.toString(),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 8,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            return SizedBox.shrink();
+                          }),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+          )),
         ),
 
         Positioned(

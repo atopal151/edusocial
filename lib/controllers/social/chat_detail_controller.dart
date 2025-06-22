@@ -46,7 +46,9 @@ class ChatDetailController extends GetxController {
   final RxBool isSendingMessage = false.obs;
   TextEditingController pollTitleController = TextEditingController();
 
+  // Controllers
   final ProfileController profileController = Get.find<ProfileController>();
+
   late SocketService _socketService;
   late StreamSubscription _privateMessageSubscription;
 

@@ -3,6 +3,7 @@ import 'package:edusocial/components/cards/user_story_card.dart';
 import 'package:edusocial/screens/home/story/my_story_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/profile_controller.dart';
 import '../../../controllers/story_controller.dart';
 
@@ -43,7 +44,7 @@ class MyStoryList extends StatelessWidget {
                     height: 65,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey[300],
+                      color: Color(0xfffafafa),
                       image: profileController.profileImage.value.isNotEmpty &&
                               profileController.profileImage.value
                                   .startsWith("http")
@@ -62,11 +63,11 @@ class MyStoryList extends StatelessWidget {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Color(0xffffffff),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(Icons.add_circle_rounded,
-                          size: 18, color: Colors.black),
+                          size: 18, color: Color(0xff272727)),
                     ),
                   ),
                 ],
@@ -75,8 +76,11 @@ class MyStoryList extends StatelessWidget {
               Text(
                 profileController.username.value.isNotEmpty
                     ? profileController.username.value
-                    : "@sen",
-                style: TextStyle(fontSize: 12),
+                    : "@Sen",
+                style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff272727)),
               ),
             ],
           ),

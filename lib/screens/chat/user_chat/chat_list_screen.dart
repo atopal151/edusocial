@@ -2,6 +2,7 @@ import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../components/user_appbar/user_appbar.dart';
 import '../../../controllers/social/chat_controller.dart';
 import '../../../controllers/group_controller/group_controller.dart';
@@ -36,7 +37,7 @@ class _ChatListScreenState extends State<ChatListScreen>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SearchTextField(
-              label: "Ara",
+              label: "Kişi ara",
               controller: chatController.searchController,
               onChanged: chatController.filterChatList,
             ),
@@ -45,19 +46,19 @@ class _ChatListScreenState extends State<ChatListScreen>
 
           /// **Online Arkadaşlar Alanı**
           Container(
-            color: Colors.white,
+            color: Color(0xffffffff),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const Text(
+                  child:  Text(
                     "Online Arkadaşlar",
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xff414751)),
+                        color: Color(0xff272727)),
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -103,7 +104,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                                             borderRadius:
                                                 BorderRadius.circular(50),
                                             border: Border.all(
-                                                color: Colors.white, width: 2),
+                                                color: Color(0xffffffff), width: 2),
                                           ),
                                         ),
                                       ),
@@ -111,10 +112,11 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(friend.name,
-                                        style: TextStyle(
+                                    child: Text('@${friend.username}',
+                                        style: GoogleFonts.inter(
                                             fontSize: 10,
-                                            color: Color(0xff414751))),
+                                            color: Color(0xff272727),
+                                            fontWeight: FontWeight.w400)),
                                   ),
                                 ],
                               ),
@@ -130,20 +132,21 @@ class _ChatListScreenState extends State<ChatListScreen>
           /// ✅ TabBar (Kişisel & Grup)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 90),
-            color: Colors.white,
+            color: Color(0xffffffff),
             child: TabBar(
               controller: _tabController,
               indicatorColor: const Color(0xffef5050),
               indicatorWeight: 1,
               dividerColor: Colors.transparent,
               labelColor: const Color(0xffef5050),
-              unselectedLabelColor: Colors.grey,
-              labelStyle: const TextStyle(
+              unselectedLabelColor: Color(0xff9ca3ae),
+              labelStyle: GoogleFonts.inter(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
+                color: Color(0xff272727),
               ),
               tabs: const [
-                Tab(text: "Kişisel"),
+                Tab(text: "Kişiler"),
                 Tab(text: "Gruplar"),
               ],
             ),
@@ -169,7 +172,6 @@ class _ChatListScreenState extends State<ChatListScreen>
   Widget _buildPrivateMessages() {
     return RefreshIndicator(
       onRefresh: () async {
-        debugPrint("🔄 Kişisel mesajlar yenileniyor...");
         await chatController.fetchChatList();
         debugPrint("✅ Kişisel mesajlar başarıyla yenilendi");
       },
@@ -199,7 +201,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Color(0xffffffff),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -222,7 +224,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                                       : const Color(0xffd9d9d9),
                                   borderRadius: BorderRadius.circular(50),
                                   border:
-                                      Border.all(color: Colors.white, width: 2),
+                                      Border.all(color: Color(0xffffffff), width: 2),
                                 ),
                               ),
                             ),
@@ -235,15 +237,15 @@ class _ChatListScreenState extends State<ChatListScreen>
                             children: [
                               Text(
                                 chat.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 13),
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xff414751)),
                               ),
                               Text(
                                 chat.lastMessage?.message ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    fontSize: 11, color: Colors.grey),
+                                style: GoogleFonts.inter(
+                                    fontSize: 10, color: Color(0xff9ca3ae), fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -253,18 +255,18 @@ class _ChatListScreenState extends State<ChatListScreen>
                             Text(
                               formatSimpleDateClock(
                                   chat.lastMessage?.createdAt ?? ''),
-                              style: const TextStyle(
-                                  fontSize: 10, color: Colors.grey),
+                              style: GoogleFonts.inter(
+                                  fontSize: 10, color: Color(0xff9ca3ae), fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 8),
                             if (chat.unreadCount > 0)
                               CircleAvatar(
                                 radius: 10,
-                                backgroundColor: Colors.red,
+                                backgroundColor: Color(0xffff565f),
                                 child: Text(
                                   chat.unreadCount.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 10, color: Colors.white),
+                                  style: GoogleFonts.inter(
+                                      fontSize: 10, color: Color(0xffffffff), fontWeight: FontWeight.w400),
                                 ),
                               ),
                           ],
