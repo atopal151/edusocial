@@ -89,7 +89,7 @@ Widget buildGroupMessageInputField() {
                   decoration: InputDecoration(
                     hintText: controller.selectedFiles.isNotEmpty 
                         ? "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz..."
-                        : "Bir mesaj yazınız... (Linkler otomatik algılanır)",
+                        : "Bir mesaj yazınız...",
                     hintStyle: TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
                     border: InputBorder.none,
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/entry_model.dart';
 import '../controllers/entry_controller.dart';
 import '../components/sheets/share_options_bottom_sheet.dart';
@@ -113,13 +114,17 @@ class DisplayEntryItem extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.share),
                     onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-                        ),
-                        builder: (_) => ShareOptionsBottomSheet(postText: entry.content),
-                      );
+                      final String shareText = """
+${entry.content}
+
+📱 EduSocial Uygulamasını İndir:
+🔗 Uygulamayı Aç: edusocial://app
+📲 App Store: https://apps.apple.com/app/edusocial/id123456789
+📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
+
+#EduSocial #Eğitim
+""";
+                      Share.share(shareText);
                     },
                   ),
                 ],

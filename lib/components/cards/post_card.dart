@@ -23,6 +23,7 @@ class PostCard extends StatefulWidget {
   final bool isLiked;
   final bool isOwner;
   final List<String> links; // ✅ Yeni ekledik!
+  final String slug;
 
   const PostCard(
       {super.key,
@@ -37,7 +38,8 @@ class PostCard extends StatefulWidget {
       required this.commentCount,
       required this.isLiked,
       required this.isOwner,
-    required this.links,});
+    required this.links,
+    required this.slug,});
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -316,8 +318,11 @@ class _PostCardState extends State<PostCard> {
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(25)),
                       ),
-                      builder: (_) =>
-                          ShareOptionsBottomSheet(postText: shareText),
+                      builder: (_) => ShareOptionsBottomSheet(
+                        postText: shareText,
+                        postId: widget.postId,
+                        postSlug: widget.slug,
+                      ),
                     );
                   },
                   child: SvgPicture.asset(

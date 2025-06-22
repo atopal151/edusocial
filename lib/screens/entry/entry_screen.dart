@@ -5,6 +5,7 @@ import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/models/entry_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../components/user_appbar/user_appbar.dart';
 import '../../components/sheets/share_options_bottom_sheet.dart';
 import '../../controllers/entry_controller.dart';
@@ -148,16 +149,17 @@ class EntryScreenState extends State<EntryScreen> {
                                     onDownvote: () => entryController.voteEntry(
                                         entry.id, "down"),
                                     onShare: () {
-                                      final String shareText = entry.content;
-                                      showModalBottomSheet(
-                                        context: context,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(25)),
-                                        ),
-                                        builder: (_) => ShareOptionsBottomSheet(
-                                            postText: shareText),
-                                      );
+                                      final String shareText = """
+${entry.content}
+
+📱 EduSocial Uygulamasını İndir:
+🔗 Uygulamayı Aç: edusocial://app
+📲 App Store: https://apps.apple.com/app/edusocial/id123456789
+📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
+
+#EduSocial #Eğitim
+""";
+                                      Share.share(shareText);
                                     },
                                     onPressed: () {
                                       Get.toNamed(Routes.entryDetail,

@@ -49,8 +49,10 @@ class PostHomeList extends StatelessWidget {
               name: post.name,
               mediaUrls: post.mediaUrls, // ✅ doğru alan // 🔁 boş liste
               likeCount: post.likeCount,
-              commentCount: post.commentCount, isLiked: post.isLiked,
+              commentCount: post.commentCount, 
+              isLiked: post.isLiked,
               isOwner: post.isOwner,
+              slug: post.slug,
             ),
           );
         }).toList(),
