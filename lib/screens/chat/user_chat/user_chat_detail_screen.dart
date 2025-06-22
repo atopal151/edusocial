@@ -35,27 +35,7 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
       return;
     }
 
-    final userDetail = args['userDetail'] as UserChatDetailModel;
-    debugPrint('✅ UserChatDetailScreen - UserDetail Model:');
-    debugPrint('  - ID: ${userDetail.id}');
-    debugPrint('  - Name: ${userDetail.name}');
-    debugPrint('  - Follower: ${userDetail.follower}');
-    debugPrint('  - Following: ${userDetail.following}');
-    debugPrint('  - ImageUrl: ${userDetail.imageUrl}');
-    debugPrint('  - Documents Count: ${userDetail.documents.length}');
-    debugPrint('  - Links Count: ${userDetail.links.length}');
-    debugPrint('  - PhotoUrls Count: ${userDetail.photoUrls.length}');
-    debugPrint('  - MemberImageUrls Count: ${userDetail.memberImageUrls.length}');
-
-    chatController.userChatDetail.value = userDetail;
     
-    // Controller'daki değerleri kontrol et
-    debugPrint('🔍 UserChatDetailScreen - Controller Değerleri:');
-    debugPrint('  - isLoading: ${chatController.isLoading.value}');
-    debugPrint('  - userChatDetail: ${chatController.userChatDetail.value != null ? 'Var' : 'Null'}');
-    if (chatController.userChatDetail.value != null) {
-      debugPrint('  - Controller UserDetail Name: ${chatController.userChatDetail.value?.name}');
-    }
   }
 
   @override
@@ -80,9 +60,6 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
       backgroundColor: const Color(0xfffafafa),
       appBar: const ChatDetailAppBar(),
       body: Obx(() {
-        debugPrint('🔄 UserChatDetailScreen - Build Çağrıldı');
-        debugPrint('  - isLoading: ${chatController.isLoading.value}');
-        debugPrint('  - userChatDetail: ${chatController.userChatDetail.value != null ? 'Var' : 'Null'}');
 
         if (chatController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

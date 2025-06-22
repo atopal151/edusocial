@@ -74,12 +74,22 @@ class _ChatDetailBodyState extends State<ChatDetailBody> {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
+                        color: Color(0xff272727),
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Icon(
-                      Icons.check_circle,
-                      color: Color(0xff2c96ff),
+                    Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Color(0xff2c96ff),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        color: Color(0xffffffff),
+                        size: 16,
+                        
+                      ),
                     ),
                   ],
                 ),

@@ -461,6 +461,12 @@ class ChatDetailController extends GetxController {
     if (currentChatId.value == null) return;
     if (isSendingMessage.value) return;
     
+    // Debug logları ekle
+    debugPrint('📤 Sending message:');
+    debugPrint('  - Text: "$message"');
+    debugPrint('  - Selected files: ${selectedFiles.length}');
+    debugPrint('  - File types: ${selectedFiles.map((f) => f.path.split('.').last).toList()}');
+    
     // Eğer hiçbir şey seçilmemişse gönderme
     if (message.isEmpty && selectedFiles.isEmpty) {
       debugPrint('❌ Nothing to send');
@@ -488,7 +494,7 @@ class ChatDetailController extends GetxController {
         
         await ChatServices.sendMessage(
           currentChatId.value!,
-          nonLinkText, // Sadece link olmayan text
+          nonLinkText.isEmpty ? ' ' : nonLinkText, // Boş string yerine space gönder
           conversationId: currentConversationId.value,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
           links: normalizedUrls, // Linkleri ayrı parametrede gönder

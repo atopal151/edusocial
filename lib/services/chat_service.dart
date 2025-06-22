@@ -24,6 +24,14 @@ class ChatServices {
     final token = _box.read('token');
     final url = Uri.parse('${AppConstants.baseUrl}/conversation');
 
+    // Debug logları ekle
+    debugPrint('📤 ChatServices.sendMessage called:');
+    debugPrint('  - Receiver ID: $receiverId');
+    debugPrint('  - Message: "$message"');
+    debugPrint('  - Conversation ID: $conversationId');
+    debugPrint('  - Media files: ${mediaFiles?.length ?? 0}');
+    debugPrint('  - Links: ${links?.length ?? 0}');
+
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
 
@@ -32,7 +40,10 @@ class ChatServices {
     if (conversationId != null) {
       request.fields['conversation_id'] = conversationId;
     }
-    request.fields['message'] = message;
+    
+    // Mesaj alanını her zaman gönder (boş string olsa bile)
+    // Backend "conversation.message.required_without_all" hatası veriyor
+    request.fields['message'] = message.isEmpty ? ' ' : message;
 
     // Linkleri ekle
     if (links != null && links.isNotEmpty) {
@@ -43,34 +54,50 @@ class ChatServices {
 
     // Medya dosyalarını ekle
     if (mediaFiles != null && mediaFiles.isNotEmpty) {
+      debugPrint('📁 Adding media files to request:');
       for (var file in mediaFiles) {
         final fileExtension = file.path.split('.').last.toLowerCase();
         String mimeType = 'application/octet-stream';
+        String fieldName = 'media[]'; // Default field name
         
         // MIME type belirle
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension)) {
           mimeType = 'image/$fileExtension';
+          fieldName = 'media[]'; // Resimler için media field
         } else if (['pdf'].contains(fileExtension)) {
           mimeType = 'application/pdf';
+          fieldName = 'documents[]'; // PDF'ler için documents field
         } else if (['doc', 'docx'].contains(fileExtension)) {
           mimeType = 'application/msword';
+          fieldName = 'documents[]'; // Word dosyaları için documents field
         } else if (['txt'].contains(fileExtension)) {
           mimeType = 'text/plain';
+          fieldName = 'documents[]'; // Text dosyaları için documents field
         }
+        
+        debugPrint('  - File: ${file.path}');
+        debugPrint('  - Extension: $fileExtension');
+        debugPrint('  - MIME Type: $mimeType');
+        debugPrint('  - Field Name: $fieldName');
         
         request.files.add(
           await http.MultipartFile.fromPath(
-            'media[]',
+            fieldName,
             file.path,
             contentType: MediaType.parse(mimeType),
           ),
         );
       }
+      debugPrint('📁 Total files added: ${request.files.length}');
     }
 
     try {
+      debugPrint('📤 Sending request to: $url');
       var streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('📥 Response status: ${response.statusCode}');
+      debugPrint('📥 Response body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Mesaj başarıyla gönderildi!");

@@ -210,6 +210,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                           children: [
                             CircleAvatar(
                               radius: 25,
+                              backgroundColor: Color(0xffd9d9d9),
                               backgroundImage: NetworkImage(chat.avatar),
                             ),
                             Positioned(

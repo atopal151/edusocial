@@ -3,6 +3,7 @@ import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../components/input_fields/message_input_field.dart';
 import '../../../controllers/social/chat_detail_controller.dart';
 
@@ -40,7 +41,7 @@ class ChatDetailScreen extends StatelessWidget {
                             imageUrl.isNotEmpty && !imageUrl.endsWith('/0');
                         return CircleAvatar(
                           radius: 20,
-                          backgroundColor: Colors.grey[300],
+                          backgroundColor: Color(0xffd9d9d9),
                           backgroundImage:
                               isImageAvailable ? NetworkImage(imageUrl) : null,
                           child: !isImageAvailable
@@ -61,7 +62,7 @@ class ChatDetailScreen extends StatelessWidget {
                               ? const Color(0xff65d384)
                               : const Color(0xffd9d9d9),
                           borderRadius: BorderRadius.circular(50),
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: Color(0xffffffff), width: 2),
                         ),
                       ),
                     ),
@@ -73,17 +74,17 @@ class ChatDetailScreen extends StatelessWidget {
                   children: [
                     Text(
                       controller.name.value,
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xff414751)),
+                          color: Color(0xff272727)),
                     ),
                     Text(
                       controller.isOnline.value ? "Çevrimiçi" : "Çevrimdışı",
-                      style: const TextStyle(
-                          fontSize: 12,
+                      style: GoogleFonts.inter(
+                          fontSize: 10,
                           color: Color(0xff9ca3ae),
-                          fontWeight: FontWeight.w400),
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
