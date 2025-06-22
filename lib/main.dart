@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'bindings/initial_bindings.dart';
 import 'routes/app_routes.dart';
+import 'services/translation_service.dart';
+import 'services/auth_service.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -18,13 +20,17 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
 
-
-
   HttpOverrides.global = MyHttpOverrides();
+
+  // AuthService'i önce başlat
+  Get.put(AuthService());
+  
+  // TranslationService'i başlat ve Türkçe çevirileri yükle
+  final translationService = Get.put(TranslationService());
+  await translationService.loadTranslations('tr');
 
   runApp(MyApp(initialRoute: Routes.main));
 }
-
 
 class MyApp extends StatelessWidget {
   final String initialRoute;
