@@ -69,8 +69,8 @@ class NotificationService {
         }),
       );
 
-      //sdebugPrint("📤 Follow request response: ${response.statusCode}");
-      //debugPrint("📤 Follow request body: ${response.body}");
+      debugPrint("📤 Follow request response: ${response.statusCode}");
+      debugPrint("📤 Follow request body: ${response.body}");
 
       final jsonResponse = jsonDecode(response.body);
       

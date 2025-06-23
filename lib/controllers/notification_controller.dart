@@ -80,22 +80,10 @@ class NotificationController extends GetxController {
   /// Takip isteğini kabul veya reddet
   Future<void> handleFollowRequest(String userId, String decision) async {
     try {
-      final response = await NotificationService.acceptOrDeclineFollowRequest(
-        userId: userId,
-        decision: decision,
-      );
-
-      // Eğer istek zaten yanıtlanmışsa
-      if (response['already_responded'] == true) {
-        // Bildirimleri yenile
-        fetchNotifications();
-        return;
-      }
-
-      // Bildirimleri güncelle
+      // Önce local güncelleme yap
       final updatedNotifications = notifications.map((notif) {
         if (notif.senderUserId == userId &&
-            notif.type == 'follow-join-request') {
+            (notif.type == 'follow-join-request' || notif.type == 'follow-request')) {
           return NotificationModel(
             id: notif.id,
             userId: notif.userId,
@@ -109,7 +97,8 @@ class NotificationController extends GetxController {
             groupId: notif.groupId,
             eventId: notif.eventId,
             groupName: notif.groupName,
-            isAccepted: true,
+            isAccepted: decision == 'accept',
+            isRejected: decision == 'decline',
             isFollowing: decision == 'accept',
             isFollowingPending: false,
           );
@@ -117,12 +106,28 @@ class NotificationController extends GetxController {
         return notif;
       }).toList();
 
+      // UI'ı hemen güncelle
       notifications.value = updatedNotifications;
 
-      // Yeni bildirimleri çek
+      // API'ye istek gönder
+      final response = await NotificationService.acceptOrDeclineFollowRequest(
+        userId: userId,
+        decision: decision,
+      );
+
+      // Eğer istek zaten yanıtlanmışsa veya başarılıysa
+      if (response['already_responded'] == true || response['status'] == true) {
+        // Bildirimleri yenile
+        fetchNotifications();
+        return;
+      }
+
+      // Hata durumunda eski haline geri döndür
       fetchNotifications();
     } catch (e) {
       debugPrint("❗ Takip isteği onaylanamadı: $e");
+      // Hata durumunda bildirimleri yenile
+      fetchNotifications();
       rethrow;
     }
   }

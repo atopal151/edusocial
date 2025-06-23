@@ -24,6 +24,7 @@ class GroupSuggestionListView extends StatelessWidget {
 
       return SizedBox(
         height: 200,
+        
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemCount: groupController.suggestionGroups.length,
@@ -51,7 +52,7 @@ class GroupSuggestionListView extends StatelessWidget {
                         },
                         child: Center(
                             child: Text(
-                          group.isMember ? "Katıldınız" : group.isPrivate ? "Katılma İsteği Gönder" : 'Gruba Katıl',
+                          group.isMember ? "Katıldınız" : group.isPrivate ? "İstek Gönder" : 'Gruba Katıl',
                           style: GoogleFonts.inter(
                               color: Color(0xffffffff),
                               fontSize: 10,

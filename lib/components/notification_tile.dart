@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:get/get.dart';
 import '../models/notification_model.dart';
+import '../controllers/notification_controller.dart';
 
 Widget buildNotificationTile(NotificationModel n) {
+  final NotificationController controller = Get.find();
+  
+  debugPrint('🔔 Bildirim tipi: ${n.type}');
   return ListTile(
     leading: Stack(
       children: [
@@ -51,7 +55,64 @@ Widget buildNotificationTile(NotificationModel n) {
       ),
     ),
     tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),
+    trailing: _buildFollowRequestAction(n, controller),
   );
+}
+
+Widget _buildFollowRequestAction(NotificationModel n, NotificationController controller) {
+  debugPrint('🔔 [Button] Bildirim tipi: ${n.type}');
+  debugPrint('🔍   - isFollowing: ${n.isFollowing}');
+  debugPrint('🔍   - isFollowingPending: ${n.isFollowingPending}');
+  debugPrint('🔍   - isAccepted: ${n.isAccepted}');
+  debugPrint('🔍   - isRejected: ${n.isRejected}');
+  if (n.type == 'follow-request' || n.type == 'follow-join-request') {
+    if (n.isAccepted) {
+      debugPrint('🔍   - Durum: Onaylandı');
+      return Text(
+        'Onaylandı',
+        style: TextStyle(
+          color: Colors.green,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    } else if (n.isRejected) {
+      debugPrint('🔍   - Durum: Reddedildi');
+      return Text(
+        'Reddedildi',
+        style: TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    } else {
+      debugPrint('🔍   - Durum: Onayla ve X gösteriliyor');
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              controller.handleFollowRequest(n.senderUserId, 'accept');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xff4CAF50),
+              minimumSize: Size(60, 32),
+              padding: EdgeInsets.symmetric(horizontal: 8),
+            ),
+            child: Text('Onayla', style: TextStyle(fontSize: 12)),
+          ),
+          SizedBox(width: 4),
+          IconButton(
+            icon: Icon(Icons.close, color: Colors.red),
+            onPressed: () {
+              controller.handleFollowRequest(n.senderUserId, 'decline');
+            },
+            tooltip: 'Reddet',
+          ),
+        ],
+      );
+    }
+  }
+  return SizedBox.shrink();
 }
 
 IconData _getIcon(String type) {
@@ -111,9 +172,6 @@ Color _getIconBgColor(String type) {
       return Color(0xFFBDBDBD); // nötr gri - daha koyu
   }
 }
-
-
-
 
 String _timeAgo(DateTime date) {
   final now = DateTime.now();
