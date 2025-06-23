@@ -109,9 +109,63 @@ class GroupTextWithLinksMessageWidget extends StatelessWidget {
                   if (message.content.isNotEmpty) const SizedBox(height: 8),
                   ...message.links!.map((link) => GestureDetector(
                     onTap: () async {
-                      if (await canLaunchUrl(Uri.parse(link))) {
-                        launchUrl(Uri.parse(link),
-                            mode: LaunchMode.externalApplication);
+                      try {
+                        debugPrint("🔗 GroupTextWithLinks - Link açma deneniyor: $link");
+                        
+                        // URL'yi temizle ve kontrol et
+                        String cleanLink = link.trim();
+                        if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
+                          cleanLink = 'https://$cleanLink';
+                        }
+                        
+                        debugPrint("�� GroupTextWithLinks - Temizlenmiş link: $cleanLink");
+                        
+                        final Uri url = Uri.parse(cleanLink);
+                        debugPrint("🔗 GroupTextWithLinks - Parsed URL: $url");
+                        
+                        // URL'nin açılabilir olup olmadığını kontrol et
+                        final canLaunch = await canLaunchUrl(url);
+                        debugPrint("🔗 GroupTextWithLinks - canLaunchUrl sonucu: $canLaunch");
+                        
+                        if (canLaunch) {
+                          debugPrint("🔗 GroupTextWithLinks - URL açılıyor...");
+                          final result = await launchUrl(
+                            url, 
+                            mode: LaunchMode.externalApplication
+                          );
+                          debugPrint("🔗 GroupTextWithLinks - launchUrl sonucu: $result");
+                          
+                          if (!result) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Link açılamadı. Lütfen tekrar deneyin."),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        } else {
+                          debugPrint("🔗 GroupTextWithLinks - URL açılamıyor: $url");
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Bu link açılamıyor: $cleanLink"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        debugPrint("🔗 GroupTextWithLinks - Link açma hatası: $e");
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Link açılırken bir hata oluştu: ${e.toString()}"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Padding(

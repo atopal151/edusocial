@@ -76,9 +76,63 @@ class GroupLinkMessageWidget extends StatelessWidget {
               message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
           child: GestureDetector(
             onTap: () async {
-              final uri = Uri.parse(message.content);
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              try {
+                debugPrint("🔗 GroupLink - Link açma deneniyor: ${message.content}");
+                
+                // URL'yi temizle ve kontrol et
+                String cleanLink = message.content.trim();
+                if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
+                  cleanLink = 'https://$cleanLink';
+                }
+                
+                debugPrint("🔗 GroupLink - Temizlenmiş link: $cleanLink");
+                
+                final Uri url = Uri.parse(cleanLink);
+                debugPrint("🔗 GroupLink - Parsed URL: $url");
+                
+                // URL'nin açılabilir olup olmadığını kontrol et
+                final canLaunch = await canLaunchUrl(url);
+                debugPrint("🔗 GroupLink - canLaunchUrl sonucu: $canLaunch");
+                
+                if (canLaunch) {
+                  debugPrint("🔗 GroupLink - URL açılıyor...");
+                  final result = await launchUrl(
+                    url, 
+                    mode: LaunchMode.externalApplication
+                  );
+                  debugPrint("🔗 GroupLink - launchUrl sonucu: $result");
+                  
+                  if (!result) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Link açılamadı. Lütfen tekrar deneyin."),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                } else {
+                  debugPrint("🔗 GroupLink - URL açılamıyor: $url");
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Bu link açılamıyor: $cleanLink"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              } catch (e) {
+                debugPrint("🔗 GroupLink - Link açma hatası: $e");
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Link açılırken bir hata oluştu: ${e.toString()}"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
             child: Container(

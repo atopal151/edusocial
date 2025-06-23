@@ -149,15 +149,25 @@ class EntryScreenState extends State<EntryScreen> {
                                     onDownvote: () => entryController.voteEntry(
                                         entry.id, "down"),
                                     onShare: () {
+                                      // Konu bilgilerini al
+                                      final topicName = displayItem.topicName ?? "Konu Bilgisi Yok";
+                                      final categoryTitle = displayItem.categoryTitle ?? "Kategori Yok";
+                                      
                                       final String shareText = """
+📝 **$topicName** (#${entry.id})
+
+🏷️ **Kategori:** $categoryTitle
+👤 **Yazar:** ${entry.user.name}
+
+💬 **Entry İçeriği:**
 ${entry.content}
 
-📱 EduSocial Uygulamasını İndir:
+📱 **EduSocial Uygulamasını İndir:**
 🔗 Uygulamayı Aç: edusocial://app
 📲 App Store: https://apps.apple.com/app/edusocial/id123456789
 📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
 
-#EduSocial #Eğitim
+#EduSocial #Eğitim #$categoryTitle
 """;
                                       Share.share(shareText);
                                     },

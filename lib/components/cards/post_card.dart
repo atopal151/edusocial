@@ -191,25 +191,54 @@ class _PostCardState extends State<PostCard> {
                           (link) => InkWell(
                             onTap: () async {
                               try {
-                                final Uri url = Uri.parse(link);
-                                if (await canLaunchUrl(url)) {
-                                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                                debugPrint("🔗 Link açma deneniyor: $link");
+                                
+                                // URL'yi temizle ve kontrol et
+                                String cleanLink = link.trim();
+                                if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
+                                  cleanLink = 'https://$cleanLink';
+                                }
+                                
+                                debugPrint("🔗 Temizlenmiş link: $cleanLink");
+                                
+                                final Uri url = Uri.parse(cleanLink);
+                                debugPrint("🔗 Parsed URL: $url");
+                                
+                                // URL'nin açılabilir olup olmadığını kontrol et
+                                final canLaunch = await canLaunchUrl(url);
+                                debugPrint("🔗 canLaunchUrl sonucu: $canLaunch");
+                                
+                                if (canLaunch) {
+                                  debugPrint("🔗 URL açılıyor...");
+                                  final result = await launchUrl(
+                                    url, 
+                                    mode: LaunchMode.externalApplication
+                                  );
+                                  debugPrint("🔗 launchUrl sonucu: $result");
+                                  
+                                  if (!result && mounted) {
+                                    CustomSnackbar.show(
+                                      title: "Hata",
+                                      message: "Link açılamadı. Lütfen tekrar deneyin.",
+                                      type: SnackbarType.error,
+                                    );
+                                  }
                                 } else {
-                                  // URL açılamadığında kullanıcıya bilgi ver
+                                  debugPrint("🔗 URL açılamıyor: $url");
                                   if (mounted) {
                                     CustomSnackbar.show(
                                       title: "Hata",
-                                      message: "Link açılamadı: $link",
+                                      message: "Bu link açılamıyor: $cleanLink",
                                       type: SnackbarType.error,
                                     );
                                   }
                                 }
                               } catch (e) {
-                                // Geçersiz URL formatı durumunda
+                                debugPrint("🔗 Link açma hatası: $e");
                                 if (mounted) {
                                   CustomSnackbar.show(
                                     title: "Hata",
-                                    message: "Geçersiz link formatı",
+                                    message: "Link açılırken bir hata oluştu: ${e.toString()}",
                                     type: SnackbarType.error,
                                   );
                                 }

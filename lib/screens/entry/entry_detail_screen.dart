@@ -119,15 +119,36 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     onDownvote: () => entryController.voteEntry(comment.id, "down"),
                     onUpvote: () => entryController.voteEntry(comment.id, "up"),
                     onShare: () {
+                      // Konunun ilk entry'sini bul
+                      String firstEntryContent = "";
+                      if (entryDetailController.entryComments.isNotEmpty) {
+                        firstEntryContent = entryDetailController.entryComments.first.content;
+                      }
+                      
+                      // Konu bilgilerini al
+                      final topic = widget.entry.topic;
+                      final categoryTitle = topic?.category?.title ?? "Kategori Yok";
+                      final topicName = topic?.name ?? "Konu Bilgisi Yok";
+                      final entryCount = entryDetailController.entryComments.length;
+                      
                       final String shareText = """
+📝 **$topicName** (#${comment.id})
+
+🏷️ **Kategori:** $categoryTitle
+📊 **Entry Sayısı:** $entryCount
+
+💬 **Bu Entry:**
 ${comment.content}
 
-📱 EduSocial Uygulamasını İndir:
+📖 **Konu Hakkında:**
+$firstEntryContent
+
+📱 **EduSocial Uygulamasını İndir:**
 🔗 Uygulamayı Aç: edusocial://app
 📲 App Store: https://apps.apple.com/app/edusocial/id123456789
 📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
 
-#EduSocial #Eğitim
+#EduSocial #Eğitim #$categoryTitle
 """;
                       Share.share(shareText);
                     },

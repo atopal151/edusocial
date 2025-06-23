@@ -235,9 +235,63 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                 if (linkUrl != null && linkUrl.isNotEmpty) ...[
                   GestureDetector(
                     onTap: () async {
-                      if (await canLaunchUrl(Uri.parse(linkUrl!))) {
-                        launchUrl(Uri.parse(linkUrl),
-                            mode: LaunchMode.externalApplication);
+                      try {
+                        debugPrint("🔗 LinkMediaText - Link açma deneniyor: $linkUrl");
+                        
+                        // URL'yi temizle ve kontrol et
+                        String cleanLink = linkUrl!.trim();
+                        if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
+                          cleanLink = 'https://$cleanLink';
+                        }
+                        
+                        debugPrint("🔗 LinkMediaText - Temizlenmiş link: $cleanLink");
+                        
+                        final Uri url = Uri.parse(cleanLink);
+                        debugPrint("🔗 LinkMediaText - Parsed URL: $url");
+                        
+                        // URL'nin açılabilir olup olmadığını kontrol et
+                        final canLaunch = await canLaunchUrl(url);
+                        debugPrint("🔗 LinkMediaText - canLaunchUrl sonucu: $canLaunch");
+                        
+                        if (canLaunch) {
+                          debugPrint("🔗 LinkMediaText - URL açılıyor...");
+                          final result = await launchUrl(
+                            url, 
+                            mode: LaunchMode.externalApplication
+                          );
+                          debugPrint("🔗 LinkMediaText - launchUrl sonucu: $result");
+                          
+                          if (!result) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Link açılamadı. Lütfen tekrar deneyin."),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        } else {
+                          debugPrint("🔗 LinkMediaText - URL açılamıyor: $url");
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Bu link açılamıyor: $cleanLink"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        debugPrint("🔗 LinkMediaText - Link açma hatası: $e");
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Link açılırken bir hata oluştu: ${e.toString()}"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Text(
