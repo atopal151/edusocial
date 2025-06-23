@@ -2,6 +2,7 @@ import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/screens/profile/people_profile_screen.dart';
+import 'package:edusocial/services/post_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -57,7 +58,35 @@ String formatSimpleDate(String dateStr) {
   }
 }
 
-
+  /// Profil postlarını ayrı bir endpoint'ten çek
+  Future<void> fetchProfilePosts() async {
+    debugPrint("🔄 ProfileController.fetchProfilePosts() çağrıldı");
+    
+    try {
+      final posts = await PostServices.fetchHomePosts();
+      debugPrint("✅ Profile postları başarıyla yüklendi: ${posts.length} post");
+      
+      // Sadece kullanıcının kendi postlarını filtrele
+      final userPosts = posts.where((post) => post.isOwner).toList();
+      debugPrint("✅ Kullanıcının kendi postları: ${userPosts.length} post");
+      
+      profilePosts.assignAll(userPosts);
+      postCount.value = userPosts.length;
+      
+      // Her postun link verilerini debug et
+      for (int i = 0; i < userPosts.length; i++) {
+        final post = userPosts[i];
+        debugPrint("📝 Profile Post $i:");
+        debugPrint("  - ID: ${post.id}");
+        debugPrint("  - Content: ${post.postDescription}");
+        debugPrint("  - Links: ${post.links}");
+        debugPrint("  - Media: ${post.mediaUrls}");
+      }
+      
+    } catch (e) {
+      debugPrint("❌ Profile postları yükleme hatası: $e");
+    }
+  }
 
   Future<void> loadProfile() async {
     debugPrint("🔄 ProfileController.loadProfile() çağrıldı");
@@ -93,9 +122,8 @@ String formatSimpleDate(String dateStr) {
       followerList.assignAll(profileData.followers);
       followingList.assignAll(profileData.followings);
       
-      // 📌 Postlar
-      postCount.value = profileData.posts.length;
-      profilePosts.assignAll(profileData.posts);
+      // 📌 Postlar - Artık ayrı bir endpoint'ten çekiyoruz
+      await fetchProfilePosts();
       
       // Profil yüklendikten sonra diğer verileri de güncelle
       _updateRelatedData();
