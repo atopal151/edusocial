@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
 import '../../../utils/date_format.dart';
@@ -67,22 +68,24 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
           mediaWidget = Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               children: [
                 Icon(
-                  isPdfFile(mediaUrl) ? Icons.picture_as_pdf : Icons.insert_drive_file,
+                  isPdfFile(mediaUrl)
+                      ? Icons.picture_as_pdf
+                      : Icons.insert_drive_file,
                   size: 32,
                   color: Colors.grey[600],
                 ),
                 const SizedBox(height: 8),
                 Text(
                   mediaUrl.split('/').last,
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: Color(0xff9ca3ae),
+                    fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -107,22 +110,24 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
           mediaWidget = Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               children: [
                 Icon(
-                  isPdfFile(mediaUrl) ? Icons.picture_as_pdf : Icons.insert_drive_file,
+                  isPdfFile(mediaUrl)
+                      ? Icons.picture_as_pdf
+                      : Icons.insert_drive_file,
                   size: 32,
-                  color: Colors.grey[600],
+                  color: Color(0xff9ca3ae),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   mediaUrl.split('/').last,
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: Color(0xff9ca3ae),
+                    fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -147,7 +152,7 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
                   radius: 12,
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: Color(0xffd9d9d9),
                   backgroundImage: (message.senderAvatarUrl != null &&
                           message.senderAvatarUrl!.isNotEmpty &&
                           !message.senderAvatarUrl!.endsWith('/0'))
@@ -162,14 +167,20 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
               ),
             Text(
               '${message.sender.name} ${message.sender.surname}',
-              style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
+              style: GoogleFonts.inter(
+                  fontSize: 10,
+                  color: Color(0xff414751),
+                  fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 5),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
                 formatSimpleDateClock(message.createdAt),
-                style: const TextStyle(fontSize: 10, color: Colors.grey),
+                style: GoogleFonts.inter(
+                    fontSize: 10,
+                    color: Color(0xff9ca3ae),
+                    fontWeight: FontWeight.w500),
               ),
             ),
             if (message.isMe)
@@ -177,7 +188,7 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
                   radius: 12,
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: Color(0xffd9d9d9),
                   backgroundImage: (message.senderAvatarUrl != null &&
                           message.senderAvatarUrl!.isNotEmpty &&
                           !message.senderAvatarUrl!.endsWith('/0'))
@@ -197,7 +208,6 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
           alignment:
               message.isMe ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
-            
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.6,
             ),
@@ -236,36 +246,40 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       try {
-                        debugPrint("🔗 LinkMediaText - Link açma deneniyor: $linkUrl");
-                        
+                        debugPrint(
+                            "🔗 LinkMediaText - Link açma deneniyor: $linkUrl");
+
                         // URL'yi temizle ve kontrol et
                         String cleanLink = linkUrl!.trim();
-                        if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
+                        if (!cleanLink.startsWith('http://') &&
+                            !cleanLink.startsWith('https://')) {
                           cleanLink = 'https://$cleanLink';
                         }
-                        
-                        debugPrint("🔗 LinkMediaText - Temizlenmiş link: $cleanLink");
-                        
+
+                        debugPrint(
+                            "🔗 LinkMediaText - Temizlenmiş link: $cleanLink");
+
                         final Uri url = Uri.parse(cleanLink);
                         debugPrint("🔗 LinkMediaText - Parsed URL: $url");
-                        
+
                         // URL'nin açılabilir olup olmadığını kontrol et
                         final canLaunch = await canLaunchUrl(url);
-                        debugPrint("🔗 LinkMediaText - canLaunchUrl sonucu: $canLaunch");
-                        
+                        debugPrint(
+                            "🔗 LinkMediaText - canLaunchUrl sonucu: $canLaunch");
+
                         if (canLaunch) {
                           debugPrint("🔗 LinkMediaText - URL açılıyor...");
-                          final result = await launchUrl(
-                            url, 
-                            mode: LaunchMode.externalApplication
-                          );
-                          debugPrint("🔗 LinkMediaText - launchUrl sonucu: $result");
-                          
+                          final result = await launchUrl(url,
+                              mode: LaunchMode.externalApplication);
+                          debugPrint(
+                              "🔗 LinkMediaText - launchUrl sonucu: $result");
+
                           if (!result) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text("Link açılamadı. Lütfen tekrar deneyin."),
+                                  content: Text(
+                                      "Link açılamadı. Lütfen tekrar deneyin."),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -287,7 +301,8 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text("Link açılırken bir hata oluştu: ${e.toString()}"),
+                              content: Text(
+                                  "Link açılırken bir hata oluştu: ${e.toString()}"),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -296,7 +311,10 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                     },
                     child: Text(
                       linkUrl,
-                      style: const TextStyle(color: Colors.blue, fontSize: 12),
+                      style: GoogleFonts.inter(
+                          color: Color(0xff2c96ff),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
                   const SizedBox(height: 8),

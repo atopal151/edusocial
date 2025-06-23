@@ -130,7 +130,6 @@ class LinkMessageWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Color(0xffFFEEEE),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -140,12 +139,12 @@ class LinkMessageWidget extends StatelessWidget {
                           // messageLink varsa title göster
                           Text(
                             message.messageLink.first.linkTitle,
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                               color: message.isMe
                                   ? Color(0xff414751)
-                                  : const Color(0xff414751),
+                                  : Color(0xff414751),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -218,7 +217,7 @@ class LinkMessageWidget extends StatelessWidget {
                                   link,
                                   style: GoogleFonts.inter(
                                     color: Color(0xff2c96ff),
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w400,
                                     fontSize: 12,
                                     decoration: TextDecoration.underline,
                                     decorationColor: Color(0xff2c96ff),
@@ -235,9 +234,9 @@ class LinkMessageWidget extends StatelessWidget {
                   if (links.isNotEmpty) const SizedBox(height: 8),
                   Text(
                     displayText,
-                    style: TextStyle(
+                      style: GoogleFonts.inter(
                       color:
-                          message.isMe ? Colors.white : const Color(0xff414751),
+                          message.isMe ? Colors.white : Color(0xff414751),
                       fontSize: 12,
                     ),
                   ),

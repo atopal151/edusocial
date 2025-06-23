@@ -1,6 +1,7 @@
 import 'package:edusocial/components/cards/people_profile_card.dart';
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/components/widgets/build_people_profile_details.dart';
+import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/people_profile_controller.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
@@ -48,26 +49,34 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
         backgroundColor: const Color(0xffffffff),
         iconBackgroundColor: const Color(0xfffafafa),
       ),
-      body: DefaultTabController(
-        length: 2,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverToBoxAdapter(
-              child: Obx(() {
-                final profile = controller.profile.value;
+      body: Obx(() {
+        // Loading durumunda kişiselleştirilmiş loading göster
+        if (controller.isLoading.value) {
+          return Center(
+            child: GeneralLoadingIndicator(
+              size: 36,
+              color: const Color(0xFFEF5050),
+              icon: Icons.person,
+            ),
+          );
+        }
 
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+        final profile = controller.profile.value;
+        if (profile == null) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Text("Kullanıcı profili yüklenemedi."),
+            ),
+          );
+        }
 
-                if (profile == null) {
-                  return const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text("Kullanıcı profili yüklenemedi."),
-                  );
-                }
-
-                return Column(
+        return DefaultTabController(
+          length: 2,
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverToBoxAdapter(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     buildPeopleProfileHeader(controller),
@@ -134,47 +143,54 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                     /// TabBar
                     ProfileTabBar(tabController: _tabController),
                   ],
-                );
-              }),
-            ),
-          ],
-          body: TabBarView(
-            controller: _tabController,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              Column(
-                children: [
-                  Container(
-                    color: const Color(0xfffafafa),
-                    child: ToggleTabBar(
-                      selectedIndex: selectedTabIndex,
-                      onTabChanged: (index) {
-                        selectedTabIndex.value = index;
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: Obx(() {
-                      return selectedTabIndex.value == 0
-                          ? _buildPosts()
-                          : _buildEntries();
-                    }),
-                  ),
-                ],
+                ),
               ),
-              _buildProfileDetails(),
             ],
+            body: TabBarView(
+              controller: _tabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      color: const Color(0xfffafafa),
+                      child: ToggleTabBar(
+                        selectedIndex: selectedTabIndex,
+                        onTabChanged: (index) {
+                          selectedTabIndex.value = index;
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: Obx(() {
+                        return selectedTabIndex.value == 0
+                            ? _buildPosts()
+                            : _buildEntries();
+                      }),
+                    ),
+                  ],
+                ),
+                _buildProfileDetails(),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
   Widget _buildPosts() {
     final posts = controller.profile.value?.posts ?? [];
+    final profile = controller.profile.value;
 
-    if (controller.profile.value?.isFollowingPending == true) {
-      return const Center(child: Icon(Icons.lock));
+    // Gizli profil kontrolü - sadece takip ediyorsa içerik göster
+    if (profile != null) {
+      final isPrivateProfile = profile.accountType == "private";
+      final isFollowing = controller.isFollowing.value;
+      
+      if (isPrivateProfile && !isFollowing) {
+        return _buildLockedContent();
+      }
     }
 
     if (posts.isEmpty) {
@@ -210,9 +226,18 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 
   Widget _buildEntries() {
     return Obx(() {
-      if (controller.profile.value?.isFollowingPending == true) {
-        return const Center(child: Icon(Icons.lock));
+      final profile = controller.profile.value;
+      
+      // Gizli profil kontrolü - sadece takip ediyorsa içerik göster
+      if (profile != null) {
+        final isPrivateProfile = profile.accountType == "private";
+        final isFollowing = controller.isFollowing.value;
+        
+        if (isPrivateProfile && !isFollowing) {
+          return _buildLockedContent();
+        }
       }
+
       if (entryController.entryPersonList.isEmpty) {
         return const Center(child: Text("Hiç entry bulunamadı."));
       }
@@ -255,24 +280,69 @@ ${entry.content}
   }
 
   Widget _buildProfileDetails() {
-    if (controller.profile.value?.isFollowingPending == true) {
-      return const Center(child: Icon(Icons.lock));
+    final profile = controller.profile.value;
+    
+    // Gizli profil kontrolü - sadece takip ediyorsa içerik göster
+    if (profile != null) {
+      final isPrivateProfile = profile.accountType == "private";
+      final isFollowing = controller.isFollowing.value;
+      
+      if (isPrivateProfile && !isFollowing) {
+        return _buildLockedContent();
+      }
     }
-    return Obx(() {
-      final profile = controller.profile.value;
-      if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      if (profile == null) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Text("Kullanıcı profili bulunamadı."),
-          ),
-        );
-      }
 
-      return buildPeopleProfileDetails(profile);
-    });
+    if (profile == null) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text("Kullanıcı profili bulunamadı."),
+        ),
+      );
+    }
+
+    return buildPeopleProfileDetails(profile);
+  }
+
+  // Kilitli içerik widget'ı
+  Widget _buildLockedContent() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xfff4f4f5),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: const Icon(
+              Icons.lock,
+              size: 30,
+              color: Color(0xff9ca3ae),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "Bu içerik gizli",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff414751),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "Bu kullanıcının içeriğini görmek için\nönce takip isteği göndermeniz gerekir.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xff9ca3ae),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

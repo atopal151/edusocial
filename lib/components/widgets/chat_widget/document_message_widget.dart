@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
 import '../../../utils/date_format.dart';
@@ -48,7 +49,7 @@ class DocumentMessageWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
                   radius: 12,
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: Color(0xffd9d9d9),
                   backgroundImage: (message.senderAvatarUrl != null &&
                           message.senderAvatarUrl!.isNotEmpty &&
                           !message.senderAvatarUrl!.endsWith('/0'))
@@ -63,14 +64,14 @@ class DocumentMessageWidget extends StatelessWidget {
               ),
             Text(
               '${message.sender.name} ${message.sender.surname}',
-              style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
+              style: GoogleFonts.inter(fontSize: 10, color: Color(0xff414751), fontWeight: FontWeight.w500),
             ),
             const SizedBox(width: 5),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               child: Text(
                 formatSimpleDateClock(message.createdAt),
-                style: const TextStyle(fontSize: 10, color: Colors.grey),
+                style: GoogleFonts.inter(fontSize: 10, color: Color(0xff9ca3ae), fontWeight: FontWeight.w400),
               ),
             ),
             if (message.isMe)
@@ -78,7 +79,7 @@ class DocumentMessageWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
                   radius: 12,
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: Color(0xffd9d9d9),
                   backgroundImage: (message.senderAvatarUrl != null &&
                           message.senderAvatarUrl!.isNotEmpty &&
                           !message.senderAvatarUrl!.endsWith('/0'))
@@ -100,7 +101,7 @@ class DocumentMessageWidget extends StatelessWidget {
           child: GestureDetector(
             onTap: documentUrl != null ? () async {
               try {
-                final uri = Uri.parse(documentUrl!);
+                final uri = Uri.parse(documentUrl);
                 if (await canLaunchUrl(uri)) {
                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                 } else {
@@ -109,7 +110,7 @@ class DocumentMessageWidget extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Document açılamadı: $documentName'),
-                        backgroundColor: Colors.red,
+                        backgroundColor: Color(0xffFF5050),
                       ),
                     );
                   }
@@ -119,7 +120,7 @@ class DocumentMessageWidget extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Document açılırken hata oluştu: $e'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Color(0xffFF5050),
                     ),
                   );
                 }
@@ -159,7 +160,7 @@ class DocumentMessageWidget extends StatelessWidget {
                       children: [
                         Text(
                           documentName,
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                             fontSize: 12,
                             color: message.isMe ? Colors.white : const Color(0xff414751),
                             fontWeight: FontWeight.w500,
@@ -169,9 +170,10 @@ class DocumentMessageWidget extends StatelessWidget {
                         if (documentUrl != null)
                           Text(
                             'Tıklayarak indir',
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               fontSize: 10,
-                              color: message.isMe ? Colors.white70 : Colors.grey,
+                              color: message.isMe ? Colors.white70 : Color(0xff9ca3ae),
+                              
                             ),
                           ),
                       ],
@@ -181,7 +183,7 @@ class DocumentMessageWidget extends StatelessWidget {
                     const SizedBox(width: 8),
                     Icon(
                       Icons.download,
-                      color: message.isMe ? Colors.white70 : Colors.grey,
+                      color: message.isMe ? Colors.white70 : Color(0xff9ca3ae),
                       size: 16,
                     ),
                   ],
