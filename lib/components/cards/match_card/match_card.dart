@@ -124,10 +124,10 @@ class _MatchCardState extends State<MatchCard> {
           children: [
             Text(
               "${match.name}, ${match.age ?? '-'}",
-              style: const TextStyle(
+              style: GoogleFonts.inter(
                   fontSize: 18.72,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xffffffff)),
             ),
             if (match.isOnline)
               Row(
@@ -137,17 +137,17 @@ class _MatchCardState extends State<MatchCard> {
                     backgroundColor: Color(0xff4DD64B),
                   ),
                   const SizedBox(width: 4),
-                  const Text("Çevrimiçi",
-                      style: TextStyle(
-                          color: Colors.white,
+                   Text("Çevrimiçi",
+                      style: GoogleFonts.inter(
+                          color: Color(0xffffffff),
                           fontSize: 12,
                           fontWeight: FontWeight.w600)),
                 ],
               ),
             const SizedBox(height: 16),
-            const Text("Eğitim",
-                style: TextStyle(
-                    color: Colors.white,
+             Text("Eğitim",
+                style: GoogleFonts.inter(
+                    color: Color(0xffffffff),
                     fontSize: 12,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
@@ -165,7 +165,7 @@ class _MatchCardState extends State<MatchCard> {
                     child: match.schoolLogo.isNotEmpty
                         ? Image.network(match.schoolLogo, width: 21, height: 21)
                         : const Icon(Icons.school,
-                            size: 18, color: Colors.grey),
+                            size: 18, color: Color(0xff9ca3ae)),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -176,15 +176,15 @@ class _MatchCardState extends State<MatchCard> {
                       match.schoolName.isNotEmpty
                           ? match.schoolName
                           : 'Okul bilgisi yok',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: GoogleFonts.inter(
+                        color: Color(0xffffffff),
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
                     ),
                     Text(
                       "${match.department.isNotEmpty ? match.department : 'Bölüm yok'} • Grade ${match.grade}",
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                         color: Color(0xffffffff),
                         fontSize: 10,
                         fontWeight: FontWeight.w400,
@@ -195,23 +195,23 @@ class _MatchCardState extends State<MatchCard> {
               ],
             ),
             const SizedBox(height: 16),
-            const Text("Hakkında",
-                style: TextStyle(
-                    color: Colors.white,
+             Text("Hakkında",
+                style: GoogleFonts.inter(
+                    color: Color(0xffffffff),
                     fontSize: 12,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             Text(
               match.about.isNotEmpty ? match.about : 'Henüz bilgi yok',
-              style: const TextStyle(
+              style: GoogleFonts.inter(
                   color: Color(0xffffffff),
                   fontSize: 10,
                   fontWeight: FontWeight.w400),
             ),
             const SizedBox(height: 16),
-            const Text("Seninle eşleştiği konular",
-                style: TextStyle(
-                    color: Colors.white,
+             Text("Seninle eşleştiği konular",
+                style: GoogleFonts.inter(
+                    color: Color(0xffffffff),
                     fontSize: 12,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
@@ -228,10 +228,10 @@ class _MatchCardState extends State<MatchCard> {
                       ),
                       child: Text(
                         topic,
-                        style: const TextStyle(
+                        style: GoogleFonts.inter(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white),
+                            color: Color(0xffffffff)),
                       ),
                     ),
                   )
@@ -294,7 +294,7 @@ class _MatchCardState extends State<MatchCard> {
         const SizedBox(height: 6),
         Text(
           label,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
+          style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12),
         ),
       ],
     );

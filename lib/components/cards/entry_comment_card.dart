@@ -28,7 +28,7 @@ class EntryCommentCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color(0xffffffff),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -54,14 +54,14 @@ class EntryCommentCard extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           color: (entry.is_like ?? false)
-                              ? Colors.green.withAlpha(50)
+                              ? Color(0xFF4CAF50).withAlpha(50)
                               : const Color(0xfff6f6f6),
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Icon(
                           Icons.keyboard_arrow_up,
                           color: (entry.is_like ?? false)
-                              ? Colors.green
+                              ? Color(0xFF4CAF50)
                               : const Color(0xff414751),
                           size: 18,
                         ),
@@ -84,14 +84,14 @@ class EntryCommentCard extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           color: (entry.is_dislike ?? false)
-                              ? Colors.red.withAlpha(50)
+                              ? Color(0xFFEF5050).withAlpha(50)
                               : const Color(0xfff6f6f6),
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Icon(
                           Icons.keyboard_arrow_down,
                           color: (entry.is_dislike ?? false)
-                              ? Colors.red
+                              ? Color(0xFFEF5050)
                               : const Color(0xff414751),
                           size: 18,
                         ),

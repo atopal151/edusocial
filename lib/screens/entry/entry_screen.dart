@@ -5,9 +5,9 @@ import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/models/entry_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../components/user_appbar/user_appbar.dart';
-import '../../components/sheets/share_options_bottom_sheet.dart';
 import '../../controllers/entry_controller.dart';
 import '../profile/people_profile_screen.dart';
 import 'package:edusocial/routes/app_routes.dart';
@@ -52,7 +52,6 @@ class EntryScreenState extends State<EntryScreen> {
         backgroundColor: const Color(0xfffafafa),
         appBar: UserAppBar(),
         body: RefreshIndicator(
-          
           onRefresh: () async {
             debugPrint("🔄 Entry verileri yenileniyor...");
             await entryController.fetchAndPrepareEntries();
@@ -123,10 +122,11 @@ class EntryScreenState extends State<EntryScreen> {
                           ),
                         )
                       : entryController.displayEntries.isEmpty
-                          ? const Center(
+                          ? Center(
                               child: Text(
                                 "Gösterilecek entry bulunamadı.",
-                                style: TextStyle(color: Colors.grey),
+                                style:
+                                    GoogleFonts.inter(color: Color(0xff9ca3ae)),
                               ),
                             )
                           : ListView.builder(
@@ -150,9 +150,12 @@ class EntryScreenState extends State<EntryScreen> {
                                         entry.id, "down"),
                                     onShare: () {
                                       // Konu bilgilerini al
-                                      final topicName = displayItem.topicName ?? "Konu Bilgisi Yok";
-                                      final categoryTitle = displayItem.categoryTitle ?? "Kategori Yok";
-                                      
+                                      final topicName = displayItem.topicName ??
+                                          "Konu Bilgisi Yok";
+                                      final categoryTitle =
+                                          displayItem.categoryTitle ??
+                                              "Kategori Yok";
+
                                       final String shareText = """
 📝 **$topicName** (#${entry.id})
 

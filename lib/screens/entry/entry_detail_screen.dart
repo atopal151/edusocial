@@ -10,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../components/cards/entry_comment_card.dart';
-import '../../components/sheets/share_options_bottom_sheet.dart';
 
 class EntryDetailScreen extends StatefulWidget {
   final EntryModel entry;
@@ -37,7 +36,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       // Bu durumda EntryDetailController'da null bir topic ile devam edilebilir
       // veya hata mesajı gösterilebilir.
       debugPrint("⚠️ EntryDetailScreen: Topic bilgisi bulunamadı!");
-      entryDetailController.setCurrentTopic(null); // veya varsayılan bir TopicModel
+      entryDetailController
+          .setCurrentTopic(null); // veya varsayılan bir TopicModel
     }
 
     entryDetailController.fetchEntryComments();
@@ -45,8 +45,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   @override
   void dispose() {
-    debugPrint("⚠️ EntryDetailScreen dispose: Widget yok ediliyor ve yorumlar temizleniyor.");
-    entryDetailController.entryComments.clear(); // Yorum listesini doğrudan burada temizle
+    debugPrint(
+        "⚠️ EntryDetailScreen dispose: Widget yok ediliyor ve yorumlar temizleniyor.");
+    entryDetailController.entryComments
+        .clear(); // Yorum listesini doğrudan burada temizle
     super.dispose();
   }
 
@@ -65,7 +67,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         children: [
           // Ana Topic ve Detayları
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -75,7 +78,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     // Butona tıklanınca yapılacak işlemi buraya ekleyin
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       border: Border.all(width: 0.1),
                       borderRadius: BorderRadius.circular(15),
@@ -107,8 +111,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             child: Obx(() {
               if (entryDetailController.entryComments.isEmpty) {
                 return Center(
-                  child: CircularProgressIndicator(backgroundColor: Color(0xff9ca3ae),color: Color(0xfffafafa),)
-                );
+                    child: CircularProgressIndicator(
+                  backgroundColor: Color(0xff9ca3ae),
+                  color: Color(0xfffafafa),
+                ));
               }
               return ListView.builder(
                 itemCount: entryDetailController.entryComments.length,
@@ -116,21 +122,25 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   final comment = entryDetailController.entryComments[index];
                   return EntryCommentCard(
                     entry: comment,
-                    onDownvote: () => entryController.voteEntry(comment.id, "down"),
+                    onDownvote: () =>
+                        entryController.voteEntry(comment.id, "down"),
                     onUpvote: () => entryController.voteEntry(comment.id, "up"),
                     onShare: () {
                       // Konunun ilk entry'sini bul
                       String firstEntryContent = "";
                       if (entryDetailController.entryComments.isNotEmpty) {
-                        firstEntryContent = entryDetailController.entryComments.first.content;
+                        firstEntryContent =
+                            entryDetailController.entryComments.first.content;
                       }
-                      
+
                       // Konu bilgilerini al
                       final topic = widget.entry.topic;
-                      final categoryTitle = topic?.category?.title ?? "Kategori Yok";
+                      final categoryTitle =
+                          topic?.category?.title ?? "Kategori Yok";
                       final topicName = topic?.name ?? "Konu Bilgisi Yok";
-                      final entryCount = entryDetailController.entryComments.length;
-                      
+                      final entryCount =
+                          entryDetailController.entryComments.length;
+
                       final String shareText = """
 📝 **$topicName** (#${comment.id})
 
@@ -179,7 +189,8 @@ $firstEntryContent
                             borderSide: BorderSide.none),
                         fillColor: const Color(0xfffafafa),
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 16),
                       ),
                     ),
                   ),
@@ -190,10 +201,7 @@ $firstEntryContent
                       height: 40,
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFFF7743),
-                            Color(0xFFEF5050)
-                          ],
+                          colors: [Color(0xFFFF7743), Color(0xFFEF5050)],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
@@ -205,16 +213,19 @@ $firstEntryContent
                           'images/icons/send_icon.svg',
                           width: 18,
                           height: 18,
-                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          colorFilter: const ColorFilter.mode(
+                              Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ),
                     onPressed: () {
                       if (commentController.text.isNotEmpty) {
-                        entryController.sendEntryToTopic(
+                        entryController
+                            .sendEntryToTopic(
                           widget.entry.topic?.id ?? 0,
                           commentController.text,
-                        ).then((_) {
+                        )
+                            .then((_) {
                           entryDetailController.fetchEntryComments();
                           commentController.clear();
                         });

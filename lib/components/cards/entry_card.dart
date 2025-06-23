@@ -1,6 +1,7 @@
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
 
 class EntryCard extends StatelessWidget {
@@ -65,7 +66,9 @@ class EntryCard extends StatelessWidget {
                         width: 12,
                         height: 12,
                         decoration: BoxDecoration(
-                          color: entry.user.isOnline ? Colors.green : Colors.grey,
+                          color: entry.user.isOnline
+                              ? Color(0xFF4CAF50)
+                              : Color(0xFF9E9E9E),
                           borderRadius: BorderRadius.circular(50),
                           border: Border.all(color: Colors.white, width: 2),
                         ),
@@ -81,14 +84,14 @@ class EntryCard extends StatelessWidget {
                   children: [
                     Text(
                       entry.user.name,
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                           color: Color(0xff414751)),
                     ),
                     Text(
                       formatSimpleDateClock(entry.human_created_at),
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                           color: Color(0xff9ca3ae), fontSize: 10),
                     ),
                   ],
@@ -101,7 +104,7 @@ class EntryCard extends StatelessWidget {
             //  Entry Başlığı
             Text(
               topicName ?? entry.topic?.name ?? "Başlıksız",
-              style: const TextStyle(
+              style: GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   fontSize: 13.28,
                   color: Color(0xff414751)),
@@ -111,7 +114,7 @@ class EntryCard extends StatelessWidget {
             //  Entry Açıklaması
             Text(
               entry.content,
-              style: const TextStyle(
+              style: GoogleFonts.inter(
                   fontSize: 12,
                   color: Color(0xff9ca3ae),
                   fontWeight: FontWeight.w500),
@@ -140,7 +143,7 @@ class EntryCard extends StatelessWidget {
                 ),
                 Text(
                   entry.upvotes_count.toString(),
-                  style: const TextStyle(fontSize: 10),
+                  style: GoogleFonts.inter(fontSize: 10),
                 ),
                 IconButton(
                   icon: Container(
@@ -162,7 +165,7 @@ class EntryCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     entry.downvotes_count.toString(),
-                    style: const TextStyle(fontSize: 10),
+                    style: GoogleFonts.inter(fontSize: 10),
                   ),
                 ),
                 Expanded(
@@ -185,9 +188,10 @@ class EntryCard extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: const Text(
+                  child: Text(
                     "Paylaş",
-                    style: TextStyle(fontSize: 10, color: Colors.grey),
+                    style: GoogleFonts.inter(
+                        fontSize: 10, color: Color(0xff9ca3ae)),
                   ),
                 ),
 
@@ -207,8 +211,11 @@ class EntryCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      categoryTitle ?? entry.topic?.category?.title ?? "Kategori Yok",
-                      style: TextStyle(fontSize: 12, color: Color(0xff9ca3ae)),
+                      categoryTitle ??
+                          entry.topic?.category?.title ??
+                          "Kategori Yok",
+                      style: GoogleFonts.inter(
+                          fontSize: 12, color: Color(0xff9ca3ae)),
                     ),
                   ),
                 )

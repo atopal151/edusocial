@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../components/cards/match_card/match_card.dart';
 import '../../components/user_appbar/user_appbar.dart';
 import '../../controllers/match_controller.dart';
@@ -34,11 +35,12 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                 Text(
                   'Henüz eşleşme bulunamadı',
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     color: Color(0xff9ca3ae),
                     fontSize: 16,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -61,10 +63,10 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                     },
                     child: Text(
                       'Ders Ekle',
-                      style: TextStyle(
-                        color: Colors.white,
+                      style: GoogleFonts.inter(
+                        color: Color(0xffffffff),
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -97,10 +99,10 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                     },
                     child: Text(
                       'Ders Ekle',
-                      style: TextStyle(
-                        color: Colors.white,
+                      style: GoogleFonts.inter(
+                        color: Color(0xffffffff),
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
