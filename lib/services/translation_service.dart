@@ -32,18 +32,18 @@ class TranslationService extends GetxService {
     
     isLoading.value = true;
     
-    debugPrint('🌍 [TranslationService] loadTranslations başlatıldı - Dil: $languageCode');
+    // debugPrint('🌍 [TranslationService] loadTranslations başlatıldı - Dil: $languageCode');
     
     try {
       final authService = Get.find<AuthService>();
       final token = authService.getToken();
       
       if (token == null) {
-        debugPrint('❌ [TranslationService] Token bulunamadı');
+        // debugPrint('❌ [TranslationService] Token bulunamadı');
         return;
       }
       
-      debugPrint('🔑 [TranslationService] Token alındı: ${token.substring(0, 20)}...');
+      // debugPrint('🔑 [TranslationService] Token alındı: ${token.substring(0, 20)}...');
       
       // Farklı endpoint'leri dene
       final possibleEndpoints = [
@@ -57,7 +57,7 @@ class TranslationService extends GetxService {
       bool success = false;
       
       for (String endpoint in possibleEndpoints) {
-        debugPrint('🌐 [TranslationService] Denenen endpoint: ${AppConstants.baseUrl}$endpoint');
+        // debugPrint('🌐 [TranslationService] Denenen endpoint: ${AppConstants.baseUrl}$endpoint');
         
         try {
           final response = await http.get(
@@ -69,13 +69,13 @@ class TranslationService extends GetxService {
             },
           );
           
-          debugPrint('📊 [TranslationService] Status Code: ${response.statusCode}');
+          // debugPrint('📊 [TranslationService] Status Code: ${response.statusCode}');
           //debugPrint('📊 [TranslationService] Response Headers: ${response.headers}');
           //debugPrint('📊 [TranslationService] Response Body: ${response.body}');
           
           if (response.statusCode == 200) {
             final data = jsonDecode(response.body);
-            debugPrint('📊 [TranslationService] Parsed Data: $data');
+            // debugPrint('📊 [TranslationService] Parsed Data: $data');
             
             // API response formatını kontrol et
             if (data['translations'] != null) {
@@ -83,13 +83,13 @@ class TranslationService extends GetxService {
               _translations = Map<String, String>.from(data['translations']);
               _currentLanguage = data['locale'] ?? languageCode;
               _isLoaded = true;
-              debugPrint('✅ [TranslationService] Çeviriler yüklendi - Endpoint: $endpoint, Dil: $_currentLanguage, Sayı: ${_translations.length}');
+              // debugPrint('✅ [TranslationService] Çeviriler yüklendi - Endpoint: $endpoint, Dil: $_currentLanguage, Sayı: ${_translations.length}');
               
               // İlk 5 çeviriyi göster
               int count = 0;
               _translations.forEach((key, value) {
                 if (count < 5) {
-                  debugPrint('🔑 [TranslationService] "$key": "$value"');
+                  // debugPrint('🔑 [TranslationService] "$key": "$value"');
                   count++;
                 }
               });
@@ -100,13 +100,13 @@ class TranslationService extends GetxService {
               _translations = Map<String, String>.from(data['data']);
               _currentLanguage = languageCode;
               _isLoaded = true;
-              debugPrint('✅ [TranslationService] Çeviriler yüklendi (eski format) - Endpoint: $endpoint, Dil: $languageCode, Sayı: ${_translations.length}');
+              //  debugPrint('✅ [TranslationService] Çeviriler yüklendi (eski format) - Endpoint: $endpoint');
               
               // İlk 5 çeviriyi göster
               int count = 0;
               _translations.forEach((key, value) {
                 if (count < 5) {
-                  debugPrint('🔑 [TranslationService] "$key": "$value"');
+                  // debugPrint('🔑 [TranslationService] "$key": "$value"');
                   count++;
                 }
               });
@@ -114,7 +114,7 @@ class TranslationService extends GetxService {
               break;
             } else {
              // debugPrint('❌ [TranslationService] Geçersiz response formatı - Endpoint: $endpoint');
-              debugPrint('📊 [TranslationService] Available keys: ${data.keys.toList()}');
+              // debugPrint('📊 [TranslationService] Available keys: ${data.keys.toList()}');
             }
           } else {
             //debugPrint('❌ [TranslationService] HTTP Error: ${response.statusCode} - Endpoint: $endpoint');
@@ -123,8 +123,8 @@ class TranslationService extends GetxService {
             // Error response'u parse etmeye çalış
             try {
               final errorData = jsonDecode(response.body);
-              debugPrint('❌ [TranslationService] Error Message: ${errorData['message']}');
-              debugPrint('❌ [TranslationService] Error Exception: ${errorData['exception']}');
+              // debugPrint('❌ [TranslationService] Error Message: ${errorData['message']}');
+              // debugPrint('❌ [TranslationService] Error Exception: ${errorData['exception']}');
             } catch (e) {
               //debugPrint('❌ [TranslationService] Error response parse edilemedi: $e');
             }
@@ -143,7 +143,7 @@ class TranslationService extends GetxService {
       //debugPrint('❌ [TranslationService] Exception Type: ${e.runtimeType}');
     } finally {
       isLoading.value = false;
-      debugPrint('🏁 [TranslationService] loadTranslations tamamlandı');
+      // debugPrint('🏁 [TranslationService] loadTranslations tamamlandı');
     }
   }
   

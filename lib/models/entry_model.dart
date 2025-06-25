@@ -30,6 +30,36 @@ class EntryModel {
     final userJson = json['user'];
     final topicJson = json['topic'];
 
+    // Eğer user field'ı yoksa, boş bir UserModel oluştur
+    UserModel user;
+    if (userJson != null) {
+      user = UserModel.fromJson(userJson);
+    } else {
+      // API'den user field'ı gelmiyorsa, temel bilgilerle oluştur
+      user = UserModel(
+        id: json['user_id'] ?? 0,
+        accountType: 'public',
+        languageId: 1,
+        avatar: '',
+        banner: '',
+        schoolId: 1,
+        schoolDepartmentId: 1,
+        name: '',
+        surname: '',
+        username: '',
+        email: '',
+        notificationEmail: true,
+        notificationMobile: true,
+        isActive: true,
+        isOnline: false,
+        avatarUrl: '',
+        bannerUrl: '',
+        isFollowing: false,
+        isFollowingPending: false,
+        isSelf: false,
+      );
+    }
+
     return EntryModel(
       id: json['id'] ?? 0,
       content: json['content'] ?? '',
@@ -37,7 +67,7 @@ class EntryModel {
       downvotescount: json['downvote_count'] ?? 0,
       humancreatedat: json['human_created_at'] ?? '',
       createdat: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
-      user: UserModel.fromJson(userJson ?? {}),
+      user: user,
       topic: topicJson != null ? TopicModel.fromJson(topicJson) : null,
       islike: json['is_like'],
       isdislike: json['is_dislike'],

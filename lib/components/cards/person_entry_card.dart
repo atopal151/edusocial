@@ -3,9 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
+import '../../models/user_model.dart';
 
-class EntryCard extends StatelessWidget {
+/// PersonEntryCard - Profil ekranları için özel entry kartı
+/// 
+/// Bu component, kullanıcı bilgilerini dışarıdan alır ve profil ekranlarında
+/// kullanılmak üzere tasarlanmıştır. Normal EntryCard'dan farklı olarak,
+/// kullanıcı bilgileri (UserModel) zorunlu parametre olarak alınır.
+/// 
+/// Kullanım örneği:
+/// ```dart
+/// PersonEntryCard(
+///   entry: entryModel,
+///   user: userModel, // Kullanıcı bilgileri dışarıdan verilir
+///   onPressed: () => print('Entry tıklandı'),
+///   onUpvote: () => print('Beğenildi'),
+///   onDownvote: () => print('Beğenilmedi'),
+///   onShare: () => print('Paylaşıldı'),
+/// )
+/// ```
+
+class PersonEntryCard extends StatelessWidget {
   final EntryModel entry;
+  final UserModel user; // Kullanıcı bilgileri dışarıdan alınacak
   final String? topicName;
   final String? categoryTitle;
   final VoidCallback onUpvote;
@@ -14,9 +34,10 @@ class EntryCard extends StatelessWidget {
   final VoidCallback onPressed;
   final VoidCallback? onPressedProfile;
 
-  const EntryCard({
+  const PersonEntryCard({
     super.key,
     required this.entry,
+    required this.user, // Kullanıcı bilgileri zorunlu
     this.topicName,
     this.categoryTitle,
     required this.onUpvote,
@@ -28,6 +49,14 @@ class EntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Debug: Avatar bilgilerini kontrol et
+    debugPrint("🖼️ PersonEntryCard - Avatar Debug:");
+    debugPrint("  - User ID: ${user.id}");
+    debugPrint("  - User Name: ${user.name} ${user.surname}");
+    debugPrint("  - Avatar URL: '${user.avatarUrl}'");
+    debugPrint("  - Avatar URL boş mu: ${user.avatarUrl.isEmpty}");
+    debugPrint("  - Avatar URL uzunluğu: ${user.avatarUrl.length}");
+    
     return InkWell(
       onTap: () {
         onPressed();
@@ -51,17 +80,17 @@ class EntryCard extends StatelessWidget {
                       onTap: onPressedProfile,
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundImage: entry.user.avatarUrl.isNotEmpty
-                            ? NetworkImage(entry.user.avatarUrl)
+                        backgroundImage: user.avatarUrl.isNotEmpty
+                            ? NetworkImage(user.avatarUrl)
                             : null,
-                        onBackgroundImageError: entry.user.avatarUrl.isNotEmpty
+                        child: user.avatarUrl.isEmpty
+                            ? const Icon(Icons.person, size: 20)
+                            : null,
+                        onBackgroundImageError: user.avatarUrl.isNotEmpty
                             ? (exception, stackTrace) {
-                                debugPrint("❌ Profil resmi yüklenemedi: ${entry.user.avatarUrl}");
+                                debugPrint("❌ Profil resmi yüklenemedi: ${user.avatarUrl}");
                                 debugPrint("❌ Hata: $exception");
                               }
-                            : null,
-                        child: entry.user.avatarUrl.isEmpty
-                            ? const Icon(Icons.person, size: 20)
                             : null,
                       ),
                     ),
@@ -73,7 +102,7 @@ class EntryCard extends StatelessWidget {
                         width: 12,
                         height: 12,
                         decoration: BoxDecoration(
-                          color: entry.user.isOnline
+                          color: user.isOnline
                               ? Color(0xFF4CAF50)
                               : Color(0xFF9E9E9E),
                           borderRadius: BorderRadius.circular(50),
@@ -89,17 +118,23 @@ class EntryCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "${entry.user.name} ${entry.user.surname}",
-                      style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Color(0xff414751)),
+                    InkWell(
+                      onTap: onPressedProfile,
+                      child: Text(
+                        "${user.name} ${user.surname}",
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            color: Color(0xff414751)),
+                      ),
                     ),
-                    Text(
-                      "@${entry.user.username}",
-                      style: GoogleFonts.inter(
-                          color: Color(0xff9ca3ae), fontSize: 10),
+                    InkWell(
+                      onTap: onPressedProfile,
+                      child: Text(
+                        "@${user.username}",
+                        style: GoogleFonts.inter(
+                            color: Color(0xff9ca3ae), fontSize: 10),
+                      ),
                     ),
                     Text(
                       formatSimpleDateClock(entry.humancreatedat),
@@ -238,4 +273,4 @@ class EntryCard extends StatelessWidget {
       ),
     );
   }
-}
+} 

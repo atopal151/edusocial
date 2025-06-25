@@ -2,6 +2,7 @@ import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/models/school_department_model.dart';
 import 'package:edusocial/models/school_model.dart';
+import 'package:edusocial/models/entry_model.dart';
 
 class PeopleProfileModel {
   final int id;
@@ -40,6 +41,7 @@ class PeopleProfileModel {
   final int followerCount;
   final bool isSelf;
   final List<PostModel> posts;
+  final List<EntryModel> entries;
   final dynamic language;
   final List<dynamic> approvedGroups;
   final SchoolModel? school;
@@ -89,6 +91,7 @@ class PeopleProfileModel {
     required this.followerCount,
     required this.isSelf,
     required this.posts,
+    required this.entries,
     required this.language,
     required this.approvedGroups,
     required this.school,
@@ -147,6 +150,7 @@ class PeopleProfileModel {
             );
           }).toList() ??
           [],
+      entries: (json['entries'] as List?)?.map((e) => EntryModel.fromJson(e)).toList() ?? [],
       language: json['language']?['name'],
       approvedGroups: json['groups'] != null
         ? List<GroupSuggestionModel>.from(

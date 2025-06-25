@@ -22,17 +22,20 @@ class PeopleProfileService {
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
-        /*final bodyString = const JsonEncoder.withIndent('  ').convert(body);
-        debugPrint('🔍 Userdata:\n$bodyString');*/
+        //final bodyString = const JsonEncoder.withIndent('  ').convert(body);
+        //debugPrint('🔍 Userdata:\n$bodyString');
 
-        return PeopleProfileModel.fromJson(body['data']);
+        final model = PeopleProfileModel.fromJson(body['data']);
+        // debugPrint("🏗️ Model oluşturuldu: ${model != null ? 'BAŞARILI' : 'BAŞARISIZ'}");
+        //debugPrint("📊 Model entries sayısı: ${model.entries.length}");
+        
+        return model;
       } else {
-        /*debugPrint(
-            "❌ [fetchUserByUsername] API başarısız: ${response.statusCode}");*/
+        debugPrint("❌ [fetchUserByUsername] API başarısız: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      /*debugPrint("❌ fetchUserByUsername error: $e");*/
+      debugPrint("❌ fetchUserByUsername error: $e");
       return null;
     }
   }
@@ -42,19 +45,50 @@ class PeopleProfileService {
     final token = box.read('token');
 
     try {
+      //debugPrint("🔄 fetchUserById çağrılıyor: user_id = $userId");
+      //debugPrint("🌐 URL: $url");
+      
       final response = await http.get(
         url,
         headers: {"Authorization": "Bearer $token"},
       );
-      //debugPrint("📥 [fetchUserById] Status: ${response.statusCode}");
-      //debugPrint("📥 [fetchUserById] Body: ${response.body}", wrapWidth: 1024);
-
+      
+      //debugPrint("📥 Response status: ${response.statusCode}");
+      
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
+        //debugPrint("📦 Response body keys: ${body.keys.toList()}");
+        
+        if (body['data'] != null) {
+          final userData = body['data'];
+          //debugPrint("👤 Kullanıcı verileri:");
+          //debugPrint("  - ID: ${userData['id']}");
+          //debugPrint("  - Name: ${userData['name']} ${userData['surname']}");
+          //debugPrint("  - Avatar: ${userData['avatar']}");
+          //debugPrint("  - Avatar URL: ${userData['avatar_url']}");
+          
+          // Tüm avatar ile ilgili alanları kontrol et
+          //debugPrint("🔍 Avatar ile ilgili tüm alanlar:");
+          userData.forEach((key, value) {
+            if (key.toString().toLowerCase().contains('avatar') || 
+                key.toString().toLowerCase().contains('image') ||
+                key.toString().toLowerCase().contains('photo') ||
+                key.toString().toLowerCase().contains('profile')) {
+                //debugPrint("  - $key: '$value' (tip: ${value.runtimeType})");
+            }
+          });
+          
+          // Tüm alanları da göster
+          //debugPrint("📋 Tüm kullanıcı alanları:");
+          userData.forEach((key, value) {
+            //debugPrint("  - $key: '$value' (tip: ${value.runtimeType})");
+          });
+        }
+        
         return PeopleProfileModel.fromJson(body['data']);
       } else {
-        // debugPrint("❌ [fetchUserById] API başarısız: ${response.statusCode}");
-        //debugPrint("❌ [fetchUserById] Body: ${response.body}", wrapWidth: 1024);
+        debugPrint("❌ [fetchUserById] API başarısız: ${response.statusCode}");
+        debugPrint("❌ Response body: ${response.body}");
         return null;
       }
     } catch (e) {

@@ -19,8 +19,8 @@ class ProfileService {
       },
     );
 
-    debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
-    debugPrint("📦 ProfileService - Response Body: ${response.body}");
+    // debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
+    // debugPrint("📦 ProfileService - Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
       final jsonBody = json.decode(response.body);
@@ -28,15 +28,15 @@ class ProfileService {
       // Post verilerini debug et
       if (jsonBody['data'] != null && jsonBody['data']['posts'] != null) {
         final posts = jsonBody['data']['posts'] as List;
-        debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
+        // debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
         
         for (int i = 0; i < posts.length; i++) {
           final post = posts[i];
-          debugPrint("📝 Post $i:");
-          debugPrint("  - ID: ${post['id']}");
-          debugPrint("  - Content: ${post['content']}");
-          debugPrint("  - Links: ${post['links']}");
-          debugPrint("  - Media: ${post['media']}");
+          // debugPrint("📝 Post $i:");
+          // debugPrint("  - ID: ${post['id']}");
+          // debugPrint("  - Content: ${post['content']}");
+          // debugPrint("  - Links: ${post['links']}");
+          // debugPrint("  - Media: ${post['media']}");
         }
       }
       

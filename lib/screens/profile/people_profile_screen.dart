@@ -9,12 +9,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../components/buttons/custom_button.dart';
-import '../../components/cards/entry_card.dart';
+import '../../components/cards/person_entry_card.dart';
 import '../../components/cards/post_card.dart';
 import '../../components/profile_tabbar/profile_tabbar.dart';
 import '../../components/profile_tabbar/toggle_tab_bar.dart';
 import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
+import '../../routes/app_routes.dart';
 
 class PeopleProfileScreen extends StatefulWidget {
   final String username;
@@ -237,40 +238,69 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
         }
       }
 
-      if (entryController.entryPersonList.isEmpty) {
+      if (controller.peopleEntries.isEmpty) {
         return const Center(child: Text("Hiç entry bulunamadı."));
       }
+      
       return ListView.builder(
-        itemCount: entryController.entryPersonList.length,
+        itemCount: controller.peopleEntries.length,
         itemBuilder: (context, index) {
-          final entry = entryController.entryPersonList[index];
+          final entry = controller.peopleEntries[index];
+          
+          // Entry'nin kullanıcı bilgilerini al
+          final user = entry.user;
+          if (user == null) {
+            //debugPrint("⚠️ Entry için kullanıcı bilgileri bulunamadı: ${entry.id}");
+            return const SizedBox.shrink();
+          }
+          
+          //debugPrint("🔍 PersonEntryCard - Kullanıcı bilgileri: ${user.avatarUrl}");
           return Container(
             color: const Color(0xfffafafa),
-            child: EntryCard(
-              onPressed: () {
-                Get.toNamed("/entryDetail", arguments: {'entry': entry});
-              },
-              entry: entry,
-              topicName: entry.topic?.name,
-              categoryTitle: entry.topic?.category?.title,
-              onPressedProfile: () {
-                Get.toNamed("/peopleProfile");
-              },
-              onUpvote: () => entryController.voteEntry(entry.id, "up"),
-              onDownvote: () => entryController.voteEntry(entry.id, "down"),
-              onShare: () {
-                final String shareText = """
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: PersonEntryCard(
+                entry: entry,
+                user: user, // Kullanıcı bilgilerini dışarıdan veriyoruz
+                topicName: entry.topic?.name,
+                categoryTitle: entry.topic?.category?.title,
+                onPressed: () {
+                  Get.toNamed(Routes.entryDetail, arguments: {'entry': entry});
+                },
+                onPressedProfile: () {
+                  // Topic'i oluşturan kullanıcının profil sayfasına yönlendir
+                  if (user.username.isNotEmpty) {
+                    Get.to(() => PeopleProfileScreen(username: user.username));
+                  } else {
+                    debugPrint("⚠️ Kullanıcı bilgileri eksik, profil sayfasına yönlendirilemiyor");
+                  }
+                },
+                onUpvote: () => entryController.voteEntry(entry.id, "up"),
+                onDownvote: () => entryController.voteEntry(entry.id, "down"),
+                onShare: () {
+                  // Konu bilgilerini al
+                  final topicName = entry.topic?.name ?? "Konu Bilgisi Yok";
+                  final categoryTitle = entry.topic?.category?.title ?? "Kategori Yok";
+
+                  final String shareText = """
+📝 **$topicName** (#${entry.id})
+
+🏷️ **Kategori:** $categoryTitle
+👤 **Yazar:** ${user.name} ${user.surname}
+
+💬 **Entry İçeriği:**
 ${entry.content}
 
-📱 EduSocial Uygulamasını İndir:
+📱 **EduSocial Uygulamasını İndir:**
 🔗 Uygulamayı Aç: edusocial://app
 📲 App Store: https://apps.apple.com/app/edusocial/id123456789
 📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
 
-#EduSocial #Eğitim
+#EduSocial #Eğitim #$categoryTitle
 """;
-                Share.share(shareText);
-              },
+                  Share.share(shareText);
+                },
+              ),
             ),
           );
         },
