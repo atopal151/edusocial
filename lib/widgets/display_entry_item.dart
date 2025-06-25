@@ -3,17 +3,16 @@ import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/entry_model.dart';
 import '../controllers/entry_controller.dart';
-import '../components/sheets/share_options_bottom_sheet.dart';
 
 class DisplayEntryItem extends StatelessWidget {
   final EntryModel entry;
   final VoidCallback onRefresh;
 
   const DisplayEntryItem({
-    Key? key,
+    super.key,
     required this.entry,
     required this.onRefresh,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +85,7 @@ class DisplayEntryItem extends StatelessWidget {
 
                   // Tarih
                   Text(
-                    entry.human_created_at,
+                    entry.humancreatedat,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],

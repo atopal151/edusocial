@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:edusocial/utils/constants.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
 
 class ShareOptionsBottomSheet extends StatelessWidget {
   final String postText;
@@ -49,26 +45,6 @@ $postText
 """;
   }
 
-  // Uygulamayı aç veya markete yönlendir
-  Future<void> _openAppOrStore() async {
-    final deepLink = Uri.parse(_getDeepLink());
-    final playStore = Uri.parse(_getPlayStoreLink());
-    final appStore = Uri.parse(_getAppStoreLink());
-
-    try {
-      if (await canLaunchUrl(deepLink)) {
-        await launchUrl(deepLink);
-      } else {
-        if (Platform.isAndroid) {
-          await launchUrl(playStore);
-        } else if (Platform.isIOS) {
-          await launchUrl(appStore);
-        }
-      }
-    } catch (e) {
-      await launchUrl(playStore);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

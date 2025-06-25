@@ -4,26 +4,26 @@ import 'package:edusocial/models/topic_model.dart';
 class EntryModel {
   final int id;
   final String content;
-  final int upvotes_count;
-  final int downvotes_count;
-  final String human_created_at;
-  final DateTime? created_at; // Tarih sıralaması için
+  final int upvotescount;
+  final int downvotescount;
+  final String humancreatedat;
+  final DateTime? createdat; // Tarih sıralaması için
   final UserModel user;
   final TopicModel? topic; // topic opsiyonel olabilir
-  final bool? is_like; // Added for vote status
-  final bool? is_dislike; // Added for vote status
+  final bool? islike; // Added for vote status
+  final bool? isdislike; // Added for vote status
 
   EntryModel({
     required this.id,
     required this.content,
-    required this.upvotes_count,
-    required this.downvotes_count,
-    required this.human_created_at,
-    this.created_at,
+    required this.upvotescount,
+    required this.downvotescount,
+    required this.humancreatedat,
+    this.createdat,
     required this.user,
     this.topic,
-    this.is_like,
-    this.is_dislike,
+    this.islike,
+    this.isdislike,
   });
 
   factory EntryModel.fromJson(Map<String, dynamic> json) {
@@ -33,40 +33,40 @@ class EntryModel {
     return EntryModel(
       id: json['id'] ?? 0,
       content: json['content'] ?? '',
-      upvotes_count: json['upvote_count'] ?? 0,
-      downvotes_count: json['downvote_count'] ?? 0,
-      human_created_at: json['human_created_at'] ?? '',
-      created_at: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
+      upvotescount: json['upvote_count'] ?? 0,
+      downvotescount: json['downvote_count'] ?? 0,
+      humancreatedat: json['human_created_at'] ?? '',
+      createdat: json['created_at'] != null ? DateTime.tryParse(json['created_at']) : null,
       user: UserModel.fromJson(userJson ?? {}),
       topic: topicJson != null ? TopicModel.fromJson(topicJson) : null,
-      is_like: json['is_like'],
-      is_dislike: json['is_dislike'],
+      islike: json['is_like'],
+      isdislike: json['is_dislike'],
     );
   }
 
   EntryModel copyWith({
     int? id,
     String? content,
-    int? upvotes_count,
-    int? downvotes_count,
-    String? human_created_at,
-    DateTime? created_at,
+    int? upvotescount,
+    int? downvotescount,
+    String? humancreatedat,
+    DateTime? createdat,
     UserModel? user,
     TopicModel? topic,
-    bool? is_like,
-    bool? is_dislike,
+    bool? islike,
+    bool? isdislike,
   }) {
     return EntryModel(
       id: id ?? this.id,
       content: content ?? this.content,
-      upvotes_count: upvotes_count ?? this.upvotes_count,
-      downvotes_count: downvotes_count ?? this.downvotes_count,
-      human_created_at: human_created_at ?? this.human_created_at,
-      created_at: created_at ?? this.created_at,
+      upvotescount: upvotescount ?? this.upvotescount,
+      downvotescount: downvotescount ?? this.downvotescount,
+      humancreatedat: humancreatedat ?? this.humancreatedat,
+      createdat: createdat ?? this.createdat,
       user: user ?? this.user,
       topic: topic ?? this.topic,
-      is_like: is_like ?? this.is_like,
-      is_dislike: is_dislike ?? this.is_dislike,
+      islike: islike ?? this.islike,
+      isdislike: isdislike ?? this.isdislike,
     );
   }
 
@@ -74,14 +74,14 @@ class EntryModel {
     return {
       'id': id,
       'content': content,
-      'upvotes_count': upvotes_count,
-      'downvotes_count': downvotes_count,
-      'human_created_at': human_created_at,
-      'created_at': created_at?.toIso8601String(),
+      'upvotes_count': upvotescount,
+      'downvotes_count': downvotescount,
+      'human_created_at': humancreatedat,
+      'created_at': createdat?.toIso8601String(),
       'user': user.toJson(),
       'topic': topic?.toJson(),
-      'is_like': is_like,
-      'is_dislike': is_dislike,
+      'is_like': islike,
+      'is_dislike': isdislike,
     };
   }
 }

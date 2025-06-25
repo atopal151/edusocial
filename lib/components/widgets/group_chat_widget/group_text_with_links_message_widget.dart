@@ -193,7 +193,7 @@ class GroupTextWithLinksMessageWidget extends StatelessWidget {
                               ),
                             ),
                           ),
-                        )).toList(),
+                        )),
                       ],
                     ),
                   ),

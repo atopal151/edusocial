@@ -7,7 +7,7 @@ import '../../controllers/social/chat_detail_controller.dart';
 
 class MessageInputField extends StatefulWidget {
   final ChatDetailController controller;
-  
+
   const MessageInputField({
     super.key,
     required this.controller,
@@ -49,55 +49,52 @@ class _MessageInputFieldState extends State<MessageInputField> {
                 padding: EdgeInsets.all(8),
                 child: Column(
                   children: [
-                    ...widget.controller.selectedFiles
-                        .map((file) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: _buildFilePreview(file),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          file.path.split('/').last,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Text(
-                                          '${(file.lengthSync() / 1024).toStringAsFixed(1)} KB',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.close, size: 20),
-                                    onPressed: () {
-                                      widget.controller.selectedFiles.remove(file);
-                                    },
-                                  ),
-                                ],
+                    ...widget.controller.selectedFiles.map((file) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: _buildFilePreview(file),
                               ),
-                            ))
-                        .toList(),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      file.path.split('/').last,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      '${(file.lengthSync() / 1024).toStringAsFixed(1)} KB',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.close, size: 20),
+                                onPressed: () {
+                                  widget.controller.selectedFiles.remove(file);
+                                },
+                              ),
+                            ],
+                          ),
+                        )),
                   ],
                 ),
               );
@@ -138,7 +135,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
                     border: InputBorder.none,
                   ),
                   onSubmitted: (value) async {
-                    if (value.isNotEmpty || widget.controller.selectedFiles.isNotEmpty) {
+                    if (value.isNotEmpty ||
+                        widget.controller.selectedFiles.isNotEmpty) {
                       await widget.controller.sendMessage(value);
                       messageController.clear();
                     }
@@ -209,7 +207,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
                     : () async {
                         if (messageController.text.isNotEmpty ||
                             widget.controller.selectedFiles.isNotEmpty) {
-                          await widget.controller.sendMessage(messageController.text);
+                          await widget.controller
+                              .sendMessage(messageController.text);
                           messageController.clear();
                         }
                       },

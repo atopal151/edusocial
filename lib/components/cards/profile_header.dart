@@ -51,7 +51,7 @@ Widget buildProfileHeader() {
                 final imageUrl = controller.profileImage.value.trim();
                 return CircleAvatar(
                   radius: 42,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Color(0xffffffff),
                   child: CircleAvatar(
                     radius: 40,
                     backgroundColor: const Color(0xfffafafa),
@@ -75,7 +75,7 @@ Widget buildProfileHeader() {
       /// Kullanıcı Adı
       Obx(() => Text(
             controller.fullName.value,
-            style: const TextStyle(
+            style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xff272727)),
@@ -84,25 +84,26 @@ Widget buildProfileHeader() {
       Obx(() => Text(
             controller.username.value,
             style: GoogleFonts.inter(
-                fontSize: 12.78,
-                fontWeight: FontWeight.w400,
+                fontSize: 13.28,
+                fontWeight: FontWeight.w500,
                 color: Color(0xff9ca3ae)),
           )),
 
       const SizedBox(height: 10),
 
-      /// Kullanıcı Bio
-      Obx(() => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              controller.bio.value,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xff9CA3AE)),
-            ),
-          )),
+      if (controller.bio.value.isNotEmpty)
+        /// Kullanıcı Bio
+        Obx(() => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                controller.bio.value,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff9CA3AE)),
+              ),
+            )),
       const SizedBox(height: 20),
 
       // Gönderi / Takipçi / Takip Edilen
@@ -136,14 +137,14 @@ Widget _buildProfileInfo(String title, RxInt value) {
     children: [
       Obx(() => Text(
             value.value.toString(),
-            style: const TextStyle(
+            style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Color(0xff414751)),
           )),
       Text(
         title,
-        style: const TextStyle(
+        style: GoogleFonts.inter(
             fontSize: 12,
             color: Color(0xff9ca3ae),
             fontWeight: FontWeight.w400),
@@ -155,6 +156,6 @@ Widget _buildProfileInfo(String title, RxInt value) {
 Widget _buildDivider() {
   return const Padding(
     padding: EdgeInsets.symmetric(horizontal: 20),
-    child: VerticalDivider(thickness: 1, color: Colors.grey),
+    child: VerticalDivider(thickness: 1, color: Color(0xff9ca3ae)),
   );
 }

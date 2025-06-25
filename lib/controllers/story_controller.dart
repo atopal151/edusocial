@@ -16,17 +16,6 @@ class StoryController extends GetxController {
 
   final profileController = Get.find<ProfileController>();
 
-  @override
-  void onInit() {
-    super.onInit();
-
-    // Profil yüklendiğinde kendi story'yi de çek
-    // ever(profileController.userId, (id) {
-    //   if (id.toString().isNotEmpty) {
-    //     fetchStories(); // Login sırasında manuel olarak çağrılacak
-    //   }
-    // });
-  }
 
   Future<void> fetchStories() async {
     debugPrint("🔄 StoryController.fetchStories() çağrıldı");

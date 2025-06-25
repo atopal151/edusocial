@@ -123,8 +123,8 @@ class TranslationService extends GetxService {
             // Error response'u parse etmeye çalış
             try {
               final errorData = jsonDecode(response.body);
-              //debugPrint('❌ [TranslationService] Error Message: ${errorData['message']}');
-              //debugPrint('❌ [TranslationService] Error Exception: ${errorData['exception']}');
+              debugPrint('❌ [TranslationService] Error Message: ${errorData['message']}');
+              debugPrint('❌ [TranslationService] Error Exception: ${errorData['exception']}');
             } catch (e) {
               //debugPrint('❌ [TranslationService] Error response parse edilemedi: $e');
             }
@@ -211,8 +211,8 @@ class TranslationService extends GetxService {
           } else {
             try {
               final errorData = jsonDecode(response.body);
-              //debugPrint('❌ [debugFetchFrontendLanguage] Error Message: ${errorData['message']}');
-              //debugPrint('❌ [debugFetchFrontendLanguage] Error Exception: ${errorData['exception']}');
+              debugPrint('❌ [debugFetchFrontendLanguage] Error Message: ${errorData['message']}');
+              debugPrint('❌ [debugFetchFrontendLanguage] Error Exception: ${errorData['exception']}');
             } catch (e) {
               //debugPrint('❌ [debugFetchFrontendLanguage] Error parse edilemedi: $e');
             }

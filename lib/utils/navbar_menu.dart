@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/match_controller.dart';
 import '../controllers/social/chat_controller.dart';
@@ -33,82 +32,69 @@ class _NavbarMenuState extends State<NavbarMenu> {
             color: Colors.white,
           ),
           child: Obx(() => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(5, (index) {
-              bool isSelected = controller.selectedIndex.value == index;
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: List.generate(5, (index) {
+                  bool isSelected = controller.selectedIndex.value == index;
 
-              /// Orta butonu (index 2) Row'dan kaldır, sadece boşluk bırak
-              if (index == 2) {
-                return const SizedBox(width: centerButtonWidth);
-              }
+                  /// Orta butonu (index 2) Row'dan kaldır, sadece boşluk bırak
+                  if (index == 2) {
+                    return const SizedBox(width: centerButtonWidth);
+                  }
 
-              return GestureDetector(
-                onTap: () {
-                  debugPrint('🔄 Navbar: Tapped on index $index (${icons[index]})');
-                  controller.changeIndex(index);
-                },
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
+                  return GestureDetector(
+                    onTap: () {
+                      debugPrint(
+                          '🔄 Navbar: Tapped on index $index (${icons[index]})');
+                      controller.changeIndex(index);
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        SvgPicture.asset(
-                          "images/icons/${icons[index]}.svg",
-                          colorFilter: ColorFilter.mode(
-                            isSelected
-                                ? const Color(0xFFEF5050)
-                                : const Color(0xFF9CA3AE),
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        // Chat ikonu için badge göster
-                        if (index == 1) // Chat index'i
-                          Builder(builder: (context) {
-                            final unreadCount = chatController.totalUnreadCount;
-                            if (unreadCount > 0) {
-                              return Positioned(
-                                right: -8,
-                                top: -8,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xffff565f),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 2,
-                                    ),
-                                   
-                                  ),
-                                  constraints: BoxConstraints(
-                                    minWidth: 20,
-                                    minHeight: 20,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      unreadCount > 99 ? '99+' : unreadCount.toString(),
-                                      style: GoogleFonts.inter(
-                                        fontSize: 8,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            SvgPicture.asset(
+                              "images/icons/${icons[index]}.svg",
+                              colorFilter: ColorFilter.mode(
+                                isSelected
+                                    ? const Color(0xFFEF5050)
+                                    : const Color(0xFF9CA3AE),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            // Chat ikonu için badge göster
+                            if (index == 1) // Chat index'i
+                              Builder(builder: (context) {
+                                final unreadCount =
+                                    chatController.totalUnreadCount;
+                                if (unreadCount > 0) {
+                                  return Positioned(
+                                    right: -8,
+                                    top: -8,
+                                    child: Container(
+                                      width: 12,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xffff565f),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
                                       ),
-                                      textAlign: TextAlign.center,
                                     ),
-                                  ),
-                                ),
-                              );
-                            }
-                            return SizedBox.shrink();
-                          }),
+                                  );
+                                }
+                                return SizedBox.shrink();
+                              }),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-              );
-            }),
-          )),
+                  );
+                }),
+              )),
         ),
 
         Positioned(
@@ -116,7 +102,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
           left: MediaQuery.of(context).size.width / 2 - 25, // Ortalar
           child: GestureDetector(
             onTap: () {
-             /* if (matchController.matches.isEmpty) {
+              /* if (matchController.matches.isEmpty) {
                 Get.toNamed("/match");
                 return;
               }*/
@@ -136,7 +122,6 @@ class _NavbarMenuState extends State<NavbarMenu> {
                 ),
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.all(Radius.circular(15)),
-                
               ),
               child: Center(
                 child: SvgPicture.asset(

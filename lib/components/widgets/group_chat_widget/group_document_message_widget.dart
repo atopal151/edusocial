@@ -93,7 +93,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
           child: GestureDetector(
             onTap: documentUrl != null ? () async {
               try {
-                final uri = Uri.parse(documentUrl!);
+                final uri = Uri.parse(documentUrl);
                 if (await canLaunchUrl(uri)) {
                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                 } else {

@@ -10,7 +10,7 @@ class TopicCategoryModel {
   final int topicCount;
   final int entryCount;
   final List<TopicModel>? topics;
-  final EntryModel? first_entry;
+  final EntryModel? firstentry;
 
   TopicCategoryModel({
     required this.id,
@@ -20,7 +20,7 @@ class TopicCategoryModel {
     required this.topicCount,
     required this.entryCount,
     this.topics,
-    this.first_entry,
+    this.firstentry,
   });
 
   factory TopicCategoryModel.fromJson(Map<String, dynamic> json) {
@@ -36,7 +36,7 @@ class TopicCategoryModel {
               .map((i) => TopicModel.fromJson(i))
               .toList()
           : null,
-      first_entry: json['first_entry'] != null
+      firstentry: json['first_entry'] != null
           ? EntryModel.fromJson(json['first_entry'])
           : null,
     );
@@ -51,7 +51,7 @@ class TopicCategoryModel {
       'topic_count': topicCount,
       'entry_count': entryCount,
       'topics': topics?.map((e) => e.toJson()).toList(),
-      'first_entry': first_entry?.toJson(),
+      'first_entry': firstentry?.toJson(),
     };
   }
 }

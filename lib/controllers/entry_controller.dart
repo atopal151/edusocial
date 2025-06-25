@@ -53,10 +53,10 @@ class EntryController extends GetxController {
       
       final List<DisplayEntryItem> preparedEntries = [];
       for (var category in fetchedCategories) {
-        if (category.first_entry != null) {
+        if (category.firstentry != null) {
           preparedEntries.add(
             DisplayEntryItem(
-              entry: category.first_entry!.copyWith(
+              entry: category.firstentry!.copyWith(
                 topic: (category.topics?.isNotEmpty == true && category.topics?.first != null)
                     ? category.topics!.first.copyWith(category: category) // Topic'e kategori bilgisini enjekte et
                     : null,
@@ -145,10 +145,10 @@ class EntryController extends GetxController {
       final indexInAll = allDisplayEntries.indexWhere((item) => item.entry.id == entryId);
       if (indexInAll != -1) {
         final currentEntry = allDisplayEntries[indexInAll].entry;
-        int newUpvotes = currentEntry.upvotes_count;
-        int newDownvotes = currentEntry.downvotes_count;
-        bool? newIsLike = currentEntry.is_like;
-        bool? newIsDislike = currentEntry.is_dislike;
+        int newUpvotes = currentEntry.upvotescount;
+        int newDownvotes = currentEntry.downvotescount;
+        bool? newIsLike = currentEntry.islike;
+        bool? newIsDislike = currentEntry.isdislike;
 
         if (vote == "up") {
           if (newIsLike == true) {
@@ -181,10 +181,10 @@ class EntryController extends GetxController {
         }
 
         final updatedEntry = currentEntry.copyWith(
-          upvotes_count: newUpvotes,
-          downvotes_count: newDownvotes,
-          is_like: newIsLike,
-          is_dislike: newIsDislike,
+          upvotescount: newUpvotes,
+          downvotescount: newDownvotes,
+          islike: newIsLike,
+          isdislike: newIsDislike,
         );
 
         allDisplayEntries[indexInAll] = allDisplayEntries[indexInAll].copyWith(
@@ -263,31 +263,31 @@ class EntryController extends GetxController {
 
   Future<void> fetchAllEntries() async {
     try {
-      print('🔄 Entry\'ler getiriliyor...');
+      debugPrint('🔄 Entry\'ler getiriliyor...');
       final entries = await EntryServices.fetchEntries();
-      print('📦 Alınan entry sayısı: ${entries.length}');
+      debugPrint('📦 Alınan entry sayısı: ${entries.length}');
       
       if (entries.isEmpty) {
-        print('⚠️ Hiç entry bulunamadı!');
+        debugPrint('⚠️ Hiç entry bulunamadı!');
         entryPersonList.clear();
         return;
       }
 
-      print('📝 Entry\'ler işleniyor...');
+      debugPrint('📝 Entry\'ler işleniyor...');
       entryPersonList.value = entries;
-      print('✅ Entry\'ler başarıyla yüklendi. Toplam: ${entryPersonList.length}');
+      debugPrint('✅ Entry\'ler başarıyla yüklendi. Toplam: ${entryPersonList.length}');
       
       // Entry'lerin içeriğini kontrol et
-      entryPersonList.forEach((entry) {
-        print('📌 Entry ID: ${entry.id}');
-        print('📌 İçerik: ${entry.content}');
-        print('📌 Kullanıcı: ${entry.user.name}');
-        print('📌 Topic: ${entry.topic?.name}');
-        print('-------------------');
-      });
+      for (var entry in entryPersonList) {
+        debugPrint('📌 Entry ID: ${entry.id}');
+        debugPrint('📌 İçerik: ${entry.content}');
+        debugPrint('📌 Kullanıcı: ${entry.user.name}');
+        debugPrint('📌 Topic: ${entry.topic?.name}');
+        debugPrint('-------------------');
+      }
     } catch (e, stackTrace) {
-      print('❌ Entry\'ler yüklenirken hata oluştu: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('❌ Entry\'ler yüklenirken hata oluştu: $e');
+      debugPrint('Stack trace: $stackTrace');
     }
   }
 }

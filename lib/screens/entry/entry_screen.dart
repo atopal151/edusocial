@@ -51,112 +51,109 @@ class EntryScreenState extends State<EntryScreen> {
       child: Scaffold(
         backgroundColor: const Color(0xfffafafa),
         appBar: UserAppBar(),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            debugPrint("🔄 Entry verileri yenileniyor...");
-            await entryController.fetchAndPrepareEntries();
-            debugPrint("✅ Entry verileri başarıyla yenilendi");
-          },
-          color: Color(0xFFEF5050),
-          backgroundColor: Color(0xfffafafa),
-          strokeWidth: 2.0,
-          displacement: 120.0,
-          edgeOffset: 10.0,
-          child: Obx(
-            () => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 🔍 Arama Alanı
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8),
-                  child: SearchTextField(
-                    label: "Entry ara",
-                    controller: entryController.entrySearchController,
-                    onChanged: (value) {
-                      final query = value.toLowerCase();
-                      entryController.displayEntries.assignAll(
-                        entryController.allDisplayEntries.where((item) {
-                          return item.entry.content
-                                  .toLowerCase()
-                                  .contains(query) ||
-                              (item.topicName?.toLowerCase().contains(query) ??
-                                  false) ||
-                              (item.categoryTitle
-                                      ?.toLowerCase()
-                                      .contains(query) ??
-                                  false);
-                        }).toList(),
-                      );
-                    },
+        body: Obx(
+          () => entryController.isEntryLoading.value
+              ? Center(
+                  child: GeneralLoadingIndicator(
+                    size: 48,
+                    color: const Color(0xFFEF5050),
                   ),
-                ),
+                )
+              : RefreshIndicator(
+                  onRefresh: () async {
+                    debugPrint("🔄 Entry verileri yenileniyor...");
+                    await entryController.fetchAndPrepareEntries();
+                    debugPrint("✅ Entry verileri başarıyla yenilendi");
+                  },
+                  color: Color(0xFFEF5050),
+                  backgroundColor: Color(0xfffafafa),
+                  strokeWidth: 2.0,
+                  displacement: 120.0,
+                  edgeOffset: 10.0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 🔍 Arama Alanı
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8),
+                        child: SearchTextField(
+                          label: "Entry ara",
+                          controller: entryController.entrySearchController,
+                          onChanged: (value) {
+                            final query = value.toLowerCase();
+                            entryController.displayEntries.assignAll(
+                              entryController.allDisplayEntries.where((item) {
+                                return item.entry.content
+                                        .toLowerCase()
+                                        .contains(query) ||
+                                    (item.topicName?.toLowerCase().contains(query) ??
+                                        false) ||
+                                    (item.categoryTitle
+                                            ?.toLowerCase()
+                                            .contains(query) ??
+                                        false);
+                              }).toList(),
+                            );
+                          },
+                        ),
+                      ),
 
-                const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-                // ➕ Yeni Konu Butonu
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CustomButton(
-                    height: 45,
-                    borderRadius: 15,
-                    text: "+ Yeni Konu Aç",
-                    onPressed: () => entryController.shareEntry(),
-                    isLoading: entryController.isEntryLoading,
-                    backgroundColor: const Color(0xfffb535c),
-                    textColor: Colors.white,
-                  ),
-                ),
+                      // ➕ Yeni Konu Butonu
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: CustomButton(
+                          height: 45,
+                          borderRadius: 15,
+                          text: "+ Yeni Konu Aç",
+                          onPressed: () => entryController.shareEntry(),
+                          isLoading: RxBool(false), // Loading durumunu kaldır
+                          backgroundColor: const Color(0xfffb535c),
+                          textColor: Colors.white,
+                        ),
+                      ),
 
-                const SizedBox(height: 10),
+                      const SizedBox(height: 10),
 
-                // 📄 Entry Listesi
-                Expanded(
-                  child: entryController.isEntryLoading.value
-                      ? Center(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 40),
-                            child: GeneralLoadingIndicator(
-                              size: 32,
-                              showIcon: false,
-                            ),
-                          ),
-                        )
-                      : entryController.displayEntries.isEmpty
-                          ? Center(
-                              child: Text(
-                                "Gösterilecek entry bulunamadı.",
-                                style:
-                                    GoogleFonts.inter(color: Color(0xff9ca3ae)),
-                              ),
-                            )
-                          : ListView.builder(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              itemCount: entryController.displayEntries.length,
-                              itemBuilder: (context, index) {
-                                final displayItem =
-                                    entryController.displayEntries[index];
-                                final EntryModel entry = displayItem.entry;
+                      // 📄 Entry Listesi
+                      Expanded(
+                        child: entryController.displayEntries.isEmpty
+                            ? Center(
+                                child: Text(
+                                  "Gösterilecek entry bulunamadı.",
+                                  style:
+                                      GoogleFonts.inter(color: Color(0xff9ca3ae)),
+                                ),
+                              )
+                            : ListView.builder(
+                                physics: AlwaysScrollableScrollPhysics(),
+                                itemCount: entryController.displayEntries.length,
+                                itemBuilder: (context, index) {
+                                  final displayItem =
+                                      entryController.displayEntries[index];
+                                  final EntryModel entry = displayItem.entry;
 
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0, vertical: 8.0),
-                                  child: EntryCard(
-                                    entry: entry,
-                                    topicName: displayItem.topicName,
-                                    categoryTitle: displayItem.categoryTitle,
-                                    onUpvote: () => entryController.voteEntry(
-                                        entry.id, "up"),
-                                    onDownvote: () => entryController.voteEntry(
-                                        entry.id, "down"),
-                                    onShare: () {
-                                      // Konu bilgilerini al
-                                      final topicName = displayItem.topicName ??
-                                          "Konu Bilgisi Yok";
-                                      final categoryTitle =
-                                          displayItem.categoryTitle ??
-                                              "Kategori Yok";
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: EntryCard(
+                                      entry: entry,
+                                      topicName: displayItem.topicName,
+                                      categoryTitle: displayItem.categoryTitle,
+                                      onUpvote: () => entryController.voteEntry(
+                                          entry.id, "up"),
+                                      onDownvote: () => entryController.voteEntry(
+                                          entry.id, "down"),
+                                      onShare: () {
+                                        // Konu bilgilerini al
+                                        final topicName = displayItem.topicName ??
+                                            "Konu Bilgisi Yok";
+                                        final categoryTitle =
+                                            displayItem.categoryTitle ??
+                                                "Kategori Yok";
 
-                                      final String shareText = """
+                                        final String shareText = """
 📝 **$topicName** (#${entry.id})
 
 🏷️ **Kategori:** $categoryTitle
@@ -172,26 +169,26 @@ ${entry.content}
 
 #EduSocial #Eğitim #$categoryTitle
 """;
-                                      Share.share(shareText);
-                                    },
-                                    onPressed: () {
-                                      Get.toNamed(Routes.entryDetail,
-                                          arguments: {'entry': entry});
-                                    },
-                                    onPressedProfile: () {
-                                      Get.to(() => PeopleProfileScreen(
-                                          username: entry.user.username));
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
+                                        Share.share(shareText);
+                                      },
+                                      onPressed: () {
+                                        Get.toNamed(Routes.entryDetail,
+                                            arguments: {'entry': entry});
+                                      },
+                                      onPressedProfile: () {
+                                        Get.to(() => PeopleProfileScreen(
+                                            username: entry.user.username));
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                      // RefreshIndicator için minimum yükseklik
+                      SizedBox(height: 50),
+                    ],
+                  ),
                 ),
-                // RefreshIndicator için minimum yükseklik
-                SizedBox(height: 50),
-              ],
-            ),
-          ),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:edusocial/components/cards/event_card.dart';
+import 'package:edusocial/components/widgets/custom_loading_indicator.dart';
 import 'package:edusocial/controllers/group_controller/group_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,7 +25,8 @@ class GroupDetailScreen extends StatefulWidget {
 
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
   final GroupController groupController = Get.put(GroupController());
-  final GroupChatDetailController chatController = Get.put(GroupChatDetailController());
+  final GroupChatDetailController chatController =
+      Get.put(GroupChatDetailController());
   late ScrollController documentsScrollController;
   late ScrollController linksScrollController;
   late ScrollController photosScrollController;
@@ -145,7 +147,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       body: Obx(
         () {
           final group = groupController.groupDetail.value;
-          if (group == null) return Center(child: CircularProgressIndicator());
+          if (group == null) {
+            return Center(
+              child: CustomLoadingIndicator(
+                size: 48,
+                color: const Color(0xFFEF5050),
+              ),
+            );
+          }
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(16),
@@ -226,13 +235,17 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       child: Column(
                         children: [
                           buildMemberAvatars(
-                            group.users.map((user) => (user['avatar_url'] ?? '').toString()).toList(),
+                            group.users
+                                .map((user) =>
+                                    (user['avatar_url'] ?? '').toString())
+                                .toList(),
                           ),
                           // Debug bilgisi
                           if (group.users.isEmpty)
                             Text(
                               'Katılımcı bulunamadı',
-                              style: TextStyle(fontSize: 10, color: Color(0xff9ca3ae)),
+                              style: TextStyle(
+                                  fontSize: 10, color: Color(0xff9ca3ae)),
                             ),
                         ],
                       ),
@@ -328,13 +341,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                 SizedBox(height: 24),
 
                 // GRUP MESAJLAŞMA VERİLERİ: Belgeler / Bağlantılar / Fotoğraflar
-                if (chatController.groupDocuments.isNotEmpty || 
-                    chatController.groupLinks.isNotEmpty || 
+                if (chatController.groupDocuments.isNotEmpty ||
+                    chatController.groupLinks.isNotEmpty ||
                     chatController.groupPhotos.isNotEmpty) ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                    
                       DefaultTabController(
                         length: 3,
                         child: Container(
@@ -352,10 +364,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                   indicator: UnderlineTabIndicator(
                                     borderSide: BorderSide(
                                         width: 2.0, color: Color(0xffef5050)),
-                                    insets: EdgeInsets.symmetric(horizontal: 16.0),
+                                    insets:
+                                        EdgeInsets.symmetric(horizontal: 16.0),
                                   ),
                                   labelStyle: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w600, fontSize: 13.28),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13.28),
                                   tabs: [
                                     Tab(text: "Belgeler"),
                                     Tab(text: "Bağlantılar"),
@@ -369,64 +383,86 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                     Obx(() {
                                       // Hem grup chat verilerinden hem de grup mesajlarından belgeleri birleştir
                                       final allDocuments = <DocumentModel>[];
-                                      
+
                                       // Grup chat verilerinden belgeler
-                                      allDocuments.addAll(chatController.groupDocuments);
-                                      
+                                      allDocuments.addAll(
+                                          chatController.groupDocuments);
+
                                       // Grup mesajlarından document türündeki mesajları belge olarak ekle
-                                      for (final message in chatController.messages) {
-                                        if (message.messageType == GroupMessageType.document) {
+                                      for (final message
+                                          in chatController.messages) {
+                                        if (message.messageType ==
+                                            GroupMessageType.document) {
                                           // Mesaj ID'sini belge ID'si olarak kullan
                                           final document = DocumentModel(
                                             id: message.id,
-                                            name: 'Belge - ${message.name} ${message.surname}',
+                                            name:
+                                                'Belge - ${message.name} ${message.surname}',
                                             sizeMb: 0.0, // Boyut bilgisi yok
-                                            humanCreatedAt: DateFormat('dd.MM.yyyy HH:mm').format(message.timestamp),
+                                            humanCreatedAt:
+                                                DateFormat('dd.MM.yyyy HH:mm')
+                                                    .format(message.timestamp),
                                             createdAt: message.timestamp,
-                                            url: message.content, // Belge URL'si
+                                            url:
+                                                message.content, // Belge URL'si
                                           );
-                                          
+
                                           // Aynı belgeyi tekrar eklemeyi önle
-                                          if (!allDocuments.any((doc) => doc.id == document.id)) {
+                                          if (!allDocuments.any(
+                                              (doc) => doc.id == document.id)) {
                                             allDocuments.add(document);
                                           }
                                         }
                                       }
-                                      
+
                                       // Belgeleri tarihe göre sırala (en yeni önce)
-                                      allDocuments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-                                      
+                                      allDocuments.sort((a, b) =>
+                                          b.createdAt.compareTo(a.createdAt));
+
                                       return allDocuments.isNotEmpty
                                           ? Scrollbar(
-                                              controller: documentsScrollController,
+                                              controller:
+                                                  documentsScrollController,
                                               trackVisibility: true,
                                               thumbVisibility: true,
                                               thickness: 5,
                                               radius: Radius.circular(15),
                                               child: ListView.builder(
-                                                controller: documentsScrollController,
+                                                controller:
+                                                    documentsScrollController,
                                                 itemCount: allDocuments.length,
                                                 itemBuilder: (context, index) {
-                                                  final doc = allDocuments[index];
+                                                  final doc =
+                                                      allDocuments[index];
                                                   return ListTile(
                                                     onTap: () async {
                                                       // Belgeyi açmak için URL'yi kullan
-                                                      if (doc.url != null && doc.url!.isNotEmpty) {
-                                                        final uri = Uri.parse(doc.url!);
-                                                        if (await canLaunchUrl(uri)) {
-                                                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                                      if (doc.url != null &&
+                                                          doc.url!.isNotEmpty) {
+                                                        final uri =
+                                                            Uri.parse(doc.url!);
+                                                        if (await canLaunchUrl(
+                                                            uri)) {
+                                                          await launchUrl(uri,
+                                                              mode: LaunchMode
+                                                                  .externalApplication);
                                                         }
                                                       }
                                                     },
                                                     leading: Container(
-                                                        padding: EdgeInsets.all(8),
+                                                        padding:
+                                                            EdgeInsets.all(8),
                                                         decoration: BoxDecoration(
-                                                            color: Color(0xfff5f6f7),
+                                                            color: Color(
+                                                                0xfff5f6f7),
                                                             borderRadius:
-                                                                BorderRadius.circular(50)),
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50)),
                                                         child: SvgPicture.asset(
                                                           "images/icons/document_icon.svg",
-                                                          colorFilter: ColorFilter.mode(
+                                                          colorFilter:
+                                                              ColorFilter.mode(
                                                             Color(0xff9ca3ae),
                                                             BlendMode.srcIn,
                                                           ),
@@ -435,15 +471,19 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                                       doc.name,
                                                       style: GoogleFonts.inter(
                                                           fontSize: 12,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Color(0xff414751)),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: Color(
+                                                              0xff414751)),
                                                     ),
                                                     subtitle: Text(
                                                       "${doc.sizeMb} Mb • ${doc.humanCreatedAt}",
                                                       style: GoogleFonts.inter(
                                                           fontSize: 12,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: Color(0xff9ca3ae)),
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: Color(
+                                                              0xff9ca3ae)),
                                                     ),
                                                   );
                                                 },
@@ -461,7 +501,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                     }),
 
                                     // GRUP CHAT BAĞLANTILARI
-                                    Obx(() => chatController.groupLinks.isNotEmpty
+                                    Obx(() => chatController
+                                            .groupLinks.isNotEmpty
                                         ? Scrollbar(
                                             controller: linksScrollController,
                                             trackVisibility: true,
@@ -470,41 +511,58 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                             radius: Radius.circular(15),
                                             child: ListView.builder(
                                               controller: linksScrollController,
-                                              itemCount: chatController.groupLinks.length,
+                                              itemCount: chatController
+                                                  .groupLinks.length,
                                               itemBuilder: (context, index) {
-                                                final link = chatController.groupLinks[index];
+                                                final link = chatController
+                                                    .groupLinks[index];
                                                 return ListTile(
                                                   onTap: () async {
-                                                    final uri = Uri.parse(link.url);
-                                                    if (await canLaunchUrl(uri)) {
-                                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                                    final uri =
+                                                        Uri.parse(link.url);
+                                                    if (await canLaunchUrl(
+                                                        uri)) {
+                                                      await launchUrl(uri,
+                                                          mode: LaunchMode
+                                                              .externalApplication);
                                                     }
                                                   },
                                                   leading: Container(
-                                                      padding: EdgeInsets.all(8),
+                                                      padding:
+                                                          EdgeInsets.all(8),
                                                       decoration: BoxDecoration(
-                                                          color: Color(0xfff5f6f7),
+                                                          color:
+                                                              Color(0xfff5f6f7),
                                                           borderRadius:
-                                                              BorderRadius.circular(50)),
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      50)),
                                                       child: Transform.rotate(
-                                                          angle: -45 * 3.1415926535 / 180,
+                                                          angle: -45 *
+                                                              3.1415926535 /
+                                                              180,
                                                           child: Icon(
                                                             Icons.link,
-                                                            color: Color(0xff9ca3ae),
+                                                            color: Color(
+                                                                0xff9ca3ae),
                                                           ))),
                                                   title: Text(
                                                     link.title,
                                                     style: GoogleFonts.inter(
                                                         fontSize: 12,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: Color(0xff414751)),
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff414751)),
                                                   ),
                                                   subtitle: Text(
                                                     link.url,
                                                     style: GoogleFonts.inter(
                                                         fontSize: 12,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: Color(0xff9ca3ae)),
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xff9ca3ae)),
                                                   ),
                                                 );
                                               },
@@ -521,7 +579,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                           )),
 
                                     // GRUP CHAT FOTOĞRAFLARI
-                                    Obx(() => chatController.groupPhotos.isNotEmpty
+                                    Obx(() => chatController
+                                            .groupPhotos.isNotEmpty
                                         ? Scrollbar(
                                             controller: photosScrollController,
                                             trackVisibility: true,
@@ -535,29 +594,41 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                                   top: 8,
                                                   bottom: 8),
                                               child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(20),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
                                                 child: Container(
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(20),
+                                                        BorderRadius.circular(
+                                                            20),
                                                   ),
                                                   child: GridView.builder(
-                                                    controller: photosScrollController,
+                                                    controller:
+                                                        photosScrollController,
                                                     gridDelegate:
                                                         SliverGridDelegateWithFixedCrossAxisCount(
                                                       crossAxisCount: 3,
                                                     ),
-                                                    itemCount: chatController.groupPhotos.length,
-                                                    itemBuilder: (context, index) {
+                                                    itemCount: chatController
+                                                        .groupPhotos.length,
+                                                    itemBuilder:
+                                                        (context, index) {
                                                       return Padding(
                                                         padding:
-                                                            const EdgeInsets.all(0.6),
+                                                            const EdgeInsets
+                                                                .all(0.6),
                                                         child: Image.network(
-                                                          getFullUrl(chatController.groupPhotos[index]),
+                                                          getFullUrl(chatController
+                                                                  .groupPhotos[
+                                                              index]),
                                                           fit: BoxFit.cover,
-                                                          errorBuilder: (context, error, stackTrace) {
-                                                            debugPrint('Error loading image: $error');
-                                                            return const Icon(Icons.error);
+                                                          errorBuilder:
+                                                              (context, error,
+                                                                  stackTrace) {
+                                                            debugPrint(
+                                                                'Error loading image: $error');
+                                                            return const Icon(
+                                                                Icons.error);
                                                           },
                                                         ),
                                                       );
@@ -613,7 +684,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                 if (event.location.isNotEmpty) {
                                   final uri = Uri.parse(event.location);
                                   if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    await launchUrl(uri,
+                                        mode: LaunchMode.externalApplication);
                                   }
                                 }
                               });

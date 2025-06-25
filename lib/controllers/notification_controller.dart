@@ -8,11 +8,6 @@ class NotificationController extends GetxController {
   var notifications = <NotificationModel>[].obs;
   var isLoading = false.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    // fetchNotifications(); // Login sırasında manuel olarak çağrılacak
-  }
 
   /// Bildirimleri çek
   Future<void> fetchNotifications() async {

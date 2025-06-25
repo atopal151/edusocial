@@ -6,9 +6,9 @@ class ShareOptionsBottomSheet extends StatelessWidget {
   final String postText;
 
   const ShareOptionsBottomSheet({
-    Key? key,
+    super.key,
     required this.postText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +129,7 @@ class ShareOptionsBottomSheet extends StatelessWidget {
   }
 
   void _copyToClipboard(BuildContext context, String text) {
-    // TODO: Implement clipboard functionality
+    
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Metin panoya kopyalandı"),

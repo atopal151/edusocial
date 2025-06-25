@@ -1,10 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class SocketService extends GetxService {
-  IO.Socket? _socket;
+  io.Socket? _socket;
   final RxBool isConnected = false.obs;
 
   // Stream Controllers for broadcasting events
@@ -24,11 +25,11 @@ class SocketService extends GetxService {
 
   // Socket başlat
   void connect(String jwtToken) {
-    print('🔌 SocketService.connect() çağrıldı');
-    print('🔌 Token: ${jwtToken.substring(0, 20)}...');
+    debugPrint('🔌 SocketService.connect() çağrıldı');
+    debugPrint('🔌 Token: ${jwtToken.substring(0, 20)}...');
     
     if (_socket != null && _socket!.connected) {
-      print('🔌 Socket zaten bağlı, yeni bağlantı kurulmuyor');
+      debugPrint('🔌 Socket zaten bağlı, yeni bağlantı kurulmuyor');
       return;
     }
 
@@ -37,10 +38,10 @@ class SocketService extends GetxService {
   }
 
   void _tryConnectWithUrl(String url, String jwtToken, String urlName) {
-    print('🔌 $urlName ile bağlantı deneniyor: $url');
+    debugPrint('🔌 $urlName ile bağlantı deneniyor: $url');
     
     // Socket.IO options
-    final options = IO.OptionBuilder()
+    final options = io.OptionBuilder()
         .setTransports(['websocket', 'polling']) // Hem websocket hem polling dene
         .setAuth({
           "auth": {
@@ -58,118 +59,118 @@ class SocketService extends GetxService {
         .setTimeout(10000) // 10 saniye timeout
         .build();
 
-    _socket = IO.io(url, options);
+    _socket = io.io(url, options);
 
-    print('🔌 Socket event dinleyicileri ayarlanıyor...');
+    debugPrint('🔌 Socket event dinleyicileri ayarlanıyor...');
     
     // Bağlantı eventleri
     _socket!.onConnect((_) {
       isConnected.value = true;
-      print('✅ Socket bağlı! ($urlName)');
-      print('✅ Socket ID: ${_socket!.id}');
+      debugPrint('✅ Socket bağlı! ($urlName)');
+      debugPrint('✅ Socket ID: ${_socket!.id}');
     });
     
     _socket!.onDisconnect((_) {
       isConnected.value = false;
-      print('❌ Socket bağlantısı kesildi! ($urlName)');
+      debugPrint('❌ Socket bağlantısı kesildi! ($urlName)');
     });
     
     _socket!.onConnectError((err) {
       isConnected.value = false;
-      print('❌ Socket bağlantı hatası ($urlName): $err');
-      print('❌ Hata tipi: ${err.runtimeType}');
+      debugPrint('❌ Socket bağlantı hatası ($urlName): $err');
+      debugPrint('❌ Hata tipi: ${err.runtimeType}');
       
       // Eğer bu URL başarısız olursa, diğer URL'leri dene
       if (url == _socketUrl) {
-        print('🔄 Diğer URL\'ler deneniyor...');
+        debugPrint('🔄 Diğer URL\'ler deneniyor...');
         Future.delayed(Duration(seconds: 2), () {
           _tryConnectWithUrl(_socketUrlWithPort, jwtToken, 'Port 3000');
         });
       } else if (url == _socketUrlWithPort) {
-        print('🔄 Son URL deneniyor...');
+        debugPrint('🔄 Son URL deneniyor...');
         Future.delayed(Duration(seconds: 2), () {
           _tryConnectWithUrl(_socketUrlWithPath, jwtToken, 'Socket.io Path');
         });
       } else {
-        print('❌ Tüm URL\'ler başarısız oldu!');
-        print('🔍 Lütfen sunucu yöneticisi ile iletişime geçin.');
+        debugPrint('❌ Tüm URL\'ler başarısız oldu!');
+        debugPrint('🔍 Lütfen sunucu yöneticisi ile iletişime geçin.');
       }
     });
     
     _socket!.onError((err) {
       isConnected.value = false;
-      print('❌ Socket genel hata ($urlName): $err');
+      debugPrint('❌ Socket genel hata ($urlName): $err');
     });
 
     // Reconnection events
     _socket!.onReconnect((_) {
-      print('🔄 Socket yeniden bağlandı! ($urlName)');
+      debugPrint('🔄 Socket yeniden bağlandı! ($urlName)');
     });
     
     _socket!.onReconnectAttempt((attemptNumber) {
-      print('🔄 Yeniden bağlanma denemesi ($urlName): $attemptNumber');
+      debugPrint('🔄 Yeniden bağlanma denemesi ($urlName): $attemptNumber');
     });
     
     _socket!.onReconnectError((error) {
-      print('❌ Yeniden bağlanma hatası ($urlName): $error');
+      debugPrint('❌ Yeniden bağlanma hatası ($urlName): $error');
     });
 
     // Event dinleyiciler
-    print('🔌 Event dinleyicileri ayarlanıyor...');
+    debugPrint('🔌 Event dinleyicileri ayarlanıyor...');
     // 1. Birebir mesaj
     _socket!.on('conversation:new_message', (data) {
-      print('📨 Birebir mesaj geldi (SocketService): $data');
+      debugPrint('📨 Birebir mesaj geldi (SocketService): $data');
       _privateMessageController.add(data);
     });
     // 2. Grup mesajı
     _socket!.on('group_conversation:new_message', (data) {
-      print('📨 Grup mesajı geldi (SocketService): $data');
+      debugPrint('📨 Grup mesajı geldi (SocketService): $data');
       _groupMessageController.add(data);
     });
     // 3. Okunmamış mesaj sayısı
     _socket!.on('conversation:un_read_message_count', (data) {
-      print('📨 Okunmamış mesaj sayısı (SocketService): $data');
+      debugPrint('📨 Okunmamış mesaj sayısı (SocketService): $data');
       _unreadMessageCountController.add(data);
     });
 
-    print('🔌 Socket bağlantısı başlatılıyor... ($urlName)');
+    debugPrint('🔌 Socket bağlantısı başlatılıyor... ($urlName)');
     _socket!.connect();
     
     // Bağlantı durumunu kontrol et
     Future.delayed(Duration(seconds: 5), () {
-      print('🔍 Socket bağlantı durumu kontrol ediliyor... ($urlName)');
-      print('🔍 isConnected.value: ${isConnected.value}');
-      print('🔍 _socket?.connected: ${_socket?.connected}');
-      print('🔍 _socket?.id: ${_socket?.id}');
+      debugPrint('🔍 Socket bağlantı durumu kontrol ediliyor... ($urlName)');
+      debugPrint('🔍 isConnected.value: ${isConnected.value}');
+      debugPrint('🔍 _socket?.connected: ${_socket?.connected}');
+      debugPrint('🔍 _socket?.id: ${_socket?.id}');
     });
   }
 
   // Mesaj gönderme
   void sendMessage(String event, dynamic data) {
-    print('📤 Mesaj gönderiliyor: $event');
-    print('📤 Data: $data');
+    debugPrint('📤 Mesaj gönderiliyor: $event');
+    debugPrint('📤 Data: $data');
     if (_socket != null && _socket!.connected) {
       _socket!.emit(event, data);
-      print('✅ Mesaj gönderildi');
+      debugPrint('✅ Mesaj gönderildi');
     } else {
-      print('❌ Socket bağlı değil, mesaj gönderilemedi');
-      print('❌ Socket durumu: ${_socket?.connected}');
+      debugPrint('❌ Socket bağlı değil, mesaj gönderilemedi');
+      debugPrint('❌ Socket durumu: ${_socket?.connected}');
     }
   }
 
   // Bağlantıyı kapat
   void disconnect() {
-    print('🔌 Socket bağlantısı kapatılıyor...');
+    debugPrint('🔌 Socket bağlantısı kapatılıyor...');
     _socket?.disconnect();
     isConnected.value = false;
-    print('✅ Socket bağlantısı kapatıldı');
+    debugPrint('✅ Socket bağlantısı kapatıldı');
   }
 
   // Dinleyicileri temizle
   void removeAllListeners() {
-    print('🔌 Socket dinleyicileri temizleniyor...');
+    debugPrint('🔌 Socket dinleyicileri temizleniyor...');
     _socket?.clearListeners();
-    print('✅ Socket dinleyicileri temizlendi');
+    debugPrint('✅ Socket dinleyicileri temizlendi');
   }
 
   @override

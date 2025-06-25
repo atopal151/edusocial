@@ -90,7 +90,7 @@ class EntryCard extends StatelessWidget {
                           color: Color(0xff414751)),
                     ),
                     Text(
-                      formatSimpleDateClock(entry.human_created_at),
+                      formatSimpleDateClock(entry.humancreatedat),
                       style: GoogleFonts.inter(
                           color: Color(0xff9ca3ae), fontSize: 10),
                     ),
@@ -127,13 +127,13 @@ class EntryCard extends StatelessWidget {
                 IconButton(
                   icon: Container(
                     decoration: BoxDecoration(
-                        color: (entry.is_like ?? false)
+                        color: (entry.islike ?? false)
                             ? Colors.green.withAlpha(50)
                             : const Color(0xfff6f6f6),
                         borderRadius: BorderRadius.all(Radius.circular(50))),
                     child: Icon(
                       Icons.keyboard_arrow_up,
-                      color: (entry.is_like ?? false)
+                      color: (entry.islike ?? false)
                           ? Colors.green
                           : const Color(0xff414751),
                       size: 18,
@@ -142,19 +142,19 @@ class EntryCard extends StatelessWidget {
                   onPressed: onUpvote,
                 ),
                 Text(
-                  entry.upvotes_count.toString(),
+                  entry.upvotescount.toString(),
                   style: GoogleFonts.inter(fontSize: 10),
                 ),
                 IconButton(
                   icon: Container(
                     decoration: BoxDecoration(
-                        color: (entry.is_dislike ?? false)
+                        color: (entry.isdislike ?? false)
                             ? Colors.red.withAlpha(50)
                             : const Color(0xfff6f6f6),
                         borderRadius: BorderRadius.all(Radius.circular(50))),
                     child: Icon(
                       Icons.keyboard_arrow_down,
-                      color: (entry.is_dislike ?? false)
+                      color: (entry.isdislike ?? false)
                           ? Colors.red
                           : const Color(0xff414751),
                       size: 18,
@@ -164,7 +164,7 @@ class EntryCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    entry.downvotes_count.toString(),
+                      entry.downvotescount.toString(),
                     style: GoogleFonts.inter(fontSize: 10),
                   ),
                 ),

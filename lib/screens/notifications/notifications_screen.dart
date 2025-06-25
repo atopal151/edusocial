@@ -149,11 +149,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     // Takip istekleri için butonlar
     if (notif.type == 'follow-join-request' || notif.type == 'follow-request') {
       debugPrint("🔍 Building button for notification:");
-      debugPrint("🔍   - isType: "+notif.type);
-      debugPrint("🔍   - isFollowing: "+notif.isFollowing.toString());
-      debugPrint("🔍   - isFollowingPending: "+notif.isFollowingPending.toString());
-      debugPrint("🔍   - isAccepted: "+notif.isAccepted.toString());
-      debugPrint("🔍   - isRejected: "+notif.isRejected.toString());
+      debugPrint("🔍   - isType: ${notif.type}");
+      debugPrint("🔍   - isFollowing: ${notif.isFollowing.toString()}");
+      debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending.toString()}");
+      debugPrint("🔍   - isAccepted: ${notif.isAccepted.toString()}");
+      debugPrint("🔍   - isRejected: ${notif.isRejected.toString()}");
 
       if (notif.isAccepted) {
         debugPrint("🔍   - Durum: Onaylandı");

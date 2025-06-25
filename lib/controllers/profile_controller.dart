@@ -42,11 +42,6 @@ class ProfileController extends GetxController {
   // 📦 Takip edilenler listesi (Mock)
   var followingList = [].obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    // loadProfile(); // Login sırasında manuel olarak çağrılacak
-  }
 
 String formatSimpleDate(String dateStr) {
   if (dateStr.isEmpty) return '';

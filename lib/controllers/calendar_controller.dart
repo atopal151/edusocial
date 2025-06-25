@@ -188,7 +188,7 @@ class CalendarController extends GetxController {
                                   onColorChanged: (color) {
                                     selectedColor.value = color;
                                   },
-                                  showLabel: true,
+                                  labelTypes: [],
                                   pickerAreaHeightPercent: 0.8,
                                 ),
                               ),

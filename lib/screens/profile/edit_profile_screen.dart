@@ -165,9 +165,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hint: Text(
               "Hesap Tipi Seçimi",
               style: GoogleFonts.inter(
-                fontSize: 14,
+                fontSize: 13.28,
                 fontWeight: FontWeight.w400,
-                color: Colors.grey.shade600,
+                color: Color(0xff9ca3ae),
               ),
             ),
             items: ['public', 'private'].map((type) {
@@ -176,9 +176,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Text(
                   type.capitalizeFirst ?? '',
                   style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    fontSize: 13.28,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff414751),
                   ),
                 ),
               );
@@ -201,7 +201,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color(0xffffffff),
           borderRadius: BorderRadius.circular(50),
         ),
         child: DropdownButtonHideUnderline(
@@ -211,9 +211,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hint: Text(
               "Dil Seçimi",
               style: GoogleFonts.inter(
-                fontSize: 14,
+                fontSize: 13.28,
                 fontWeight: FontWeight.w400,
-                color: Colors.grey.shade600,
+                color: Color(0xff9ca3ae),
               ),
             ),
             items: controller.languages.map((language) {
@@ -223,9 +223,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   language.name,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    fontSize: 13.28,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff414751),
                   ),
                 ),
               );
@@ -248,7 +248,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color(0xffffffff),
           borderRadius: BorderRadius.circular(50),
         ),
         child: DropdownButtonHideUnderline(
@@ -260,9 +260,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hint: Text(
               "Okul Seçimi",
               style: GoogleFonts.inter(
-                fontSize: 14,
+                fontSize: 13.28,
                 fontWeight: FontWeight.w400,
-                color: Colors.grey.shade600,
+                color: Color(0xff9ca3ae),
               ),
             ),
             items: controller.userSchools.map((school) {
@@ -272,9 +272,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   school['name'],
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    fontSize: 13.28,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff414751),
                   ),
                 ),
               );
@@ -297,7 +297,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Color(0xffffffff),
           borderRadius: BorderRadius.circular(50),
         ),
         child: DropdownButtonHideUnderline(
@@ -309,9 +309,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hint: Text(
               "Bölüm Seçimi",
               style: GoogleFonts.inter(
-                fontSize: 14,
+                fontSize: 13.28,
                 fontWeight: FontWeight.w400,
-                color: Colors.grey.shade600,
+                color: Color(0xff9ca3ae),
               ),
             ),
             items: controller.userDepartments.map((department) {
@@ -321,9 +321,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   department['title'],
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    fontSize: 13.28,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff414751),
                   ),
                 ),
               );
@@ -466,11 +466,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SizedBox(height: 5),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Color(0xffffffff),
             borderRadius: BorderRadius.circular(50),
           ),
           child: TextField(
             controller: controller,
+            style: GoogleFonts.inter(
+                color: Color(0xff414751),
+                fontSize: 13.28,
+                fontWeight: FontWeight.w400),
             decoration: InputDecoration(
               prefixText: prefix.isNotEmpty ? "$prefix " : null,
               prefixStyle: GoogleFonts.inter(color: Color(0xffd0d4db)),
@@ -510,7 +514,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 alignment:
                     value.value ? Alignment.centerRight : Alignment.centerLeft,
                 decoration: BoxDecoration(
-                  color: Colors.white, // track arka planı tamamen kaldırıldı
+                  color: Color(0xffffffff), // track arka planı tamamen kaldırıldı
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Container(
@@ -537,7 +541,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Color(0xffffffff),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Row(
@@ -557,7 +561,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: const Icon(
                       Icons.close,
                       size: 14,
-                      color: Colors.black54,
+                    color: Color(0xff414751),
                     ),
                   ),
                 ],
@@ -571,7 +575,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Text(
       title,
       style: GoogleFonts.inter(
-          fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xff414751)),
+          fontWeight: FontWeight.w600, fontSize: 13.28, color: Color(0xff414751)),
     );
   }
 }

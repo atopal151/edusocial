@@ -24,11 +24,7 @@ class CustomLoadingIndicator extends StatelessWidget {
             strokeWidth: strokeWidth,
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
-          Icon(
-            Icons.group,
-            size: size * 0.5,
-            color: color.withAlpha(120),
-          ),
+          
         ],
       ),
     );

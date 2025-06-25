@@ -36,7 +36,7 @@ Widget buildGroupSuggestionCard(GroupSuggestionModel group) {
 
         // 🔹 Grup Profili (Yuvarlak Avatar)
         Positioned(
-          top: 5,
+          top: 10,
           left: 10,
           child: CircleAvatar(
             radius: 20,

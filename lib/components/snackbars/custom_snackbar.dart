@@ -23,7 +23,7 @@ class CustomSnackbar {
       messageText: Text(
         message,
         style: GoogleFonts.inter(
-          color: const Color(0xFF414751).withOpacity(0.8),
+          color: const Color(0xFF414751).withValues(alpha: 0.8),
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),

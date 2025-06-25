@@ -58,7 +58,7 @@ class PeopleProfileService {
         return null;
       }
     } catch (e) {
-      print("❗ fetchUserById error: $e");
+      debugPrint("❗ fetchUserById error: $e");
       return null;
     }
   }
@@ -131,7 +131,7 @@ class PeopleProfileService {
 
       return false;
     } catch (e) {
-      print("❗ unfollowUser error: $e");
+      debugPrint("❗ unfollowUser error: $e");
       return false;
     }
   }

@@ -1,5 +1,4 @@
 import 'package:edusocial/controllers/social/chat_detail_controller.dart';
-import 'package:edusocial/models/user_chat_detail_model.dart';
 import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_app_bar.dart';
 import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_body.dart';
 // import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_bottom.dart';

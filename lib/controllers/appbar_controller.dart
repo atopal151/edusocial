@@ -11,11 +11,6 @@ class AppBarController extends GetxController {
   final NavigationController navController = Get.find<NavigationController>();
   final ProfileService _profileService = ProfileService(); // 🔹 servisi ekledik
 
-  @override
-  void onInit() {
-    super.onInit();
-    // fetchAndSetProfileImage(); // Login sırasında manuel olarak çağrılacak
-  }
 
   /// 🔄 Avatar'ı backend'den al ve UI'ya yansıt
   Future<void> fetchAndSetProfileImage() async {

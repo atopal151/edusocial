@@ -7,7 +7,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../controllers/search_text_controller.dart';
 import '../buttons/custom_button.dart';
 import '../buttons/icon_button.dart';
-import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 
 class EventCard extends StatelessWidget {
@@ -19,14 +18,14 @@ class EventCard extends StatelessWidget {
   final VoidCallback onLocation;
 
   const EventCard({
-    Key? key,
+    super.key,
     required this.eventTitle,
     required this.eventDescription,
     required this.eventDate,
     required this.eventImage,
     required this.onShare,
     required this.onLocation,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

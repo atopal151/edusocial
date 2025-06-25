@@ -5,6 +5,7 @@ import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/profile_controller.dart';
 import 'group_suggestion_card.dart';
 
@@ -47,12 +48,12 @@ Widget buildProfileDetails() {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     /// **Okul Bilgisi**
-                    const Text(
+                    Text(
                       "Okuduğu Okul",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1F1F1F),
+                        color: Color(0xff414751),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -65,7 +66,8 @@ Widget buildProfileDetails() {
                                       ?.toString()
                                       .isNotEmpty ??
                                   false)
-                              ? NetworkImage(profileData.school!.logo.toString())
+                              ? NetworkImage(
+                                  profileData.school!.logo.toString())
                               : AssetImage('images/school_logo.png')
                                   as ImageProvider,
                         ),
@@ -74,19 +76,19 @@ Widget buildProfileDetails() {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData.school?.name?? "Okul bilgisi yok",
-                              style: const TextStyle(
+                              profileData.school?.name ?? "Okul bilgisi yok",
+                              style: GoogleFonts.inter(
                                 fontSize: 13.28,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF414751),
+                                color: Color(0xff414751),
                               ),
                             ),
                             Text(
                               "${profileData.schoolDepartment?.title ?? "Bölüm bilgisi yok"} ",
-                              style: const TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF9CA3AE),
+                                color: Color(0xff9ca3ae),
                               ),
                             ),
                           ],
@@ -96,16 +98,17 @@ Widget buildProfileDetails() {
                     const SizedBox(height: 20),
 
                     /// **Kişisel Bilgiler**
-                    const Text(
+                    Text(
                       "Kişisel Bilgiler",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1F1F1F),
+                        color: Color(0xff414751),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Column(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildPersonalInfo(
                           icon: SvgPicture.asset(
@@ -120,9 +123,6 @@ Widget buildProfileDetails() {
                           label: "Doğum Tarihi",
                           value: formatSimpleDate(profileData.birthDate),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
                         _buildPersonalInfo(
                           icon: SvgPicture.asset(
                             "images/icons/profile_tab_icon.svg",
@@ -136,17 +136,20 @@ Widget buildProfileDetails() {
                           label: "E-posta Adresi",
                           value: profileData.email,
                         ),
+                        const SizedBox(
+                          width: 10,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 20),
 
                     /// **Aldığı Dersler**
-                    const Text(
+                    Text(
                       "Aldığı Dersler",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1F1F1F),
+                        color: Color(0xff414751),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -171,12 +174,12 @@ Widget buildProfileDetails() {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Katıldığı Gruplar",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xff1F1F1F),
+                        color: Color(0xff414751),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -233,18 +236,18 @@ Widget _buildPersonalInfo(
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              color: Color(0xFF9CA3AE),
+              color: Color(0xff9ca3ae),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF414751),
+              color: Color(0xff414751),
             ),
           ),
         ],

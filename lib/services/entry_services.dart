@@ -228,18 +228,7 @@ class EntryServices {
           return EntryModel.fromJson(json);
         }).toList();
 
-        // debugPrint("✅ Successfully parsed ${entries.length} entries");
-        entries.forEach((entry) {
-          // debugPrint("📦 Entry ID: ${entry.id}");
-          // debugPrint("📦 Entry Content: ${entry.content}");
-          // debugPrint("📦 Entry Upvotes: ${entry.upvotes_count}");
-          // debugPrint("📦 Entry Downvotes: ${entry.downvotes_count}");
-          // debugPrint("📦 Entry Created At: ${entry.human_created_at}");
-          // debugPrint("📦 Entry Topic: ${entry.topic?.name}");
-          // debugPrint("📦 Entry Category: ${entry.topic?.category?.title}");
-          // debugPrint("📦 Entry User: ${entry.user.name}");
-          // debugPrint("-------------------");
-        });
+      
 
         return entries;
       } else {
@@ -254,12 +243,12 @@ class EntryServices {
 
   static Future<List<EntryModel>> fetchEntries() async {
     try {
-      print('🔍 Fetching all entries');
+      debugPrint('🔍 Fetching all entries');
       final token = await GetStorage().read('token');
-      print('🔑 Token: ${token != null ? 'Var' : 'Yok'}');
+      debugPrint('🔑 Token: ${token != null ? 'Var' : 'Yok'}');
 
       if (token == null) {
-        print('❌ Token bulunamadı!');
+        debugPrint('❌ Token bulunamadı!');
         return [];
       }
 
@@ -277,41 +266,41 @@ class EntryServices {
         }),
       );
 
-      print('📥 All entries status code: ${response.statusCode}');
-      print('📥 All entries full response: ${response.body}');
+      debugPrint('📥 All entries status code: ${response.statusCode}');
+      debugPrint('📥 All entries full response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> entries = jsonBody['data'] ?? [];
-        print('📦 Alınan entry sayısı: ${entries.length}');
+        debugPrint('📦 Alınan entry sayısı: ${entries.length}');
 
         if (entries.isEmpty) {
-          print('⚠️ Hiç entry bulunamadı!');
+          debugPrint('⚠️ Hiç entry bulunamadı!');
           return [];
         }
 
-        print('📝 Entry\'ler parse ediliyor...');
+        debugPrint('📝 Entry\'ler parse ediliyor...');
         final List<EntryModel> entryList = entries.map((entry) {
-          print('📌 Entry detayları:');
-          print('   ID: ${entry['id']}');
-          print('   İçerik: ${entry['content']}');
-          print('   Upvote: ${entry['upvote_count']}');
-          print('   Downvote: ${entry['downvote_count']}');
-          print('   Oluşturulma: ${entry['human_created_at']}');
-          print('   Topic: ${entry['topic']?['name']}');
-          print('   Kategori: ${entry['topic']?['topic_category']?['title']}');
-          print('   Kullanıcı: ${entry['user']?['name']}');
+          debugPrint('📌 Entry detayları:');
+          debugPrint('   ID: ${entry['id']}');
+          debugPrint('   İçerik: ${entry['content']}');
+          debugPrint('   Upvote: ${entry['upvote_count']}');
+          debugPrint('   Downvote: ${entry['downvote_count']}');
+          debugPrint('   Oluşturulma: ${entry['human_created_at']}');
+          debugPrint('   Topic: ${entry['topic']?['name']}');
+          debugPrint('   Kategori: ${entry['topic']?['topic_category']?['title']}');
+          debugPrint('   Kullanıcı: ${entry['user']?['name']}');
           return EntryModel.fromJson(entry);
         }).toList();
 
-        print('✅ Entry\'ler başarıyla yüklendi');
+        debugPrint('✅ Entry\'ler başarıyla yüklendi');
         return entryList;
       } else {
-        print('❌ All Entries Error: ${response.statusCode} - ${response.body}');
+        debugPrint('❌ All Entries Error: ${response.statusCode} - ${response.body}');
         return [];
       }
     } catch (e) {
-      print('❌ All Entries Error: $e');
+          debugPrint('❌ All Entries Error: $e');
       return [];
     }
   }

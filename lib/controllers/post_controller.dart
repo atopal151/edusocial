@@ -17,12 +17,6 @@ class PostController extends GetxController {
   var selectedPost = Rxn<PostModel>();
   var isPostDetailLoading = false.obs;
   
-  @override
-  void onInit() {
-    super.onInit();
-    // fetchHomePosts(); // Login sırasında manuel olarak çağrılacak
-    //debugPrint("🔄 PostController onInit - postHomeList.length: ${postHomeList.length}");
-  }
 
 //POST GET
   Future<void> fetchHomePosts() async {

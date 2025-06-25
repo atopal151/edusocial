@@ -17,7 +17,7 @@ class TopicModel {
   final int entryCountLast24;
   final String badgeType;
   final TopicCategoryModel? category;
-  final EntryModel? last_entry;
+  final EntryModel? lastentry;
   final UserModel? user;
 
   TopicModel({
@@ -34,7 +34,7 @@ class TopicModel {
     required this.entryCountLast24,
     required this.badgeType,
     this.category,
-    this.last_entry,
+    this.lastentry,
     this.user,
   });
 
@@ -58,7 +58,7 @@ class TopicModel {
       category: json['category'] != null
           ? TopicCategoryModel.fromJson(json['category'])
           : null,
-      last_entry: json['last_entry'] != null
+      lastentry: json['last_entry'] != null
           ? EntryModel.fromJson(json['last_entry'])
           : null,
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
@@ -79,7 +79,7 @@ class TopicModel {
       'entry_count': entryCount,
       'entry_count_last_24': entryCountLast24,
       'badge_type': badgeType,
-      'last_entry': last_entry?.toJson(),
+      'last_entry': lastentry?.toJson(),
       'user': user?.toJson(),
     };
   }
@@ -97,7 +97,7 @@ class TopicModel {
     int? entryCount,
     int? entryCountLast24,
     String? badgeType,
-    EntryModel? last_entry,
+    EntryModel? lastentry,
     UserModel? user,
     TopicCategoryModel? category,
   }) {
@@ -114,7 +114,7 @@ class TopicModel {
       entryCount: entryCount ?? this.entryCount,
       entryCountLast24: entryCountLast24 ?? this.entryCountLast24,
       badgeType: badgeType ?? this.badgeType,
-      last_entry: last_entry ?? this.last_entry,
+      lastentry: lastentry ?? this.lastentry,
       user: user ?? this.user,
       category: category ?? this.category,
     );

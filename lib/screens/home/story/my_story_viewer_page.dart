@@ -32,8 +32,9 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
     _animationController?.dispose();
 
     final story = storyController.getMyStory();
-    if (story == null || story.storyUrls.length <= 1)
+    if (story == null || story.storyUrls.length <= 1) {
       return; // güvenlik kontrolü
+    }
 
     _animationController = AnimationController(
       vsync: this,
@@ -192,7 +193,7 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
                             GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       Text(
-                        timeAgo(story.created_at),
+                        timeAgo(story.createdat),
                         style: GoogleFonts.inter(
                             color: Color(0xffffffff), fontSize: 10, fontWeight: FontWeight.w400),
                       ),

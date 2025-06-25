@@ -1,6 +1,5 @@
 import 'package:edusocial/models/chat_models/chat_detail_model.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:edusocial/components/widgets/chat_widget/link_media_text_message_widget.dart';
 import 'package:edusocial/components/widgets/chat_widget/text_message_widget.dart';
 import 'package:edusocial/components/widgets/chat_widget/link_messaje_widget.dart';

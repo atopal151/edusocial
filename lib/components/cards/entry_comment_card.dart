@@ -53,14 +53,14 @@ class EntryCommentCard extends StatelessWidget {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: (entry.is_like ?? false)
+                          color: (entry.islike ?? false)
                               ? Color(0xFF4CAF50).withAlpha(50)
                               : const Color(0xfff6f6f6),
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Icon(
                           Icons.keyboard_arrow_up,
-                          color: (entry.is_like ?? false)
+                          color: (entry.islike ?? false)
                               ? Color(0xFF4CAF50)
                               : const Color(0xff414751),
                           size: 18,
@@ -71,7 +71,7 @@ class EntryCommentCard extends StatelessWidget {
                       width: 5,
                     ),
                     Text(
-                      entry.upvotes_count.toString(),
+                      entry.upvotescount.toString(),
                       style: GoogleFonts.inter(fontSize: 10, color: Color(0xff9ca3ae)),
                     ),
                     SizedBox(
@@ -83,14 +83,14 @@ class EntryCommentCard extends StatelessWidget {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: (entry.is_dislike ?? false)
+                          color: (entry.isdislike ?? false)
                               ? Color(0xFFEF5050).withAlpha(50)
                               : const Color(0xfff6f6f6),
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: Icon(
                           Icons.keyboard_arrow_down,
-                          color: (entry.is_dislike ?? false)
+                          color: (entry.isdislike ?? false)
                               ? Color(0xFFEF5050)
                               : const Color(0xff414751),
                           size: 18,
@@ -101,7 +101,7 @@ class EntryCommentCard extends StatelessWidget {
                       width: 5,
                     ),
                     Text(
-                      entry.downvotes_count.toString(), // downvotes_count kullanıldı
+                      entry.downvotescount.toString(), // downvotes_count kullanıldı
                       style: GoogleFonts.inter(fontSize: 10, color: Color(0xff9ca3ae)),
                     ),
                   ],
@@ -157,7 +157,7 @@ class EntryCommentCard extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  entry.human_created_at,
+                                  entry.humancreatedat,
                                   style: GoogleFonts.inter(
                                       color: Color(0xff9ca3ae), fontSize: 10),
                                 ),

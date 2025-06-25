@@ -29,13 +29,13 @@ class EntryDetailController extends GetxController {
         debugPrint("📝 Sıralama öncesi yorumlar:");
         for (int i = 0; i < comments.length; i++) {
           final comment = comments[i];
-          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.created_at}, Upvotes: ${comment.upvotes_count}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
+          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.createdat}, Upvotes: ${comment.upvotescount}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
         }
         
         // Yorumları tarihe göre sırala (en yeni en üstte)
         comments.sort((a, b) {
-          final dateA = a.created_at;
-          final dateB = b.created_at;
+          final dateA = a.createdat;
+          final dateB = b.createdat;
           
           if (dateA == null && dateB == null) return 0;
           if (dateA == null) return 1; // null değerler sona
@@ -48,7 +48,7 @@ class EntryDetailController extends GetxController {
         debugPrint("📝 Sıralama sonrası yorumlar:");
         for (int i = 0; i < comments.length; i++) {
           final comment = comments[i];
-          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.created_at}, Upvotes: ${comment.upvotes_count}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
+          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.createdat}, Upvotes: ${comment.upvotescount}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
         }
         
         entryComments.value = comments;
@@ -74,10 +74,10 @@ class EntryDetailController extends GetxController {
     }
     
     final currentComment = entryComments[commentIndex];
-    int newUpvotes = currentComment.upvotes_count;
-    int newDownvotes = currentComment.downvotes_count;
-    bool? newIsLike = currentComment.is_like;
-    bool? newIsDislike = currentComment.is_dislike;
+      int newUpvotes = currentComment.upvotescount;
+    int newDownvotes = currentComment.downvotescount;
+    bool? newIsLike = currentComment.islike;
+    bool? newIsDislike = currentComment.isdislike;
 
     if (vote == "up") {
       if (newIsLike == true) {
@@ -110,20 +110,16 @@ class EntryDetailController extends GetxController {
     }
 
     final updatedComment = currentComment.copyWith(
-      upvotes_count: newUpvotes,
-      downvotes_count: newDownvotes,
-      is_like: newIsLike,
-      is_dislike: newIsDislike,
+      upvotescount: newUpvotes,
+      downvotescount: newDownvotes,
+      islike: newIsLike,
+      isdislike: newIsDislike,
     );
 
     entryComments[commentIndex] = updatedComment;
     debugPrint("✅ Yorum oy durumu güncellendi: Upvotes: $newUpvotes, Downvotes: $newDownvotes, IsLike: $newIsLike, IsDislike: $newIsDislike");
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   @override
   void onClose() {

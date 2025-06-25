@@ -51,7 +51,6 @@ class ChatDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         InkWell(
           onTap: () {
-            // TODO: Menü işlemleri
           },
           child: Container(
             decoration: BoxDecoration(
