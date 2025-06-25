@@ -50,12 +50,12 @@ class PersonEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Debug: Avatar bilgilerini kontrol et
-    debugPrint("🖼️ PersonEntryCard - Avatar Debug:");
-    debugPrint("  - User ID: ${user.id}");
-    debugPrint("  - User Name: ${user.name} ${user.surname}");
-    debugPrint("  - Avatar URL: '${user.avatarUrl}'");
-    debugPrint("  - Avatar URL boş mu: ${user.avatarUrl.isEmpty}");
-    debugPrint("  - Avatar URL uzunluğu: ${user.avatarUrl.length}");
+    //debugPrint("🖼️ PersonEntryCard - Avatar Debug:");
+    //debugPrint("  - User ID: ${user.id}");
+    //debugPrint("  - User Name: ${user.name} ${user.surname}");
+    //debugPrint("  - Avatar URL: '${user.avatarUrl}'");
+    //debugPrint("  - Avatar URL boş mu: ${user.avatarUrl.isEmpty}");
+    //debugPrint("  - Avatar URL uzunluğu: ${user.avatarUrl.length}");
     
     return InkWell(
       onTap: () {
@@ -83,14 +83,14 @@ class PersonEntryCard extends StatelessWidget {
                         backgroundImage: user.avatarUrl.isNotEmpty
                             ? NetworkImage(user.avatarUrl)
                             : null,
-                        child: user.avatarUrl.isEmpty
-                            ? const Icon(Icons.person, size: 20)
-                            : null,
                         onBackgroundImageError: user.avatarUrl.isNotEmpty
                             ? (exception, stackTrace) {
                                 debugPrint("❌ Profil resmi yüklenemedi: ${user.avatarUrl}");
                                 debugPrint("❌ Hata: $exception");
                               }
+                            : null,
+                        child: user.avatarUrl.isEmpty
+                            ? const Icon(Icons.person, size: 20)
                             : null,
                       ),
                     ),

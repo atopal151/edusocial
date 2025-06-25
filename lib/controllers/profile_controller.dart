@@ -8,7 +8,10 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../models/profile_model.dart';
+import '../models/entry_model.dart';
+import '../models/user_model.dart';
 import '../services/profile_service.dart';
+import '../services/people_profile_services.dart';
 
 class ProfileController extends GetxController {
   final AppBarController appBarController = Get.find<AppBarController>();
@@ -42,6 +45,8 @@ class ProfileController extends GetxController {
   // 📦 Takip edilenler listesi (Mock)
   var followingList = [].obs;
 
+  // 📝 Kullanıcının entries'ları (PeopleProfileScreen'deki gibi)
+  var personEntries = <EntryModel>[].obs;
 
 String formatSimpleDate(String dateStr) {
   if (dateStr.isEmpty) return '';
@@ -120,9 +125,18 @@ String formatSimpleDate(String dateStr) {
       // 📌 Postlar - Artık ayrı bir endpoint'ten çekiyoruz
       await fetchProfilePosts();
       
+      // 📝 Entries'ları kullanıcı bilgileriyle işle
+      if (profileData.entries.isNotEmpty) {
+        debugPrint("📝 Entries sayısı: ${profileData.entries.length}");
+        await _processEntriesWithUserData(profileData.entries);
+        debugPrint("✅ Kullanıcının ${profileData.entries.length} entries'ı yüklendi");
+      } else {
+        debugPrint("⚠️ Kullanıcının entries'ı bulunamadı");
+      }
+      
       // Profil yüklendikten sonra diğer verileri de güncelle
       _updateRelatedData();
-        } catch (e) {
+    } catch (e) {
       debugPrint("❌ Profil yükleme hatası: $e");
     } finally {
       isLoading.value = false;
@@ -165,5 +179,106 @@ String formatSimpleDate(String dateStr) {
   void updateProfile(String name, String newBio) {
     fullName.value = name;
     bio.value = newBio;
+  }
+
+  /// Entries'ları topic user_id'lerine göre kullanıcı bilgileriyle işle
+  Future<void> _processEntriesWithUserData(List<EntryModel> entries) async {
+    try {
+      final processedEntries = <EntryModel>[];
+      
+      for (final entry in entries) {
+        // Topic'in user_id'sini al
+        final topicUserId = entry.topic?.userId;
+        
+        if (topicUserId != null) {
+          debugPrint("👤 Topic kullanıcısı için bilgi çekiliyor: user_id = $topicUserId");
+          
+          // Kullanıcı bilgilerini API'den çek
+          final userData = await PeopleProfileService.fetchUserById(topicUserId);
+          
+          if (userData != null) {
+            // Kullanıcı bilgilerini debug et
+            debugPrint("📸 Kullanıcı avatar bilgileri:");
+            debugPrint("  - Avatar URL: ${userData.avatarUrl}");
+            debugPrint("  - Avatar: ${userData.avatar}");
+            debugPrint("  - Name: ${userData.name} ${userData.surname}");
+            debugPrint("  - Username: ${userData.username}");
+            
+            // Kullanıcı bilgilerini UserModel'e dönüştür
+            final user = _createUserModelFromProfile(userData);
+            
+            // UserModel'deki avatar bilgilerini de debug et
+            debugPrint("🖼️ UserModel avatar bilgileri:");
+            debugPrint("  - Avatar URL: ${user.avatarUrl}");
+            debugPrint("  - Avatar: ${user.avatar}");
+            debugPrint("  - Kullanılan avatar alanı: ${user.avatarUrl.isNotEmpty ? 'avatarUrl' : 'avatar'}");
+            
+            // Entry'yi güncellenmiş kullanıcı bilgileriyle oluştur
+            final processedEntry = EntryModel(
+              id: entry.id,
+              content: entry.content,
+              upvotescount: entry.upvotescount,
+              downvotescount: entry.downvotescount,
+              humancreatedat: entry.humancreatedat,
+              createdat: entry.createdat,
+              user: user,
+              topic: entry.topic,
+              islike: entry.islike,
+              isdislike: entry.isdislike,
+            );
+            
+            processedEntries.add(processedEntry);
+            debugPrint("✅ Entry ${entry.id} için kullanıcı bilgileri yüklendi: ${user.name} ${user.surname}");
+          } else {
+            debugPrint("⚠️ Kullanıcı bilgileri alınamadı: user_id = $topicUserId");
+            processedEntries.add(entry); // Orijinal entry'yi ekle
+          }
+        } else {
+          debugPrint("⚠️ Topic user_id bulunamadı, orijinal entry kullanılıyor");
+          processedEntries.add(entry); // Orijinal entry'yi ekle
+        }
+      }
+      
+      personEntries.assignAll(processedEntries);
+      debugPrint("✅ Tüm entries kullanıcı bilgileriyle işlendi");
+      
+    } catch (e) {
+      debugPrint("❌ Entries işleme hatası: $e");
+      // Hata durumunda orijinal entries'ları kullan
+      personEntries.assignAll(entries);
+    }
+  }
+
+  /// ProfileModel'den UserModel oluştur
+  UserModel _createUserModelFromProfile(dynamic profile) {
+    return UserModel(
+      id: profile.id,
+      accountType: profile.accountType,
+      languageId: profile.languageId != null ? int.tryParse(profile.languageId!) ?? 1 : 1,
+      avatar: profile.avatar,
+      banner: profile.banner,
+      schoolId: profile.schoolId != null ? int.tryParse(profile.schoolId!) ?? 1 : 1,
+      schoolDepartmentId: profile.schoolDepartmentId != null ? int.tryParse(profile.schoolDepartmentId!) ?? 1 : 1,
+      name: profile.name,
+      surname: profile.surname,
+      username: profile.username,
+      email: profile.email,
+      phone: profile.phone,
+      birthday: profile.birthDate.isNotEmpty ? DateTime.tryParse(profile.birthDate) : null,
+      instagram: profile.instagram,
+      tiktok: profile.tiktok,
+      twitter: profile.twitter,
+      facebook: profile.facebook,
+      linkedin: profile.linkedin,
+      notificationEmail: profile.notificationEmail,
+      notificationMobile: profile.notificationMobile,
+      isActive: profile.isActive,
+      isOnline: profile.isOnline,
+      avatarUrl: profile.avatarUrl.isNotEmpty ? profile.avatarUrl : profile.avatar, // Avatar URL boşsa avatar alanını kullan
+      bannerUrl: profile.bannerUrl,
+      isFollowing: profile.isFollowing,
+      isFollowingPending: profile.isFollowingPending,
+      isSelf: profile.isSelf,
+    );
   }
 }

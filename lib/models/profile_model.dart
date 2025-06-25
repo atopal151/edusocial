@@ -2,6 +2,7 @@ import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/models/school_department_model.dart';
 import 'package:edusocial/models/school_model.dart';
 import 'package:edusocial/models/user_model.dart';
+import 'package:edusocial/models/entry_model.dart';
 
 class ProfileModel {
   final int id;
@@ -51,6 +52,7 @@ class ProfileModel {
   final List<dynamic> approvedFollowers;
   final List<dynamic> stories;
   final List<dynamic> followingStories;
+  final List<EntryModel> entries;
 
   ProfileModel({
     required this.id,
@@ -100,6 +102,7 @@ class ProfileModel {
     required this.approvedFollowers,
     required this.stories,
     required this.followingStories,
+    required this.entries,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -171,6 +174,10 @@ class ProfileModel {
     stories: (json['stories'] as List<dynamic>?) ?? [],
     followingStories:
         (json['following_stories'] as List<dynamic>?) ?? [],
+    entries: (json['entries'] as List<dynamic>?)
+            ?.map((e) => EntryModel.fromJson(e))
+            .toList() ??
+        [],
   );
 }
 

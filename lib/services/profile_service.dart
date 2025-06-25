@@ -19,28 +19,46 @@ class ProfileService {
       },
     );
 
-    // debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
-    // debugPrint("📦 ProfileService - Response Body: ${response.body}");
-
+    debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
+    debugPrint("📦 ProfileService - Response Body: ${response.body}");
+    
     if (response.statusCode == 200) {
-      final jsonBody = json.decode(response.body);
-      
-      // Post verilerini debug et
-      if (jsonBody['data'] != null && jsonBody['data']['posts'] != null) {
-        final posts = jsonBody['data']['posts'] as List;
-        // debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
+      // Gelen verinin tamamını JSON formatında yazdır
+      try {
+        final jsonBody = json.decode(response.body);
+        final formattedJson = const JsonEncoder.withIndent('  ').convert(jsonBody);
+        debugPrint("🔍 ProfileService - Tam JSON Response:");
+        debugPrint(formattedJson);
         
-        for (int i = 0; i < posts.length; i++) {
-          final post = posts[i];
-          // debugPrint("📝 Post $i:");
-          // debugPrint("  - ID: ${post['id']}");
-          // debugPrint("  - Content: ${post['content']}");
-          // debugPrint("  - Links: ${post['links']}");
-          // debugPrint("  - Media: ${post['media']}");
+        // Data alanını ayrıca yazdır
+        if (jsonBody['data'] != null) {
+          final dataJson = const JsonEncoder.withIndent('  ').convert(jsonBody['data']);
+          debugPrint("📊 ProfileService - Data Alanı:");
+          debugPrint(dataJson);
+          
+          // Entries alanını kontrol et
+          if (jsonBody['data']['entries'] != null) {
+            final entries = jsonBody['data']['entries'] as List;
+            debugPrint("📝 ProfileService - Entries sayısı: ${entries.length}");
+            for (int i = 0; i < entries.length; i++) {
+              debugPrint("📝 Entry $i: ${entries[i]}");
+            }
+          } else {
+            debugPrint("⚠️ ProfileService - Entries alanı bulunamadı");
+          }
+          
+          // Post verilerini debug et
+          if (jsonBody['data']['posts'] != null) {
+            final posts = jsonBody['data']['posts'] as List;
+            debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
+          }
         }
+        
+        return ProfileModel.fromJson(jsonBody['data']);
+      } catch (e) {
+        debugPrint("❌ ProfileService - JSON parse hatası: $e");
+        throw Exception("❗ Profil verisi alınamadı: ${response.body}");
       }
-      
-      return ProfileModel.fromJson(jsonBody['data']);
     } else {
       throw Exception("❗ Profil verisi alınamadı: ${response.body}");
     }
