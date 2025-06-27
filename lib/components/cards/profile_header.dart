@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/profile_controller.dart';
+import '../../routes/app_routes.dart';
 
 final ProfileController controller = Get.find();
 
@@ -114,14 +115,20 @@ Widget buildProfileHeader() {
           _buildDivider(),
           InkWell(
             onTap: () {
-              Get.toNamed("/followers");
+              Get.toNamed(Routes.followers, arguments: {
+                'followers': controller.followerList.map((item) => item as Map<String, dynamic>).toList(),
+                'screenTitle': 'Takipçi',
+              });
             },
             child: _buildProfileInfo("Takipçi", controller.followers),
           ),
           _buildDivider(),
           InkWell(
             onTap: () {
-              Get.toNamed("/following");
+              Get.toNamed(Routes.following, arguments: {
+                'followings': controller.followingList.map((item) => item as Map<String, dynamic>).toList(),
+                'screenTitle': 'Takip Edilen',
+              });
             },
             child: _buildProfileInfo("Takip Edilen", controller.following),
           ),

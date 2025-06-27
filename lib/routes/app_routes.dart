@@ -183,12 +183,18 @@ class Routes {
     ),
     GetPage(
       name: followers,
-      page: () => ProfileFollowerScreen(),
+      page: () => ProfileFollowerScreen(
+        followers: Get.arguments['followers'] ?? [],
+        screenTitle: Get.arguments['screenTitle'] ?? 'Takipçi',
+      ),
       binding: ProfileBinding(),
     ),
     GetPage(
       name: following,
-      page: () => ProfileFollowingScreen(),
+      page: () => ProfileFollowingScreen(
+        followings: Get.arguments['followings'] ?? [],
+        screenTitle: Get.arguments['screenTitle'] ?? 'Takip edilen',
+      ),
       binding: ProfileBinding(),
     ),
     GetPage(

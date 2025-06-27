@@ -8,6 +8,7 @@ import 'package:edusocial/controllers/profile_controller.dart'; // Import Profil
 import 'package:edusocial/models/profile_model.dart'; // Import ProfileModel
 import 'package:edusocial/controllers/entry_detail_controller.dart'; 
 import 'package:edusocial/models/display_entry_item.dart'; //
+import 'package:edusocial/controllers/people_profile_controller.dart'; // Import PeopleProfileController
 
 class EntryController extends GetxController {
   var entryList = <EntryModel>[].obs;
@@ -193,6 +194,58 @@ class EntryController extends GetxController {
 
         // Filtered listeyi de güncelle (bu, UI'ı otomatik olarak tetikleyecektir)
         applySearchFilterToDisplayList();
+      }
+
+      // People Profile Screen'deki entry'lerin oy durumunu güncelle
+      if (Get.isRegistered<PeopleProfileController>()) {
+        final peopleProfileController = Get.find<PeopleProfileController>();
+        final indexInPeople = peopleProfileController.peopleEntries.indexWhere((entry) => entry.id == entryId);
+        if (indexInPeople != -1) {
+          final currentEntry = peopleProfileController.peopleEntries[indexInPeople];
+          int newUpvotes = currentEntry.upvotescount;
+          int newDownvotes = currentEntry.downvotescount;
+          bool? newIsLike = currentEntry.islike;
+          bool? newIsDislike = currentEntry.isdislike;
+
+          if (vote == "up") {
+            if (newIsLike == true) {
+              // Already liked, unlike it
+              newUpvotes--;
+              newIsLike = false;
+            } else {
+              // Like it
+              newUpvotes++;
+              newIsLike = true;
+              if (newIsDislike == true) {
+                newDownvotes--;
+                newIsDislike = false;
+              }
+            }
+          } else if (vote == "down") {
+            if (newIsDislike == true) {
+              // Already disliked, undislike it
+              newDownvotes--;
+              newIsDislike = false;
+            } else {
+              // Dislike it
+              newDownvotes++;
+              newIsDislike = true;
+              if (newIsLike == true) {
+                newUpvotes--;
+                newIsLike = false;
+              }
+            }
+          }
+
+          final updatedEntry = currentEntry.copyWith(
+            upvotescount: newUpvotes,
+            downvotescount: newDownvotes,
+            islike: newIsLike,
+            isdislike: newIsDislike,
+          );
+
+          peopleProfileController.peopleEntries[indexInPeople] = updatedEntry;
+        }
       }
 
       // Detay ekranındaki yorumların oy durumunu güncelle (yeniden yüklemeden)

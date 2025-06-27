@@ -19,38 +19,38 @@ class ProfileService {
       },
     );
 
-    debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
-    debugPrint("📦 ProfileService - Response Body: ${response.body}");
+    //debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
+      //debugPrint("📦 ProfileService - Response Body: ${response.body}");
     
     if (response.statusCode == 200) {
       // Gelen verinin tamamını JSON formatında yazdır
       try {
         final jsonBody = json.decode(response.body);
-        final formattedJson = const JsonEncoder.withIndent('  ').convert(jsonBody);
-        debugPrint("🔍 ProfileService - Tam JSON Response:");
-        debugPrint(formattedJson);
+        //final formattedJson = const JsonEncoder.withIndent('  ').convert(jsonBody);
+        //debugPrint("🔍 ProfileService - Tam JSON Response:");
+        // debugPrint(formattedJson);
         
         // Data alanını ayrıca yazdır
         if (jsonBody['data'] != null) {
-          final dataJson = const JsonEncoder.withIndent('  ').convert(jsonBody['data']);
-          debugPrint("📊 ProfileService - Data Alanı:");
-          debugPrint(dataJson);
+          //final dataJson = const JsonEncoder.withIndent('  ').convert(jsonBody['data']);
+          //debugPrint("📊 ProfileService - Data Alanı:");
+          //debugPrint(dataJson);
           
           // Entries alanını kontrol et
           if (jsonBody['data']['entries'] != null) {
             final entries = jsonBody['data']['entries'] as List;
-            debugPrint("📝 ProfileService - Entries sayısı: ${entries.length}");
+            //debugPrint("📝 ProfileService - Entries sayısı: ${entries.length}");
             for (int i = 0; i < entries.length; i++) {
-              debugPrint("📝 Entry $i: ${entries[i]}");
+              //debugPrint("📝 Entry $i: ${entries[i]}");
             }
           } else {
-            debugPrint("⚠️ ProfileService - Entries alanı bulunamadı");
+            //debugPrint("⚠️ ProfileService - Entries alanı bulunamadı");
           }
           
           // Post verilerini debug et
           if (jsonBody['data']['posts'] != null) {
             final posts = jsonBody['data']['posts'] as List;
-            debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
+            //debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
           }
         }
         

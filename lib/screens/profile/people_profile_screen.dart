@@ -119,6 +119,16 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                             text: "Mesaj Gönder",
                             onPressed: () {
                               // Mesaj gönderme ekranına yönlendirme
+                              if (profile != null) {
+                                Get.toNamed(Routes.chatDetail, arguments: {
+                                  'userId': profile.id,
+                                  'conversationId': null, // Yeni konuşma başlatılacak
+                                  'name': '${profile.name} ${profile.surname}',
+                                  'username': profile.username,
+                                  'avatarUrl': profile.avatarUrl.isNotEmpty ? profile.avatarUrl : profile.avatar,
+                                  'isOnline': profile.isOnline,
+                                });
+                              }
                             },
                             backgroundColor: const Color(0xff1f1f1f),
                             textColor: const Color(0xffffffff),

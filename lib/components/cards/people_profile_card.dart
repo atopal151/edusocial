@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:edusocial/controllers/people_profile_controller.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../routes/app_routes.dart';
 
 Widget buildPeopleProfileHeader(PeopleProfileController controller) {
   return Obx(() {
@@ -99,14 +100,20 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
             _buildDivider(),
             InkWell(
               onTap: () {
-                Get.toNamed("/followers");
+                /* Get.toNamed(Routes.followers, arguments: {
+                  'followers': profile.followers.map((item) => item as Map<String, dynamic>).toList(),
+                  'screenTitle': '${profile.name} ${profile.surname} - Takipçi',
+                });*/
               },
               child: _buildProfileInfo("Takipçi", profile.followerCount),
             ),
             _buildDivider(),
             InkWell(
               onTap: () {
-                Get.toNamed("/following");
+                /*Get.toNamed(Routes.following, arguments: {
+                  'followings': profile.followings.map((item) => item as Map<String, dynamic>).toList(),
+                  'screenTitle': '${profile.name} ${profile.surname} - Takip Edilen',
+                });*/
               },
               child: _buildProfileInfo("Takip Edilen", profile.followingCount),
             ),
