@@ -1,0 +1,1314 @@
+{
+  "signup": {
+    "title": "Benzer İlgi Alanlarına\nSahip Kişilerle Tanış!",
+    "subtitle": "EduSocial, Polonya'daki uluslararası okullarda eğitim\ngören öğrenciler için tasarlanmış yenilikçi bir sosyal\nplatformdur.",
+    "form": {
+      "title": "Kayıt Ol",
+      "name": "Ad",
+      "surname": "Soyad",
+      "username": "Kullanıcı adı",
+      "email": "E-posta",
+      "password": "Şifre",
+      "confirmPassword": "Şifre Tekrar"
+    },
+    "privacyPolicy": "Gizlilik politikası ve kullanım koşullarını okudum anladım ve kabul ediyorum.",
+    "registerButton": "Kayıt Ol",
+    "loginLink": {
+      "text": "Hesabınız var mı?",
+      "link": "Giriş Yap."
+    },
+    "validation": {
+      "nameRequired": "Ad alanı zorunludur",
+      "surnameRequired": "Soyad alanı zorunludur",
+      "usernameRequired": "Kullanıcı adı zorunludur",
+      "usernameMinLength": "Kullanıcı adı en az 3 karakter olmalıdır",
+      "emailRequired": "E-posta alanı zorunludur",
+      "emailInvalid": "Geçerli bir e-posta adresi giriniz",
+      "passwordRequired": "Şifre alanı zorunludur",
+      "passwordMinLength": "Şifre en az 6 karakter olmalıdır",
+      "confirmPasswordRequired": "Şifre tekrar alanı zorunludur",
+      "passwordsNotMatch": "Şifreler eşleşmiyor",
+      "privacyPolicyRequired": "Gizlilik politikasını kabul etmelisiniz"
+    },
+    "errors": {
+      "signupFailed": "Kayıt işlemi başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "usernameExists": "Bu kullanıcı adı zaten kullanılıyor",
+      "emailExists": "Bu e-posta adresi zaten kullanılıyor",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "signupSuccess": "Kayıt işlemi başarılı!",
+      "welcomeMessage": "EduSocial'e hoş geldiniz!"
+    }
+  },
+  "login": {
+    "title": "Benzer İlgi Alanlarına\n Sahip Kişilerle Tanış!",
+    "subtitle": "EduSocial, Polonya'daki uluslararası okullarda eğitim gören öğrenciler için tasarlanmış yenilikçi bir sosyal platformdur.",
+    "form": {
+      "title": "Giriş Yap",
+      "usernameOrEmail": "Kullanıcı adı veya e-posta",
+      "password": "Şifre"
+    },
+    "forgotPassword": "Şifrenizi mi unuttunuz?",
+    "loginButton": "Giriş Yap",
+    "signupLink": {
+      "text": "Hesabınız yok mu?",
+      "link": "Kayıt Ol."
+    },
+    "validation": {
+      "usernameOrEmailRequired": "Kullanıcı adı veya e-posta zorunludur",
+      "passwordRequired": "Şifre zorunludur",
+      "invalidCredentials": "Kullanıcı adı/e-posta veya şifre hatalı"
+    },
+    "errors": {
+      "loginFailed": "Giriş işlemi başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "invalidCredentials": "Kullanıcı adı/e-posta veya şifre hatalı",
+      "accountLocked": "Hesabınız kilitlendi",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "loginSuccess": "Giriş başarılı!",
+      "welcomeBack": "Tekrar hoş geldiniz!"
+    }
+  },
+  "step1": {
+    "header": {
+      "title": "Okul Bilgilerinizi Tamamlayın",
+      "subtitle": "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!"
+    },
+    "form": {
+      "school": "Okul",
+      "department": "Bölüm"
+    },
+    "warning": "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir.",
+    "continueButton": "Devam Et",
+    "loading": {
+      "schools": "Okullar yükleniyor...",
+      "departments": "Bölümler yükleniyor..."
+    },
+    "validation": {
+      "schoolRequired": "Okul seçimi zorunludur",
+      "departmentRequired": "Bölüm seçimi zorunludur"
+    },
+    "errors": {
+      "schoolsLoadFailed": "Okullar yüklenemedi",
+      "departmentsLoadFailed": "Bölümler yüklenemedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    }
+  },
+  "step2": {
+    "header": {
+      "title": "Bilgilerinizi Tamamlayın",
+      "subtitle": "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!"
+    },
+    "form": {
+      "courseQuestion": "Hangi dersleri alıyorsun?",
+      "courseInput": "Ders adı giriniz",
+      "savedCourses": "Kaydedilen Konular"
+    },
+    "warning": "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir.",
+    "continueButton": "Devam Et",
+    "validation": {
+      "courseRequired": "En az bir ders eklemelisiniz",
+      "courseMinLength": "Ders adı en az 2 karakter olmalıdır",
+      "courseMaxLength": "Ders adı en fazla 50 karakter olabilir",
+      "courseAlreadyExists": "Bu ders zaten eklenmiş"
+    },
+    "errors": {
+      "courseAddFailed": "Ders eklenemedi",
+      "courseRemoveFailed": "Ders kaldırılamadı",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "courseAdded": "Ders başarıyla eklendi",
+      "courseRemoved": "Ders başarıyla kaldırıldı"
+    }
+  },
+  "step3": {
+    "header": {
+      "title": "Bilgilerinizi Tamamlayın",
+      "subtitle": "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!"
+    },
+    "groupsSection": {
+      "title": "Katılmak İsteyeceğin Gruplar"
+    },
+    "groupActions": {
+      "joined": "Katıldınız",
+      "pending": "Katılım Bekleniyor",
+      "joinRequest": "Katılma İsteği Gönder",
+      "join": "Gruba Katıl"
+    },
+    "completeButton": "Hesabı Tamamla",
+    "loading": {
+      "groups": "Gruplar yükleniyor...",
+      "joining": "Gruba katılınıyor...",
+      "completing": "Hesap tamamlanıyor..."
+    },
+    "validation": {
+      "groupsRequired": "En az bir grup seçmelisiniz"
+    },
+    "errors": {
+      "groupsLoadFailed": "Gruplar yüklenemedi",
+      "joinGroupFailed": "Gruba katılma işlemi başarısız",
+      "completeOnboardingFailed": "Hesap tamamlama işlemi başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "groupJoined": "Gruba başarıyla katıldınız",
+      "joinRequestSent": "Katılma isteği gönderildi",
+      "onboardingCompleted": "Hesabınız başarıyla tamamlandı!",
+      "welcomeMessage": "EduSocial'e hoş geldiniz!"
+    }
+  },
+  "calendar": {
+    "title": "Takvim",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \neiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "dateSelector": {
+      "previousDay": "Önceki gün",
+      "nextDay": "Sonraki gün",
+      "selectDate": "Tarih seç"
+    },
+    "addReminder": "Hatırlatma ekle",
+    "reminderCard": {
+      "edit": "Düzenle",
+      "delete": "Sil"
+    },
+    "loading": {
+      "reminders": "Hatırlatmalar yükleniyor...",
+      "saving": "Kaydediliyor...",
+      "deleting": "Siliniyor..."
+    },
+    "validation": {
+      "titleRequired": "Başlık zorunludur",
+      "dateTimeRequired": "Tarih ve saat zorunludur",
+      "colorRequired": "Renk seçimi zorunludur"
+    },
+    "errors": {
+      "remindersLoadFailed": "Hatırlatmalar yüklenemedi",
+      "reminderSaveFailed": "Hatırlatma kaydedilemedi",
+      "reminderDeleteFailed": "Hatırlatma silinemedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "reminderSaved": "Hatırlatma başarıyla kaydedildi",
+      "reminderDeleted": "Hatırlatma başarıyla silindi",
+      "reminderUpdated": "Hatırlatma başarıyla güncellendi"
+    },
+    "emptyState": {
+      "title": "Henüz hatırlatmanız yok",
+      "subtitle": "Yeni bir hatırlatma ekleyerek başlayın"
+    },
+    "reminderDetail": {
+      "title": "Hatırlatıcı Detayı",
+      "titleLabel": "📝 Başlık:",
+      "timeLabel": "⏰ Zaman:",
+      "notificationLabel": "🔔 Bildirim:",
+      "notificationOn": "Açık",
+      "notificationOff": "Kapalı",
+      "close": "Kapat",
+      "error": {
+        "title": "Hata",
+        "message": "Hatırlatıcı getirilemedi."
+      }
+    }
+  },
+  "groupChatDetail": {
+    "appBar": {
+      "memberCount": "üye"
+    },
+    "emptyState": {
+      "title": "Henüz mesaj yok",
+      "subtitle": "İlk mesajı siz gönderin!"
+    },
+    "loading": {
+      "messages": "Mesajlar yükleniyor...",
+      "groupData": "Grup bilgileri yükleniyor...",
+      "sending": "Gönderiliyor..."
+    },
+    "errors": {
+      "groupLoadFailed": "Grup bilgileri yüklenemedi",
+      "messagesLoadFailed": "Mesajlar yüklenemedi",
+      "messageSendFailed": "Mesaj gönderilemedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "messageSent": "Mesaj başarıyla gönderildi"
+    },
+    "actions": {
+      "more": "Daha fazla",
+      "groupDetails": "Grup detayları"
+    }
+  },
+  "chat": {
+    "chatList": {
+      "searchPlaceholder": "Kişi ara",
+      "onlineFriends": "Online Arkadaşlar",
+      "tabs": {
+        "people": "Kişiler",
+        "groups": "Gruplar"
+      },
+      "refreshSuccess": "Kişisel mesajlar başarıyla yenilendi"
+    },
+    "chatDetail": {
+      "onlineStatus": {
+        "online": "Çevrimiçi",
+        "offline": "Çevrimdışı"
+      },
+      "error": {
+        "title": "Hata",
+        "userInfoNotLoaded": "Kullanıcı bilgileri henüz yüklenmedi!"
+      }
+    },
+    "userChatDetail": {
+      "error": {
+        "title": "Hata",
+        "userInfoNotFound": "Kullanıcı bilgileri bulunamadı!",
+        "userInfoLoadFailed": "Kullanıcı bilgileri yüklenemedi"
+      },
+      "tabs": {
+        "documents": "Belgeler",
+        "links": "Bağlantılar",
+        "photos": "Fotoğraflar"
+      },
+      "documentInfo": "Mb •"
+    },
+    "messageInput": {
+      "placeholder": "Bir mesaj yazınız...",
+      "fileSelected": "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz...",
+      "fileSize": "KB",
+      "removeFile": "Dosyayı kaldır"
+    },
+    "chatDetailBottom": {
+      "placeholder": "Mesaj yazın... (Linkler otomatik algılanır)",
+      "send": "Gönder"
+    },
+    "loading": {
+      "messages": "Mesajlar yükleniyor...",
+      "sending": "Gönderiliyor...",
+      "loadingUserInfo": "Kullanıcı bilgileri yükleniyor..."
+    },
+    "errors": {
+      "messageSendFailed": "Mesaj gönderilemedi",
+      "fileUploadFailed": "Dosya yüklenemedi",
+      "imageUploadFailed": "Resim yüklenemedi",
+      "documentUploadFailed": "Belge yüklenemedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "messageSent": "Mesaj başarıyla gönderildi",
+      "fileUploaded": "Dosya başarıyla yüklendi",
+      "imageUploaded": "Resim başarıyla yüklendi",
+      "documentUploaded": "Belge başarıyla yüklendi"
+    },
+    "actions": {
+      "more": "Daha fazla",
+      "userDetails": "Kullanıcı detayları",
+      "sendMessage": "Mesaj gönder",
+      "attachFile": "Dosya ekle",
+      "attachImage": "Resim ekle",
+      "createPoll": "Anket oluştur"
+    },
+    "fileTypes": {
+      "document": "Belge",
+      "image": "Resim",
+      "video": "Video",
+      "audio": "Ses"
+    }
+  },
+  "entry": {
+    "entryScreen": {
+      "searchPlaceholder": "Entry ara",
+      "newTopicButton": "+ Yeni Konu Aç",
+      "noEntriesFound": "Gösterilecek entry bulunamadı.",
+      "refreshSuccess": "Entry verileri başarıyla yenilendi",
+      "refreshLoading": "Entry verileri yenileniyor..."
+    },
+    "entryDetail": {
+      "categoryNotFound": "Kategori Yok",
+      "topicNotFound": "Konu Bilgisi Yok",
+      "commentPlaceholder": "Bu konuya entry paylaşın",
+      "sendComment": "Yorum gönder",
+      "entryCount": "Entry Sayısı",
+      "shareText": {
+        "topicTitle": "Konu Başlığı",
+        "category": "Kategori",
+        "author": "Yazar",
+        "entryContent": "Entry İçeriği",
+        "aboutTopic": "Konu Hakkında",
+        "downloadApp": "EduSocial Uygulamasını İndir:",
+        "openApp": "Uygulamayı Aç",
+        "appStore": "App Store",
+        "playStore": "Play Store"
+      }
+    },
+    "entryShare": {
+      "title": "Konu Başlığı",
+      "entryContent": "Entry",
+      "category": "Kategori",
+      "createTopicButton": "+ Konuyu Aç",
+      "loading": {
+        "creating": "Konu oluşturuluyor...",
+        "categories": "Kategoriler yükleniyor..."
+      }
+    },
+    "entryCard": {
+      "share": "Paylaş",
+      "upvote": "Beğen",
+      "downvote": "Beğenme",
+      "reply": "Yanıtla",
+      "report": "Bildir",
+      "delete": "Sil",
+      "edit": "Düzenle"
+    },
+    "entryCommentCard": {
+      "reply": "Yanıtla",
+      "share": "Paylaş",
+      "report": "Bildir",
+      "delete": "Sil",
+      "edit": "Düzenle"
+    },
+    "loading": {
+      "entries": "Entry'ler yükleniyor...",
+      "comments": "Yorumlar yükleniyor...",
+      "sending": "Gönderiliyor...",
+      "creating": "Oluşturuluyor..."
+    },
+    "errors": {
+      "entriesLoadFailed": "Entry'ler yüklenemedi",
+      "commentsLoadFailed": "Yorumlar yüklenemedi",
+      "entrySendFailed": "Entry gönderilemedi",
+      "topicCreateFailed": "Konu oluşturulamadı",
+      "voteFailed": "Oylama başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "entrySent": "Entry başarıyla gönderildi",
+      "topicCreated": "Konu başarıyla oluşturuldu",
+      "voteRecorded": "Oylama kaydedildi",
+      "commentSent": "Yorum başarıyla gönderildi"
+    },
+    "validation": {
+      "titleRequired": "Konu başlığı zorunludur",
+      "contentRequired": "Entry içeriği zorunludur",
+      "categoryRequired": "Kategori seçimi zorunludur",
+      "titleMinLength": "Konu başlığı en az 3 karakter olmalıdır",
+      "contentMinLength": "Entry içeriği en az 10 karakter olmalıdır",
+      "titleMaxLength": "Konu başlığı en fazla 100 karakter olabilir",
+      "contentMaxLength": "Entry içeriği en fazla 1000 karakter olabilir"
+    },
+    "actions": {
+      "share": "Paylaş",
+      "like": "Beğen",
+      "dislike": "Beğenme",
+      "reply": "Yanıtla",
+      "report": "Bildir",
+      "delete": "Sil",
+      "edit": "Düzenle",
+      "createTopic": "Konu Oluştur",
+      "sendEntry": "Entry Gönder"
+    }
+  },
+  "event": {
+    "eventScreen": {
+      "title": "Etkinlikler",
+      "loading": "Etkinlikler yükleniyor...",
+      "noEvents": "Gösterilecek etkinlik bulunamadı."
+    },
+    "eventCard": {
+      "share": "Paylaş",
+      "viewLocation": "Konumu Gör",
+      "notification": "Bildirim",
+      "notificationSet": "Etkinlik bildirimi ayarlandı.",
+      "more": "Daha fazla",
+      "shareText": {
+        "downloadApp": "EduSocial Uygulamasını İndir:",
+        "openApp": "Uygulamayı Aç",
+        "appStore": "App Store",
+        "playStore": "Play Store"
+      }
+    },
+    "eventDetail": {
+      "title": "Etkinlik Detayı",
+      "date": "Tarih",
+      "time": "Saat",
+      "location": "Konum",
+      "description": "Açıklama",
+      "organizer": "Organizatör",
+      "participants": "Katılımcılar",
+      "join": "Katıl",
+      "leave": "Ayrıl",
+      "share": "Paylaş",
+      "report": "Bildir"
+    },
+    "loading": {
+      "events": "Etkinlikler yükleniyor...",
+      "eventDetails": "Etkinlik detayları yükleniyor...",
+      "joining": "Katılınıyor...",
+      "leaving": "Ayrılınıyor..."
+    },
+    "errors": {
+      "eventsLoadFailed": "Etkinlikler yüklenemedi",
+      "eventDetailLoadFailed": "Etkinlik detayları yüklenemedi",
+      "joinFailed": "Etkinliğe katılma başarısız",
+      "leaveFailed": "Etkinlikten ayrılma başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "eventShared": "Etkinlik başarıyla paylaşıldı",
+      "joinedEvent": "Etkinliğe başarıyla katıldınız",
+      "leftEvent": "Etkinlikten başarıyla ayrıldınız",
+      "notificationSet": "Etkinlik bildirimi ayarlandı"
+    },
+    "actions": {
+      "share": "Paylaş",
+      "viewLocation": "Konumu Gör",
+      "join": "Katıl",
+      "leave": "Ayrıl",
+      "report": "Bildir",
+      "setNotification": "Bildirim Ayarla",
+      "removeNotification": "Bildirimi Kaldır"
+    },
+    "notifications": {
+      "shared": "Paylaşıldı",
+      "locationView": "Konum Gör",
+      "locationInfo": "için konum bilgisi görüntüleniyor."
+    }
+  },
+  "groups": {
+    "groupList": {
+      "createGroupButton": "Yeni Grup Oluştur",
+      "myGroups": "Bulunduğun Gruplar",
+      "allGroups": "Tüm Gruplar",
+      "joined": "Katıldınız",
+      "pending": "Onay Bekliyor",
+      "join": "Katıl",
+      "loading": "Gruplar yükleniyor..."
+    },
+    "createGroup": {
+      "title": "Yeni Grup Oluştur",
+      "groupPhoto": "Grup Fotoğrafı",
+      "groupName": "Grup Adı",
+      "groupDescription": "Grup Açıklaması",
+      "groupArea": "Grup Alanı",
+      "privacySetting": "Gruba girmek için katılım isteği\ngöndermek gereksin.",
+      "cancel": "İptal",
+      "createGroup": "Grup Oluştur",
+      "loading": {
+        "creating": "Grup oluşturuluyor...",
+        "areas": "Grup alanları yükleniyor..."
+      }
+    },
+    "groupDetail": {
+      "title": "Grup Detayı",
+      "noParticipants": "Katılımcı bulunamadı",
+      "created": "Oluşturuldu",
+      "participantCount": "Katılımcı Sayısı",
+      "groupEvents": "Grup Etkinlikleri",
+      "tabs": {
+        "documents": "Belgeler",
+        "links": "Bağlantılar",
+        "photos": "Fotoğraflar"
+      },
+      "emptyStates": {
+        "documents": "Henüz belge eklenmemiş",
+        "links": "Henüz bağlantı eklenmemiş",
+        "photos": "Henüz fotoğraf eklenmemiş"
+      },
+      "documentInfo": "Mb •",
+      "documentPrefix": "Belge -"
+    },
+    "groupParticipants": {
+      "title": "Grup Katılımcıları",
+      "noParticipants": "Henüz katılımcı yok",
+      "sendMessage": "Mesaj Gönder"
+    },
+    "groupCard": {
+      "share": "Paylaş",
+      "join": "Katıl",
+      "leave": "Ayrıl",
+      "report": "Bildir",
+      "delete": "Sil",
+      "edit": "Düzenle"
+    },
+    "loading": {
+      "groups": "Gruplar yükleniyor...",
+      "groupDetails": "Grup detayları yükleniyor...",
+      "participants": "Katılımcılar yükleniyor...",
+      "creating": "Oluşturuluyor...",
+      "joining": "Katılınıyor...",
+      "leaving": "Ayrılınıyor..."
+    },
+    "errors": {
+      "groupsLoadFailed": "Gruplar yüklenemedi",
+      "groupDetailLoadFailed": "Grup detayları yüklenemedi",
+      "participantsLoadFailed": "Katılımcılar yüklenemedi",
+      "groupCreateFailed": "Grup oluşturulamadı",
+      "joinFailed": "Gruba katılma başarısız",
+      "leaveFailed": "Gruptan ayrılma başarısız",
+      "noGroupSelected": "Grup seçilmedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "groupCreated": "Grup başarıyla oluşturuldu",
+      "joinedGroup": "Gruba başarıyla katıldınız",
+      "leftGroup": "Gruptan başarıyla ayrıldınız",
+      "groupShared": "Grup başarıyla paylaşıldı"
+    },
+    "validation": {
+      "nameRequired": "Grup adı zorunludur",
+      "descriptionRequired": "Grup açıklaması zorunludur",
+      "areaRequired": "Grup alanı seçimi zorunludur",
+      "nameMinLength": "Grup adı en az 3 karakter olmalıdır",
+      "descriptionMinLength": "Grup açıklaması en az 10 karakter olmalıdır",
+      "nameMaxLength": "Grup adı en fazla 50 karakter olabilir",
+      "descriptionMaxLength": "Grup açıklaması en fazla 500 karakter olabilir"
+    },
+    "actions": {
+      "createGroup": "Grup Oluştur",
+      "joinGroup": "Gruba Katıl",
+      "leaveGroup": "Gruptan Ayrıl",
+      "shareGroup": "Grubu Paylaş",
+      "reportGroup": "Grubu Bildir",
+      "deleteGroup": "Grubu Sil",
+      "editGroup": "Grubu Düzenle",
+      "viewParticipants": "Katılımcıları Görüntüle",
+      "sendMessage": "Mesaj Gönder"
+    },
+    "notifications": {
+      "error": "Hata",
+      "noGroupSelected": "Grup seçilmedi"
+    }
+  },
+  "home": {
+    "homeScreen": {
+      "suggestedGroups": "İlgini Çekebilecek Gruplar",
+      "hotTopics": "Gündemdeki Konular",
+      "refreshSuccess": "Ana sayfa verileri başarıyla yenilendi",
+      "refreshLoading": "Ana sayfa verileri yenileniyor...",
+      "refreshError": "Ana sayfa verileri yenilenirken hata"
+    },
+    "groupSuggestion": {
+      "joined": "Katıldınız",
+      "sendRequest": "İstek Gönder",
+      "joinGroup": "Gruba Katıl"
+    },
+    "hotTopics": {
+      "noTopics": "Gündemdeki konu bulunamadı"
+    },
+    "postHome": {
+      "noPosts": "Gösterilecek gönderi bulunamadı",
+      "loading": "Gönderiler yükleniyor..."
+    },
+    "story": {
+      "addStory": {
+        "title": "Hikayeye Ekle",
+        "nearby": "Yakınlardakiler",
+        "selectFromGallery": "Galeriden Seç",
+        "share": "Paylaş",
+        "camera": "Kamera",
+        "photoLibrary": "Fotoğraf Galerisi",
+        "selectPhoto": "Lütfen bir fotoğraf seçin",
+        "photoSelectionError": "Fotoğraf seçilirken bir hata oluştu",
+        "cameraError": "Kamera açılırken bir hata oluştu",
+        "storyShareError": "Hikaye paylaşılırken bir hata oluştu",
+        "warning": "Uyarı",
+        "error": "Hata"
+      },
+      "myStoryList": {
+        "you": "@Sen",
+        "noStory": "Hikayeniz yok"
+      },
+      "storyViewer": {
+        "noImage": "Görsel yok",
+        "timeAgo": {
+          "justNow": "az önce",
+          "minutesAgo": "dk önce",
+          "hoursAgo": "saat önce",
+          "yesterday": "dün",
+          "daysAgo": "gün önce"
+        }
+      },
+      "myStoryViewer": {
+        "timeAgo": {
+          "justNow": "az önce",
+          "minutesAgo": "dk önce",
+          "hoursAgo": "saat önce",
+          "yesterday": "dün",
+          "daysAgo": "gün önce"
+        }
+      }
+    },
+    "createPost": {
+      "title": "Gönderi Oluştur",
+      "postButton": "Gönderi",
+      "placeholder": "Neler oluyor?",
+      "links": "Linkler",
+      "addPhoto": "Fotoğraf Ekle",
+      "addCamera": "Kamera",
+      "addGallery": "Galeri",
+      "removeImage": "Resmi kaldır",
+      "removeLink": "Linki kaldır",
+      "postError": "Gönderi paylaşılırken bir hata oluştu.",
+      "contentRequired": "Lütfen gönderi içeriği girin.",
+      "warning": "Uyarı",
+      "error": "Hata",
+      "loading": "Paylaşılıyor..."
+    },
+    "loading": {
+      "homeData": "Ana sayfa verileri yükleniyor...",
+      "stories": "Hikayeler yükleniyor...",
+      "groups": "Gruplar yükleniyor...",
+      "topics": "Konular yükleniyor...",
+      "posts": "Gönderiler yükleniyor...",
+      "creating": "Oluşturuluyor...",
+      "sharing": "Paylaşılıyor..."
+    },
+    "errors": {
+      "homeDataLoadFailed": "Ana sayfa verileri yüklenemedi",
+      "storiesLoadFailed": "Hikayeler yüklenemedi",
+      "groupsLoadFailed": "Gruplar yüklenemedi",
+      "topicsLoadFailed": "Konular yüklenemedi",
+      "postsLoadFailed": "Gönderiler yüklenemedi",
+      "storyCreateFailed": "Hikaye oluşturulamadı",
+      "postCreateFailed": "Gönderi oluşturulamadı",
+      "photoSelectionFailed": "Fotoğraf seçimi başarısız",
+      "cameraAccessFailed": "Kamera erişimi başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu"
+    },
+    "success": {
+      "homeDataRefreshed": "Ana sayfa verileri başarıyla yenilendi",
+      "storyCreated": "Hikaye başarıyla oluşturuldu",
+      "postCreated": "Gönderi başarıyla oluşturuldu",
+      "photoSelected": "Fotoğraf başarıyla seçildi"
+    },
+    "validation": {
+      "postContentRequired": "Gönderi içeriği zorunludur",
+      "storyImageRequired": "Hikaye için fotoğraf zorunludur",
+      "contentMinLength": "İçerik en az 1 karakter olmalıdır",
+      "contentMaxLength": "İçerik en fazla 1000 karakter olabilir"
+    },
+    "actions": {
+      "createPost": "Gönderi Oluştur",
+      "createStory": "Hikaye Oluştur",
+      "sharePost": "Gönderiyi Paylaş",
+      "shareStory": "Hikayeyi Paylaş",
+      "addPhoto": "Fotoğraf Ekle",
+      "addCamera": "Kamera Ekle",
+      "addGallery": "Galeriden Ekle",
+      "removeImage": "Resmi Kaldır",
+      "removeLink": "Linki Kaldır",
+      "close": "Kapat",
+      "cancel": "İptal"
+    },
+    "notifications": {
+      "refreshSuccess": "Ana sayfa verileri başarıyla yenilendi",
+      "refreshError": "Ana sayfa verileri yenilenirken hata oluştu"
+    }
+  },
+  "match": {
+    "title": "Benzer İlgi Alanlarına \n Sahip Kişilerle Tanış!",
+    "subtitle": "EduSocial, Polonya'daki uluslararası okullarda eğitim \n gören öğrenciler için tasarlanmış yenilikçi bir sosyal \n platformdur.",
+    "form": {
+      "courseQuestion": "Hangi Konuyu Çalışacaksın?",
+      "courseInput": "Konu adı giriniz",
+      "savedTopics": "Kaydedilen Konular"
+    },
+    "findMatchesButton": "Uygun Eşleşmeleri Bul",
+    "resultScreen": {
+      "noMatchesFound": "Henüz eşleşme bulunamadı",
+      "addCourseButton": "Ders Ekle"
+    },
+    "matchCard": {
+      "online": "Çevrimiçi",
+      "education": "Eğitim",
+      "about": "Hakkında",
+      "matchedTopics": "Seninle eşleştiği konular",
+      "noSchoolInfo": "Okul bilgisi yok",
+      "noDepartment": "Bölüm yok",
+      "noAboutInfo": "Henüz bilgi yok",
+      "grade": "Grade",
+      "actions": {
+        "follow": "Takip Et",
+        "following": "Takip Ediliyor",
+        "message": "mesaj",
+        "next": "Geç",
+        "followAction": "Takip Et"
+      }
+    },
+    "dragActions": {
+      "follow": "Takip Et",
+      "next": "Geç"
+    },
+    "loading": {
+      "findingMatches": "Eşleşmeler aranıyor...",
+      "addingCourses": "Dersler ekleniyor...",
+      "following": "Takip ediliyor..."
+    },
+    "validation": {
+      "topicRequired": "En az bir konu eklemelisiniz",
+      "topicMinLength": "Konu adı en az 2 karakter olmalıdır",
+      "topicMaxLength": "Konu adı en fazla 50 karakter olabilir",
+      "topicAlreadyExists": "Bu konu zaten eklenmiş"
+    },
+    "errors": {
+      "courseAlreadyAdded": "dersi zaten eklenmiş veya eklenemedi.",
+      "courseAddFailed": "Ders eklenemedi",
+      "topicAddFailed": "Konu eklenemedi",
+      "topicRemoveFailed": "Konu kaldırılamadı",
+      "followFailed": "Takip işlemi başarısız",
+      "matchesLoadFailed": "Eşleşmeler yüklenemedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu",
+      "generalError": "Bir hata oluştu"
+    },
+    "success": {
+      "coursesSaved": "Dersler profilinize kaydedildi!",
+      "topicAdded": "Konu başarıyla eklendi",
+      "topicRemoved": "Konu başarıyla kaldırıldı",
+      "userFollowed": "takip edildi!",
+      "followSuccess": "Takip işlemi başarılı"
+    }
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "loading": {
+      "notifications": "Bildirimler yükleniyor...",
+      "refreshing": "Bildirimler yenileniyor...",
+      "refreshed": "Bildirimler başarıyla yenilendi"
+    },
+    "grouping": {
+      "today": "Bugün",
+      "yesterday": "Dün",
+      "lastWeek": "Son 7 Gün",
+      "older": "Daha Önce"
+    },
+    "timeAgo": {
+      "justNow": "az önce",
+      "minutesAgo": "dk",
+      "hoursAgo": "s",
+      "daysAgo": "g",
+      "weeksAgo": "h",
+      "monthsAgo": "a",
+      "yearsAgo": "y"
+    },
+    "actions": {
+      "accept": "Onayla",
+      "decline": "Reddet",
+      "accepted": "Onaylandı",
+      "rejected": "Reddedildi",
+      "follow": "Takip Et",
+      "unfollow": "Takipten Çıkar",
+      "close": "Kapat"
+    },
+    "notificationTypes": {
+      "followRequest": "Takip İsteği",
+      "followJoinRequest": "Takip ve Katılma İsteği",
+      "postLike": "Gönderi Beğenisi",
+      "postComment": "Gönderi Yorumu",
+      "groupJoinRequest": "Grup Katılma İsteği",
+      "groupJoin": "Grup Katılımı",
+      "createGroupEvent": "Grup Etkinliği Oluşturma",
+      "groupAccept": "Grup Onayı"
+    },
+    "messages": {
+      "followRequest": "sizi takip etmek istiyor",
+      "postLiked": "gönderinizi beğendi",
+      "postCommented": "gönderinize yorum yaptı",
+      "groupJoinRequest": "grubunuza katılmak istiyor",
+      "groupJoined": "grubunuza katıldı",
+      "eventCreated": "grup etkinliği oluşturdu",
+      "groupAccepted": "grup isteğiniz onaylandı"
+    },
+    "loading": {
+      "notifications": "Bildirimler yükleniyor...",
+      "refreshing": "Bildirimler yenileniyor...",
+      "accepting": "Onaylanıyor...",
+      "declining": "Reddediliyor...",
+      "following": "Takip ediliyor...",
+      "unfollowing": "Takipten çıkarılıyor..."
+    },
+    "errors": {
+      "notificationsLoadFailed": "Bildirimler yüklenemedi",
+      "followRequestFailed": "Takip isteği onaylanamadı",
+      "groupJoinRequestFailed": "Grup katılma isteği işlenemedi",
+      "followFailed": "Takip işlemi başarısız",
+      "unfollowFailed": "Takipten çıkarma işlemi başarısız",
+      "eventCreateRequestFailed": "Etkinlik oluşturma isteği onaylanamadı",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu",
+      "generalError": "Bir hata oluştu"
+    },
+    "success": {
+      "notificationsRefreshed": "Bildirimler başarıyla yenilendi",
+      "followRequestAccepted": "Takip isteği onaylandı",
+      "followRequestDeclined": "Takip isteği reddedildi",
+      "groupJoinRequestAccepted": "Grup katılma isteği onaylandı",
+      "groupJoinRequestDeclined": "Grup katılma isteği reddedildi",
+      "userFollowed": "Kullanıcı takip edildi",
+      "userUnfollowed": "Kullanıcı takipten çıkarıldı",
+      "eventCreateRequestAccepted": "Etkinlik oluşturma isteği onaylandı",
+      "eventCreateRequestDeclined": "Etkinlik oluşturma isteği reddedildi"
+    },
+    "validation": {
+      "userIdRequired": "Kullanıcı ID gerekli",
+      "groupIdRequired": "Grup ID gerekli",
+      "eventIdRequired": "Etkinlik ID gerekli",
+      "decisionRequired": "Karar gerekli"
+    },
+    "debug": {
+      "buildingButton": "Bildirim için buton oluşturuluyor:",
+      "notificationType": "Tip:",
+      "isFollowing": "Takip ediliyor:",
+      "isFollowingPending": "Takip beklemede:",
+      "isAccepted": "Onaylandı:",
+      "isRejected": "Reddedildi:",
+      "status": "Durum:",
+      "groupId": "Grup ID:",
+      "senderUserId": "Gönderen Kullanıcı ID:",
+      "message": "Mesaj:",
+      "groupJoinRequestButton": "Grup katılma isteği butonu oluşturuluyor:",
+      "groupIdNull": "Grup ID null, buton gösterilmiyor",
+      "requestAccepted": "İstek zaten onaylanmış, 'Onaylandı' butonu gösteriliyor",
+      "requestRejected": "İstek reddedilmiş, 'Reddedildi' butonu gösteriliyor",
+      "requestPending": "İstek beklemede, onaylama/reddetme butonları gösteriliyor"
+    }
+  },
+  "profile": {
+    "mainProfile": {
+      "editProfile": "Profili Düzenle",
+      "refreshLoading": "Profil verileri yenileniyor...",
+      "refreshSuccess": "Profil verileri başarıyla yenilendi",
+      "noEntriesFound": "Hiç entry bulunamadı.",
+      "noPostsFound": "Hiç gönderi bulunamadı.",
+      "shareText": {
+        "topicInfo": "Konu Bilgisi Yok",
+        "categoryInfo": "Kategori Yok",
+        "appLink": "Uygulamayı Aç: edusocial://app",
+        "appStore": "App Store: https://apps.apple.com/app/edusocial/id123456789",
+        "playStore": "Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app",
+        "hashtags": "#EduSocial #Eğitim"
+      }
+    },
+    "editProfile": {
+      "title": "Profili Düzenle",
+      "form": {
+        "username": "Kullanıcı Adı",
+        "name": "Ad",
+        "surname": "Soyad",
+        "email": "E-posta",
+        "phone": "Telefon",
+        "birthday": "Doğum Tarihi",
+        "biography": "Biyografi"
+      },
+      "socialMedia": {
+        "title": "Sosyal Medya Hesapları",
+        "instagram": "Instagram",
+        "twitter": "Twitter",
+        "facebook": "Facebook",
+        "linkedin": "LinkedIn",
+        "tiktok": "Tiktok"
+      },
+      "schoolInfo": {
+        "title": "Okul ve Bölüm Bilgisi",
+        "schoolSelection": "Okul Seçimi",
+        "departmentSelection": "Bölüm Seçimi"
+      },
+      "lessons": {
+        "title": "Dersler",
+        "addLesson": "Ders ekle"
+      },
+      "notifications": {
+        "title": "Bildirim Ayarları",
+        "emailNotification": "E-posta Bildirimi",
+        "mobileNotification": "Mobil Bildirimi"
+      },
+      "language": {
+        "title": "Dil Seçimi",
+        "languageSelection": "Dil Seçimi"
+      },
+      "accountType": {
+        "title": "Hesap Tipi",
+        "accountTypeSelection": "Hesap Tipi Seçimi",
+        "public": "Herkese Açık",
+        "private": "Gizli"
+      },
+      "saveButton": "Kaydet",
+      "loading": "Kaydediliyor..."
+    },
+    "peopleProfile": {
+      "loading": "Kullanıcı profili yükleniyor...",
+      "loadError": "Kullanıcı profili yüklenemedi.",
+      "notFound": "Kullanıcı profili bulunamadı.",
+      "actions": {
+        "follow": "Takip Et",
+        "unfollow": "Takibi Bırak",
+        "pendingApproval": "Onay Bekliyor",
+        "sendMessage": "Mesaj Gönder"
+      },
+      "lockedContent": {
+        "title": "Bu içerik gizli",
+        "description": "Bu kullanıcının içeriğini görmek için\nönce takip isteği göndermeniz gerekir."
+      },
+      "noPostsFound": "Hiç gönderi bulunamadı.",
+      "noEntriesFound": "Hiç entry bulunamadı.",
+      "entriesLoading": "Entryler yükleniyor...",
+      "shareText": {
+        "topicInfo": "Konu Bilgisi Yok",
+        "categoryInfo": "Kategori Yok",
+        "appLink": "Uygulamayı Aç: edusocial://app",
+        "appStore": "App Store: https://apps.apple.com/app/edusocial/id123456789",
+        "playStore": "Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app",
+        "hashtags": "#EduSocial #Eğitim"
+      }
+    },
+    "followers": {
+      "title": "Takipçi",
+      "sendMessage": "Mesaj Gönder"
+    },
+    "following": {
+      "title": "Takip edilen",
+      "sendMessage": "Mesaj Gönder"
+    },
+    "loading": {
+      "profile": "Profil yükleniyor...",
+      "posts": "Gönderiler yükleniyor...",
+      "entries": "Entryler yükleniyor...",
+      "followers": "Takipçiler yükleniyor...",
+      "following": "Takip edilenler yükleniyor...",
+      "saving": "Kaydediliyor...",
+      "refreshing": "Yenileniyor..."
+    },
+    "errors": {
+      "profileLoadFailed": "Profil yüklenemedi",
+      "postsLoadFailed": "Gönderiler yüklenemedi",
+      "entriesLoadFailed": "Entryler yüklenemedi",
+      "followersLoadFailed": "Takipçiler yüklenemedi",
+      "followingLoadFailed": "Takip edilenler yüklenemedi",
+      "profileUpdateFailed": "Profil güncellenemedi",
+      "followFailed": "Takip işlemi başarısız",
+      "unfollowFailed": "Takipten çıkarma işlemi başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu",
+      "generalError": "Bir hata oluştu"
+    },
+    "success": {
+      "profileLoaded": "Profil başarıyla yüklendi",
+      "profileUpdated": "Profil başarıyla güncellendi",
+      "followSuccess": "Kullanıcı takip edildi",
+      "unfollowSuccess": "Kullanıcı takipten çıkarıldı",
+      "followRequestSent": "Takip isteği gönderildi"
+    },
+    "validation": {
+      "usernameRequired": "Kullanıcı adı zorunludur",
+      "nameRequired": "Ad zorunludur",
+      "surnameRequired": "Soyad zorunludur",
+      "emailRequired": "E-posta zorunludur",
+      "emailInvalid": "Geçerli bir e-posta adresi giriniz",
+      "phoneInvalid": "Geçerli bir telefon numarası giriniz",
+      "birthdayInvalid": "Geçerli bir doğum tarihi giriniz"
+    },
+    "debug": {
+      "profileLoading": "ProfileController.loadProfile() çağrıldı",
+      "profileLoaded": "Profil verisi başarıyla yüklendi:",
+      "profileLoadError": "Profil yükleme hatası:",
+      "postsLoading": "ProfileController.fetchProfilePosts() çağrıldı",
+      "postsLoaded": "Profile postları başarıyla yüklendi:",
+      "postsLoadError": "Profile postları yükleme hatası:",
+      "userPostsFiltered": "Kullanıcının kendi postları:",
+      "entriesProcessing": "Entries sayısı:",
+      "entriesLoaded": "Kullanıcının entries'ı yüklendi",
+      "entriesNotFound": "Kullanıcının entries'ı bulunamadı",
+      "relatedDataUpdating": "İlgili veriler güncelleniyor...",
+      "appBarUpdateError": "AppBar güncelleme hatası:",
+      "storyUpdateError": "Story güncelleme hatası:",
+      "topicUserLoading": "Topic kullanıcısı için bilgi çekiliyor: user_id =",
+      "userDataLoaded": "Kullanıcı bilgileri yüklendi:",
+      "userDataError": "Kullanıcı bilgileri alınamadı: user_id =",
+      "topicUserIdNotFound": "Topic user_id bulunamadı, orijinal entry kullanılıyor",
+      "entriesProcessed": "Tüm entries kullanıcı bilgileriyle işlendi",
+      "entriesProcessingError": "Entries işleme hatası:",
+      "userInfoMissing": "Kullanıcı bilgileri eksik, profil sayfasına yönlendirilemiyor"
+    },
+    "fallbackTexts": {
+      "noSchoolInfo": "Okul bilgisi yok",
+      "noDepartmentInfo": "Bölüm bilgisi yok",
+      "invalidDate": "Geçersiz Tarih"
+    }
+  },
+  "search": {
+    "title": "Arama",
+    "searchField": {
+      "placeholder": "Ara...",
+      "hint": "Kişi, grup veya etkinlik ara"
+    },
+    "tabs": {
+      "people": "Kişiler",
+      "groups": "Gruplar",
+      "events": "Etkinlikler"
+    },
+    "people": {
+      "online": "Çevrimiçi",
+      "offline": "Çevrimdışı",
+      "noResults": "Kişi bulunamadı",
+      "loading": "Kişiler aranıyor..."
+    },
+    "groups": {
+      "join": "Katıl",
+      "pendingApproval": "Onay Bekliyor",
+      "memberCount": "üye",
+      "noResults": "Grup bulunamadı",
+      "loading": "Gruplar aranıyor...",
+      "groupSelected": "Grup Seçildi",
+      "redirectingToGroup": "grubuna yönlendiriliyor.",
+      "notMember": "Bu grubun üyesi değilsiniz"
+    },
+    "events": {
+      "noResults": "Etkinlik bulunamadı",
+      "loading": "Etkinlikler aranıyor...",
+      "shared": "Paylaşıldı",
+      "eventShared": "etkinliği paylaşıldı.",
+      "locationError": "Konum açılamadı:",
+      "error": "Hata"
+    },
+    "loading": {
+      "searching": "Aranıyor...",
+      "loadingResults": "Sonuçlar yükleniyor...",
+      "fetchingData": "Veriler getiriliyor..."
+    },
+    "errors": {
+      "searchFailed": "Arama başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu",
+      "generalError": "Bir hata oluştu",
+      "joinRequestFailed": "Gruba katılma isteği gönderilemedi. Lütfen tekrar deneyin.",
+      "locationOpenFailed": "Konum açılamadı"
+    },
+    "success": {
+      "joinRequestSent": "Gruba katılma isteğiniz gönderildi.",
+      "searchCompleted": "Arama tamamlandı"
+    },
+    "debug": {
+      "searchResultsLoaded": "Arama sonuçları yüklendi:",
+      "usersCount": "Kullanıcılar:",
+      "groupsCount": "Gruplar:",
+      "eventsCount": "Etkinlikler:",
+      "groupMembershipStatus": "Grup üyelik durumu:",
+      "groupTapped": "Grup tıklandı:",
+      "isMember": "Üye mi:",
+      "groupId": "Grup ID:",
+      "navigatingToGroupChat": "Grup sohbetine yönlendiriliyor ID:",
+      "userNotMember": "Kullanıcı bu grubun üyesi değil",
+      "searchError": "Arama hatası:"
+    },
+    "fallbackTexts": {
+      "noGroupImage": "Grup resmi yok",
+      "noUserImage": "Kullanıcı resmi yok",
+      "noEventImage": "Etkinlik resmi yok"
+    }
+  },
+  "common": {
+    "buttons": {
+      "ok": "Tamam",
+      "cancel": "İptal",
+      "yes": "Evet",
+      "no": "Hayır",
+      "close": "Kapat",
+      "back": "Geri",
+      "continue": "Devam",
+      "confirm": "Onayla",
+      "reject": "Reddet",
+      "giveUp": "Vazgeç",
+      "save": "Kaydet",
+      "update": "Güncelle",
+      "delete": "Sil",
+      "edit": "Düzenle",
+      "share": "Paylaş",
+      "send": "Gönder",
+      "add": "Ekle",
+      "remove": "Kaldır",
+      "search": "Ara",
+      "refresh": "Yenile",
+      "loading": "Yükleniyor...",
+      "sending": "Gönderiliyor...",
+      "saving": "Kaydediliyor...",
+      "deleting": "Siliniyor...",
+      "updating": "Güncelleniyor...",
+      "creating": "Oluşturuluyor...",
+      "joining": "Katılınıyor...",
+      "leaving": "Ayrılınıyor...",
+      "following": "Takip ediliyor...",
+      "unfollowing": "Takipten çıkarılıyor..."
+    },
+    "messages": {
+      "success": "Başarılı",
+      "error": "Hata",
+      "warning": "Uyarı",
+      "info": "Bilgi",
+      "copySuccess": "Metin panoya kopyalandı",
+      "linkOpenFailed": "Link açılamadı. Lütfen tekrar deneyin.",
+      "linkNotSupported": "Bu link açılamıyor",
+      "featureComingSoon": "Bu özellik yakında eklenecek",
+      "reportFeatureComingSoon": "Şikayet özelliği yakında eklenecek",
+      "operationSuccess": "İşlem başarılı",
+      "operationFailed": "İşlem başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu",
+      "generalError": "Bir hata oluştu",
+      "tryAgain": "Lütfen tekrar deneyin",
+      "noData": "Veri bulunamadı",
+      "noResults": "Sonuç bulunamadı",
+      "loading": "Yükleniyor...",
+      "pleaseWait": "Lütfen bekleyin...",
+      "connectionError": "Bağlantı hatası",
+      "timeoutError": "Zaman aşımı hatası",
+      "permissionDenied": "İzin reddedildi",
+      "fileNotFound": "Dosya bulunamadı",
+      "invalidInput": "Geçersiz giriş",
+      "requiredField": "Bu alan zorunludur",
+      "invalidFormat": "Geçersiz format",
+      "tooShort": "Çok kısa",
+      "tooLong": "Çok uzun",
+      "alreadyExists": "Zaten mevcut",
+      "notFound": "Bulunamadı",
+      "accessDenied": "Erişim reddedildi",
+      "sessionExpired": "Oturum süresi doldu",
+      "maintenanceMode": "Bakım modu",
+      "updateRequired": "Güncelleme gerekli"
+    },
+    "dialogs": {
+      "confirmTitle": "Onay",
+      "confirmMessage": "Bu işlemi gerçekleştirmek istediğinize emin misiniz?",
+      "deleteTitle": "Silme Onayı",
+      "deleteMessage": "Bu öğeyi silmek istediğinize emin misiniz?",
+      "logoutTitle": "Çıkış Yap",
+      "logoutMessage": "Hesabınızdan çıkmak istediğinize emin misiniz?",
+      "unsavedChangesTitle": "Kaydedilmemiş Değişiklikler",
+      "unsavedChangesMessage": "Kaydedilmemiş değişiklikleriniz var. Çıkmak istediğinize emin misiniz?",
+      "errorTitle": "Hata",
+      "warningTitle": "Uyarı",
+      "infoTitle": "Bilgi",
+      "successTitle": "Başarılı"
+    },
+    "validation": {
+      "required": "Bu alan zorunludur",
+      "invalidEmail": "Geçerli bir e-posta adresi giriniz",
+      "invalidPhone": "Geçerli bir telefon numarası giriniz",
+      "invalidUrl": "Geçerli bir URL giriniz",
+      "minLength": "En az {min} karakter olmalıdır",
+      "maxLength": "En fazla {max} karakter olabilir",
+      "passwordMismatch": "Şifreler eşleşmiyor",
+      "invalidFormat": "Geçersiz format",
+      "alreadyExists": "Bu değer zaten kullanılıyor",
+      "notFound": "Bulunamadı",
+      "invalidDate": "Geçersiz tarih",
+      "futureDate": "Gelecek bir tarih seçiniz",
+      "pastDate": "Geçmiş bir tarih seçiniz",
+      "invalidTime": "Geçersiz saat",
+      "invalidNumber": "Geçerli bir sayı giriniz",
+      "positiveNumber": "Pozitif bir sayı giriniz",
+      "integerOnly": "Sadece tam sayı giriniz"
+    },
+    "time": {
+      "justNow": "az önce",
+      "minutesAgo": "dk önce",
+      "hoursAgo": "saat önce",
+      "daysAgo": "gün önce",
+      "weeksAgo": "hafta önce",
+      "monthsAgo": "ay önce",
+      "yearsAgo": "yıl önce",
+      "yesterday": "dün",
+      "today": "bugün",
+      "tomorrow": "yarın"
+    },
+    "status": {
+      "online": "Çevrimiçi",
+      "offline": "Çevrimdışı",
+      "away": "Uzakta",
+      "busy": "Meşgul",
+      "invisible": "Görünmez"
+    },
+    "file": {
+      "size": "Boyut",
+      "type": "Tür",
+      "name": "Ad",
+      "date": "Tarih",
+      "bytes": "bayt",
+      "kilobytes": "KB",
+      "megabytes": "MB",
+      "gigabytes": "GB",
+      "unknown": "Bilinmeyen"
+    },
+    "navigation": {
+      "back": "Geri",
+      "next": "İleri",
+      "previous": "Önceki",
+      "skip": "Atla",
+      "finish": "Bitir",
+      "done": "Tamamlandı",
+      "close": "Kapat",
+      "cancel": "İptal",
+      "confirm": "Onayla"
+    }
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "buttons": {
+      "editProfile": "Profili Düzenle",
+      "privacyPolicy": "Gizlilik Politikası",
+      "notificationSettings": "Bildirim Ayarları",
+      "logout": "Çıkış Yap"
+    },
+    "logoutDialog": {
+      "title": "Çıkış Yap",
+      "message": "Hesabınızdan çıkmak istediğinize emin misiniz?",
+      "cancel": "Vazgeç",
+      "confirm": "Çıkış Yap"
+    },
+    "loading": {
+      "loggingOut": "Çıkış yapılıyor...",
+      "savingSettings": "Ayarlar kaydediliyor...",
+      "loadingSettings": "Ayarlar yükleniyor..."
+    },
+    "errors": {
+      "logoutFailed": "Çıkış yapılamadı",
+      "settingsLoadFailed": "Ayarlar yüklenemedi",
+      "settingsSaveFailed": "Ayarlar kaydedilemedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu",
+      "generalError": "Bir hata oluştu"
+    },
+    "success": {
+      "logoutSuccess": "Başarıyla çıkış yapıldı",
+      "settingsSaved": "Ayarlar başarıyla kaydedildi",
+      "settingsLoaded": "Ayarlar başarıyla yüklendi"
+    },
+    "validation": {
+      "settingsRequired": "Ayarlar gerekli",
+      "invalidSettings": "Geçersiz ayarlar"
+    },
+    "debug": {
+      "settingsLoading": "Ayarlar yükleniyor...",
+      "settingsSaving": "Ayarlar kaydediliyor...",
+      "logoutProcess": "Çıkış işlemi başlatıldı",
+      "logoutSuccess": "Çıkış işlemi başarılı",
+      "logoutError": "Çıkış işlemi hatası:"
+    },
+    "navigation": {
+      "goToEditProfile": "Profil düzenleme sayfasına yönlendiriliyor",
+      "goToPrivacyPolicy": "Gizlilik politikası sayfasına yönlendiriliyor",
+      "goToNotificationSettings": "Bildirim ayarları sayfasına yönlendiriliyor"
+    }
+  }
+} 
