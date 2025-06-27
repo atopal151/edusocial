@@ -1,5 +1,6 @@
 // entry_detail_screen.dart
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
+import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/entry_controller.dart';
 import 'package:edusocial/controllers/entry_detail_controller.dart';
 import 'package:edusocial/models/entry_model.dart';
@@ -111,9 +112,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             child: Obx(() {
               if (entryDetailController.entryComments.isEmpty) {
                 return Center(
-                    child: CircularProgressIndicator(
-                  backgroundColor: Color(0xff9ca3ae),
-                  color: Color(0xfffafafa),
+                    child: GeneralLoadingIndicator(
+                  size: 32,
+                  showIcon: false,
                 ));
               }
               return ListView.builder(

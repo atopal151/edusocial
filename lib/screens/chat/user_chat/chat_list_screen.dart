@@ -86,7 +86,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   Stack(
                                     children: [
                                       CircleAvatar(
-                                        backgroundColor: Color(0xffffffff),
+                                        backgroundColor: Color(0xfffafafa),
                                         radius: 28,
                                         backgroundImage:
                                             NetworkImage(friend.profileImage),
@@ -210,7 +210,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                           children: [
                             CircleAvatar(
                               radius: 25,
-                              backgroundColor: Color(0xffd9d9d9),
+                              backgroundColor: Color(0xfffafafa),
                               backgroundImage: NetworkImage(chat.avatar),
                             ),
                             Positioned(
@@ -315,6 +315,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                       children: [
                         CircleAvatar(
                           radius: 25,
+                              backgroundColor: Color(0xfffafafa),
                           backgroundImage: NetworkImage(group.avatarUrl),
                         ),
                         const SizedBox(width: 10),

@@ -50,13 +50,15 @@ class EntryCard extends StatelessWidget {
                     InkWell(
                       onTap: onPressedProfile,
                       child: CircleAvatar(
+                        backgroundColor: Color(0xfffafafa),
                         radius: 20,
                         backgroundImage: entry.user.avatarUrl.isNotEmpty
                             ? NetworkImage(entry.user.avatarUrl)
                             : null,
                         onBackgroundImageError: entry.user.avatarUrl.isNotEmpty
                             ? (exception, stackTrace) {
-                                debugPrint("❌ Profil resmi yüklenemedi: ${entry.user.avatarUrl}");
+                                debugPrint(
+                                    "❌ Profil resmi yüklenemedi: ${entry.user.avatarUrl}");
                                 debugPrint("❌ Hata: $exception");
                               }
                             : null,
@@ -65,7 +67,6 @@ class EntryCard extends StatelessWidget {
                             : null,
                       ),
                     ),
-                  
                     Positioned(
                       bottom: 0,
                       right: 0,
@@ -176,7 +177,7 @@ class EntryCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                      entry.downvotescount.toString(),
+                    entry.downvotescount.toString(),
                     style: GoogleFonts.inter(fontSize: 10),
                   ),
                 ),

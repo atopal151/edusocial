@@ -170,6 +170,8 @@ class EntryCommentCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       CircleAvatar(
                         radius: 12,
+                                        backgroundColor: Color(0xfffafafa),
+
                         backgroundImage: NetworkImage(entry.user.avatarUrl),
                       ),
                     ],

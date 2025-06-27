@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/group_message_input_field.dart';
 import '../../../components/widgets/group_chat_widget/group_document_message_widget.dart';
@@ -30,7 +31,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
     super.initState();
     debugPrint('🚀 GroupChatDetailScreen initialized');
     controller.fetchGroupDetails();
-    
+
     // Mesajlar yüklendikten sonra en alta git
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration(milliseconds: 500), () {
@@ -54,7 +55,6 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
             if (group == null) {
               return Row(
                 children: [
-                  
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -63,7 +63,6 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                         color: Color(0xFFFF7C7C),
                         strokeWidth: 2,
                       ),
-                   
                     ],
                   ),
                 ],
@@ -72,8 +71,39 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
             return Row(
               children: [
                 CircleAvatar(
-                    backgroundImage: NetworkImage(group.avatarUrl ??
-                        "https://stageapi.edusocial.pl/storage/avatars/a25YweIb75P9UdftcMr1b0Sa1fC75fDKAcTK7ZWf.png")),
+                  radius: 20,
+                  backgroundColor: Colors.grey[200],
+                  child: group.avatarUrl != null && group.avatarUrl!.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            group.avatarUrl!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Network image yüklenemezse SVG göster
+                              return SvgPicture.asset(
+                                "images/icons/group_icon.svg",
+                                colorFilter: const ColorFilter.mode(
+                                  Color(0xff9ca3ae),
+                                  BlendMode.srcIn,
+                                ),
+                                width: 24,
+                                height: 24,
+                              );
+                            },
+                          ),
+                        )
+                      : SvgPicture.asset(
+                          "images/icons/group_icon.svg",
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xff9ca3ae),
+                            BlendMode.srcIn,
+                          ),
+                          width: 24,
+                          height: 24,
+                        ),
+                ),
                 SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +117,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                       children: [
                         Icon(
                           Icons.person,
-                          color: Colors.red,
+                          color: Color(0xffef5050),
                           size: 15,
                         ),
                         SizedBox(
@@ -137,7 +167,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                     controller.scrollToBottom(animated: false);
                   }
                 });
-                
+
                 return ListView.builder(
                   controller: controller.scrollController,
                   itemCount: controller.messages.length,
@@ -149,12 +179,12 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                     } else if (message.messageType ==
                         GroupMessageType.document) {
                       return GroupDocumentMessageWidget(message: message);
-                    } else if (message.messageType ==
-                        GroupMessageType.image) {
+                    } else if (message.messageType == GroupMessageType.image) {
                       return GroupImageMessageWidget(message: message);
                     } else if (message.messageType == GroupMessageType.link) {
                       return GroupLinkMessageWidget(message: message);
-                    } else if (message.messageType == GroupMessageType.textWithLinks) {
+                    } else if (message.messageType ==
+                        GroupMessageType.textWithLinks) {
                       return GroupTextWithLinksMessageWidget(message: message);
                     } else if (message.messageType == GroupMessageType.poll) {
                       return GroupPollMessageWidget(

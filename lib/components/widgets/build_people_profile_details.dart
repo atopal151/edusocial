@@ -35,14 +35,15 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                       CircleAvatar(
+                        CircleAvatar(
                           backgroundColor: Color(0xfffafafa),
                           radius: 20,
                           backgroundImage: (profileData.school?.logo
                                       ?.toString()
                                       .isNotEmpty ??
                                   false)
-                              ? NetworkImage(profileData.school!.logo.toString())
+                              ? NetworkImage(
+                                  profileData.school!.logo.toString())
                               : AssetImage('images/school_logo.png')
                                   as ImageProvider,
                         ),
@@ -84,7 +85,8 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Column(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildPersonalInfo(
                         icon: SvgPicture.asset(
@@ -99,7 +101,6 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                         label: "Doğum Tarihi",
                         value: profileData.birthDate,
                       ),
-                      const SizedBox(height: 10),
                       _buildPersonalInfo(
                         icon: SvgPicture.asset(
                           "images/icons/profile_tab_icon.svg",
@@ -113,6 +114,7 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                         label: "E-posta Adresi",
                         value: profileData.email,
                       ),
+                      const SizedBox(width: 10),
                       const SizedBox(height: 10),
                       if (profileData.language != null &&
                           profileData.language is Map &&

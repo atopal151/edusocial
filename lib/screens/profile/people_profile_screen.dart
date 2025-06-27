@@ -56,7 +56,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
             child: GeneralLoadingIndicator(
               size: 36,
               color: const Color(0xFFEF5050),
-              icon: Icons.person,
             ),
           );
         }
@@ -246,6 +245,16 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
         if (isPrivateProfile && !isFollowing) {
           return _buildLockedContent();
         }
+      }
+
+      // Entries loading durumu
+      if (controller.isEntriesLoading.value) {
+        return Center(
+          child: GeneralLoadingIndicator(
+            size: 24,
+            color: const Color(0xFFEF5050),
+          ),
+        );
       }
 
       if (controller.peopleEntries.isEmpty) {

@@ -80,6 +80,7 @@ class PersonEntryCard extends StatelessWidget {
                       onTap: onPressedProfile,
                       child: CircleAvatar(
                         radius: 20,
+                        backgroundColor: Color(0xfffafafa),
                         backgroundImage: user.avatarUrl.isNotEmpty
                             ? NetworkImage(user.avatarUrl)
                             : null,

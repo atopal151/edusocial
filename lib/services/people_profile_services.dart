@@ -18,7 +18,8 @@ class PeopleProfileService {
       final response = await http.get(
         url,
         headers: {"Authorization": "Bearer $token"},
-      );
+      ).timeout(const Duration(seconds: 10)); // 10 saniye timeout
+      
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
@@ -51,7 +52,7 @@ class PeopleProfileService {
       final response = await http.get(
         url,
         headers: {"Authorization": "Bearer $token"},
-      );
+      ).timeout(const Duration(seconds: 8)); // 8 saniye timeout
       
       //debugPrint("📥 Response status: ${response.statusCode}");
       
@@ -167,6 +168,37 @@ class PeopleProfileService {
     } catch (e) {
       debugPrint("❗ unfollowUser error: $e");
       return false;
+    }
+  }
+
+  /// Birden fazla kullanıcıyı tek seferde çek (performans için)
+  static Future<Map<int, PeopleProfileModel>> fetchUsersByIds(List<int> userIds) async {
+    if (userIds.isEmpty) return {};
+    
+    final Map<int, PeopleProfileModel> users = {};
+    final token = box.read('token');
+
+    try {
+      // Eğer backend batch endpoint'i varsa kullan, yoksa paralel çek
+      // Şimdilik paralel çekme yapıyoruz
+      final List<Future<void>> futures = userIds.map((userId) async {
+        try {
+          final userData = await fetchUserById(userId);
+          if (userData != null) {
+            users[userId] = userData;
+          }
+        } catch (e) {
+          debugPrint("❌ Kullanıcı $userId çekilirken hata: $e");
+        }
+      }).toList();
+
+      // Tüm kullanıcıları 15 saniye içinde çekmeye çalış
+      await Future.wait(futures).timeout(const Duration(seconds: 15));
+      
+      return users;
+    } catch (e) {
+      debugPrint("❌ Batch kullanıcı çekme hatası: $e");
+      return {};
     }
   }
 }

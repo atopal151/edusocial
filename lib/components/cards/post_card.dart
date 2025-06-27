@@ -97,7 +97,7 @@ class _PostCardState extends State<PostCard> {
                         },
                         child: CircleAvatar(
                           radius: 20,
-                          backgroundColor: Color(0xfff3f4f6), // Gri arkaplan
+                          backgroundColor: Color(0xfffafafa), // Gri arkaplan
                           backgroundImage: widget.profileImage.isNotEmpty
                               ? NetworkImage(widget.profileImage)
                               : null, // Eğer profil resmi varsa kullan

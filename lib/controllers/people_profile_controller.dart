@@ -7,16 +7,22 @@ import 'package:get/get.dart';
 
 class PeopleProfileController extends GetxController {
   var isLoading = true.obs; // Profil genel yüklenme durumu
+  var isEntriesLoading = false.obs; // Entries yüklenme durumu
   var isFollowLoading = false.obs; // Takip/çıkar butonu loading
   var isFollowing = false.obs; // Kullanıcı takip ediliyor mu
   var isFollowingPending = false.obs; // Takip isteği bekliyor mu
   var profile = Rxn<PeopleProfileModel>(); // Kullanıcı profili
   var peopleEntries = <EntryModel>[].obs; // Kullanıcının entries'ları
 
+  // Kullanıcı cache'i - performans için
+  final Map<int, UserModel> _userCache = {};
+
   /// Username ile profil çekme
   Future<void> loadUserProfileByUsername(String username) async {
     try {
       isLoading.value = true;
+      isEntriesLoading.value = true;
+      _userCache.clear(); // Cache'i temizle
       //debugPrint("🔄 Profil yükleniyor: $username");
 
       final data = await PeopleProfileService.fetchUserByUsername(username);
@@ -27,21 +33,96 @@ class PeopleProfileController extends GetxController {
         isFollowing.value = data.isFollowing;
         isFollowingPending.value = data.isFollowingPending;
         
-        // API'den gelen entries verilerini kullanıcı bilgileriyle işle
-        //debugPrint("📝 Entries sayısı: ${data.entries.length}");
-        await _processEntriesWithUserData(data.entries);
-        //debugPrint("✅ Kullanıcının ${data.entries.length} entries'ı yüklendi");
+        // Profil bilgileri yüklendi, ana loading'i kapat
+        isLoading.value = false;
+        
+        // Entries'ları ayrı olarak yükle (progressive loading)
+        if (data.entries.isNotEmpty) {
+          //debugPrint("📝 Entries sayısı: ${data.entries.length}");
+          await _processEntriesWithUserDataOptimized(data.entries);
+          //debugPrint("✅ Kullanıcının ${data.entries.length} entries'ı yüklendi");
+        } else {
+          peopleEntries.assignAll([]);
+        }
       } else {
         //debugPrint("⚠️ Profil verisi boş döndü (username: $username)");
+        isLoading.value = false;
       }
     } catch (e) {
       debugPrint("❌ Profil yüklenirken hata oluştu: $e");
-    } finally {
       isLoading.value = false;
+    } finally {
+      isEntriesLoading.value = false;
     }
   }
 
-  /// Entries'ları topic user_id'lerine göre kullanıcı bilgileriyle işle
+  /// Optimize edilmiş entries işleme - tek seferde tüm kullanıcıları çeker
+  Future<void> _processEntriesWithUserDataOptimized(List<EntryModel> entries) async {
+    try {
+      if (entries.isEmpty) {
+        peopleEntries.assignAll([]);
+        return;
+      }
+
+      // 1. Önce tüm benzersiz topic user_id'lerini topla
+      final Set<int> uniqueUserIds = {};
+      for (final entry in entries) {
+        final topicUserId = entry.topic?.userId;
+        if (topicUserId != null) {
+          uniqueUserIds.add(topicUserId);
+        }
+      }
+
+      //debugPrint("🔍 ${uniqueUserIds.length} benzersiz kullanıcı ID'si bulundu");
+
+      // 2. Tüm kullanıcıları batch olarak çek
+      if (uniqueUserIds.isNotEmpty) {
+        final userDataMap = await PeopleProfileService.fetchUsersByIds(uniqueUserIds.toList());
+        
+        // Cache'e ekle
+        for (final entry in userDataMap.entries) {
+          _userCache[entry.key] = _createUserModelFromProfile(entry.value);
+        }
+        
+        //debugPrint("✅ ${_userCache.length} kullanıcı verisi batch olarak cache'lendi");
+      }
+
+      // 3. Entry'leri işle ve cache'den kullanıcı bilgilerini al
+      final processedEntries = entries.map((entry) {
+        final topicUserId = entry.topic?.userId;
+        
+        if (topicUserId != null && _userCache.containsKey(topicUserId)) {
+          final user = _userCache[topicUserId]!;
+          
+          return EntryModel(
+            id: entry.id,
+            content: entry.content,
+            upvotescount: entry.upvotescount,
+            downvotescount: entry.downvotescount,
+            humancreatedat: entry.humancreatedat,
+            createdat: entry.createdat,
+            user: user,
+            topic: entry.topic,
+            islike: entry.islike,
+            isdislike: entry.isdislike,
+          );
+        } else {
+          // Cache'de yoksa orijinal entry'yi kullan
+          return entry;
+        }
+      }).toList();
+
+      peopleEntries.assignAll(processedEntries);
+      //debugPrint("✅ Tüm entries optimize edilmiş şekilde işlendi");
+      
+    } catch (e) {
+      debugPrint("❌ Entries işleme hatası: $e");
+      // Hata durumunda orijinal entries'ları kullan
+      peopleEntries.assignAll(entries);
+    }
+  }
+
+  /// Eski yöntem - geriye uyumluluk için tutuldu
   Future<void> _processEntriesWithUserData(List<EntryModel> entries) async {
     try {
       final processedEntries = <EntryModel>[];
@@ -153,6 +234,7 @@ class PeopleProfileController extends GetxController {
   Future<void> loadUserProfile(int userId) async {
     try {
       isLoading.value = true;
+      _userCache.clear(); // Cache'i temizle
 
       final data = await PeopleProfileService.fetchUserById(userId);
       if (data != null) {
@@ -161,7 +243,7 @@ class PeopleProfileController extends GetxController {
         isFollowingPending.value = data.isFollowingPending;
         
         // API'den gelen entries verilerini kullanıcı bilgileriyle işle
-        await _processEntriesWithUserData(data.entries);
+        await _processEntriesWithUserDataOptimized(data.entries);
         //debugPrint("✅ Kullanıcının ${data.entries.length} entries'ı yüklendi");
       } else {
         debugPrint("⚠️ Profil verisi boş döndü");
@@ -213,5 +295,12 @@ class PeopleProfileController extends GetxController {
     } finally {
       isFollowLoading.value = false;
     }
+  }
+
+  @override
+  void onClose() {
+    // Controller dispose edildiğinde cache'i temizle
+    _userCache.clear();
+    super.onClose();
   }
 }
