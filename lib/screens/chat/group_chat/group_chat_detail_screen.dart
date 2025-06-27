@@ -53,20 +53,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           child: Obx(() {
             final group = controller.groupData.value;
             if (group == null) {
-              return Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const CustomLoadingIndicator(
-                        size: 26,
-                        color: Color(0xFFFF7C7C),
-                        strokeWidth: 2,
-                      ),
-                    ],
-                  ),
-                ],
-              );
+              return Center();
             }
             return Row(
               children: [
@@ -161,12 +148,68 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           children: [
             Expanded(
               child: Obx(() {
+                final isMessagesLoading = controller.isMessagesLoading.value;
+                final isGroupLoading = controller.isGroupDataLoading.value;
+                final group = controller.groupData.value;
+
                 // Mesajlar yüklendiğinde en alta git
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (controller.messages.isNotEmpty) {
                     controller.scrollToBottom(animated: false);
                   }
                 });
+
+                // Grup verisi veya mesajlar yükleniyorsa loading göster
+                if (isGroupLoading || isMessagesLoading || group == null) {
+                  return Center(
+                    child: CustomLoadingIndicator(
+                      size: 40,
+                      color: Color(0xFFFF7C7C),
+                      strokeWidth: 3,
+                    ),
+                  );
+                }
+
+                // Mesajlar boşsa
+                if (controller.messages.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.chat_bubble_outline,
+                            size: 40,
+                            color: Color(0xff9ca3ae),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          "Henüz mesaj yok",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff414751),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "İlk mesajı siz gönderin!",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xff9ca3ae),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
                 return ListView.builder(
                   controller: controller.scrollController,
