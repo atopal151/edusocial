@@ -1,5 +1,6 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/components/buttons/custom_button.dart';
+import 'package:edusocial/components/buttons/notification_action_button.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/notification_controller.dart';
 import 'package:edusocial/models/notification_model.dart';
@@ -157,34 +158,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
       if (notif.isAccepted) {
         debugPrint("🔍   - Durum: Onaylandı");
-        return SizedBox(
-          width: 100,
-          child: CustomButton(
-            text: "Onaylandı",
-            height: 32,
-            borderRadius: 15,
-            onPressed: () {}, // Tıklanamaz
-            isLoading: RxBool(false),
-            backgroundColor: Color(0xffffffff),
-            textColor: Colors.grey[600]!,
-          ),
-        );
+        return NotificationActionButtonStyles.accepted(text: "Onaylandı");
       }
 
       if (notif.isRejected) {
         debugPrint("🔍   - Durum: Reddedildi");
-        return SizedBox(
-          width: 100,
-          child: CustomButton(
-            text: "Reddedildi",
-            height: 32,
-            borderRadius: 15,
-            onPressed: () {}, // Tıklanamaz
-            isLoading: RxBool(false),
-            backgroundColor: Color(0xfffb535c),
-            textColor: Color(0xfffff6f6),
-          ),
-        );
+        return NotificationActionButtonStyles.rejected(text: "Reddedildi");
       }
 
       // Her durumda Onayla ve X göster
@@ -192,19 +171,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 100,
-            child: CustomButton(
-              text: "Onayla",
-              height: 32,
-              borderRadius: 15,
-              onPressed: () {
-                controller.handleFollowRequest(notif.senderUserId, 'accept');
-              },
-              isLoading: RxBool(false),
-            backgroundColor: Color(0xfffb535c),
-            textColor: Color(0xfffff6f6),
-            ),
+          NotificationActionButtonStyles.accept(
+            text: "Onayla",
+            onPressed: () {
+              controller.handleFollowRequest(notif.senderUserId, 'accept');
+            },
           ),
           SizedBox(width: 8),
           Container(
@@ -249,35 +220,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
       if (notif.isAccepted) {
         debugPrint(
             "🔍   - Request is already accepted, showing 'Onaylandı' button");
-        return SizedBox(
-          width: 100,
-          child: CustomButton(
-            text: "Onaylandı",
-            height: 32,
-            borderRadius: 15,
-            onPressed: () {}, // Tıklanamaz
-            isLoading: RxBool(false),
-            backgroundColor: Colors.grey[300]!,
-            textColor: Colors.grey[600]!,
-          ),
-        );
+        return NotificationActionButtonStyles.accepted(text: "Onaylandı");
       }
 
       // Eğer istek reddedilmişse
       if (notif.isRejected) {
         debugPrint("🔍   - Request is rejected, showing 'Reddedildi' button");
-        return SizedBox(
-          width: 100,
-          child: CustomButton(
-            text: "Reddedildi",
-            height: 32,
-            borderRadius: 15,
-            onPressed: () {}, // Tıklanamaz
-            isLoading: RxBool(false),
-            backgroundColor: Color(0xffffd6d6),
-            textColor: Color(0xfffb535c),
-          ),
-        );
+        return NotificationActionButtonStyles.rejected(text: "Reddedildi");
       }
 
       debugPrint("🔍   - Request is pending, showing accept/decline buttons");
@@ -285,30 +234,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 100,
-            child: CustomButton(
-              text: "Onayla",
-              height: 32,
-              borderRadius: 15,
-              onPressed: () {
-                controller.handleGroupJoinRequest(
-                  notif.senderUserId,
-                  notif.groupId!,
-                  'accept',
-                );
-              },
-              isLoading: RxBool(false),
-              backgroundColor: const Color(0xFFfff6f6),
-              textColor: Color(0xFFed7474),
-            ),
+          NotificationActionButtonStyles.accept(
+            text: "Onayla",
+            onPressed: () {
+              controller.handleGroupJoinRequest(
+                notif.senderUserId,
+                notif.groupId!,
+                'accept',
+              );
+            },
           ),
           SizedBox(width: 8),
           Container(
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              
               borderRadius: BorderRadius.circular(15),
             ),
             child: IconButton(
