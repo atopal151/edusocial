@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../controllers/story_controller.dart';
+import '../../../controllers/profile_controller.dart';
 import '../../../components/snackbars/custom_snackbar.dart';
 import '../../../services/language_service.dart';
 
@@ -129,65 +130,196 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: _selectedImages.length + 1,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 6,
-                crossAxisSpacing: 6,
-              ),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return GestureDetector(
-                    onTap: pickFromCamera,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.camera_alt_rounded,
-                          size: 32,
-                          color: Color(0xFFF26B6B),
-                        ),
-                      ),
-                    ),
-                  );
-                } else {
-                  final file = File(_selectedImages[index - 1].path);
-                  return Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(file, fit: BoxFit.cover),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              _selectedImages.removeAt(index - 1);
-                            });
-                          },
+            child: _selectedImages.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: pickFromCamera,
                           child: Container(
+                            width: 100,
+                            height: 100,
                             decoration: BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
+                              color: const Color(0xFFF5F5F5),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            padding: const EdgeInsets.all(4),
-                            child: const Icon(Icons.close,
-                                size: 16, color: Colors.white),
+                            child: const Icon(
+                              Icons.camera_alt_rounded,
+                              size: 40,
+                              color: Color(0xFFF26B6B),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
+                        const SizedBox(height: 16),
+                        Text(
+                          languageService.tr("home.story.addStory.selectPhotoWarning"),
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: const Color(0xFF9CA3AE),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        // Story Preview (9:16 aspect ratio)
+                        Expanded(
+                          child: Container(
+                            width: double.infinity,
+                            constraints: BoxConstraints(
+                              maxHeight: MediaQuery.of(context).size.height * 0.6,
+                            ),
+                            child: AspectRatio(
+                              aspectRatio: 9 / 16,
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      color: Colors.black,
+                                      child: Image.file(
+                                        File(_selectedImages.first.path),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  // Story preview overlay
+                                  Positioned(
+                                    top: 16,
+                                    left: 16,
+                                    right: 16,
+                                    child: Row(
+                                      children: [
+                                        Obx(() {
+                                          final ProfileController profileController = Get.find<ProfileController>();
+                                          return CircleAvatar(
+                                            radius: 16,
+                                            backgroundColor: Colors.white,
+                                            backgroundImage: profileController.profileImage.value.isNotEmpty &&
+                                                profileController.profileImage.value.startsWith("http")
+                                                ? NetworkImage(profileController.profileImage.value)
+                                                : null,
+                                            child: profileController.profileImage.value.isEmpty ||
+                                                !profileController.profileImage.value.startsWith("http")
+                                                ? Icon(
+                                                    Icons.person,
+                                                    size: 20,
+                                                    color: Color(0xFF9CA3AE),
+                                                  )
+                                                : null,
+                                          );
+                                        }),
+                                        const SizedBox(width: 8),
+                                        Obx(() {
+                                          final ProfileController profileController = Get.find<ProfileController>();
+                                          return Text(
+                                            profileController.username.value,
+                                            style: GoogleFonts.inter(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          );
+                                        }),
+                                        const Spacer(),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _selectedImages.clear();
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Küçük thumbnail'ler (eğer birden fazla seçili varsa)
+                        if (_selectedImages.length > 1)
+                          Container(
+                            height: 80,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _selectedImages.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    // İlk sıraya taşı
+                                    setState(() {
+                                      final selected = _selectedImages.removeAt(index);
+                                      _selectedImages.insert(0, selected);
+                                    });
+                                  },
+                                  child: Container(
+                                    width: 60,
+                                    height: 80,
+                                    margin: const EdgeInsets.only(right: 8),
+                                    decoration: BoxDecoration(
+                                      border: index == 0
+                                          ? Border.all(color: Color(0xFFF26B6B), width: 2)
+                                          : null,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(6),
+                                          child: Image.file(
+                                            File(_selectedImages[index].path),
+                                            width: 60,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 2,
+                                          right: 2,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedImages.removeAt(index);
+                                              });
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              padding: const EdgeInsets.all(2),
+                                              child: const Icon(
+                                                Icons.close,
+                                                size: 12,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.all(16),
@@ -206,8 +338,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                     ),
                     onPressed: pickImages,
                     label: Text(
-                      languageService
-                          .tr("home.story.addStory.selectFromGallery"),
+                      languageService.tr("home.story.addStory.selectFromGallery"),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

@@ -99,10 +99,10 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
     final difference = now.difference(date);
 
     if (difference.inSeconds < 60) return languageService.tr("common.time.justNow");
-    if (difference.inMinutes < 60) return "${difference.inMinutes} ${languageService.tr("common.time.minutes")} ${languageService.tr("common.time.ago")}";
-    if (difference.inHours < 24) return "${difference.inHours} ${languageService.tr("common.time.hours")} ${languageService.tr("common.time.ago")}";
+    if (difference.inMinutes < 60) return "${difference.inMinutes} ${languageService.tr("common.time.minutesAgo")}";
+    if (difference.inHours < 24) return "${difference.inHours} ${languageService.tr("common.time.hoursAgo")}";
     if (difference.inDays == 1) return languageService.tr("common.time.yesterday");
-    if (difference.inDays < 7) return "${difference.inDays} ${languageService.tr("common.time.days")} ${languageService.tr("common.time.ago")}";
+    if (difference.inDays < 7) return "${difference.inDays} ${languageService.tr("common.time.daysAgo")}";
     return "${date.day}/${date.month}/${date.year}";
   }
 

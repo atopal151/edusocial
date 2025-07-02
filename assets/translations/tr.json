@@ -1408,6 +1408,19 @@
   "story": {
     "userStoryCard": {
       "you": "@Sen"
+    },
+    "addStory": {
+      "title": "Story Paylaş",
+      "selectFromGallery": "Galeriden Seç",
+      "nearby": "Yakındaki",
+      "share": "Paylaş",
+      "selectPhotoWarning": "Lütfen bir fotoğraf seçin",
+      "shareError": "Story paylaşılırken hata oluştu",
+      "photoSelectionError": "Fotoğraf seçilirken hata oluştu",
+      "cameraError": "Kamera açılırken hata oluştu"
+    },
+    "viewer": {
+      "noImage": "Görsel yüklenemedi"
     }
   },
   "auth": {

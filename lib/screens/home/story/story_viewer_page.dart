@@ -110,10 +110,10 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       final difference = now.difference(date);
 
       if (difference.inSeconds < 60) return languageService.tr("common.time.justNow");
-      if (difference.inMinutes < 60) return "${difference.inMinutes} ${languageService.tr("common.time.minutes")} ${languageService.tr("common.time.ago")}";
-      if (difference.inHours < 24) return "${difference.inHours} ${languageService.tr("common.time.hours")} ${languageService.tr("common.time.ago")}";
+      if (difference.inMinutes < 60) return "${difference.inMinutes} ${languageService.tr("common.time.minutesAgo")}";
+      if (difference.inHours < 24) return "${difference.inHours} ${languageService.tr("common.time.hoursAgo")}";
       if (difference.inDays == 1) return languageService.tr("common.time.yesterday");
-      if (difference.inDays < 7) return "${difference.inDays} ${languageService.tr("common.time.days")} ${languageService.tr("common.time.ago")}";
+      if (difference.inDays < 7) return "${difference.inDays} ${languageService.tr("common.time.daysAgo")}";
       return "${date.day}/${date.month}/${date.year}";
     }
 
@@ -213,7 +213,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                           children: [
                             Text(story.username,
                                 style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600)),
-                            Text(timeAgo(story.created_at), style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 10, fontWeight: FontWeight.w400)),
+                            Text(timeAgo(story.createdat), style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 10, fontWeight: FontWeight.w400)),
                           ],
                         ),
                         Spacer(),

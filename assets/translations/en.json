@@ -1375,6 +1375,19 @@
   "story": {
     "userStoryCard": {
       "you": "@You"
+    },
+    "addStory": {
+      "title": "Share Story",
+      "selectFromGallery": "Select from Gallery",
+      "nearby": "Nearby",
+      "share": "Share",
+      "selectPhotoWarning": "Please select a photo",
+      "shareError": "Error occurred while sharing story",
+      "photoSelectionError": "Error occurred while selecting photo",
+      "cameraError": "Error occurred while opening camera"
+    },
+    "viewer": {
+      "noImage": "Image could not be loaded"
     }
   },
   "auth": {
@@ -1416,14 +1429,6 @@
     "rejected": "Rejected",
     "accept": "Accept",
     "decline": "Decline"
-  },
-  "time": {
-    "justNow": "just now",
-    "minute": "min",
-    "hour": "h",
-    "day": "d",
-    "week": "w",
-    "month": "mo",
-    "year": "y"
   }
+
 }
