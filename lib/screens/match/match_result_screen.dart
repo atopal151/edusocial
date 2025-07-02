@@ -33,47 +33,49 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Obx(() {
           if (controller.matches.isEmpty) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                 Text(
-                  languageService.tr("match.resultScreen.noMatchesFound"),
-                  style: GoogleFonts.inter(
-                    color: Color(0xff9ca3ae),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFFF7743),
-                        Color(0xFFEF5050)
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+            return Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   Text(
+                    languageService.tr("match.resultScreen.noMatchesFound"),
+                    style: GoogleFonts.inter(
+                      color: Color(0xff9ca3ae),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
                     ),
-                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: InkWell(
-                    onTap: () {
-                      Get.toNamed('/match');
-                    },
-                    child: Text(
-                      languageService.tr("match.resultScreen.addCourseButton"),
-                      style: GoogleFonts.inter(
-                        color: Color(0xffffffff),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFF7743),
+                          Color(0xFFEF5050)
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        Get.toNamed('/match');
+                      },
+                      child: Text(
+                        languageService.tr("match.resultScreen.addCourseButton"),
+                        style: GoogleFonts.inter(
+                          color: Color(0xffffffff),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           } else {
             return Column(

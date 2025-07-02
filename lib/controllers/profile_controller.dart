@@ -3,6 +3,7 @@ import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:edusocial/services/post_service.dart';
+import 'package:edusocial/services/entry_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -125,14 +126,8 @@ String formatSimpleDate(String dateStr) {
       // 📌 Postlar - Artık ayrı bir endpoint'ten çekiyoruz
       await fetchProfilePosts();
       
-      // 📝 Entries'ları kullanıcı bilgileriyle işle
-      if (profileData.entries.isNotEmpty) {
-        debugPrint("📝 Entries sayısı: ${profileData.entries.length}");
-        await _processEntriesWithUserData(profileData.entries);
-        debugPrint("✅ Kullanıcının ${profileData.entries.length} entries'ı yüklendi");
-      } else {
-        debugPrint("⚠️ Kullanıcının entries'ı bulunamadı");
-      }
+      // 📝 Entries'ları yeni endpoint'ten çek
+      await _fetchEntriesFromUsername(profileData.username);
       
       // Profil yüklendikten sonra diğer verileri de güncelle
       _updateRelatedData();
@@ -179,6 +174,153 @@ String formatSimpleDate(String dateStr) {
   void updateProfile(String name, String newBio) {
     fullName.value = name;
     bio.value = newBio;
+  }
+
+  /// 🔥 YENİ: Entry'ye oy verme işlemi
+  Future<void> voteEntry(int entryId, String vote) async {
+    try {
+      debugPrint("🔄 ProfileController - Entry'ye oy veriliyor: $entryId, vote: $vote");
+      
+      // API'ye oy verme isteği gönder
+      final success = await EntryServices.voteEntry(
+        vote: vote,
+        entryId: entryId,
+      );
+
+      if (success) {
+        debugPrint("✅ ProfileController - Oy verme başarılı");
+        
+        // Profile entries listesindeki ilgili entry'yi güncelle
+        final indexInProfile = personEntries.indexWhere((entry) => entry.id == entryId);
+        if (indexInProfile != -1) {
+          final currentEntry = personEntries[indexInProfile];
+          int newUpvotes = currentEntry.upvotescount;
+          int newDownvotes = currentEntry.downvotescount;
+          bool? newIsLike = currentEntry.islike;
+          bool? newIsDislike = currentEntry.isdislike;
+
+          if (vote == "up") {
+            if (newIsLike == true) {
+              // Zaten beğenilmiş, beğeniyi kaldır
+              newUpvotes--;
+              newIsLike = false;
+            } else {
+              // Beğen
+              newUpvotes++;
+              newIsLike = true;
+              if (newIsDislike == true) {
+                newDownvotes--;
+                newIsDislike = false;
+              }
+            }
+          } else if (vote == "down") {
+            if (newIsDislike == true) {
+              // Zaten beğenilmemiş, beğenmemeyi kaldır
+              newDownvotes--;
+              newIsDislike = false;
+            } else {
+              // Beğenme
+              newDownvotes++;
+              newIsDislike = true;
+              if (newIsLike == true) {
+                newUpvotes--;
+                newIsLike = false;
+              }
+            }
+          }
+
+          final updatedEntry = currentEntry.copyWith(
+            upvotescount: newUpvotes,
+            downvotescount: newDownvotes,
+            islike: newIsLike,
+            isdislike: newIsDislike,
+          );
+
+          personEntries[indexInProfile] = updatedEntry;
+          debugPrint("✅ ProfileController - Entry oy durumu güncellendi: Upvotes: $newUpvotes, Downvotes: $newDownvotes");
+        }
+      } else {
+        debugPrint("❌ ProfileController - Oy verme başarısız");
+      }
+    } catch (e) {
+      debugPrint("❌ ProfileController - Oy verme hatası: $e");
+    }
+  }
+
+  /// 🔥 YENİ: Username'den entries'ları çek
+  Future<void> _fetchEntriesFromUsername(String username) async {
+    try {
+      debugPrint("🔄 ProfileController - Entries çekiliyor: $username");
+      
+      final userData = await ProfileService.fetchUserByUsername(username);
+      
+      if (userData != null && userData.entries.isNotEmpty) {
+        debugPrint("✅ ProfileController - ${userData.entries.length} entries bulundu");
+        
+        // People profile'daki gibi entries'ları işle
+        final processedEntries = <EntryModel>[];
+        
+        for (final entry in userData.entries) {
+          // Entry'nin user bilgilerini userData'dan al
+          final user = UserModel(
+            id: int.tryParse(userData.id.toString()) ?? 0,
+            accountType: userData.accountType,
+            languageId: int.tryParse(userData.languageId?.toString() ?? '1') ?? 1,
+            avatar: userData.avatar,
+            banner: userData.banner,
+            schoolId: int.tryParse(userData.schoolId?.toString() ?? '1') ?? 1,
+            schoolDepartmentId: int.tryParse(userData.schoolDepartmentId?.toString() ?? '1') ?? 1,
+            name: userData.name,
+            surname: userData.surname,
+            username: userData.username,
+            email: userData.email,
+            phone: userData.phone,
+            birthday: userData.birthDate.isNotEmpty ? DateTime.tryParse(userData.birthDate) : null,
+            instagram: userData.instagram,
+            tiktok: userData.tiktok,
+            twitter: userData.twitter,
+            facebook: userData.facebook,
+            linkedin: userData.linkedin,
+            notificationEmail: userData.notificationEmail,
+            notificationMobile: userData.notificationMobile,
+            isActive: userData.isActive,
+            isOnline: userData.isOnline,
+            avatarUrl: userData.avatarUrl.isNotEmpty ? userData.avatarUrl : userData.avatar,
+            bannerUrl: userData.bannerUrl,
+            isFollowing: userData.isFollowing,
+            isFollowingPending: userData.isFollowingPending,
+            isSelf: userData.isSelf,
+          );
+          
+          // Entry'yi user bilgileriyle oluştur
+          final processedEntry = EntryModel(
+            id: entry.id,
+            content: entry.content,
+            upvotescount: entry.upvotescount,
+            downvotescount: entry.downvotescount,
+            humancreatedat: entry.humancreatedat,
+            createdat: entry.createdat,
+            user: user,
+            topic: entry.topic,
+            islike: entry.islike,
+            isdislike: entry.isdislike,
+          );
+          
+          processedEntries.add(processedEntry);
+        }
+        
+        personEntries.assignAll(processedEntries);
+        debugPrint("✅ ProfileController - ${processedEntries.length} entries yüklendi");
+        
+      } else {
+        debugPrint("⚠️ ProfileController - Entries bulunamadı");
+        personEntries.clear();
+      }
+      
+    } catch (e) {
+      debugPrint("❌ ProfileController - Entries çekme hatası: $e");
+      personEntries.clear();
+    }
   }
 
   /// Entries'ları topic user_id'lerine göre kullanıcı bilgileriyle işle

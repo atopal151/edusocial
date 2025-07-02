@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/comment_controller.dart';
+import '../../services/language_service.dart';
 import '../input_fields/comment_input_field.dart';
 
 class CommentBottomSheet extends StatefulWidget {
@@ -54,7 +55,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
-                  "Yorumlar",
+                  Get.find<LanguageService>().tr("comments.title"),
                   style: GoogleFonts.inter(
                       fontSize: 18, fontWeight: FontWeight.w700),
                 ),

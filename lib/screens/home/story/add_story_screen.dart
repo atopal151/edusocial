@@ -41,7 +41,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
         title: languageService.tr("common.errors.error"),
-        message: languageService.tr("story.addStory.photoSelectionError"),
+        message: languageService.tr("home.story.addStory.photoSelectionError"),
         type: SnackbarType.error,
       );
     }
@@ -59,7 +59,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
         title: languageService.tr("common.errors.error"),
-        message: languageService.tr("story.addStory.cameraError"),
+        message: languageService.tr("home.story.addStory.cameraError"),
         type: SnackbarType.error,
       );
     }
@@ -79,7 +79,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         final LanguageService languageService = Get.find<LanguageService>();
         CustomSnackbar.show(
           title: languageService.tr("common.errors.error"),
-          message: languageService.tr("story.addStory.shareError"),
+          message: languageService.tr("home.story.addStory.shareError"),
           type: SnackbarType.error,
         );
       }
@@ -87,7 +87,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
         title: languageService.tr("common.warnings.warning"),
-        message: languageService.tr("story.addStory.selectPhotoWarning"),
+        message: languageService.tr("home.story.addStory.selectPhotoWarning"),
         type: SnackbarType.warning,
       );
     }
@@ -101,7 +101,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          languageService.tr("story.addStory.title"),
+          languageService.tr("home.story.addStory.title"),
           style: GoogleFonts.inter(
             color: const Color(0xFF414751),
             fontSize: 18,
@@ -120,7 +120,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             alignment: Alignment.centerLeft,
             child: Text(
-              languageService.tr("story.addStory.nearby"),
+              languageService.tr("home.story.addStory.nearby"),
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -205,9 +205,9 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                       ),
                     ),
                     onPressed: pickImages,
-                    icon: const Icon(Icons.photo_library, color: Color(0xFFF26B6B)),
                     label: Text(
-                      languageService.tr("story.addStory.selectFromGallery"),
+                      languageService
+                          .tr("home.story.addStory.selectFromGallery"),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -248,7 +248,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                               ),
                             )
                           : Text(
-                              languageService.tr("story.addStory.share"),
+                              languageService.tr("home.story.addStory.share"),
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,

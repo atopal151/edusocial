@@ -247,8 +247,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                     debugPrint("⚠️ Kullanıcı bilgileri eksik, profil sayfasına yönlendirilemiyor");
                   }
                 },
-                onUpvote: () => entryController.voteEntry(entry.id, "up"),
-                onDownvote: () => entryController.voteEntry(entry.id, "down"),
+                onUpvote: () => controller.voteEntry(entry.id, "up"),
+                onDownvote: () => controller.voteEntry(entry.id, "down"),
                 onShare: () {
                   // Konu bilgilerini al
                   final topicName = entry.topic?.name ?? languageService.tr("profile.mainProfile.shareText.topicInfo");

@@ -131,16 +131,8 @@ class PersonEntryCard extends StatelessWidget {
                             color: Color(0xff414751)),
                       ),
                     ),
-                    InkWell(
-                      onTap: onPressedProfile,
-                      child: Text(
-                        "@${user.username}",
-                        style: GoogleFonts.inter(
-                            color: Color(0xff9ca3ae), fontSize: 10),
-                      ),
-                    ),
                     Text(
-                      formatSimpleDateClock(entry.humancreatedat),
+                      formatSimpleDateClock(entry.createdat.toString()),
                       style: GoogleFonts.inter(
                           color: Color(0xff9ca3ae), fontSize: 10),
                     ),

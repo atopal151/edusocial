@@ -100,12 +100,7 @@ class EntryCard extends StatelessWidget {
                           color: Color(0xff414751)),
                     ),
                     Text(
-                      "@${entry.user.username}",
-                      style: GoogleFonts.inter(
-                          color: Color(0xff9ca3ae), fontSize: 10),
-                    ),
-                    Text(
-                      formatSimpleDateClock(entry.humancreatedat),
+                      formatSimpleDateClock(entry.createdat.toString()),
                       style: GoogleFonts.inter(
                           color: Color(0xff9ca3ae), fontSize: 10),
                     ),
