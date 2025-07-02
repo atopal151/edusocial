@@ -3,7 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 
-import '../../controllers/social/chat_detail_controller.dart';
+import '../../controllers/chat_controllers/chat_detail_controller.dart';
+import '../../services/language_service.dart';
 
 class MessageInputField extends StatefulWidget {
   final ChatDetailController controller;
@@ -34,6 +35,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Container(
       decoration: BoxDecoration(
         color: Color(0xfffafafa),
@@ -128,8 +130,8 @@ class _MessageInputFieldState extends State<MessageInputField> {
                   controller: messageController,
                   decoration: InputDecoration(
                     hintText: widget.controller.selectedFiles.isNotEmpty
-                        ? "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz..."
-                        : "Bir mesaj yazınız... ",
+                        ? languageService.tr("chat.messageInput.fileSelected")
+                        : languageService.tr("chat.messageInput.placeholder"),
                     hintStyle:
                         TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
                     border: InputBorder.none,

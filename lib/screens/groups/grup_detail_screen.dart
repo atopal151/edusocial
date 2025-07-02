@@ -1,17 +1,29 @@
 import 'package:edusocial/components/cards/event_card.dart';
+import 'package:edusocial/components/cards/group_suggestion_card.dart';
+import 'package:edusocial/components/buttons/custom_button.dart';
+import 'package:edusocial/components/buttons/icon_button.dart';
+import 'package:edusocial/components/cards/profile_cards.dart';
+import 'package:edusocial/components/user_appbar/group_appbar.dart';
 import 'package:edusocial/components/widgets/custom_loading_indicator.dart';
 import 'package:edusocial/controllers/group_controller/group_controller.dart';
+import 'package:edusocial/models/group_models/group_detail_model.dart';
+import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
+import 'package:edusocial/routes/app_routes.dart';
+import 'package:edusocial/services/group_services/group_service.dart';
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../services/language_service.dart';
 
 import '../../components/cards/members_avatar.dart';
 import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
     show GroupDetailTreePointBottomSheet;
-import '../../controllers/social/group_chat_detail_controller.dart';
+import '../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../models/chat_models/group_message_model.dart';
 import '../../models/document_model.dart';
 import '../../screens/groups/group_participants_screen.dart';
@@ -90,6 +102,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: AppBar(
@@ -243,7 +257,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           // Debug bilgisi
                           if (group.users.isEmpty)
                             Text(
-                              'Katılımcı bulunamadı',
+                              languageService.tr("groups.groupDetail.noParticipants"),
                               style: TextStyle(
                                   fontSize: 10, color: Color(0xff9ca3ae)),
                             ),
@@ -280,7 +294,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           child: Column(
                             children: [
                               Text(
-                                "Oluşturuldu",
+                                languageService.tr("groups.groupDetail.created"),
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 10,
@@ -315,7 +329,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  "Katılımcı Sayısı",
+                                  languageService.tr("groups.groupDetail.participantCount"),
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 10,
@@ -371,9 +385,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13.28),
                                   tabs: [
-                                    Tab(text: "Belgeler"),
-                                    Tab(text: "Bağlantılar"),
-                                    Tab(text: "Fotoğraflar"),
+                                    Tab(text: languageService.tr("groups.groupDetail.tabs.documents")),
+                                    Tab(text: languageService.tr("groups.groupDetail.tabs.links")),
+                                    Tab(text: languageService.tr("groups.groupDetail.tabs.photos")),
                                   ]),
                               SizedBox(
                                 height: 350,
@@ -397,7 +411,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                           final document = DocumentModel(
                                             id: message.id,
                                             name:
-                                                'Belge - ${message.name} ${message.surname}',
+                                                '${languageService.tr("groups.groupDetail.document")} - ${message.name} ${message.surname}',
                                             sizeMb: 0.0, // Boyut bilgisi yok
                                             humanCreatedAt:
                                                 DateFormat('dd.MM.yyyy HH:mm')
@@ -491,7 +505,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                             )
                                           : Center(
                                               child: Text(
-                                                "Henüz belge eklenmemiş",
+                                                languageService.tr("groups.groupDetail.emptyStates.documents"),
                                                 style: GoogleFonts.inter(
                                                   fontSize: 12,
                                                   color: Color(0xff9ca3ae),
@@ -570,7 +584,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                           )
                                         : Center(
                                             child: Text(
-                                              "Henüz bağlantı eklenmemiş",
+                                              languageService.tr("groups.groupDetail.emptyStates.links"),
                                               style: GoogleFonts.inter(
                                                 fontSize: 12,
                                                 color: Color(0xff9ca3ae),
@@ -640,7 +654,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                           )
                                         : Center(
                                             child: Text(
-                                              "Henüz fotoğraf eklenmemiş",
+                                              languageService.tr("groups.groupDetail.emptyStates.photos"),
                                               style: GoogleFonts.inter(
                                                 fontSize: 12,
                                                 color: Color(0xff9ca3ae),
@@ -664,7 +678,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Grup Etkinlikleri",
+                      Text(languageService.tr("groups.groupDetail.groupEvents"),
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       SizedBox(height: 8),
@@ -677,7 +691,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           return EventCard(
                               eventTitle: event.title,
                               eventDescription: event.description,
-                              eventDate: event.humanStartTime,
+                              eventDate: formatSimpleDateClock(event.endTime),
                               eventImage: event.bannerUrl,
                               onShare: () {},
                               onLocation: () async {

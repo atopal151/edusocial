@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 class GroupDetailTreePointBottomSheet extends StatelessWidget {
   const GroupDetailTreePointBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -24,8 +28,8 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
             ListTile(
               leading:
                   const Icon(Icons.outbond, color: Color(0xfffb535c)),
-              title: const Text(
-                "Gruptan Ayrıl",
+              title: Text(
+                languageService.tr("groups.groupDetail.bottomSheet.leaveGroup"),
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
@@ -39,7 +43,7 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
                 Icons.warning_rounded,
                 color: Color(0xfffb535c),
               ),
-              title: const Text("Şikayet Et",
+              title: Text(languageService.tr("groups.groupDetail.bottomSheet.report"),
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,

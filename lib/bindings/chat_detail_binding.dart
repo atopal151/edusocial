@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../controllers/social/chat_detail_controller.dart';
+import '../controllers/chat_controllers/chat_detail_controller.dart';
 
 class ChatDetailBinding extends Bindings {
   @override

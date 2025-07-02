@@ -4,6 +4,7 @@ import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
+import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -98,16 +99,18 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         Get.offAllNamed('/main'); // Main screen'e git (navbar 0. index)
       } catch (e) {
         isPosting.value = false;
+        final LanguageService languageService = Get.find<LanguageService>();
         CustomSnackbar.show(
-          title: "Hata",
-          message: "Gönderi paylaşılırken bir hata oluştu.",
+          title: languageService.tr("common.errors.error"),
+          message: languageService.tr("post.createPost.error"),
           type: SnackbarType.error,
         );
       }
     } else {
+      final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
-        title: "Uyarı",
-        message: "Lütfen gönderi içeriği girin.",
+        title: languageService.tr("common.warnings.warning"),
+        message: languageService.tr("post.createPost.emptyContent"),
         type: SnackbarType.warning,
       );
     }
@@ -115,6 +118,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: AppBar(
@@ -158,7 +162,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                             )
                           else
                             Text(
-                              "Gönderi",
+                              languageService.tr("post.createPost.share"),
                               style: GoogleFonts.inter(
                                 color: Color(0xffffffff),
                                 fontSize: 12,
@@ -203,7 +207,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   maxLines: null,
                   style: const TextStyle(color: Color(0xff414751)),
                   decoration: InputDecoration(
-                    hintText: "Neler oluyor?",
+                    hintText: languageService.tr("post.createPost.placeholder"),
                     hintStyle: GoogleFonts.inter(
                         color: Color(0xff414751),
                         fontSize: 13.28,
@@ -267,7 +271,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Linkler (${_links.length}):",
+                    "${languageService.tr("post.createPost.links")} (${_links.length}):",
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

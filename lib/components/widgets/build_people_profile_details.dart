@@ -4,8 +4,10 @@ import 'package:edusocial/models/people_profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
+  final LanguageService languageService = Get.find<LanguageService>();
   return SingleChildScrollView(
     child: Container(
       color: const Color(0xfffafafa),
@@ -24,10 +26,10 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                 children: [
                   /// **Okul Bilgisi**
                   if (profileData.school != null) ...[
-                    const Text(
-                      "Okuduğu Okul",
-                      style: TextStyle(
-                        fontSize: 13.28,
+                    Text(
+                      languageService.tr("profile.details.school"),
+                      style: const TextStyle(
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1F1F1F),
                       ),
@@ -76,10 +78,10 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                   ],
 
                   /// **Kişisel Bilgiler**
-                  const Text(
-                    "Kişisel Bilgiler",
-                    style: TextStyle(
-                      fontSize: 13.28,
+                  Text(
+                    languageService.tr("profile.details.personalInfo"),
+                    style: const TextStyle(
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1F1F1F),
                     ),
@@ -98,7 +100,7 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                           width: 20,
                           height: 20,
                         ),
-                        label: "Doğum Tarihi",
+                        label: languageService.tr("profile.details.birthDate"),
                         value: profileData.birthDate,
                       ),
                       _buildPersonalInfo(
@@ -111,7 +113,7 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                           width: 20,
                           height: 20,
                         ),
-                        label: "E-posta Adresi",
+                        label: languageService.tr("profile.details.email"),
                         value: profileData.email,
                       ),
                       const SizedBox(width: 10),
@@ -138,9 +140,9 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
 
                   /// **Aldığı Dersler**
                   if (profileData.lessons.isNotEmpty) ...[
-                    const Text(
-                      "Aldığı Dersler",
-                      style: TextStyle(
+                    Text(
+                      languageService.tr("profile.details.courses"),
+                      style: const TextStyle(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1F1F1F),

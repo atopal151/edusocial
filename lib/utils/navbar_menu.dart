@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/match_controller.dart';
-import '../controllers/social/chat_controller.dart';
+import '../controllers/chat_controllers/chat_controller.dart';
 
 class NavbarMenu extends StatefulWidget {
   const NavbarMenu({super.key});

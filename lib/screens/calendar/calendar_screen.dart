@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../controllers/calendar_controller.dart';
+import '../../services/language_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -19,6 +20,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       appBar: BackAppBar(),
       backgroundColor: Color(0xffFAFAFA),
@@ -30,7 +33,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             children: [
               // Başlık ve Açıklama
               Text(
-                "Takvim",
+                languageService.tr("calendar.title"),
                 style: TextStyle(
                   fontSize: 18.72,
                   fontWeight: FontWeight.w600,
@@ -39,7 +42,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
               SizedBox(height: 20),
               Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \neiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                languageService.tr("calendar.description"),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w400,

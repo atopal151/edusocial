@@ -6,11 +6,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 import '../widgets/comment_bottom_sheet.dart';
 import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 import '../snackbars/custom_snackbar.dart';
+import '../../services/language_service.dart';
 
 class PostCard extends StatefulWidget {
   final int postId;
@@ -69,8 +71,22 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     final ProfileController profileController = Get.find<ProfileController>();
-
     final PostController postController = Get.find<PostController>();
+    final languageService = Get.find<LanguageService>();
+    final locale = languageService.currentLanguage.value;
+    String formattedDate;
+    try {
+      final date = DateTime.tryParse(widget.postDate);
+      if (date != null) {
+        final dateFormat = locale == "tr" ? "dd.MM.yyyy" : "MM/dd/yyyy";
+        formattedDate = DateFormat(dateFormat, locale).format(date);
+      } else {
+        formattedDate = widget.postDate;
+      }
+    } catch (_) {
+      formattedDate = widget.postDate;
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
@@ -120,7 +136,7 @@ class _PostCardState extends State<PostCard> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            widget.postDate,
+                            formattedDate,
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w400,
@@ -398,7 +414,7 @@ class _PostCardState extends State<PostCard> {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  "Paylaş",
+                  Get.find<LanguageService>().tr("common.buttons.share"),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

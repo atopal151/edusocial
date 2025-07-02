@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../models/calendar_model.dart';
 import '../../services/calendar_service.dart';
+import '../../services/language_service.dart';
 import '../../utils/date_format.dart';
 
 Future<void> showReminderDetailDialog(BuildContext context, int reminderId) async {
+  final LanguageService languageService = Get.find<LanguageService>();
+  
   showDialog(
     context: context,
     barrierDismissible: true,
@@ -23,9 +27,9 @@ Future<void> showReminderDetailDialog(BuildContext context, int reminderId) asyn
           }
 
           if (snapshot.hasError || !snapshot.hasData) {
-            return const AlertDialog(
-              title: Text("Hata"),
-              content: Text("Hatırlatıcı getirilemedi."),
+            return AlertDialog(
+              title: Text(languageService.tr("calendar.reminderDetail.error.title")),
+              content: Text(languageService.tr("calendar.reminderDetail.error.message")),
             );
           }
 
@@ -33,25 +37,25 @@ Future<void> showReminderDetailDialog(BuildContext context, int reminderId) asyn
           return AlertDialog(
             backgroundColor: Color(0xffffffff),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: const Text("Hatırlatıcı Detayı"),
+            title: Text(languageService.tr("calendar.reminderDetail.title")),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("📝 Başlık: ${reminder.title}",
+                Text("📝 ${languageService.tr("calendar.reminderDetail.titleLabel")}: ${reminder.title}",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 SizedBox(height: 10),
-                Text("⏰ Zaman: ${formatSimpleDateClock(reminder.dateTime)}",
+                Text("⏰ ${languageService.tr("calendar.reminderDetail.timeLabel")}: ${formatSimpleDateClock(reminder.dateTime)}",
                     style: TextStyle(fontSize: 14)),
                 SizedBox(height: 10),
-                Text("🔔 Bildirim: ${reminder.sendNotification ? 'Açık' : 'Kapalı'}",
+                Text("🔔 ${languageService.tr("calendar.reminderDetail.notificationLabel")}: ${reminder.sendNotification ? languageService.tr("calendar.reminderDetail.notificationOn") : languageService.tr("calendar.reminderDetail.notificationOff")}",
                     style: TextStyle(fontSize: 14)),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Kapat",style: TextStyle(color: Color(0xffef5050)),),
+                child: Text(languageService.tr("calendar.reminderDetail.close"), style: TextStyle(color: Color(0xffef5050))),
               ),
             ],
           );

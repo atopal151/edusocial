@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../components/input_fields/message_input_field.dart';
-import '../../../controllers/social/chat_detail_controller.dart';
+import '../../../controllers/chat_controllers/chat_detail_controller.dart';
+import '../../../services/language_service.dart';
 
 class ChatDetailScreen extends StatelessWidget {
   ChatDetailScreen({super.key});
@@ -15,6 +16,8 @@ class ChatDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Obx(() {
       final userDetail = controller.userChatDetail.value;
       final isLoading = controller.isLoading.value;
@@ -80,7 +83,7 @@ class ChatDetailScreen extends StatelessWidget {
                           color: Color(0xff272727)),
                     ),
                     Text(
-                      controller.isOnline.value ? "Çevrimiçi" : "Çevrimdışı",
+                      controller.isOnline.value ? languageService.tr("chat.chatDetail.onlineStatus.online") : languageService.tr("chat.chatDetail.onlineStatus.offline"),
                       style: GoogleFonts.inter(
                           fontSize: 10,
                           color: Color(0xff9ca3ae),
@@ -143,8 +146,10 @@ class ChatDetailScreen extends StatelessWidget {
   }
 
   void _onUserDetailTap(dynamic userDetail) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     if (userDetail == null) {
-      Get.snackbar('Hata', 'Kullanıcı bilgileri henüz yüklenmedi!');
+      Get.snackbar(languageService.tr("chat.chatDetail.error.title"), languageService.tr("chat.chatDetail.error.userInfoNotLoaded"));
       return;
     }
 

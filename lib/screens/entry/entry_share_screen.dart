@@ -8,6 +8,7 @@ import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_multiline_textfield.dart';
 import '../../models/topic_category_model.dart';
 import '../../services/entry_services.dart';
+import '../../services/language_service.dart';
 
 class EntryShareScreen extends StatefulWidget {
   const EntryShareScreen({super.key});
@@ -22,12 +23,35 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
   int currentCharCount = 0;
   final RxList<TopicCategoryModel> categoryList = <TopicCategoryModel>[].obs;
   final Rxn<TopicCategoryModel> selectedTopicCategory = Rxn<TopicCategoryModel>();
+  late LanguageService? languageService;
 
   @override
   void initState() {
     super.initState();
     entryController.bodyEntryController.addListener(_entryTextListener);
     _fetchTopicCategories();
+    _initializeLanguageService();
+  }
+
+  void _initializeLanguageService() {
+    try {
+      languageService = Get.find<LanguageService>();
+    } catch (e) {
+      // Eğer LanguageService bulunamazsa, null olarak bırak
+      print('LanguageService bulunamadı: $e');
+      languageService = null;
+    }
+  }
+
+  String _getTranslation(String key, {String fallback = ''}) {
+    try {
+      if (languageService != null) {
+        return languageService!.tr(key);
+      }
+    } catch (e) {
+      print('Çeviri hatası ($key): $e');
+    }
+    return fallback;
   }
 
   void _entryTextListener() {
@@ -70,7 +94,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
             children: [
               CustomTextField(
                 textColor: Color(0xff9CA3AE),
-                hintText: "Konu Başlığı",
+                hintText: _getTranslation("entryShare.title", fallback: "Konu Başlığı"),
                 controller: entryController.titleEntryController,
                 backgroundColor: Color(0xffffffff),
               ),
@@ -80,7 +104,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
               CustomMultilineTextField(
                 count: entryController.bodyEntryController.text.length,
                 textColor: Color(0xff9CA3AE),
-                hintText: "Entry",
+                hintText: _getTranslation("entryShare.entryContent", fallback: "Entry"),
                 controller: entryController.bodyEntryController,
                 backgroundColor: Color(0xffffffff),
               ),
@@ -89,7 +113,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
               ),
               Obx(
                 () => CustomDropDown(
-                  label: "Kategori",
+                  label: _getTranslation("entryShare.category", fallback: "Kategori"),
                   items: categoryList.map((e) => e.title).toList(),
                   selectedItem: selectedTopicCategory.value?.title ?? (categoryList.isNotEmpty ? categoryList.first.title : ""),
                   onChanged: (value) {
@@ -105,7 +129,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
               CustomButton(
                 height: 50,
                 borderRadius: 15,
-                text: "+ Konuyu Aç",
+                text: _getTranslation("entryShare.createTopicButton", fallback: "+ Konu Oluştur"),
                 onPressed: () {
                   entryController.shareEntryPost(
                     topicName: entryController.titleEntryController.text,

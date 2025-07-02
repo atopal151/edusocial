@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
 import '../../../utils/date_format.dart';
+import '../../../services/language_service.dart';
 
 class LinkMediaTextMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -29,6 +31,7 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     // 🔹 Media Path kontrolü
     String? mediaUrl;
     if (message.messageMedia.isNotEmpty) {
@@ -278,8 +281,7 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                      "Link açılamadı. Lütfen tekrar deneyin."),
+                                  content: Text(languageService.tr("chat.link.cannotOpen")),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -290,7 +292,7 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("Bu link açılamıyor: $cleanLink"),
+                                content: Text("${languageService.tr("chat.link.cannotOpenThis")}: $cleanLink"),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -301,8 +303,7 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                  "Link açılırken bir hata oluştu: ${e.toString()}"),
+                              content: Text("${languageService.tr("chat.link.openError")}: ${e.toString()}"),
                               backgroundColor: Colors.red,
                             ),
                           );

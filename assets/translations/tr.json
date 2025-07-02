@@ -107,7 +107,8 @@
     "form": {
       "courseQuestion": "Hangi dersleri alıyorsun?",
       "courseInput": "Ders adı giriniz",
-      "savedCourses": "Kaydedilen Konular"
+      "savedCourses": "Kaydedilen Konular",
+      "addButton": "Ekle"
     },
     "warning": "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir.",
     "continueButton": "Devam Et",
@@ -165,6 +166,7 @@
       "welcomeMessage": "EduSocial'e hoş geldiniz!"
     }
   },
+  
   "calendar": {
     "title": "Takvim",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \neiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -218,6 +220,12 @@
       }
     }
   },
+  "entryShare": {
+  "title": "Konu Başlığı",
+  "entryContent": "Entry",
+  "category": "Kategori",
+  "createTopicButton": "+ Konu Oluştur"
+},
   "groupChatDetail": {
     "appBar": {
       "memberCount": "üye"
@@ -321,6 +329,28 @@
       "image": "Resim",
       "video": "Video",
       "audio": "Ses"
+    },
+    
+    "groupChat": {
+      "fileSelected": "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz...",
+      "messagePlaceholder": "Bir mesaj yazınız..."
+    },
+    "document": {
+      "cannotOpen": "Belge açılamadı",
+      "openError": "Belge açılırken hata oluştu",
+      "clickToDownload": "Tıklayarak indir"
+    },
+    
+    "link": {
+      "cannotOpen": "Link açılamadı. Lütfen tekrar deneyin.",
+      "cannotOpenThis": "Bu link açılamıyor",
+      "openError": "Link açılırken bir hata oluştu"
+    },
+    "poll": {
+      "title": "Anket sorusu yazın",
+      "option": "Seçenek ekleyin",
+      "addOption": "Seçenek Ekle",
+      "send": "Anket Gönder"
     }
   },
   "entry": {
@@ -349,16 +379,7 @@
         "playStore": "Play Store"
       }
     },
-    "entryShare": {
-      "title": "Konu Başlığı",
-      "entryContent": "Entry",
-      "category": "Kategori",
-      "createTopicButton": "+ Konuyu Aç",
-      "loading": {
-        "creating": "Konu oluşturuluyor...",
-        "categories": "Kategoriler yükleniyor..."
-      }
-    },
+    
     "entryCard": {
       "share": "Paylaş",
       "upvote": "Beğen",
@@ -492,7 +513,10 @@
       "joined": "Katıldınız",
       "pending": "Onay Bekliyor",
       "join": "Katıl",
-      "loading": "Gruplar yükleniyor..."
+      "loading": "Gruplar yükleniyor...",
+      "groupSelected": "Grup Seçildi",
+      "redirectingToGroup": "grubuna yönlendiriliyor.",
+      "notMember": "Bu grubun üyesi değilsiniz"
     },
     "createGroup": {
       "title": "Yeni Grup Oluştur",
@@ -519,6 +543,11 @@
         "links": "Bağlantılar",
         "photos": "Fotoğraflar"
       },
+
+      "bottomSheet": {
+        "leaveGroup": "Gruptan Ayrıl",
+        "report": "Şikayet Et"
+      },
       "emptyStates": {
         "documents": "Henüz belge eklenmemiş",
         "links": "Henüz bağlantı eklenmemiş",
@@ -538,7 +567,8 @@
       "leave": "Ayrıl",
       "report": "Bildir",
       "delete": "Sil",
-      "edit": "Düzenle"
+      "edit": "Düzenle",
+      "messages": "Mesaj"
     },
     "loading": {
       "groups": "Gruplar yükleniyor...",
@@ -585,9 +615,20 @@
       "viewParticipants": "Katılımcıları Görüntüle",
       "sendMessage": "Mesaj Gönder"
     },
+    "list": {
+      "groupSelected": "Grup Seçildi",
+      "redirectingToGroup": "grubuna yönlendiriliyor.",
+      "join": "Katıl",
+      "pendingApproval": "Onay Bekliyor"
+    },
     "notifications": {
       "error": "Hata",
       "noGroupSelected": "Grup seçilmedi"
+    },
+    "suggestion": {
+      "joined": "Katıldınız",
+      "sendRequest": "İstek Gönder",
+      "joinGroup": "Gruba Katıl"
     }
   },
   "home": {
@@ -616,18 +657,16 @@
         "nearby": "Yakınlardakiler",
         "selectFromGallery": "Galeriden Seç",
         "share": "Paylaş",
-        "camera": "Kamera",
-        "photoLibrary": "Fotoğraf Galerisi",
-        "selectPhoto": "Lütfen bir fotoğraf seçin",
         "photoSelectionError": "Fotoğraf seçilirken bir hata oluştu",
         "cameraError": "Kamera açılırken bir hata oluştu",
-        "storyShareError": "Hikaye paylaşılırken bir hata oluştu",
-        "warning": "Uyarı",
-        "error": "Hata"
+        "shareError": "Hikaye paylaşılırken bir hata oluştu",
+        "selectPhotoWarning": "Lütfen bir fotoğraf seçin"
       },
       "myStoryList": {
-        "you": "@Sen",
-        "noStory": "Hikayeniz yok"
+        "you": "@Sen"
+      },
+      "viewer": {
+        "noImage": "Görsel yok"
       },
       "storyViewer": {
         "noImage": "Görsel yok",
@@ -779,6 +818,20 @@
       "topicRemoved": "Konu başarıyla kaldırıldı",
       "userFollowed": "takip edildi!",
       "followSuccess": "Takip işlemi başarılı"
+    },
+    "card": {
+      "follow": "Takip Et",
+      "skip": "Geç",
+      "online": "Çevrimiçi",
+      "education": "Eğitim",
+      "noSchoolInfo": "Okul bilgisi yok",
+      "noDepartment": "Bölüm yok",
+      "grade": "Grade",
+      "about": "Hakkında",
+      "noInfoYet": "Henüz bilgi yok",
+      "matchedTopics": "Seninle eşleştiği konular",
+      "following": "Takip Ediliyor",
+      "message": "mesaj"
     }
   },
   "notifications": {
@@ -786,7 +839,11 @@
     "loading": {
       "notifications": "Bildirimler yükleniyor...",
       "refreshing": "Bildirimler yenileniyor...",
-      "refreshed": "Bildirimler başarıyla yenilendi"
+      "refreshed": "Bildirimler başarıyla yenilendi",
+      "accepting": "Onaylanıyor...",
+      "declining": "Reddediliyor...",
+      "following": "Takip ediliyor...",
+      "unfollowing": "Takipten çıkarılıyor..."
     },
     "grouping": {
       "today": "Bugün",
@@ -830,14 +887,6 @@
       "groupJoined": "grubunuza katıldı",
       "eventCreated": "grup etkinliği oluşturdu",
       "groupAccepted": "grup isteğiniz onaylandı"
-    },
-    "loading": {
-      "notifications": "Bildirimler yükleniyor...",
-      "refreshing": "Bildirimler yenileniyor...",
-      "accepting": "Onaylanıyor...",
-      "declining": "Reddediliyor...",
-      "following": "Takip ediliyor...",
-      "unfollowing": "Takipten çıkarılıyor..."
     },
     "errors": {
       "notificationsLoadFailed": "Bildirimler yüklenemedi",
@@ -886,6 +935,35 @@
     }
   },
   "profile": {
+    "title": "Profil",
+    "tabbar": {
+      "posts": "Gönderiler",
+      "entries": "Entryler"
+    },
+    "editProfile": {
+      "title": "Profili Düzenle",
+      "username": "Kullanıcı Adı",
+      "name": "Ad",
+      "surname": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "birthday": "Doğum Tarihi",
+      "bio": "Biyografi",
+      "socialMediaAccounts": "Sosyal Medya Hesapları",
+      "schoolAndDepartment": "Okul ve Bölüm Bilgisi",
+      "courses": "Dersler",
+      "notificationSettings": "Bildirim Ayarları",
+      "emailNotification": "E-posta Bildirimi",
+      "mobileNotification": "Mobil Bildirimi",
+      "languageSelection": "Dil Seçimi",
+      "accountType": "Hesap Tipi",
+      "accountTypeSelection": "Hesap Tipi Seçimi",
+      "schoolSelection": "Okul Seçimi",
+      "departmentSelection": "Bölüm Seçimi",
+      "saveProfile": "Profili Kaydet",
+      "profileUpdated": "Profil başarıyla güncellendi",
+      "profileUpdateFailed": "Profil güncellenemedi"
+    },
     "mainProfile": {
       "editProfile": "Profili Düzenle",
       "refreshLoading": "Profil verileri yenileniyor...",
@@ -900,52 +978,6 @@
         "playStore": "Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app",
         "hashtags": "#EduSocial #Eğitim"
       }
-    },
-    "editProfile": {
-      "title": "Profili Düzenle",
-      "form": {
-        "username": "Kullanıcı Adı",
-        "name": "Ad",
-        "surname": "Soyad",
-        "email": "E-posta",
-        "phone": "Telefon",
-        "birthday": "Doğum Tarihi",
-        "biography": "Biyografi"
-      },
-      "socialMedia": {
-        "title": "Sosyal Medya Hesapları",
-        "instagram": "Instagram",
-        "twitter": "Twitter",
-        "facebook": "Facebook",
-        "linkedin": "LinkedIn",
-        "tiktok": "Tiktok"
-      },
-      "schoolInfo": {
-        "title": "Okul ve Bölüm Bilgisi",
-        "schoolSelection": "Okul Seçimi",
-        "departmentSelection": "Bölüm Seçimi"
-      },
-      "lessons": {
-        "title": "Dersler",
-        "addLesson": "Ders ekle"
-      },
-      "notifications": {
-        "title": "Bildirim Ayarları",
-        "emailNotification": "E-posta Bildirimi",
-        "mobileNotification": "Mobil Bildirimi"
-      },
-      "language": {
-        "title": "Dil Seçimi",
-        "languageSelection": "Dil Seçimi"
-      },
-      "accountType": {
-        "title": "Hesap Tipi",
-        "accountTypeSelection": "Hesap Tipi Seçimi",
-        "public": "Herkese Açık",
-        "private": "Gizli"
-      },
-      "saveButton": "Kaydet",
-      "loading": "Kaydediliyor..."
     },
     "peopleProfile": {
       "loading": "Kullanıcı profili yükleniyor...",
@@ -1045,6 +1077,19 @@
       "noSchoolInfo": "Okul bilgisi yok",
       "noDepartmentInfo": "Bölüm bilgisi yok",
       "invalidDate": "Geçersiz Tarih"
+    },
+    "details": {
+      "personalInfo": "Kişisel Bilgiler",
+      "birthDate": "Doğum Tarihi",
+      "email": "E-posta Adresi",
+      "courses": "Aldığı Dersler",
+      "school": "Okuduğu Okul",
+      "joinedGroups": "Katıldığı Gruplar"
+    },
+    "header": {
+      "posts": "Gönderi",
+      "followers": "Takipçi",
+      "following": "Takip Edilen"
     }
   },
   "search": {
@@ -1072,7 +1117,28 @@
       "loading": "Gruplar aranıyor...",
       "groupSelected": "Grup Seçildi",
       "redirectingToGroup": "grubuna yönlendiriliyor.",
-      "notMember": "Bu grubun üyesi değilsiniz"
+      "notMember": "Bu grubun üyesi değilsiniz",
+      "groupDetail": {
+        "noParticipants": "Katılımcı bulunamadı",
+        "created": "Oluşturuldu",
+        "participantCount": "Katılımcı Sayısı",
+        "document": "Belge",
+        "groupEvents": "Grup Etkinlikleri",
+        "tabs": {
+          "documents": "Belgeler",
+          "links": "Bağlantılar",
+          "photos": "Fotoğraflar"
+        },
+        "bottomSheet": {
+          "leaveGroup": "Gruptan Ayrıl",
+          "report": "Şikayet Et"
+        },
+        "emptyStates": {
+          "documents": "Bu grupta henüz belge paylaşılmamış",
+          "links": "Bu grupta henüz bağlantı paylaşılmamış",
+          "photos": "Bu grupta henüz fotoğraf paylaşılmamış"
+        }
+      }
     },
     "events": {
       "noResults": "Etkinlik bulunamadı",
@@ -1080,7 +1146,17 @@
       "shared": "Paylaşıldı",
       "eventShared": "etkinliği paylaşıldı.",
       "locationError": "Konum açılamadı:",
-      "error": "Hata"
+      "error": "Hata",
+      "viewLocation": "Konumu Gör",
+      "notification": {
+        "title": "Bildirim",
+        "message": "Etkinlik bildirimi ayarlandı."
+      }
+    },
+    "event": {
+      "eventCard": {
+        "viewLocation": "Konumu Gör"
+      }
     },
     "loading": {
       "searching": "Aranıyor...",
@@ -1260,6 +1336,15 @@
       "close": "Kapat",
       "cancel": "İptal",
       "confirm": "Onayla"
+    },
+    "actions": {
+      "about": "Hakkında",
+      "report": "Şikayet Et",
+      "delete": "Sil"
+    },
+    "info": {
+      "info": "Bilgi",
+      "reportFeatureComingSoon": "Şikayet özelliği yakında eklenecek"
     }
   },
   "settings": {
@@ -1310,5 +1395,73 @@
       "goToPrivacyPolicy": "Gizlilik politikası sayfasına yönlendiriliyor",
       "goToNotificationSettings": "Bildirim ayarları sayfasına yönlendiriliyor"
     }
+  },
+  "post": {
+    "createPost": {
+      "share": "Gönderi",
+      "placeholder": "Neler oluyor?",
+      "links": "Linkler",
+      "error": "Gönderi paylaşılırken bir hata oluştu.",
+      "emptyContent": "Lütfen gönderi içeriği girin."
+    }
+  },
+  "story": {
+    "userStoryCard": {
+      "you": "@Sen"
+    }
+  },
+  "auth": {
+    "logout": {
+      "title": "Çıkış Yap",
+      "confirmation": "Hesabınızdan çıkmak istediğinize emin misiniz?",
+      "logout": "Çıkış Yap"
+    }
+  },
+  "comments": {
+    "input": {
+      "placeholder": "Yorum yaz..."
+    }
+  },
+  "share": {
+    "title": "Paylaş",
+    "platforms": {
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn"
+    },
+    "actions": {
+      "copy": "Kopyala"
+    },
+    "subjects": {
+      "whatsapp": "WhatsApp ile paylaş",
+      "telegram": "Telegram ile paylaş",
+      "twitter": "Twitter ile paylaş",
+      "facebook": "Facebook ile paylaş",
+      "linkedin": "LinkedIn ile paylaş"
+    },
+    "copySuccess": "Metin panoya kopyalandı",
+    "notification": {
+      "accepted": "Onaylandı",
+      "rejected": "Reddedildi",
+      "accept": "Onayla",
+      "decline": "Reddet"
+    },
+    "time": {
+      "justNow": "az önce",
+      "minute": "dk",
+      "hour": "s",
+      "day": "g",
+      "week": "h",
+      "month": "a",
+      "year": "y"
+    }
+  },
+
+  "entryDetail": {
+    "noCategory": "Kategori Yok",
+    "noTopicInfo": "Konu Bilgisi Yok",
+    "commentPlaceholder": "Bu konuya bir entry paylaş"
   }
 } 

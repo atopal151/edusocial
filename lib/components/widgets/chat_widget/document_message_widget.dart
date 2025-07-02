@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
 import '../../../utils/date_format.dart';
+import '../../../services/language_service.dart';
 
 class DocumentMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -32,6 +34,7 @@ class DocumentMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     final documentUrl = getDocumentUrl();
     final documentName = getDocumentName();
 
@@ -109,7 +112,7 @@ class DocumentMessageWidget extends StatelessWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Document açılamadı: $documentName'),
+                        content: Text('${languageService.tr("chat.document.cannotOpen")}: $documentName'),
                         backgroundColor: Color(0xffFF5050),
                       ),
                     );
@@ -119,7 +122,7 @@ class DocumentMessageWidget extends StatelessWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Document açılırken hata oluştu: $e'),
+                      content: Text('${languageService.tr("chat.document.openError")}: $e'),
                       backgroundColor: Color(0xffFF5050),
                     ),
                   );
@@ -169,7 +172,7 @@ class DocumentMessageWidget extends StatelessWidget {
                         ),
                         if (documentUrl != null)
                           Text(
-                            'Tıklayarak indir',
+                            languageService.tr("chat.document.clickToDownload"),
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               color: message.isMe ? Colors.white70 : Color(0xff9ca3ae),

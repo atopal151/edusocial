@@ -8,6 +8,7 @@ import '../../controllers/search_text_controller.dart';
 import '../buttons/custom_button.dart';
 import '../buttons/icon_button.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
+import '../../services/language_service.dart';
 
 class EventCard extends StatelessWidget {
   final String eventTitle;
@@ -30,6 +31,7 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SearchTextController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Card(
       elevation: 0,
@@ -69,7 +71,9 @@ class EventCard extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Get.snackbar("Bildirim", "Etkinlik bildirimi ayarlandı.");
+                        Get.snackbar(
+                            languageService.tr("events.notification.title"),
+                            languageService.tr("events.notification.message"));
                       },
                     ),
                     const SizedBox(width: 8),
@@ -150,7 +154,7 @@ class EventCard extends StatelessWidget {
                       child: CustomButton(
                         height: 40,
                         borderRadius: 15,
-                        text: "Paylaş",
+                        text: languageService.tr("common.buttons.share"),
                         onPressed: () {
                           final String shareText = """
 $eventTitle
@@ -184,7 +188,8 @@ $eventDescription
                       child: CustomButton(
                         height: 40,
                         borderRadius: 15,
-                        text: "Konumu Gör",
+                        text:
+                            languageService.tr("event.eventCard.viewLocation"),
                         onPressed: onLocation,
                         icon: SvgPicture.asset(
                           "images/icons/location.svg",

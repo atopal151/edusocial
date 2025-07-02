@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../services/auth_service.dart';
+import '../../services/language_service.dart';
 
 class LogoutDialogs {
   static void showLogoutDialog() {
+    final LanguageService languageService = Get.find<LanguageService>();
     Get.dialog(
       Center(
         child: Material(
@@ -35,7 +37,7 @@ class LogoutDialogs {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  "Çıkış Yap",
+                  languageService.tr("auth.logout.title"),
                   style: GoogleFonts.inter(
                     fontSize: 17.28,
                     fontWeight: FontWeight.w600,
@@ -45,7 +47,7 @@ class LogoutDialogs {
                 ),
                 SizedBox(height: 12),
                 Text(
-                  "Hesabınızdan çıkmak istediğinize emin misiniz?",
+                  languageService.tr("auth.logout.confirmation"),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
@@ -68,7 +70,7 @@ class LogoutDialogs {
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
-                            "Vazgeç",
+                            languageService.tr("common.buttons.cancel"),
                             style: GoogleFonts.inter(
                               fontSize: 13.28,
                               color: Color(0xffed7474),
@@ -92,7 +94,7 @@ class LogoutDialogs {
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
-                            "Çıkış Yap",
+                            languageService.tr("auth.logout.logout"),
                             style: TextStyle(
                               fontSize: 13.28,
                               color: Colors.white,

@@ -4,6 +4,7 @@ import '../../components/buttons/custom_button.dart';
 import '../../components/cards/group_card.dart';
 import '../../components/onboarding_header/on_header.dart';
 import '../../controllers/onboarding_controller.dart';
+import '../../services/language_service.dart';
 
 class Step3View extends StatelessWidget {
   const Step3View({super.key});
@@ -11,6 +12,7 @@ class Step3View extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OnboardingController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Scaffold(
       backgroundColor: Color(0xffFAFAFA),
@@ -23,13 +25,12 @@ class Step3View extends StatelessWidget {
             SizedBox(height: 40),
             OnboardingHeader(
               imagePath: "images/icons/Vector.png",
-              title: "Bilgilerinizi Tamamlayın",
-              subtitle:
-                  "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!",
+              title: languageService.tr("step3.header.title"),
+              subtitle: languageService.tr("step3.header.subtitle"),
             ),
             SizedBox(height: 30),
             Text(
-              "Katılmak İsteyeceğin Gruplar",
+              languageService.tr("step3.groupsSection.title"),
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -45,8 +46,8 @@ class Step3View extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 10),
                       child: GroupCard(
                         action: group.isMember
-                            ? "Katıldınız"
-                            : (group.isPending ? "Katılım Bekleniyor" : group.isPrivate ? "Katılma İsteği Gönder": 'Gruba Katıl'),
+                            ? languageService.tr("step3.groupActions.joined")
+                            : (group.isPending ? languageService.tr("step3.groupActions.pending") : group.isPrivate ? languageService.tr("step3.groupActions.joinRequest"): languageService.tr("step3.groupActions.join")),
                         imageUrl: group.bannerUrl,
                         groupName: group.name,
                         groupDescription: group.description,
@@ -64,7 +65,7 @@ class Step3View extends StatelessWidget {
             CustomButton(
               height: 50,
               borderRadius: 15,
-              text: "Hesabı Tamamla",
+              text: languageService.tr("step3.completeButton"),
               onPressed: controller.completeOnboarding,
               isLoading: controller.isLoading,
               backgroundColor: Color(0xFF414751),

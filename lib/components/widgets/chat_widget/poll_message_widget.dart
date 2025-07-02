@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
+import '../../../services/language_service.dart';
 
 class PollMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -8,10 +10,11 @@ class PollMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     // Mesajın içinde "[POLL] Anket başlığı - Seçenek1, Seçenek2" gibi bir yapı varsa parçalayabilirsin
     final content = message.message.replaceFirst('[POLL]', '').trim();
     final parts = content.split('-');
-    final question = parts.isNotEmpty ? parts.first.trim() : 'Anket';
+    final question = parts.isNotEmpty ? parts.first.trim() : languageService.tr("chat.poll.defaultTitle");
     final options =
         parts.length > 1 ? parts.last.split(',').map((e) => e.trim()).toList() : [];
 

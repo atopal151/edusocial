@@ -1,3 +1,4 @@
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import '../../controllers/search_text_controller.dart';
 import '../../components/lists/user_list.dart';
 import '../../components/lists/group_list.dart';
 import '../../components/cards/event_card.dart';
+import '../../services/language_service.dart';
 
 class SearchTextScreen extends StatefulWidget {
   const SearchTextScreen({super.key});
@@ -28,6 +30,8 @@ class _SearchTextScreenState extends State<SearchTextScreen>
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: Color(0xffFAFAFA),
       appBar: AppBar(
@@ -71,7 +75,7 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                           .filterResults(value); // gelen verilerde filtrele
                     },
                     decoration: InputDecoration(
-                      hintText: "Ara...",
+                      hintText: languageService.tr("search.searchField.placeholder"),
                       border: InputBorder.none,
                     ),
                   ),
@@ -118,7 +122,7 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                           width: 18,
                         ),
                         SizedBox(width: 8),
-                        Text("Kişiler",
+                        Text(languageService.tr("search.tabs.people"),
                             style: GoogleFonts.inter(
                                 fontSize: 13.28, fontWeight: FontWeight.w600)),
                       ],
@@ -138,7 +142,7 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                           width: 18,
                         ),
                         SizedBox(width: 8),
-                        Text("Gruplar",
+                        Text(languageService.tr("search.tabs.groups"),
                             style: GoogleFonts.inter(
                                 fontSize: 13.28, fontWeight: FontWeight.w600)),
                       ],
@@ -158,7 +162,7 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                           width: 18,
                         ),
                         SizedBox(width: 8),
-                        Text("Etkinlikler",
+                        Text(languageService.tr("search.tabs.events"),
                             style: GoogleFonts.inter(
                                 fontSize: 13.28, fontWeight: FontWeight.w600)),
                       ],
@@ -202,11 +206,11 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                         return EventCard(
                           eventTitle: event.title,
                           eventDescription: event.description,
-                          eventDate: event.endTime,
+                          eventDate: formatSimpleDateClock(event.endTime),
                           eventImage: event.bannerUrl,
                           onShare: () {
-                            Get.snackbar("Paylaşıldı",
-                                "${event.title} etkinliği paylaşıldı.");
+                            Get.snackbar(languageService.tr("common.messages.success"),
+                                "${event.title} ${languageService.tr("event.notifications.shared")}");
                           },
                           onLocation: () async {
                             final url = event.location;
@@ -214,7 +218,8 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                               await launchUrl(Uri.parse(url),
                                   mode: LaunchMode.externalApplication);
                             } else {
-                              Get.snackbar("Hata", "Konum açılamadı: $url");
+                              Get.snackbar(languageService.tr("common.messages.error"), 
+                                  languageService.tr("event.notifications.locationView"));
                             }
                           },
                         );

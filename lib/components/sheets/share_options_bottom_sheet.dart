@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 class ShareOptionsBottomSheet extends StatelessWidget {
   final String postText;
@@ -12,13 +14,14 @@ class ShareOptionsBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            "Paylaş",
+          Text(
+            languageService.tr("share.title"),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -30,17 +33,17 @@ class ShareOptionsBottomSheet extends StatelessWidget {
             children: [
               _buildShareOption(
                 icon: "images/icons/whatsapp_icon.svg",
-                label: "WhatsApp",
+                label: languageService.tr("share.platforms.whatsapp"),
                 onTap: () => _shareToWhatsApp(postText),
               ),
               _buildShareOption(
                 icon: "images/icons/telegram_icon.svg",
-                label: "Telegram",
+                label: languageService.tr("share.platforms.telegram"),
                 onTap: () => _shareToTelegram(postText),
               ),
               _buildShareOption(
                 icon: "images/icons/twitter_icon.svg",
-                label: "Twitter",
+                label: languageService.tr("share.platforms.twitter"),
                 onTap: () => _shareToTwitter(postText),
               ),
             ],
@@ -51,17 +54,17 @@ class ShareOptionsBottomSheet extends StatelessWidget {
             children: [
               _buildShareOption(
                 icon: "images/icons/facebook_icon.svg",
-                label: "Facebook",
+                label: languageService.tr("share.platforms.facebook"),
                 onTap: () => _shareToFacebook(postText),
               ),
               _buildShareOption(
                 icon: "images/icons/linkedin_icon.svg",
-                label: "LinkedIn",
+                label: languageService.tr("share.platforms.linkedin"),
                 onTap: () => _shareToLinkedIn(postText),
               ),
               _buildShareOption(
                 icon: "images/icons/copy_icon.svg",
-                label: "Kopyala",
+                label: languageService.tr("share.actions.copy"),
                 onTap: () => _copyToClipboard(context, postText),
               ),
             ],
@@ -109,30 +112,36 @@ class ShareOptionsBottomSheet extends StatelessWidget {
   }
 
   void _shareToWhatsApp(String text) {
-    Share.share(text, subject: "WhatsApp ile paylaş");
+    final LanguageService languageService = Get.find<LanguageService>();
+    Share.share(text, subject: languageService.tr("share.subjects.whatsapp"));
   }
 
   void _shareToTelegram(String text) {
-    Share.share(text, subject: "Telegram ile paylaş");
+    final LanguageService languageService = Get.find<LanguageService>();
+    Share.share(text, subject: languageService.tr("share.subjects.telegram"));
   }
 
   void _shareToTwitter(String text) {
-    Share.share(text, subject: "Twitter ile paylaş");
+    final LanguageService languageService = Get.find<LanguageService>();
+    Share.share(text, subject: languageService.tr("share.subjects.twitter"));
   }
 
   void _shareToFacebook(String text) {
-    Share.share(text, subject: "Facebook ile paylaş");
+    final LanguageService languageService = Get.find<LanguageService>();
+    Share.share(text, subject: languageService.tr("share.subjects.facebook"));
   }
 
   void _shareToLinkedIn(String text) {
-    Share.share(text, subject: "LinkedIn ile paylaş");
+    final LanguageService languageService = Get.find<LanguageService>();
+    Share.share(text, subject: languageService.tr("share.subjects.linkedin"));
   }
 
   void _copyToClipboard(BuildContext context, String text) {
+    final LanguageService languageService = Get.find<LanguageService>();
     
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Metin panoya kopyalandı"),
+      SnackBar(
+        content: Text(languageService.tr("share.copySuccess")),
         duration: Duration(seconds: 2),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/search_text_controller.dart';
+import '../../services/language_service.dart';
 
 class GroupListItem extends StatelessWidget {
   final GroupSearchModel group;
@@ -12,6 +13,7 @@ class GroupListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SearchTextController controller = Get.find<SearchTextController>();
+    final LanguageService languageService = Get.find<LanguageService>();
     
     return GestureDetector(
       onTap: () {
@@ -24,7 +26,10 @@ class GroupListItem extends StatelessWidget {
           Get.toNamed('/group_chat_detail', arguments: {'groupId': group.id.toString()});
         } else {
           debugPrint('❌ User is not a member of this group');
-          Get.snackbar("Grup Seçildi", "${group.name} grubuna yönlendiriliyor.");
+          Get.snackbar(
+            languageService.tr("groups.list.groupSelected"), 
+            "${group.name} ${languageService.tr("groups.list.redirectingToGroup")}"
+          );
         }
       },
       child: Container(
@@ -120,7 +125,7 @@ class GroupListItem extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      "Katıl",
+                      languageService.tr("groups.list.join"),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -134,7 +139,7 @@ class GroupListItem extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(left: 8),
                 child: Text(
-                  "Onay Bekliyor",
+                  languageService.tr("groups.list.pendingApproval"),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

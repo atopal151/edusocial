@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:edusocial/services/language_service.dart';
 
 import '../../components/cards/entry_comment_card.dart';
 
@@ -25,6 +26,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       Get.find<EntryDetailController>();
   final EntryController entryController = Get.find<EntryController>();
   final TextEditingController commentController = TextEditingController();
+  final LanguageService languageService = Get.find<LanguageService>();
 
   @override
   void initState() {
@@ -86,7 +88,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      widget.entry.topic?.category?.title ?? "Kategori Yok",
+                      widget.entry.topic?.category?.title ?? languageService.tr("entryDetail.noCategory"),
                       style: GoogleFonts.inter(
                           fontSize: 12, color: const Color(0xff272727)),
                     ),
@@ -96,7 +98,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
                 // Topic Başlığı
                 Text(
-                  widget.entry.topic?.name ?? "Konu Bilgisi Yok",
+                  widget.entry.topic?.name ?? languageService.tr("entryDetail.noTopicInfo"),
                   style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -137,7 +139,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       // Konu bilgilerini al
                       final topic = widget.entry.topic;
                       final categoryTitle =
-                          topic?.category?.title ?? "Kategori Yok";
+                          topic?.category?.title ?? languageService.tr("entryDetail.noCategory");
                       final topicName = topic?.name ?? "Konu Bilgisi Yok";
                       final entryCount =
                           entryDetailController.entryComments.length;
@@ -182,7 +184,7 @@ $firstEntryContent
                     child: TextField(
                       controller: commentController,
                       decoration: InputDecoration(
-                        hintText: "Bu konuya entry paylaşın",
+                        hintText: languageService.tr("entry.entryDetail.commentPlaceholder"),
                         hintStyle: GoogleFonts.inter(
                             color: const Color(0xff9ca3ae), fontSize: 13.28),
                         border: OutlineInputBorder(

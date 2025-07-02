@@ -83,7 +83,14 @@ class MatchController extends GetxController {
   }
 
   void startChat() {
-    Get.toNamed("/chat_detail");
+    // Mevcut eşleşmenin bilgilerini mesajlaşma sayfasına gönder
+    Get.toNamed("/chat_detail", arguments: {
+      'userId': currentMatch.userId,
+      'userName': currentMatch.name,
+      'userAvatar': currentMatch.profileImage,
+      'username': currentMatch.username,
+      'isOnline': currentMatch.isOnline,
+    });
   }
 
   void nextMatch() {

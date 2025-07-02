@@ -11,6 +11,7 @@ import '../../components/dropdowns/custom_dropdown.dart';
 import '../../components/input_fields/costum_textfield.dart';
 import '../../components/input_fields/custom_multiline_textfield.dart';
 import '../../components/user_appbar/back_appbar.dart';
+import '../../services/language_service.dart';
 
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({super.key});
@@ -39,11 +40,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: BackAppBar(
         iconBackgroundColor: Color(0xffffffff),
-        title: "Yeni Grup Oluştur",
+        title: languageService.tr("groups.createGroup.title"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -174,8 +177,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                      "Grup Fotoğrafı",
+                    Text(
+                      languageService.tr("groups.createGroup.groupPhoto"),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -187,7 +190,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               ),
               CustomTextField(
                 textColor: Color(0xff414751),
-                hintText: "Grup Adı",
+                hintText: languageService.tr("groups.createGroup.groupName"),
                 controller: createGroupController.nameGroupController,
                 backgroundColor: Color(0xffffffff),
               ),
@@ -196,14 +199,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 count: createGroupController
                     .descriptionGroupController.text.length,
                 textColor: Color(0xff414751),
-                hintText: "Grup Açıklaması",
+                hintText: languageService.tr("groups.createGroup.groupDescription"),
                 controller: createGroupController.descriptionGroupController,
                 backgroundColor: Color(0xffffffff),
               ),
               SizedBox(height: 20),
               Obx(() => CustomDropDown(
                     color: Color(0xff414751),
-                    label: "Grup Alanı",
+                    label: languageService.tr("groups.createGroup.groupArea"),
                     items: createGroupController.groupAreas
                         .map((e) => e.name)
                         .toList(),
@@ -224,7 +227,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Gruba girmek için katılım isteği\ngöndermek gereksin.",
+                    languageService.tr("groups.createGroup.privacySetting"),
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
@@ -247,7 +250,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 children: [
                   Expanded(
                     child: CustomButton(
-                      text: "İptal",
+                      text: languageService.tr("groups.createGroup.cancel"),
                       height: 40,
                       borderRadius: 15,
                       onPressed: () => Get.back(),
@@ -259,7 +262,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   SizedBox(width: 10),
                   Expanded(
                     child: CustomButton(
-                      text: "Grup Oluştur",
+                      text: languageService.tr("groups.createGroup.createGroup"),
                       height: 40,
                       borderRadius: 15,
                       onPressed: () => createGroupController.createGroup(),

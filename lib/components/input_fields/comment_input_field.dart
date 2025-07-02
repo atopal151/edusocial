@@ -1,9 +1,12 @@
 import 'package:edusocial/controllers/comment_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 Widget buildCommentInputField(CommentController commentController,
     String postId, TextEditingController messageController) {
+  final LanguageService languageService = Get.find<LanguageService>();
   return Container(
     decoration: BoxDecoration(
       color: const Color(0xfffafafa),
@@ -14,8 +17,8 @@ Widget buildCommentInputField(CommentController commentController,
         Expanded(
           child: TextField(
             controller: messageController,
-            decoration: const InputDecoration(
-              hintText: "Yorum yaz...",
+            decoration: InputDecoration(
+              hintText: languageService.tr("comments.input.placeholder"),
               hintStyle: TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 10),

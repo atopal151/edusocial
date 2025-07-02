@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/costum_textfield.dart';
 import '../../controllers/signup_controller.dart';
+import '../../services/language_service.dart';
 
 class SignupView extends StatelessWidget {
   const SignupView({super.key});
@@ -12,6 +13,7 @@ class SignupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SignupController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Scaffold(
       body: Container(
@@ -33,7 +35,7 @@ class SignupView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Benzer İlgi Alanlarına\nSahip Kişilerle Tanış! ",
+                      languageService.tr("signup.title"),
                       style: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
@@ -43,7 +45,7 @@ class SignupView extends StatelessWidget {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "EduSocial, Polonya’daki uluslararası okullarda eğitim\ngören öğrenciler için tasarlanmış yenilikçi bir sosyal\nplatformdur.",
+                      languageService.tr("signup.subtitle"),
                       style: GoogleFonts.inter(
                           fontSize: 12,
                           color: Color(0xffffe4e4),
@@ -61,7 +63,7 @@ class SignupView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Kayıt Ol",
+                            languageService.tr("signup.form.title"),
                             style: GoogleFonts.inter(
                                 fontSize: 18.72,
                                 fontWeight: FontWeight.w700,
@@ -72,38 +74,38 @@ class SignupView extends StatelessWidget {
                           ),
                           CustomTextField(
                               textColor: Color(0xFF9ca3ae),
-                              hintText: "Ad",
+                              hintText: languageService.tr("signup.form.name"),
                               controller: controller.nameSuController,
                               backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
                               textColor: Color(0xFF9ca3ae),
-                              hintText: "Soyad",
+                              hintText: languageService.tr("signup.form.surname"),
                               controller: controller.surnameSuController,
                               backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
                               textColor: Color(0xFF9ca3ae),
-                              hintText: "Kullanıcı adı",
+                              hintText: languageService.tr("signup.form.username"),
                               controller: controller.usernameSuController,
                               backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
                               textColor: Color(0xFF9ca3ae),
-                              hintText: "E-posta",
+                              hintText: languageService.tr("signup.form.email"),
                               controller: controller.emailSuController,
                               backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
                               textColor: Color(0xFF9ca3ae),
-                              hintText: "Şifre",
+                              hintText: languageService.tr("signup.form.password"),
                               isPassword: true,
                               controller: controller.passwordSuController,
                               backgroundColor: Color(0xfff5f5f5)),
                           SizedBox(height: 10),
                           CustomTextField(
                               textColor: Color(0xFF9ca3ae),
-                              hintText: "Şifre Tekrar",
+                              hintText: languageService.tr("signup.form.confirmPassword"),
                               isPassword: true,
                               controller:
                                   controller.confirmPasswordSuController,
@@ -131,7 +133,7 @@ class SignupView extends StatelessWidget {
                               SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  "Gizlilik politikası ve kullanım koşullarını okudum anladım ve kabul ediyorum.",
+                                  languageService.tr("signup.privacyPolicy"),
                                   style: GoogleFonts.inter(
                                       fontSize: 12,
                                       color: Color(0xff414751),
@@ -145,7 +147,7 @@ class SignupView extends StatelessWidget {
                               height: 50,
                               borderRadius: 15,
                               backgroundColor: Color(0xffE75454),
-                              text: "Kayıt Ol",
+                              text: languageService.tr("signup.registerButton"),
                               isLoading: controller.isSuLoading,
                               textColor: Colors.white,
                               onPressed: () {
@@ -159,13 +161,13 @@ class SignupView extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text("Hesabınız var mı? ",
+                                Text(languageService.tr("signup.loginLink.text"),
                                     style: GoogleFonts.inter(
                                         color: Color(0xFF414751),
                                         fontWeight: FontWeight.w600,
                                         fontSize: 13.28)),
                                 Text(
-                                  "Giriş Yap.",
+                                  languageService.tr("signup.loginLink.link"),
                                   style: GoogleFonts.inter(
                                       color: Color(0xFFEf5050),
                                       decoration: TextDecoration.underline,

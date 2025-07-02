@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
+import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 class EntryCard extends StatelessWidget {
   final EntryModel entry;
@@ -202,7 +204,7 @@ class EntryCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    "Paylaş",
+                    Get.find<LanguageService>().tr("common.buttons.share"),
                     style: GoogleFonts.inter(
                         fontSize: 10, color: Color(0xff9ca3ae)),
                   ),

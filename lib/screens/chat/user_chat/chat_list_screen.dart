@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../components/user_appbar/user_appbar.dart';
-import '../../../controllers/social/chat_controller.dart';
+import '../../../controllers/chat_controllers/chat_controller.dart';
 import '../../../controllers/group_controller/group_controller.dart';
+import '../../../services/language_service.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -29,6 +30,8 @@ class _ChatListScreenState extends State<ChatListScreen>
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       appBar: UserAppBar(),
       backgroundColor: const Color(0xFFFAFAFA),
@@ -37,7 +40,7 @@ class _ChatListScreenState extends State<ChatListScreen>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SearchTextField(
-              label: "Kişi ara",
+              label: languageService.tr("chat.chatList.searchPlaceholder"),
               controller: chatController.searchController,
               onChanged: chatController.filterChatList,
             ),
@@ -54,7 +57,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child:  Text(
-                    "Online Arkadaşlar",
+                    languageService.tr("chat.chatList.onlineFriends"),
                     style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
@@ -145,9 +148,9 @@ class _ChatListScreenState extends State<ChatListScreen>
                 fontSize: 14,
                 color: Color(0xff272727),
               ),
-              tabs: const [
-                Tab(text: "Kişiler"),
-                Tab(text: "Gruplar"),
+              tabs: [
+                Tab(text: languageService.tr("chat.chatList.tabs.people")),
+                Tab(text: languageService.tr("chat.chatList.tabs.groups")),
               ],
             ),
           ),

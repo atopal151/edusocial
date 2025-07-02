@@ -7,6 +7,7 @@ import '../../components/input_fields/custom_textfield_step2.dart';
 import '../../components/lists/custom_chip_list.dart';
 import '../../components/onboarding_header/on_header.dart';
 import '../../controllers/onboarding_controller.dart';
+import '../../services/language_service.dart';
 
 class Step2View extends StatelessWidget {
   const Step2View({super.key});
@@ -14,6 +15,7 @@ class Step2View extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OnboardingController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Scaffold(
       backgroundColor: Color(0xffFAFAFA),
@@ -28,13 +30,12 @@ class Step2View extends StatelessWidget {
                 SizedBox(height: 100),
                 OnboardingHeader(
                   imagePath: "images/icons/Group.png",
-                  title: "Bilgilerinizi Tamamlayın",
-                  subtitle:
-                      "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!",
+                  title: languageService.tr("step2.header.title"),
+                  subtitle: languageService.tr("step2.header.subtitle"),
                 ),
                 SizedBox(height: 30),
                 Text(
-                  "Hangi dersleri alıyorsun?",
+                  languageService.tr("step2.form.courseQuestion"),
                   style: GoogleFonts.inter(
                       fontSize: 13.28,
                       fontWeight: FontWeight.w400,
@@ -47,7 +48,7 @@ class Step2View extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  "Kaydedilen Konular",
+                  languageService.tr("step2.form.savedCourses"),
                   style: GoogleFonts.inter(
                       fontSize: 13.28,
                       fontWeight: FontWeight.w400,
@@ -64,15 +65,13 @@ class Step2View extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 WarningBox(
-                  message:
-                      "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir.",
+                  message: languageService.tr("step2.warning"),
                 ),
                 SizedBox(height: 30),
                 CustomButton(
-
                         height: 50,
                         borderRadius: 15,
-                      text: "Devam Et",
+                      text: languageService.tr("step2.continueButton"),
                       onPressed: controller.proceedToNextStep2,
                       isLoading: controller.isLoading,
                       backgroundColor: Color(0xFF414751),

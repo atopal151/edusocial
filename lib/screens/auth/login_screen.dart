@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/costum_textfield.dart';
 import '../../controllers/login_controller.dart';
+import '../../services/language_service.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -11,6 +12,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Scaffold(
       backgroundColor: Color(0xffffffff),
@@ -64,7 +66,7 @@ class LoginView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Benzer İlgi Alanlarına\n Sahip Kişilerle Tanış!",
+                          languageService.tr("login.title"),
                           style: GoogleFonts.inter(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
@@ -74,7 +76,7 @@ class LoginView extends StatelessWidget {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "EduSocial, Polonya’daki uluslararası okullarda eğitim gören öğrenciler için tasarlanmış yenilikçi bir sosyal platformdur.",
+                          languageService.tr("login.subtitle"),
                           style: GoogleFonts.inter(
                               fontSize: 12,
                               color: Color(0xffffe4e4),
@@ -92,7 +94,7 @@ class LoginView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Giriş Yap",
+                                languageService.tr("login.form.title"),
                                 style: GoogleFonts.inter(
                                   fontSize: 18.72,
                                   fontWeight: FontWeight.w700,
@@ -102,13 +104,13 @@ class LoginView extends StatelessWidget {
                               SizedBox(height: 10),
                               CustomTextField(
                                   textColor: Color(0xFF9CA3AE),
-                                  hintText: "Kullanıcı adı veya e-posta",
+                                  hintText: languageService.tr("login.form.usernameOrEmail"),
                                   controller: controller
                                       .emailController, 
                                   backgroundColor: Color(0xfff5f5f5)),
                               CustomTextField(
                                   textColor: Color(0xFF9CA3AE),
-                                  hintText: "Şifre",
+                                  hintText: languageService.tr("login.form.password"),
                                   isPassword: true,
                                   controller: controller
                                       .passwordController, 
@@ -121,7 +123,7 @@ class LoginView extends StatelessWidget {
                                     controller.loginPasswordUpgrade();
                                   },
                                   child: Text(
-                                    "Şifrenizi mi unuttunuz?",
+                                    languageService.tr("login.forgotPassword"),
                                     style: GoogleFonts.inter(
                                       fontSize: 13.28,
                                       color: Color(0xFF414751),
@@ -137,7 +139,7 @@ class LoginView extends StatelessWidget {
                                 height: 45,
                                 borderRadius: 15,
                                 backgroundColor: Color(0xffE75454),
-                                text: "Giriş Yap",
+                                text: languageService.tr("login.loginButton"),
                                 isLoading: controller.isLoading,
                                 textColor: Color(0xffffffff),
                                 onPressed: () {
@@ -155,14 +157,14 @@ class LoginView extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "Hesabınız yok mu? ",
+                                        languageService.tr("login.signupLink.text"),
                                         style: GoogleFonts.inter(
                                             color: Color(0xFF414751),
                                             fontSize: 13.28,
                                             fontWeight: FontWeight.w600),
                                       ),
                                       Text(
-                                        "Kayıt Ol.",
+                                        languageService.tr("login.signupLink.link"),
                                         style: GoogleFonts.inter(
                                             color: Color(0xFFE55050),
                                             decoration:

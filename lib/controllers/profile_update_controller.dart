@@ -7,6 +7,7 @@ import 'package:edusocial/models/profile_model.dart';
 import 'package:edusocial/services/onboarding_service.dart';
 import 'package:edusocial/services/profile_service.dart';
 import 'package:edusocial/services/profile_update_services.dart';
+import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +17,7 @@ import '../../components/snackbars/custom_snackbar.dart';
 
 class ProfileUpdateController extends GetxController {
   final _profileService = ProfileService();
+  final _languageService = Get.find<LanguageService>();
 
   // Ana model (backend'den gelen tüm veriler burada tutulur)
   Rx<ProfileModel?> userProfileModel = Rx<ProfileModel?>(null);
@@ -27,6 +29,7 @@ class ProfileUpdateController extends GetxController {
   /// 🌍 Diller
   var languages = <LanguageModel>[].obs;
   var selectedLanguageId = Rxn<int>();
+  var selectedLanguageCode = ''.obs; // Dil kodu (tr, en)
 
   var selectedSchoolName = "".obs;
   int? selectedSchoolId;
@@ -74,8 +77,64 @@ class ProfileUpdateController extends GetxController {
   Future<void> fetchLanguages() async {
     try {
       languages.value = await ProfileUpdateService.fetchLanguages();
+      
+      // Mevcut dili seç
+      _setCurrentLanguage();
     } catch (e) {
       Get.snackbar('Hata', 'Dilleri çekerken hata oluştu!');
+    }
+  }
+
+  /// Mevcut dili seç
+  void _setCurrentLanguage() {
+    // Önce profil verisinden dil kodunu al
+    final profileLanguage = userProfileModel.value?.language;
+    
+    if (profileLanguage != null && profileLanguage.isNotEmpty) {
+      // Profilde dil varsa, o dili seç
+      final languageModel = languages.firstWhereOrNull(
+        (lang) => lang.code == profileLanguage,
+      );
+      
+      if (languageModel != null) {
+        selectedLanguageId.value = languageModel.id;
+        selectedLanguageCode.value = languageModel.code;
+      } else {
+        // Profildeki dil desteklenmiyorsa varsayılan dili seç
+        _setDefaultLanguage();
+      }
+    } else {
+      // Profilde dil yoksa varsayılan dili seç
+      _setDefaultLanguage();
+    }
+  }
+
+  /// Varsayılan dili seç (İngilizce)
+  void _setDefaultLanguage() {
+    final defaultLanguage = languages.firstWhereOrNull(
+      (lang) => lang.code == 'en',
+    );
+    
+    if (defaultLanguage != null) {
+      selectedLanguageId.value = defaultLanguage.id;
+      selectedLanguageCode.value = defaultLanguage.code;
+    }
+  }
+
+  /// Dil seçildiğinde çağrılır
+  void onLanguageSelected(int languageId) {
+    final selectedLanguage = languages.firstWhereOrNull(
+      (lang) => lang.id == languageId,
+    );
+    
+    if (selectedLanguage != null) {
+      selectedLanguageId.value = languageId;
+      selectedLanguageCode.value = selectedLanguage.code;
+      
+      // Dil servisini güncelle
+      _languageService.changeLanguage(selectedLanguage.code);
+      
+      print('Dil değiştirildi: ${selectedLanguage.code}');
     }
   }
 
@@ -222,12 +281,18 @@ class ProfileUpdateController extends GetxController {
     // 🌍 Seçili dil id'sini de set et
     if (data.languageId != null && data.languageId!.isNotEmpty) {
       selectedLanguageId.value = int.tryParse(data.languageId!);
+      
+      // Dil kodunu da set et
+      final languageModel = languages.firstWhereOrNull(
+        (lang) => lang.id == selectedLanguageId.value,
+      );
+      if (languageModel != null) {
+        selectedLanguageCode.value = languageModel.code;
+        
+        // Dil servisini güncelle
+        _languageService.setLanguageFromProfile(languageModel.code);
+      }
     }
-  }
-
-  /// 🌍 Dil seçildiğinde çağrılacak
-  void onLanguageSelected(int languageId) {
-    selectedLanguageId.value = languageId;
   }
 
   /// 🎛️ Switch kontroller

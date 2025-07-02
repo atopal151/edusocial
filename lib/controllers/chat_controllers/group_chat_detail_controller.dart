@@ -10,10 +10,12 @@ import '../../models/group_models/group_detail_model.dart';
 import '../../models/document_model.dart';
 import '../../models/link_model.dart';
 import '../../services/group_services/group_service.dart';
+import '../../services/language_service.dart';
 import '../profile_controller.dart';
 
 class GroupChatDetailController extends GetxController {
   final GroupServices _groupServices = GroupServices();
+  final LanguageService languageService = Get.find<LanguageService>();
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isGroupDataLoading = false.obs; // Grup verisi için ayrı loading
@@ -333,7 +335,7 @@ class GroupChatDetailController extends GetxController {
                 style: TextStyle(fontSize: 12),
                 controller: pollTitleController,
                 decoration: InputDecoration(
-                  hintText: "Anket Başlığı",
+                  hintText: languageService.tr("chat.poll.title"),
                   filled: true,
                   fillColor: const Color(0xfff5f5f5),
                   hintStyle:
@@ -358,7 +360,7 @@ class GroupChatDetailController extends GetxController {
                               child: TextField(
                                 style: TextStyle(fontSize: 12),
                                 decoration: InputDecoration(
-                                  hintText: "+ Seçenek Ekle",
+                                  hintText: languageService.tr("chat.poll.addOption"),
                                   filled: true,
                                   fillColor: const Color(0xfff5f5f5),
                                   hintStyle: const TextStyle(
@@ -391,8 +393,8 @@ class GroupChatDetailController extends GetxController {
                   color: Color(0xffED7474),
                   size: 15,
                 ),
-                label: const Text(
-                  'Seçenek Ekle',
+                label: Text(
+                  languageService.tr("chat.poll.addOption"),
                   style: TextStyle(color: Color(0xffED7474), fontSize: 12),
                 ),
               ),
@@ -403,7 +405,7 @@ class GroupChatDetailController extends GetxController {
                     foregroundColor: const Color(0xffED7474),
                */
               CustomButton(
-                  text: "Gönder",
+                  text: languageService.tr("chat.poll.send"),
                   height: 45,
                   borderRadius: 15,
                   onPressed: () {

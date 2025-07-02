@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../models/chat_models/group_message_model.dart';
+import '../../../services/language_service.dart';
 
 class GroupPollMessageWidget extends StatelessWidget {
   final GroupMessageModel message;
@@ -19,6 +20,7 @@ class GroupPollMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     // 📌 `DateTime` → `String` formatına çeviriyoruz
     String formattedTime = DateFormat('dd.MM.yyyy HH:mm').format(message.timestamp);
     
@@ -160,7 +162,7 @@ class GroupPollMessageWidget extends StatelessWidget {
                                       ],
                                     ),
                                     Text(
-                                      '${pollVotes[option] ?? 0} oy',
+                                      '${pollVotes[option] ?? 0} ${languageService.tr("chat.poll.vote")}',
                                       style: const TextStyle(
                                         fontSize: 10,
                                         color: Colors.grey,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 class ToggleTabBar extends StatelessWidget {
   final RxInt selectedIndex;
@@ -13,6 +14,8 @@ class ToggleTabBar extends StatelessWidget {
 
   @override
 Widget build(BuildContext context) {
+  final LanguageService languageService = Get.find<LanguageService>();
+  
   return Obx(() => Align(
         alignment: Alignment.centerLeft, // ✅ Sol üst köşe
         child: Container(
@@ -24,8 +27,8 @@ Widget build(BuildContext context) {
           child: Row(
             mainAxisSize: MainAxisSize.min, // ✅ sadece içerik kadar yer kapla
             children: [
-              _buildToggleItem(0, "Gönderiler"),
-              _buildToggleItem(1, "Entryler"),
+              _buildToggleItem(0, languageService.tr("profile.tabbar.posts")),
+              _buildToggleItem(1, languageService.tr("profile.tabbar.entries")),
             ],
           ),
         ),

@@ -135,6 +135,7 @@ flutter:
     - images/user1.png
     - images/user2.png
     - images/school_logo.png
+    - assets/translations/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

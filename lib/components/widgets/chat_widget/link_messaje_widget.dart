@@ -3,6 +3,8 @@ import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
+import '../../../services/language_service.dart';
 
 class LinkMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -20,6 +22,7 @@ class LinkMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     // messageLink varsa onu kullan, yoksa text içindeki URL'leri çıkar
     List<String> links = [];
     String displayText = message.message;
@@ -182,7 +185,7 @@ class LinkMessageWidget extends StatelessWidget {
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text("Link açılamadı. Lütfen tekrar deneyin."),
+                                            content: Text(languageService.tr("chat.link.cannotOpen")),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
@@ -193,7 +196,7 @@ class LinkMessageWidget extends StatelessWidget {
                                     if (context.mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
-                                          content: Text("Bu link açılamıyor: $cleanLink"),
+                                          content: Text("${languageService.tr("chat.link.cannotOpenThis")}: $cleanLink"),
                                           backgroundColor: Colors.red,
                                         ),
                                       );
@@ -204,7 +207,7 @@ class LinkMessageWidget extends StatelessWidget {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text("Link açılırken bir hata oluştu: ${e.toString()}"),
+                                        content: Text("${languageService.tr("chat.link.openError")}: ${e.toString()}"),
                                         backgroundColor: Colors.red,
                                       ),
                                     );

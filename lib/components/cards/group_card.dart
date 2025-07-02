@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 class GroupCard extends StatelessWidget {
   final String imageUrl;
@@ -26,6 +28,7 @@ class GroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Container(
       padding: EdgeInsets.all(8),
       width: 200,
@@ -67,7 +70,7 @@ class GroupCard extends StatelessWidget {
                       width: 1,
                     ),
                     Text(
-                      "$chatNotification Mesaj",
+                      "$chatNotification ${languageService.tr("groups.groupCard.messages")}",
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,

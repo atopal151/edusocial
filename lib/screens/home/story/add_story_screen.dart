@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../controllers/story_controller.dart';
 import '../../../components/snackbars/custom_snackbar.dart';
+import '../../../services/language_service.dart';
 
 class AddStoryScreen extends StatefulWidget {
   const AddStoryScreen({super.key});
@@ -37,9 +38,10 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       }
     } catch (e) {
       debugPrint("Hata: $e", wrapWidth: 1024);
+      final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
-        title: "Hata",
-        message: "Fotoğraf seçilirken bir hata oluştu",
+        title: languageService.tr("common.errors.error"),
+        message: languageService.tr("story.addStory.photoSelectionError"),
         type: SnackbarType.error,
       );
     }
@@ -54,9 +56,10 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         });
       }
     } catch (e) {
+      final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
-        title: "Hata",
-        message: "Kamera açılırken bir hata oluştu",
+        title: languageService.tr("common.errors.error"),
+        message: languageService.tr("story.addStory.cameraError"),
         type: SnackbarType.error,
       );
     }
@@ -73,16 +76,18 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         Get.back();
       } catch (e) {
         isPosting.value = false;
+        final LanguageService languageService = Get.find<LanguageService>();
         CustomSnackbar.show(
-          title: "Hata",
-          message: "Hikaye paylaşılırken bir hata oluştu",
+          title: languageService.tr("common.errors.error"),
+          message: languageService.tr("story.addStory.shareError"),
           type: SnackbarType.error,
         );
       }
     } else {
+      final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
-        title: "Uyarı",
-        message: "Lütfen bir fotoğraf seçin",
+        title: languageService.tr("common.warnings.warning"),
+        message: languageService.tr("story.addStory.selectPhotoWarning"),
         type: SnackbarType.warning,
       );
     }
@@ -90,12 +95,13 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          "Hikayeye Ekle",
+          languageService.tr("story.addStory.title"),
           style: GoogleFonts.inter(
             color: const Color(0xFF414751),
             fontSize: 18,
@@ -114,7 +120,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             alignment: Alignment.centerLeft,
             child: Text(
-              "Yakınlardakiler",
+              languageService.tr("story.addStory.nearby"),
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -201,7 +207,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                     onPressed: pickImages,
                     icon: const Icon(Icons.photo_library, color: Color(0xFFF26B6B)),
                     label: Text(
-                      "Galeriden Seç",
+                      languageService.tr("story.addStory.selectFromGallery"),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -242,7 +248,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                               ),
                             )
                           : Text(
-                              "Paylaş",
+                              languageService.tr("story.addStory.share"),
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/profile_controller.dart';
 import '../../../controllers/story_controller.dart';
+import '../../../services/language_service.dart';
 
 class MyStoryList extends StatelessWidget {
   final StoryController storyController = Get.find<StoryController>();
@@ -15,6 +16,7 @@ class MyStoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Obx(() {
       final myStory = storyController.myStory.value;
 
@@ -76,7 +78,7 @@ class MyStoryList extends StatelessWidget {
               Text(
                 profileController.username.value.isNotEmpty
                     ? profileController.username.value
-                    : "@Sen",
+                    : languageService.tr("story.myStoryList.you"),
                 style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w400,

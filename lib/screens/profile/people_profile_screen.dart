@@ -16,6 +16,7 @@ import '../../components/profile_tabbar/toggle_tab_bar.dart';
 import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
 import '../../routes/app_routes.dart';
+import '../../services/language_service.dart';
 
 class PeopleProfileScreen extends StatefulWidget {
   final String username;
@@ -43,6 +44,8 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
       appBar: BackAppBar(
@@ -62,10 +65,10 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 
         final profile = controller.profile.value;
         if (profile == null) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: EdgeInsets.all(20),
-              child: Text("Kullanıcı profili yüklenemedi."),
+              child: Text(languageService.tr("profile.peopleProfile.loadError")),
             ),
           );
         }
@@ -91,10 +94,10 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                                 height: 40,
                                 borderRadius: 5,
                                 text: controller.isFollowingPending.value
-                                    ? "Onay Bekliyor"
+                                    ? languageService.tr("profile.peopleProfile.actions.pendingApproval")
                                     : controller.isFollowing.value
-                                        ? "Takibi Bırak"
-                                        : "Takip Et",
+                                        ? languageService.tr("profile.peopleProfile.actions.unfollow")
+                                        : languageService.tr("profile.peopleProfile.actions.follow"),
                                 onPressed: () {
                                   if (!controller.isFollowingPending.value) {
                                     if (controller.isFollowing.value) {
@@ -115,16 +118,19 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                           child: CustomButton(
                             height: 40,
                             borderRadius: 5,
-                            text: "Mesaj Gönder",
+                            text: languageService.tr("profile.peopleProfile.actions.sendMessage"),
                             onPressed: () {
                               // Mesaj gönderme ekranına yönlendirme
                               if (profile != null) {
                                 Get.toNamed(Routes.chatDetail, arguments: {
                                   'userId': profile.id,
-                                  'conversationId': null, // Yeni konuşma başlatılacak
+                                  'conversationId':
+                                      null, // Yeni konuşma başlatılacak
                                   'name': '${profile.name} ${profile.surname}',
                                   'username': profile.username,
-                                  'avatarUrl': profile.avatarUrl.isNotEmpty ? profile.avatarUrl : profile.avatar,
+                                  'avatarUrl': profile.avatarUrl.isNotEmpty
+                                      ? profile.avatarUrl
+                                      : profile.avatar,
                                   'isOnline': profile.isOnline,
                                 });
                               }
@@ -189,6 +195,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   }
 
   Widget _buildPosts() {
+    final LanguageService languageService = Get.find<LanguageService>();
     final posts = controller.profile.value?.posts ?? [];
     final profile = controller.profile.value;
 
@@ -196,14 +203,16 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
     if (profile != null) {
       final isPrivateProfile = profile.accountType == "private";
       final isFollowing = controller.isFollowing.value;
-      
+
       if (isPrivateProfile && !isFollowing) {
         return _buildLockedContent();
       }
     }
 
     if (posts.isEmpty) {
-      return const Center(child: Text("Hiç gönderi bulunamadı."));
+      return Center(
+          child:
+              Text(languageService.tr("profile.peopleProfile.noPostsFound")));
     }
 
     return Container(
@@ -234,14 +243,16 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   }
 
   Widget _buildEntries() {
+    final LanguageService languageService = Get.find<LanguageService>();
+
     return Obx(() {
       final profile = controller.profile.value;
-      
+
       // Gizli profil kontrolü - sadece takip ediyorsa içerik göster
       if (profile != null) {
         final isPrivateProfile = profile.accountType == "private";
         final isFollowing = controller.isFollowing.value;
-        
+
         if (isPrivateProfile && !isFollowing) {
           return _buildLockedContent();
         }
@@ -258,21 +269,23 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
       }
 
       if (controller.peopleEntries.isEmpty) {
-        return const Center(child: Text("Hiç entry bulunamadı."));
+        return Center(
+            child: Text(
+                languageService.tr("profile.peopleProfile.noEntriesFound")));
       }
-      
+
       return ListView.builder(
         itemCount: controller.peopleEntries.length,
         itemBuilder: (context, index) {
           final entry = controller.peopleEntries[index];
-          
+
           // Entry'nin kullanıcı bilgilerini al
           final user = entry.user;
           if (user == null) {
             //debugPrint("⚠️ Entry için kullanıcı bilgileri bulunamadı: ${entry.id}");
             return const SizedBox.shrink();
           }
-          
+
           //debugPrint("🔍 PersonEntryCard - Kullanıcı bilgileri: ${user.avatarUrl}");
           return Container(
             color: const Color(0xfffafafa),
@@ -291,15 +304,16 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                   if (user.username.isNotEmpty) {
                     Get.to(() => PeopleProfileScreen(username: user.username));
                   } else {
-                    debugPrint("⚠️ Kullanıcı bilgileri eksik, profil sayfasına yönlendirilemiyor");
+                    debugPrint(
+                        "⚠️ Kullanıcı bilgileri eksik, profil sayfasına yönlendirilemiyor");
                   }
                 },
                 onUpvote: () => entryController.voteEntry(entry.id, "up"),
                 onDownvote: () => entryController.voteEntry(entry.id, "down"),
                 onShare: () {
                   // Konu bilgilerini al
-                  final topicName = entry.topic?.name ?? "Konu Bilgisi Yok";
-                  final categoryTitle = entry.topic?.category?.title ?? "Kategori Yok";
+                  final topicName = entry.topic?.name ?? languageService.tr("profile.peopleProfile.shareText.topicInfo");
+                  final categoryTitle = entry.topic?.category?.title ?? languageService.tr("profile.peopleProfile.shareText.categoryInfo");
 
                   final String shareText = """
 📝 **$topicName** (#${entry.id})
@@ -310,12 +324,11 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 💬 **Entry İçeriği:**
 ${entry.content}
 
-📱 **EduSocial Uygulamasını İndir:**
-🔗 Uygulamayı Aç: edusocial://app
-📲 App Store: https://apps.apple.com/app/edusocial/id123456789
-📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
+📱 **${languageService.tr("profile.peopleProfile.shareText.appLink")}**
+📲 ${languageService.tr("profile.peopleProfile.shareText.appStore")}
+📱 ${languageService.tr("profile.peopleProfile.shareText.playStore")}
 
-#EduSocial #Eğitim #$categoryTitle
+${languageService.tr("profile.peopleProfile.shareText.hashtags")} #$categoryTitle
 """;
                   Share.share(shareText);
                 },
@@ -329,22 +342,23 @@ ${entry.content}
 
   Widget _buildProfileDetails() {
     final profile = controller.profile.value;
-    
+
     // Gizli profil kontrolü - sadece takip ediyorsa içerik göster
     if (profile != null) {
       final isPrivateProfile = profile.accountType == "private";
       final isFollowing = controller.isFollowing.value;
-      
+
       if (isPrivateProfile && !isFollowing) {
         return _buildLockedContent();
       }
     }
 
     if (profile == null) {
-      return const Center(
+      final LanguageService languageService = Get.find<LanguageService>();
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(20),
-          child: Text("Kullanıcı profili bulunamadı."),
+          child: Text(languageService.tr("profile.peopleProfile.notFound")),
         ),
       );
     }
@@ -354,6 +368,8 @@ ${entry.content}
 
   // Kilitli içerik widget'ı
   Widget _buildLockedContent() {
+    final LanguageService languageService = Get.find<LanguageService>();
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -372,19 +388,20 @@ ${entry.content}
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            "Bu içerik gizli",
-            style: TextStyle(
+          Text(
+            languageService.tr("profile.peopleProfile.lockedContent.title"),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Color(0xff414751),
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            "Bu kullanıcının içeriğini görmek için\nönce takip isteği göndermeniz gerekir.",
+          Text(
+            languageService
+                .tr("profile.peopleProfile.lockedContent.description"),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: Color(0xff9ca3ae),
             ),

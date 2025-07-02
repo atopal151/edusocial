@@ -3,6 +3,7 @@ import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../routes/app_routes.dart';
+import '../../services/language_service.dart';
 
 class ProfileFollowingScreen extends StatefulWidget {
   final List<Map<String, dynamic>> followings;
@@ -11,7 +12,7 @@ class ProfileFollowingScreen extends StatefulWidget {
   const ProfileFollowingScreen({
     super.key, 
     required this.followings,
-    this.screenTitle = 'Takip edilen',
+    this.screenTitle = '',
   });
 
   @override
@@ -21,10 +22,14 @@ class ProfileFollowingScreen extends StatefulWidget {
 class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: BackAppBar(
-        title: widget.screenTitle,
+        title: widget.screenTitle.isEmpty 
+            ? languageService.tr("profile.following.title")
+            : widget.screenTitle,
         backgroundColor: Color(0xfffafafa),
         iconBackgroundColor: Color(0xffffffff),
       ),
@@ -74,7 +79,7 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
                 ),
               ),
               child: Text(
-                "Mesaj Gönder",
+                languageService.tr("profile.following.sendMessage"),
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,

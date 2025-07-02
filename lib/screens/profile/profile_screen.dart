@@ -15,6 +15,7 @@ import '../../controllers/post_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../routes/app_routes.dart';
 import '../profile/people_profile_screen.dart';
+import '../../services/language_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -42,6 +43,8 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: const Color(0xffffffff),
       appBar: AppBar(
@@ -104,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       child: CustomButton(
                         height: 40,
                         borderRadius: 5,
-                        text: "Profili Düzenle",
+                        text: languageService.tr("profile.mainProfile.editProfile"),
                         onPressed: () {
                           controller.getToSettingScreen();
                         },
@@ -204,9 +207,11 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   /// **Entryler Sekmesi İçeriği**
   Widget _buildEntries() {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Obx(() {
       if (controller.personEntries.isEmpty) {
-        return const Center(child: Text("Hiç entry bulunamadı."));
+        return Center(child: Text(languageService.tr("profile.mainProfile.noEntriesFound")));
       }
 
       return ListView.builder(
@@ -246,8 +251,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                 onDownvote: () => entryController.voteEntry(entry.id, "down"),
                 onShare: () {
                   // Konu bilgilerini al
-                  final topicName = entry.topic?.name ?? "Konu Bilgisi Yok";
-                  final categoryTitle = entry.topic?.category?.title ?? "Kategori Yok";
+                  final topicName = entry.topic?.name ?? languageService.tr("profile.mainProfile.shareText.topicInfo");
+                  final categoryTitle = entry.topic?.category?.title ?? languageService.tr("profile.mainProfile.shareText.categoryInfo");
 
                   final String shareText = """
 📝 **$topicName** (#${entry.id})
@@ -259,11 +264,11 @@ class _ProfileScreenState extends State<ProfileScreen>
 ${entry.content}
 
 📱 **EduSocial Uygulamasını İndir:**
-🔗 Uygulamayı Aç: edusocial://app
-📲 App Store: https://apps.apple.com/app/edusocial/id123456789
-📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
+🔗 ${languageService.tr("profile.mainProfile.shareText.appLink")}
+📲 ${languageService.tr("profile.mainProfile.shareText.appStore")}
+📱 ${languageService.tr("profile.mainProfile.shareText.playStore")}
 
-#EduSocial #Eğitim #$categoryTitle
+${languageService.tr("profile.mainProfile.shareText.hashtags")}
 """;
                   Share.share(shareText);
                 },

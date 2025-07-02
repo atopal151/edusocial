@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 import '../../../models/chat_models/group_message_model.dart';
+import '../../../services/language_service.dart';
 
 class GroupDocumentMessageWidget extends StatelessWidget {
   final GroupMessageModel message;
@@ -24,6 +26,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     // 📌 `DateTime` → `String` formatına çeviriyoruz
     String formattedTime = DateFormat('dd.MM.yyyy HH:mm').format(message.timestamp);
     final documentUrl = getDocumentUrl();
@@ -101,7 +104,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Document açılamadı: $documentName'),
+                        content: Text('${languageService.tr("chat.document.cannotOpen")}: $documentName'),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -111,7 +114,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Document açılırken hata oluştu: $e'),
+                      content: Text('${languageService.tr("chat.document.openError")}: $e'),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -161,7 +164,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
                         ),
                         if (documentUrl != null)
                           Text(
-                            'Tıklayarak indir',
+                            languageService.tr("chat.document.clickToDownload"),
                             style: TextStyle(
                               fontSize: 10,
                               color: message.isSentByMe ? Colors.white70 : Colors.grey,

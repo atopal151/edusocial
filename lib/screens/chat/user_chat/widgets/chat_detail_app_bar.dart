@@ -1,4 +1,4 @@
-import 'package:edusocial/controllers/social/chat_detail_controller.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

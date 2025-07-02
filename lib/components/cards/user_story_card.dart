@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/story_model.dart';
 import '../../screens/home/story/story_viewer_page.dart';
+import '../../services/language_service.dart';
 
 class UserStoryCard extends StatelessWidget {
   final StoryModel? story; // nullable yaptık
@@ -16,6 +17,7 @@ class UserStoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     // Eğer kullanıcıya ait story yoksa "Add Story" göster
     if (isMe) {
       return GestureDetector(
@@ -49,7 +51,7 @@ class UserStoryCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text("@Sen", style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w400, color: Color(0xff272727))),
+            Text(languageService.tr("story.userStoryCard.you"), style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w400, color: Color(0xff272727))),
           ],
         ),
       );

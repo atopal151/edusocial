@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/components/snackbars/custom_snackbar.dart';
+import '../../services/language_service.dart';
 
 class UserTreePointBottomSheet extends StatelessWidget {
   final int postId;
@@ -12,6 +13,7 @@ class UserTreePointBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PostController postController = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return SafeArea(
       child: Padding(
@@ -36,7 +38,7 @@ class UserTreePointBottomSheet extends StatelessWidget {
                 child: const Icon(Icons.delete, color: Color(0xffef5050), size: 20),
               ),
               title: Text(
-                "Delete",
+                languageService.tr("common.actions.delete"),
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -55,7 +57,7 @@ class UserTreePointBottomSheet extends StatelessWidget {
                 child: const Icon(Icons.warning_rounded, color: Color(0xffef5050), size: 20),
               ),
               title: Text(
-                "Şikayet Et",
+                languageService.tr("common.actions.report"),
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
@@ -65,8 +67,8 @@ class UserTreePointBottomSheet extends StatelessWidget {
               onTap: () {
                 Get.back(); // Bottom sheet'i kapat
                 CustomSnackbar.show(
-                  title: "Bilgi",
-                  message: "Şikayet özelliği yakında eklenecek",
+                  title: languageService.tr("common.info.info"),
+                  message: languageService.tr("common.info.reportFeatureComingSoon"),
                   type: SnackbarType.info,
                 );
               },

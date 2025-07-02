@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/group_controller/group_controller.dart';
-import '../../controllers/social/chat_controller.dart';
+import '../../controllers/chat_controllers/chat_controller.dart';
+import '../../services/language_service.dart';
 
 class GroupParticipantsScreen extends StatefulWidget {
   const GroupParticipantsScreen({super.key});
@@ -36,10 +37,12 @@ class _GroupParticipantsScreenState extends State<GroupParticipantsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: BackAppBar(
-        title: 'Grup Katılımcıları',
+        title: languageService.tr("groups.groupParticipants.title"),
         backgroundColor: Color(0xfffafafa),
         iconBackgroundColor: Color(0xffffffff),
       ),
@@ -61,7 +64,7 @@ class _GroupParticipantsScreenState extends State<GroupParticipantsScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Henüz katılımcı yok',
+                  languageService.tr("groups.groupParticipants.noParticipants"),
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -130,7 +133,7 @@ class _GroupParticipantsScreenState extends State<GroupParticipantsScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      "Mesaj Gönder",
+                      languageService.tr("groups.groupParticipants.sendMessage"),
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,

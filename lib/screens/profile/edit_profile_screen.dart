@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../controllers/profile_update_controller.dart';
+import '../../services/language_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -18,6 +19,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final ProfileUpdateController controller = Get.put(ProfileUpdateController());
+  final LanguageService languageService = Get.find<LanguageService>();
   final ImagePicker _picker = ImagePicker();
   var accountType = ''.obs;
 
@@ -58,23 +60,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     _buildHeaderPhotoWithAvatar(),
                     const SizedBox(height: 20),
                     _buildTextField(
-                        "Kullanıcı Adı", "@", controller.usernameController),
+                        languageService.tr("profile.editProfile.username"), "@", controller.usernameController),
                     const SizedBox(height: 10),
-                    _buildTextField("Ad", "", controller.nameController),
+                    _buildTextField(languageService.tr("profile.editProfile.name"), "", controller.nameController),
                     const SizedBox(height: 10),
-                    _buildTextField("Soyad", "", controller.surnameController),
+                    _buildTextField(languageService.tr("profile.editProfile.surname"), "", controller.surnameController),
                     const SizedBox(height: 10),
-                    _buildTextField("E-posta", "", controller.emailController),
+                    _buildTextField(languageService.tr("profile.editProfile.email"), "", controller.emailController),
                     const SizedBox(height: 10),
-                    _buildTextField("Telefon", "", controller.phoneController),
-                    const SizedBox(height: 10),
-                    _buildTextField(
-                        "Doğum Tarihi", "", controller.birthdayController),
+                    _buildTextField(languageService.tr("profile.editProfile.phone"), "", controller.phoneController),
                     const SizedBox(height: 10),
                     _buildTextField(
-                        "Biyografi", "", controller.descriptionController),
+                        languageService.tr("profile.editProfile.birthday"), "", controller.birthdayController),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                        languageService.tr("profile.editProfile.bio"), "", controller.descriptionController),
                     const SizedBox(height: 20),
-                    _sectionTitle("Sosyal Medya Hesapları"),
+                    _sectionTitle(languageService.tr("profile.editProfile.socialMediaAccounts")),
                     const SizedBox(height: 10),
                     _buildTextField(
                         "Instagram", "@", controller.instagramController),
@@ -89,13 +91,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         "LinkedIn", "/", controller.linkedinController),
                     const SizedBox(height: 10),
                     _buildTextField("Tiktok", "@", controller.tiktokController),
-                    _sectionTitle("Okul ve Bölüm Bilgisi"),
+                    _sectionTitle(languageService.tr("profile.editProfile.schoolAndDepartment")),
                     const SizedBox(height: 10),
                     _buildSchoolDropdown(),
                     const SizedBox(height: 10),
                     _buildDepartmentDropdown(),
                     const SizedBox(height: 20),
-                    _sectionTitle("Dersler"),
+                    _sectionTitle(languageService.tr("profile.editProfile.courses")),
                     const SizedBox(height: 10),
                     CustomTextFieldStep2(
                       controller: controller.lessonController,
@@ -110,30 +112,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 10),
                     _buildLessonChips(),
                     const SizedBox(height: 20),
-                    _sectionTitle("Bildirim Ayarları"),
+                    _sectionTitle(languageService.tr("profile.editProfile.notificationSettings")),
                     const SizedBox(height: 10),
                     _buildSwitchTile(
-                        "E-posta Bildirimi",
+                        languageService.tr("profile.editProfile.emailNotification"),
                         controller.emailNotification,
                         controller.toggleEmailNotification),
                     const SizedBox(height: 20),
                     _buildSwitchTile(
-                        "Mobil Bildirimi",
+                        languageService.tr("profile.editProfile.mobileNotification"),
                         controller.mobileNotification,
                         controller.toggleMobileNotification),
                     const SizedBox(height: 20),
-                    _sectionTitle("Dil Seçimi"),
+                    _sectionTitle(languageService.tr("profile.editProfile.languageSelection")),
                     const SizedBox(height: 20),
                     _buildLanguageDropdown(),
                     const SizedBox(height: 20),
-                    _sectionTitle("Hesap Tipi"),
+                    _sectionTitle(languageService.tr("profile.editProfile.accountType")),
                     const SizedBox(height: 10),
                     _buildAccountTypeDropdown(),
                     const SizedBox(height: 30),
                     CustomButton(
                       height: 50,
                       borderRadius: 15,
-                      text: "Kaydet",
+                      text: languageService.tr("common.buttons.save"),
                       onPressed: controller.saveProfile,
                       isLoading: controller.isLoading,
                       backgroundColor: const Color(0xFFEF5050),
@@ -163,7 +165,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ? controller.accountType.value
                 : null,
             hint: Text(
-              "Hesap Tipi Seçimi",
+              languageService.tr("profile.editProfile.accountTypeSelection"),
               style: GoogleFonts.inter(
                 fontSize: 13.28,
                 fontWeight: FontWeight.w400,
@@ -209,7 +211,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             isExpanded: true,
             value: controller.selectedLanguageId.value,
             hint: Text(
-              "Dil Seçimi",
+              languageService.tr("profile.editProfile.languageSelection"),
               style: GoogleFonts.inter(
                 fontSize: 13.28,
                 fontWeight: FontWeight.w400,
@@ -258,7 +260,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ? controller.selectedSchoolName.value
                 : null,
             hint: Text(
-              "Okul Seçimi",
+              languageService.tr("profile.editProfile.schoolSelection"),
               style: GoogleFonts.inter(
                 fontSize: 13.28,
                 fontWeight: FontWeight.w400,
@@ -307,7 +309,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ? controller.selectedDepartmentName.value
                 : null,
             hint: Text(
-              "Bölüm Seçimi",
+              languageService.tr("profile.editProfile.departmentSelection"),
               style: GoogleFonts.inter(
                 fontSize: 13.28,
                 fontWeight: FontWeight.w400,

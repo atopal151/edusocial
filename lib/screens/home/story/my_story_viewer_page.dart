@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/story_controller.dart';
+import '../../../services/language_service.dart';
 
 class MyStoryViewerPage extends StatefulWidget {
   const MyStoryViewerPage({super.key});
@@ -93,15 +94,16 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
   }
 
   String timeAgo(DateTime date) {
+    final LanguageService languageService = Get.find<LanguageService>();
     final now = DateTime.now();
     final difference = now.difference(date);
 
-    if (difference.inSeconds < 60) return 'az önce';
-    if (difference.inMinutes < 60) return '${difference.inMinutes} dk önce';
-    if (difference.inHours < 24) return '${difference.inHours} saat önce';
-    if (difference.inDays == 1) return 'dün';
-    if (difference.inDays < 7) return '${difference.inDays} gün önce';
-    return '${date.day}/${date.month}/${date.year}';
+    if (difference.inSeconds < 60) return languageService.tr("common.time.justNow");
+    if (difference.inMinutes < 60) return "${difference.inMinutes} ${languageService.tr("common.time.minutes")} ${languageService.tr("common.time.ago")}";
+    if (difference.inHours < 24) return "${difference.inHours} ${languageService.tr("common.time.hours")} ${languageService.tr("common.time.ago")}";
+    if (difference.inDays == 1) return languageService.tr("common.time.yesterday");
+    if (difference.inDays < 7) return "${difference.inDays} ${languageService.tr("common.time.days")} ${languageService.tr("common.time.ago")}";
+    return "${date.day}/${date.month}/${date.year}";
   }
 
   @override

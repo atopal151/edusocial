@@ -1,6 +1,7 @@
-import 'package:edusocial/controllers/social/chat_detail_controller.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../services/language_service.dart';
 
 class ChatDetailBottom extends StatelessWidget {
   const ChatDetailBottom({super.key});
@@ -9,6 +10,7 @@ class ChatDetailBottom extends StatelessWidget {
   Widget build(BuildContext context) {
     final chatController = Get.find<ChatDetailController>();
     final textController = TextEditingController();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -27,7 +29,7 @@ class ChatDetailBottom extends StatelessWidget {
             child: TextField(
               controller: textController,
               decoration: InputDecoration(
-                hintText: 'Mesaj yazın... (Linkler otomatik algılanır)',
+                hintText: languageService.tr("chat.messageInput.placeholder"),
                 hintStyle: const TextStyle(
                   color: Color(0xff9ca3ae),
                   fontSize: 14,

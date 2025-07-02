@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import '../../controllers/social/group_chat_detail_controller.dart';
+import '../../controllers/chat_controllers/group_chat_detail_controller.dart';
+import '../../services/language_service.dart';
 
 final GroupChatDetailController controller = Get.find();
 
 Widget buildGroupMessageInputField() {
+  final LanguageService languageService = Get.find<LanguageService>();
   TextEditingController messageController = TextEditingController();
 
   return Container(
@@ -88,8 +90,8 @@ Widget buildGroupMessageInputField() {
                   controller: messageController,
                   decoration: InputDecoration(
                     hintText: controller.selectedFiles.isNotEmpty 
-                        ? "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz..."
-                        : "Bir mesaj yazınız...",
+                        ? languageService.tr("chat.groupChat.fileSelected")
+                        : languageService.tr("chat.groupChat.messagePlaceholder"),
                     hintStyle: TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
                     border: InputBorder.none,
                   ),

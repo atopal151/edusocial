@@ -3,7 +3,7 @@ import 'package:edusocial/controllers/home_controller.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/controllers/topics_controller.dart';
-import 'package:edusocial/controllers/social/chat_controller.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/controllers/notification_controller.dart';
 import 'package:edusocial/controllers/appbar_controller.dart';

@@ -13,6 +13,7 @@ import '../../controllers/topics_controller.dart';
 import '../../controllers/post_controller.dart';
 import 'story/my_story_list.dart';
 import 'post_home_list.dart';
+import '../../services/language_service.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
@@ -42,6 +43,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: UserAppBar(),
@@ -94,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                 if (groupController.suggestionGroups.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                    child: Text("İlgini Çekebilecek Gruplar",
+                    child: Text(languageService.tr("home.homeScreen.suggestedGroups"),
                         style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff272727))),
                   ),
                   GroupSuggestionListView(),
@@ -102,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                 if (topicsController.hotTopics.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0, top: 12, bottom: 12),
-                    child: Text("Gündemdeki Konular",
+                    child: Text(languageService.tr("home.homeScreen.hotTopics"),
                         style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xff272727))),
                   ),
                   HotTopicsListView(),

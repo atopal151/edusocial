@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../components/dialogs/logout_dialog.dart';
 import '../../components/user_appbar/back_appbar.dart';
+import '../../services/language_service.dart';
 
 class UserSettingsScreen extends StatefulWidget {
   const UserSettingsScreen({super.key});
@@ -17,6 +18,8 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
   final ProfileController controller = Get.find();
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: BackAppBar(
@@ -28,7 +31,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             PrimaryButton(
-              text: "Profili Düzenle",
+              text: languageService.tr("settings.buttons.editProfile"),
               onPressed: () {
                 controller.getToSettingScreen();
               },
@@ -47,7 +50,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
               height: 6,
             ),
             PrimaryButton(
-              text: "Gizlilik Politikası",
+              text: languageService.tr("settings.buttons.privacyPolicy"),
               onPressed: () {},
               backgroundColor: Color(0xffffffff),
               textColor: Color(0xff414751),
@@ -64,7 +67,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
               height: 6,
             ),
             PrimaryButton(
-              text: "Bildirim Ayarları",
+              text: languageService.tr("settings.buttons.notificationSettings"),
               onPressed: () {},
               backgroundColor: Color(0xffffffff),
               textColor: Color(0xff414751),
@@ -81,7 +84,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
               height: 6,
             ),
             PrimaryButton(
-              text: "Çıkış Yap",
+              text: languageService.tr("settings.buttons.logout"),
               onPressed: () {
                 LogoutDialogs.showLogoutDialog();
               },

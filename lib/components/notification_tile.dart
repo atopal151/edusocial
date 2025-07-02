@@ -3,9 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import '../models/notification_model.dart';
 import '../controllers/notification_controller.dart';
+import '../services/language_service.dart';
 
 Widget buildNotificationTile(NotificationModel n) {
   final NotificationController controller = Get.find();
+  final LanguageService languageService = Get.find<LanguageService>();
   
   debugPrint('🔔 Bildirim tipi: ${n.type}');
   return ListTile(
@@ -48,6 +50,7 @@ Widget buildNotificationTile(NotificationModel n) {
           TextSpan(
             text: _timeAgo(
               n.timestamp,
+              languageService,
             ),
             style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
           )
@@ -55,11 +58,11 @@ Widget buildNotificationTile(NotificationModel n) {
       ),
     ),
     tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),
-    trailing: _buildFollowRequestAction(n, controller),
+    trailing: _buildFollowRequestAction(n, controller, languageService),
   );
 }
 
-Widget _buildFollowRequestAction(NotificationModel n, NotificationController controller) {
+Widget _buildFollowRequestAction(NotificationModel n, NotificationController controller, LanguageService languageService) {
   debugPrint('🔔 [Button] Bildirim tipi: ${n.type}');
   debugPrint('🔍   - isFollowing: ${n.isFollowing}');
   debugPrint('🔍   - isFollowingPending: ${n.isFollowingPending}');
@@ -69,7 +72,7 @@ Widget _buildFollowRequestAction(NotificationModel n, NotificationController con
     if (n.isAccepted) {
       debugPrint('🔍   - Durum: Onaylandı');
       return Text(
-        'Onaylandı',
+        languageService.tr("notification.accepted"),
         style: TextStyle(
           color: Colors.green,
           fontWeight: FontWeight.bold,
@@ -78,7 +81,7 @@ Widget _buildFollowRequestAction(NotificationModel n, NotificationController con
     } else if (n.isRejected) {
       debugPrint('🔍   - Durum: Reddedildi');
       return Text(
-        'Reddedildi',
+        languageService.tr("notification.rejected"),
         style: TextStyle(
           color: Colors.red,
           fontWeight: FontWeight.bold,
@@ -98,7 +101,7 @@ Widget _buildFollowRequestAction(NotificationModel n, NotificationController con
               minimumSize: Size(60, 32),
               padding: EdgeInsets.symmetric(horizontal: 8),
             ),
-            child: Text('Onayla', style: TextStyle(fontSize: 12)),
+            child: Text(languageService.tr("notification.accept"), style: TextStyle(fontSize: 12)),
           ),
           SizedBox(width: 4),
           IconButton(
@@ -106,7 +109,7 @@ Widget _buildFollowRequestAction(NotificationModel n, NotificationController con
             onPressed: () {
               controller.handleFollowRequest(n.senderUserId, 'decline');
             },
-            tooltip: 'Reddet',
+            tooltip: languageService.tr("notification.decline"),
           ),
         ],
       );
@@ -173,15 +176,15 @@ Color _getIconBgColor(String type) {
   }
 }
 
-String _timeAgo(DateTime date) {
+String _timeAgo(DateTime date, LanguageService languageService) {
   final now = DateTime.now();
   final diff = now.difference(date);
 
-  if (diff.inMinutes < 1) return "az önce";
-  if (diff.inMinutes < 60) return "${diff.inMinutes}dk";
-  if (diff.inHours < 24) return "${diff.inHours}s";
-  if (diff.inDays < 7) return "${diff.inDays}g";
-  if (diff.inDays < 30) return "${(diff.inDays / 7).floor()}h"; // hafta
-  if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}a"; // ay
-  return "${(diff.inDays / 365).floor()}y"; // yıl
+  if (diff.inMinutes < 1) return languageService.tr("time.justNow");
+  if (diff.inMinutes < 60) return "${diff.inMinutes}${languageService.tr("time.minute")}";
+  if (diff.inHours < 24) return "${diff.inHours}${languageService.tr("time.hour")}";
+  if (diff.inDays < 7) return "${diff.inDays}${languageService.tr("time.day")}";
+  if (diff.inDays < 30) return "${(diff.inDays / 7).floor()}${languageService.tr("time.week")}";
+  if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}${languageService.tr("time.month")}";
+  return "${(diff.inDays / 365).floor()}${languageService.tr("time.year")}";
 }

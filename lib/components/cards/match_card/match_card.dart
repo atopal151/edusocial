@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../controllers/match_controller.dart';
+import '../../../services/language_service.dart';
 
 class MatchCard extends StatefulWidget {
   const MatchCard({super.key});
@@ -19,6 +20,7 @@ class _MatchCardState extends State<MatchCard> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Obx(() {
       final match = controller.currentMatch;
       double rotationAngle = _dragOffset.dx / 300;
@@ -71,7 +73,9 @@ class _MatchCardState extends State<MatchCard> {
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              _dragOffset.dx > 0 ? "Takip Et" : "Geç",
+                              _dragOffset.dx > 0 
+                                ? languageService.tr("match.card.follow") 
+                                : languageService.tr("match.card.skip"),
                               style: GoogleFonts.inter(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w600,
@@ -93,6 +97,7 @@ class _MatchCardState extends State<MatchCard> {
   }
 
   Widget _buildMatchCard(match) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -137,7 +142,8 @@ class _MatchCardState extends State<MatchCard> {
                     backgroundColor: Color(0xff4DD64B),
                   ),
                   const SizedBox(width: 4),
-                   Text("Çevrimiçi",
+                   Text(
+                      languageService.tr("match.card.online"),
                       style: GoogleFonts.inter(
                           color: Color(0xffffffff),
                           fontSize: 12,
@@ -145,7 +151,8 @@ class _MatchCardState extends State<MatchCard> {
                 ],
               ),
             const SizedBox(height: 16),
-             Text("Eğitim",
+             Text(
+                languageService.tr("match.card.education"),
                 style: GoogleFonts.inter(
                     color: Color(0xffffffff),
                     fontSize: 12,
@@ -175,7 +182,7 @@ class _MatchCardState extends State<MatchCard> {
                     Text(
                       match.schoolName.isNotEmpty
                           ? match.schoolName
-                          : 'Okul bilgisi yok',
+                          : languageService.tr("match.card.noSchoolInfo"),
                       style: GoogleFonts.inter(
                         color: Color(0xffffffff),
                         fontWeight: FontWeight.w600,
@@ -183,7 +190,7 @@ class _MatchCardState extends State<MatchCard> {
                       ),
                     ),
                     Text(
-                      "${match.department.isNotEmpty ? match.department : 'Bölüm yok'} • Grade ${match.grade}",
+                      "${match.department.isNotEmpty ? match.department : languageService.tr("match.card.noDepartment")} • ${languageService.tr("match.card.grade")} ${match.grade}",
                       style: GoogleFonts.inter(
                         color: Color(0xffffffff),
                         fontSize: 10,
@@ -195,21 +202,23 @@ class _MatchCardState extends State<MatchCard> {
               ],
             ),
             const SizedBox(height: 16),
-             Text("Hakkında",
+             Text(
+                languageService.tr("match.card.about"),
                 style: GoogleFonts.inter(
                     color: Color(0xffffffff),
                     fontSize: 12,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             Text(
-              match.about.isNotEmpty ? match.about : 'Henüz bilgi yok',
+              match.about.isNotEmpty ? match.about : languageService.tr("match.card.noInfoYet"),
               style: GoogleFonts.inter(
                   color: Color(0xffffffff),
                   fontSize: 10,
                   fontWeight: FontWeight.w400),
             ),
             const SizedBox(height: 16),
-             Text("Seninle eşleştiği konular",
+             Text(
+                languageService.tr("match.card.matchedTopics"),
                 style: GoogleFonts.inter(
                     color: Color(0xffffffff),
                     fontSize: 12,
@@ -243,19 +252,21 @@ class _MatchCardState extends State<MatchCard> {
               children: [
                 _buildActionButton(
                   iconPath: 'images/icons/match_user_add_icon.svg',
-                  label: match.isFollowing ? 'Takip Ediliyor' : 'Takip Et',
+                  label: match.isFollowing 
+                    ? languageService.tr("match.card.following") 
+                    : languageService.tr("match.card.follow"),
                   color: const Color(0xff65D384),
                   onTap: controller.followUser,
                 ),
                 _buildActionButton(
                   iconPath: 'images/icons/match_message_icon.svg',
-                  label: 'mesaj',
+                  label: languageService.tr("match.card.message"),
                   color: const Color(0xffFF7743),
                   onTap: controller.startChat,
                 ),
                 _buildActionButton(
                   iconPath: 'images/icons/match_next_icon.svg',
-                  label: 'Geç',
+                  label: languageService.tr("match.card.skip"),
                   color: const Color(0xffEF5050),
                   onTap: controller.nextMatch,
                 ),

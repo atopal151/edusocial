@@ -1,9 +1,10 @@
-import 'package:edusocial/controllers/social/chat_detail_controller.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_detail_controller.dart';
 import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_app_bar.dart';
 import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_body.dart';
 // import 'package:edusocial/screens/chat/user_chat/widgets/chat_detail_bottom.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:edusocial/services/language_service.dart';
 
 class UserChatDetailScreen extends StatefulWidget {
   const UserChatDetailScreen({super.key});
@@ -27,8 +28,9 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
 
     if (args == null || !args.containsKey('chatId') || !args.containsKey('userDetail')) {
       debugPrint('❌ UserChatDetailScreen - Eksik veya hatalı arguments');
+      final languageService = Get.find<LanguageService>();
       Future.microtask(() {
-        Get.snackbar('Hata', 'Kullanıcı bilgileri bulunamadı!');
+        Get.snackbar(languageService.tr("userChat.errorTitle"), languageService.tr("userChat.userNotFound"));
         Get.back();
       });
       return;
@@ -65,7 +67,8 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
         }
 
         if (chatController.userChatDetail.value == null) {
-          return const Center(child: Text('Kullanıcı bilgileri yüklenemedi'));
+          final languageService = Get.find<LanguageService>();
+          return Center(child: Text(languageService.tr("userChat.userNotLoaded")));
         }
 
         return const ChatDetailBody();

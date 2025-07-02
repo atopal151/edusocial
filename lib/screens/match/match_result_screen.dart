@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../components/cards/match_card/match_card.dart';
 import '../../components/user_appbar/user_appbar.dart';
 import '../../controllers/match_controller.dart';
+import '../../services/language_service.dart';
 
 class MatchResultScreen extends StatefulWidget {
   const MatchResultScreen({super.key});
@@ -14,6 +15,7 @@ class MatchResultScreen extends StatefulWidget {
 
 class _MatchResultScreenState extends State<MatchResultScreen> {
   final MatchController controller = Get.find();
+  final LanguageService languageService = Get.find();
 
   @override
   void initState() {
@@ -36,7 +38,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                  Text(
-                  'Henüz eşleşme bulunamadı',
+                  languageService.tr("match.resultScreen.noMatchesFound"),
                   style: GoogleFonts.inter(
                     color: Color(0xff9ca3ae),
                     fontSize: 16,
@@ -62,7 +64,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                       Get.toNamed('/match');
                     },
                     child: Text(
-                      'Ders Ekle',
+                      languageService.tr("match.resultScreen.addCourseButton"),
                       style: GoogleFonts.inter(
                         color: Color(0xffffffff),
                         fontSize: 12,
@@ -98,7 +100,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                       Get.toNamed('/match');
                     },
                     child: Text(
-                      'Ders Ekle',
+                      languageService.tr("match.resultScreen.addCourseButton"),
                       style: GoogleFonts.inter(
                         color: Color(0xffffffff),
                         fontSize: 12,

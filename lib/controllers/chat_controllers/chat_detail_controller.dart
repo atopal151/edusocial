@@ -13,6 +13,7 @@ import '../../models/chat_models/chat_detail_model.dart';
 import '../../models/user_chat_detail_model.dart';
 import '../../models/document_model.dart';
 import '../../models/link_model.dart';
+import 'package:edusocial/services/language_service.dart';
 
 class ChatDetailController extends GetxController {
   final isLoading = false.obs;
@@ -93,10 +94,10 @@ class ChatDetailController extends GetxController {
       final userId = arguments['userId'] as int?;
       final conversationId = arguments['conversationId'];
 
-      // UI için veriler
-      final nameArg = arguments['name'] as String?;
+      // UI için veriler - match sayfasından da gelebilir
+      final nameArg = arguments['name'] as String? ?? arguments['userName'] as String?;
       final usernameArg = arguments['username'] as String?;
-      final avatarUrlArg = arguments['avatarUrl'] as String?;
+      final avatarUrlArg = arguments['avatarUrl'] as String? ?? arguments['userAvatar'] as String?;
       final isOnlineArg = arguments['isOnline'] as bool?;
       
       // conversationId can be int or String, convert to String
@@ -117,6 +118,9 @@ class ChatDetailController extends GetxController {
       debugPrint('ChatDetailController initialized:');
       debugPrint('  - User ID: ${currentChatId.value}');
       debugPrint('  - Conversation ID: ${currentConversationId.value}');
+      debugPrint('  - Name: ${name.value}');
+      debugPrint('  - Username: ${username.value}');
+      debugPrint('  - Avatar URL: ${avatarUrl.value}');
 
       if (currentChatId.value != null) {
         fetchConversationMessages();
@@ -322,6 +326,7 @@ class ChatDetailController extends GetxController {
   void openPollBottomSheet() {
     pollQuestion.value = '';
     pollOptions.assignAll(['', '']);
+    final LanguageService languageService = Get.find<LanguageService>();
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(16),
@@ -338,7 +343,7 @@ class ChatDetailController extends GetxController {
                 style: const TextStyle(fontSize: 12),
                 controller: pollTitleController,
                 decoration: InputDecoration(
-                  hintText: "Anket Başlığı",
+                  hintText: languageService.tr("chat.poll.title"),
                   filled: true,
                   fillColor: const Color(0xfff5f5f5),
                   hintStyle:
@@ -363,7 +368,7 @@ class ChatDetailController extends GetxController {
                               child: TextField(
                                 style: const TextStyle(fontSize: 12),
                                 decoration: InputDecoration(
-                                  hintText: "+ Seçenek Ekle",
+                                  hintText: languageService.tr("chat.poll.option"),
                                   filled: true,
                                   fillColor: const Color(0xfff5f5f5),
                                   hintStyle: const TextStyle(
@@ -392,14 +397,14 @@ class ChatDetailController extends GetxController {
               TextButton.icon(
                 onPressed: () => pollOptions.add(''),
                 icon: const Icon(Icons.add, color: Color(0xffED7474), size: 15),
-                label: const Text(
-                  'Seçenek Ekle',
-                  style: TextStyle(color: Color(0xffED7474), fontSize: 12),
+                label: Text(
+                  languageService.tr("chat.poll.addOption"),
+                  style: const TextStyle(color: Color(0xffED7474), fontSize: 12),
                 ),
               ),
               const SizedBox(height: 30),
               CustomButton(
-                  text: "Gönder",
+                  text: languageService.tr("chat.poll.send"),
                   height: 45,
                   borderRadius: 15,
                   onPressed: () {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../services/language_service.dart';
+import 'package:get/get.dart';
 
 class CustomTextFieldStep2 extends StatelessWidget {
   final TextEditingController controller;
@@ -13,6 +15,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Container(
       decoration: BoxDecoration(
         color: Color(0xffffffff),
@@ -38,7 +41,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
-              hintText: "Ders adı giriniz",
+              hintText: languageService.tr("step2.form.courseInput"),
               hintStyle: GoogleFonts.inter(
                 color: Color(0xff414751),
                 fontSize: 12,
@@ -60,7 +63,7 @@ class CustomTextFieldStep2 extends StatelessWidget {
                   padding: const EdgeInsets.only(
                       left: 16.0, right: 16, top: 8, bottom: 8),
                   child: Text(
-                    "Ekle",
+                    languageService.tr("common.buttons.add"),
                     style: GoogleFonts.inter(
                         color: Color(0xffffffff),
                         fontWeight: FontWeight.w600,

@@ -6,6 +6,7 @@ import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_textfield_step2.dart';
 import '../../components/lists/custom_chip_list.dart';
 import '../../controllers/match_controller.dart';
+import '../../services/language_service.dart';
 
 class MatchScreen extends StatefulWidget {
   const MatchScreen({super.key});
@@ -19,6 +20,8 @@ class _MatchScreenState extends State<MatchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       
       body: Stack(
@@ -83,7 +86,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   child: Column(
                     children: [
                       Text(
-                        "Benzer İlgi Alanlarına \n Sahip Kişilerle Tanış!",
+                        languageService.tr("match.title"),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                             color: Color(0xffffffff),
@@ -92,7 +95,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        "EduSocial, Polonya’daki uluslararası okullarda eğitim \n gören öğrenciler için tasarlanmış yenilikçi bir sosyal \n platformdur.",
+                        languageService.tr("match.subtitle"),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                             color: Color(0xffffffff),
@@ -106,7 +109,7 @@ class _MatchScreenState extends State<MatchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: Text(
-                    "Hangi Konuyu Çalışacaksın?",
+                    languageService.tr("match.form.courseQuestion"),
                     textAlign: TextAlign.start,
                     style: GoogleFonts.inter(
                         color: Color(0xffffffff),
@@ -126,7 +129,7 @@ class _MatchScreenState extends State<MatchScreen> {
                 Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: Text(
-                        "Kaydedilen Konular",
+                        languageService.tr("match.form.savedTopics"),
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Colors.white,
@@ -153,7 +156,7 @@ class _MatchScreenState extends State<MatchScreen> {
 
                         height: 50,
                         borderRadius: 15,
-                      text: "Uygun Eşleşmeleri Bul",
+                      text: languageService.tr("match.findMatchesButton"),
                       onPressed: controller.addCoursesToProfile,
                       isLoading: controller.isLoading,
                       backgroundColor: Colors.white,

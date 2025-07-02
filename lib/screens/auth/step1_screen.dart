@@ -6,6 +6,7 @@ import '../../components/buttons/custom_button.dart';
 import '../../components/dialogs/warning_box.dart';
 import '../../components/onboarding_header/on_header.dart';
 import '../../controllers/onboarding_controller.dart';
+import '../../services/language_service.dart';
 
 class Step1View extends StatelessWidget {
   const Step1View({super.key});
@@ -13,6 +14,7 @@ class Step1View extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OnboardingController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Scaffold(
       backgroundColor: Color(0xffFAFAFA),
@@ -26,9 +28,8 @@ class Step1View extends StatelessWidget {
               SizedBox(height: 40),
               OnboardingHeader(
                 imagePath: "images/icons/Graduate.png",
-                title: "Okul Bilgilerinizi Tamamlayın",
-                subtitle:
-                    "Okulunu, bölümünü ve sınıfını ekleyerek platformu sana özel hale getir!",
+                title: languageService.tr("step1.header.title"),
+                subtitle: languageService.tr("step1.header.subtitle"),
               ),
               SizedBox(height: 30),
               Obx(() {
@@ -45,7 +46,7 @@ class Step1View extends StatelessWidget {
                   );
                 }
                 return CustomDropDown(
-                  label: "Okul",
+                  label: languageService.tr("step1.form.school"),
                   items: controller.schools
                       .map((e) => e['name'].toString())
                       .toList(),
@@ -72,7 +73,7 @@ class Step1View extends StatelessWidget {
                   );
                 }
                 return CustomDropDown(
-                  label: "Bölüm",
+                  label: languageService.tr("step1.form.department"),
                   items: controller.departments
                       .map((e) => e['title'].toString())
                       .toList(),
@@ -86,13 +87,12 @@ class Step1View extends StatelessWidget {
               }),
               SizedBox(height: 20),
               WarningBox(
-                  message:
-                      "Üyeliğinizi doğru doldurmadığınız taktirde hesabınız kalıcı olarak kapatılabilir."),
+                  message: languageService.tr("step1.warning")),
               SizedBox(height: 30),
               CustomButton(
                 height: 50,
                 borderRadius: 15,
-                text: "Devam Et",
+                text: languageService.tr("step1.continueButton"),
                 onPressed: controller.proceedToNextStep,
                 isLoading: controller.isLoading,
                 backgroundColor: Color(0xFF414751),

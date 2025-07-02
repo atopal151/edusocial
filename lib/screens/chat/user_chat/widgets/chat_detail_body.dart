@@ -1,9 +1,11 @@
-import 'package:edusocial/controllers/social/chat_detail_controller.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_detail_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../services/language_service.dart';
 
 class ChatDetailBody extends StatefulWidget {
   const ChatDetailBody({super.key});
@@ -45,6 +47,7 @@ class _ChatDetailBodyState extends State<ChatDetailBody> {
   Widget build(BuildContext context) {
     final chatController = Get.find<ChatDetailController>();
     final userChatDetail = chatController.userChatDetail.value!;
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -133,10 +136,10 @@ class _ChatDetailBodyState extends State<ChatDetailBody> {
                       fontWeight: FontWeight.w600,
                       fontSize: 13.28,
                     ),
-                    tabs: const [
-                      Tab(text: "Belgeler"),
-                      Tab(text: "Bağlantılar"),
-                      Tab(text: "Fotoğraflar"),
+                    tabs: [
+                      Tab(text: languageService.tr("chat.userChatDetail.tabs.documents")),
+                      Tab(text: languageService.tr("chat.userChatDetail.tabs.links")),
+                      Tab(text: languageService.tr("chat.userChatDetail.tabs.photos")),
                     ],
                   ),
                   SizedBox(
@@ -179,7 +182,7 @@ class _ChatDetailBodyState extends State<ChatDetailBody> {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  "${doc.sizeMb} Mb • ${DateFormat('dd.MM.yyyy').format(doc.createdAt)}",
+                                  "${doc.sizeMb} Mb • ${DateFormat(languageService.currentLanguage.value == 'tr' ? 'dd.MM.yyyy' : 'MM/dd/yyyy', languageService.currentLanguage.value).format(doc.createdAt)}",
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,

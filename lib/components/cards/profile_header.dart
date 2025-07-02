@@ -3,11 +3,13 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/profile_controller.dart';
 import '../../routes/app_routes.dart';
+import '../../services/language_service.dart';
 
 final ProfileController controller = Get.find();
 
 /// Profil Bilgileri Bölümü
 Widget buildProfileHeader() {
+  final LanguageService languageService = Get.find<LanguageService>();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
@@ -111,26 +113,26 @@ Widget buildProfileHeader() {
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildProfileInfo("Gönderi", controller.postCount),
+          _buildProfileInfo(languageService.tr("profile.header.posts"), controller.postCount),
           _buildDivider(),
           InkWell(
             onTap: () {
               Get.toNamed(Routes.followers, arguments: {
                 'followers': controller.followerList.map((item) => item as Map<String, dynamic>).toList(),
-                'screenTitle': 'Takipçi',
+                'screenTitle': languageService.tr("profile.header.followers"),
               });
             },
-            child: _buildProfileInfo("Takipçi", controller.followers),
+            child: _buildProfileInfo(languageService.tr("profile.header.followers"), controller.followers),
           ),
           _buildDivider(),
           InkWell(
             onTap: () {
               Get.toNamed(Routes.following, arguments: {
                 'followings': controller.followingList.map((item) => item as Map<String, dynamic>).toList(),
-                'screenTitle': 'Takip Edilen',
+                'screenTitle': languageService.tr("profile.header.following"),
               });
             },
-            child: _buildProfileInfo("Takip Edilen", controller.following),
+            child: _buildProfileInfo(languageService.tr("profile.header.following"), controller.following),
           ),
         ],
       ),

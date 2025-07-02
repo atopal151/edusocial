@@ -8,10 +8,12 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/profile_controller.dart';
 import 'group_suggestion_card.dart';
+import '../../services/language_service.dart';
 
 final ProfileController controller = Get.find();
 
 Widget buildProfileDetails() {
+  final LanguageService languageService = Get.find<LanguageService>();
   return Obx(() {
     if (controller.isLoading.value) {
       return Container(
@@ -49,7 +51,7 @@ Widget buildProfileDetails() {
                   children: [
                     /// **Okul Bilgisi**
                     Text(
-                      "Okuduğu Okul",
+                      languageService.tr("profile.details.school"),
                       style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
@@ -76,7 +78,7 @@ Widget buildProfileDetails() {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              profileData.school?.name ?? "Okul bilgisi yok",
+                              profileData.school?.name ?? languageService.tr("profile.fallbackTexts.noSchoolInfo"),
                               style: GoogleFonts.inter(
                                 fontSize: 13.28,
                                 fontWeight: FontWeight.w600,
@@ -84,7 +86,7 @@ Widget buildProfileDetails() {
                               ),
                             ),
                             Text(
-                              "${profileData.schoolDepartment?.title ?? "Bölüm bilgisi yok"} ",
+                              "${profileData.schoolDepartment?.title ?? languageService.tr("profile.fallbackTexts.noDepartmentInfo")}" ,
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w400,
@@ -99,7 +101,7 @@ Widget buildProfileDetails() {
 
                     /// **Kişisel Bilgiler**
                     Text(
-                      "Kişisel Bilgiler",
+                      languageService.tr("profile.details.personalInfo"),
                       style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
@@ -120,7 +122,7 @@ Widget buildProfileDetails() {
                             width: 20,
                             height: 20,
                           ),
-                          label: "Doğum Tarihi",
+                          label: languageService.tr("profile.details.birthDate"),
                           value: formatSimpleDate(profileData.birthDate),
                         ),
                         _buildPersonalInfo(
@@ -133,7 +135,7 @@ Widget buildProfileDetails() {
                             width: 20,
                             height: 20,
                           ),
-                          label: "E-posta Adresi",
+                          label: languageService.tr("profile.details.email"),
                           value: profileData.email,
                         ),
                         const SizedBox(
@@ -145,7 +147,7 @@ Widget buildProfileDetails() {
 
                     /// **Aldığı Dersler**
                     Text(
-                      "Aldığı Dersler",
+                      languageService.tr("profile.details.courses"),
                       style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
@@ -175,7 +177,7 @@ Widget buildProfileDetails() {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Katıldığı Gruplar",
+                      languageService.tr("profile.details.joinedGroups"),
                       style: GoogleFonts.inter(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,

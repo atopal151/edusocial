@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../components/user_appbar/user_appbar.dart';
 import '../../controllers/entry_controller.dart';
+import '../../services/language_service.dart';
 import '../profile/people_profile_screen.dart';
 import 'package:edusocial/routes/app_routes.dart';
 
@@ -44,6 +45,8 @@ class EntryScreenState extends State<EntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -77,7 +80,7 @@ class EntryScreenState extends State<EntryScreen> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16.0, right: 16, top: 8),
                         child: SearchTextField(
-                          label: "Entry ara",
+                          label: languageService.tr("entry.entryScreen.searchPlaceholder"),
                           controller: entryController.entrySearchController,
                           onChanged: (value) {
                             final query = value.toLowerCase();
@@ -106,7 +109,7 @@ class EntryScreenState extends State<EntryScreen> {
                         child: CustomButton(
                           height: 45,
                           borderRadius: 15,
-                          text: "+ Yeni Konu Aç",
+                          text: languageService.tr("entry.entryScreen.newTopicButton"),
                           onPressed: () => entryController.shareEntry(),
                           isLoading: RxBool(false), // Loading durumunu kaldır
                           backgroundColor: const Color(0xfffb535c),
@@ -121,7 +124,7 @@ class EntryScreenState extends State<EntryScreen> {
                         child: entryController.displayEntries.isEmpty
                             ? Center(
                                 child: Text(
-                                  "Gösterilecek entry bulunamadı.",
+                                  languageService.tr("entry.entryScreen.noEntriesFound"),
                                   style:
                                       GoogleFonts.inter(color: Color(0xff9ca3ae)),
                                 ),
@@ -148,22 +151,22 @@ class EntryScreenState extends State<EntryScreen> {
                                       onShare: () {
                                         // Konu bilgilerini al
                                         final topicName = displayItem.topicName ??
-                                            "Konu Bilgisi Yok";
+                                            languageService.tr("entry.entryDetail.topicNotFound");
                                         final categoryTitle =
                                             displayItem.categoryTitle ??
-                                                "Kategori Yok";
+                                                languageService.tr("entry.entryDetail.categoryNotFound");
 
                                         final String shareText = """
 📝 **$topicName** (#${entry.id})
 
-🏷️ **Kategori:** $categoryTitle
-👤 **Yazar:** ${entry.user.name}
+🏷️ **${languageService.tr("entry.entryDetail.shareText.category")}:** $categoryTitle
+👤 **${languageService.tr("entry.entryDetail.shareText.author")}:** ${entry.user.name}
 
-💬 **Entry İçeriği:**
+💬 **${languageService.tr("entry.entryDetail.shareText.entryContent")}:**
 ${entry.content}
 
-📱 **EduSocial Uygulamasını İndir:**
-🔗 Uygulamayı Aç: edusocial://app
+📱 **${languageService.tr("entry.entryDetail.shareText.downloadApp")}:**
+🔗 ${languageService.tr("entry.entryDetail.shareText.openApp")}: edusocial://app
 📲 App Store: https://apps.apple.com/app/edusocial/id123456789
 📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
 

@@ -107,7 +107,8 @@
     "form": {
       "courseQuestion": "What courses are you taking?",
       "courseInput": "Enter course name",
-      "savedCourses": "Saved Courses"
+      "savedCourses": "Saved Courses",
+      "addButton": "Add"
     },
     "warning": "If you do not fill in your membership correctly, your account may be permanently closed.",
     "continueButton": "Continue",
@@ -218,6 +219,12 @@
       }
     }
   },
+  "entryShare": {
+    "title": "Topic Title",
+    "entryContent": "Entry",
+    "category": "Category",
+    "createTopicButton": "+ Create Topic"
+  },
   "groupChatDetail": {
     "appBar": {
       "memberCount": "members"
@@ -321,6 +328,26 @@
       "image": "Image",
       "video": "Video",
       "audio": "Audio"
+    },
+    "poll": {
+      "title": "Write a poll question",
+      "option": "Add option",
+      "addOption": "Add Option",
+      "send": "Send Poll"
+    },
+    "groupChat": {
+      "fileSelected": "File selected. You can write a message or send directly...",
+      "messagePlaceholder": "Write a message..."
+    },
+    "document": {
+      "cannotOpen": "Document could not be opened",
+      "openError": "An error occurred while opening the document",
+      "clickToDownload": "Click to download"
+    },
+    "link": {
+      "cannotOpen": "Link could not be opened. Please try again.",
+      "cannotOpenThis": "This link cannot be opened",
+      "openError": "An error occurred while opening the link"
     }
   },
   "entry": {
@@ -332,32 +359,9 @@
       "refreshLoading": "Refreshing entry data..."
     },
     "entryDetail": {
-      "categoryNotFound": "No Category",
-      "topicNotFound": "No Topic Information",
-      "commentPlaceholder": "Share an entry to this topic",
-      "sendComment": "Send comment",
-      "entryCount": "Entry Count",
-      "shareText": {
-        "topicTitle": "Topic Title",
-        "category": "Category",
-        "author": "Author",
-        "entryContent": "Entry Content",
-        "aboutTopic": "About Topic",
-        "downloadApp": "Download EduSocial App:",
-        "openApp": "Open App",
-        "appStore": "App Store",
-        "playStore": "Play Store"
-      }
-    },
-    "entryShare": {
-      "title": "Topic Title",
-      "entryContent": "Entry",
-      "category": "Category",
-      "createTopicButton": "+ Create Topic",
-      "loading": {
-        "creating": "Creating topic...",
-        "categories": "Loading categories..."
-      }
+      "noCategory": "No Category",
+      "noTopicInfo": "No Topic Information",
+      "commentPlaceholder": "Share an entry to this topic"
     },
     "entryCard": {
       "share": "Share",
@@ -519,6 +523,10 @@
         "links": "Links",
         "photos": "Photos"
       },
+      "bottomSheet": {
+        "leaveGroup": "Leave Group",
+        "report": "Report"
+      },
       "emptyStates": {
         "documents": "No documents added yet",
         "links": "No links added yet",
@@ -538,7 +546,8 @@
       "leave": "Leave",
       "report": "Report",
       "delete": "Delete",
-      "edit": "Edit"
+      "edit": "Edit",
+      "messages": "Messages"
     },
     "loading": {
       "groups": "Loading groups...",
@@ -588,6 +597,17 @@
     "notifications": {
       "error": "Error",
       "noGroupSelected": "No group selected"
+    },
+    "suggestion": {
+      "joined": "Joined",
+      "sendRequest": "Send Request",
+      "joinGroup": "Join Group"
+    },
+    "list": {
+      "groupSelected": "Group Selected",
+      "redirectingToGroup": "redirecting to group.",
+      "join": "Join",
+      "pendingApproval": "Pending Approval"
     }
   },
   "home": {
@@ -616,28 +636,16 @@
         "nearby": "Nearby",
         "selectFromGallery": "Select from Gallery",
         "share": "Share",
-        "camera": "Camera",
-        "photoLibrary": "Photo Library",
-        "selectPhoto": "Please select a photo",
-        "photoSelectionError": "Error occurred while selecting photo",
-        "cameraError": "Error occurred while opening camera",
-        "storyShareError": "Error occurred while sharing story",
-        "warning": "Warning",
-        "error": "Error"
+        "photoSelectionError": "An error occurred while selecting photo",
+        "cameraError": "An error occurred while opening camera",
+        "shareError": "An error occurred while sharing story",
+        "selectPhotoWarning": "Please select a photo"
       },
       "myStoryList": {
-        "you": "@You",
-        "noStory": "No story"
+        "you": "@You"
       },
       "storyViewer": {
-        "noImage": "No image",
-        "timeAgo": {
-          "justNow": "just now",
-          "minutesAgo": "min ago",
-          "hoursAgo": "hours ago",
-          "yesterday": "yesterday",
-          "daysAgo": "days ago"
-        }
+        "noImage": "No Image"
       },
       "myStoryViewer": {
         "timeAgo": {
@@ -779,15 +787,24 @@
       "topicRemoved": "Topic removed successfully",
       "userFollowed": "followed!",
       "followSuccess": "Follow operation successful"
+    },
+    "card": {
+      "follow": "Follow",
+      "skip": "Skip",
+      "online": "Online",
+      "education": "Education",
+      "noSchoolInfo": "No school info",
+      "noDepartment": "No department",
+      "grade": "Grade",
+      "about": "About",
+      "noInfoYet": "No info yet",
+      "matchedTopics": "Topics matched with you",
+      "following": "Following",
+      "message": "message"
     }
   },
   "notifications": {
     "title": "Notifications",
-    "loading": {
-      "notifications": "Loading notifications...",
-      "refreshing": "Refreshing notifications...",
-      "refreshed": "Notifications refreshed successfully"
-    },
     "grouping": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -834,6 +851,7 @@
     "loading": {
       "notifications": "Loading notifications...",
       "refreshing": "Refreshing notifications...",
+      "refreshed": "Notifications refreshed successfully",
       "accepting": "Accepting...",
       "declining": "Declining...",
       "following": "Following...",
@@ -886,6 +904,11 @@
     }
   },
   "profile": {
+    "title": "Profile",
+    "tabbar": {
+      "posts": "Posts",
+      "entries": "Entries"
+    },
     "mainProfile": {
       "editProfile": "Edit Profile",
       "refreshLoading": "Refreshing profile data...",
@@ -903,49 +926,27 @@
     },
     "editProfile": {
       "title": "Edit Profile",
-      "form": {
-        "username": "Username",
-        "name": "Name",
-        "surname": "Surname",
-        "email": "Email",
-        "phone": "Phone",
-        "birthday": "Birthday",
-        "biography": "Biography"
-      },
-      "socialMedia": {
-        "title": "Social Media Accounts",
-        "instagram": "Instagram",
-        "twitter": "Twitter",
-        "facebook": "Facebook",
-        "linkedin": "LinkedIn",
-        "tiktok": "Tiktok"
-      },
-      "schoolInfo": {
-        "title": "School and Department Information",
-        "schoolSelection": "School Selection",
-        "departmentSelection": "Department Selection"
-      },
-      "lessons": {
-        "title": "Lessons",
-        "addLesson": "Add lesson"
-      },
-      "notifications": {
-        "title": "Notification Settings",
-        "emailNotification": "Email Notification",
-        "mobileNotification": "Mobile Notification"
-      },
-      "language": {
-        "title": "Language Selection",
-        "languageSelection": "Language Selection"
-      },
-      "accountType": {
-        "title": "Account Type",
-        "accountTypeSelection": "Account Type Selection",
-        "public": "Public",
-        "private": "Private"
-      },
-      "saveButton": "Save",
-      "loading": "Saving..."
+      "username": "Username",
+      "name": "Name",
+      "surname": "Surname",
+      "email": "Email",
+      "phone": "Phone",
+      "birthday": "Birthday",
+      "bio": "Biography",
+      "socialMediaAccounts": "Social Media Accounts",
+      "schoolAndDepartment": "School and Department Information",
+      "courses": "Courses",
+      "notificationSettings": "Notification Settings",
+      "emailNotification": "Email Notification",
+      "mobileNotification": "Mobile Notification",
+      "languageSelection": "Language Selection",
+      "accountType": "Account Type",
+      "accountTypeSelection": "Account Type Selection",
+      "schoolSelection": "School Selection",
+      "departmentSelection": "Department Selection",
+      "saveProfile": "Save Profile",
+      "profileUpdated": "Profile updated successfully",
+      "profileUpdateFailed": "Profile update failed"
     },
     "peopleProfile": {
       "loading": "Loading user profile...",
@@ -1045,6 +1046,19 @@
       "noSchoolInfo": "No school information",
       "noDepartmentInfo": "No department information",
       "invalidDate": "Invalid Date"
+    },
+    "details": {
+      "personalInfo": "Personal Information",
+      "birthDate": "Birth Date",
+      "email": "Email Address",
+      "courses": "Courses Taken",
+      "school": "School Attended",
+      "joinedGroups": "Joined Groups"
+    },
+    "header": {
+      "posts": "Posts",
+      "followers": "Followers",
+      "following": "Following"
     }
   },
   "search": {
@@ -1072,7 +1086,24 @@
       "loading": "Searching groups...",
       "groupSelected": "Group Selected",
       "redirectingToGroup": "redirecting to group.",
-      "notMember": "You are not a member of this group"
+      "notMember": "You are not a member of this group",
+      "groupDetail": {
+        "noParticipants": "No participants found",
+        "created": "Created",
+        "participantCount": "Participant Count",
+        "document": "Document",
+        "groupEvents": "Group Events",
+        "tabs": {
+          "documents": "Documents",
+          "links": "Links",
+          "photos": "Photos"
+        },
+        "emptyStates": {
+          "documents": "No documents shared in this group yet",
+          "links": "No links shared in this group yet",
+          "photos": "No photos shared in this group yet"
+        }
+      }
     },
     "events": {
       "noResults": "No events found",
@@ -1080,7 +1111,17 @@
       "shared": "Shared",
       "eventShared": "event shared.",
       "locationError": "Could not open location:",
-      "error": "Error"
+      "error": "Error",
+      "viewLocation": "View Location",
+      "notification": {
+        "title": "Notification",
+        "message": "Event notification has been set."
+      }
+    },
+    "event": {
+      "eventCard": {
+        "viewLocation": "View Location"
+      }
     },
     "loading": {
       "searching": "Searching...",
@@ -1311,6 +1352,77 @@
       "close": "Close",
       "cancel": "Cancel",
       "confirm": "Confirm"
+    },
+    "actions": {
+      "about": "About",
+      "report": "Report",
+      "delete": "Delete"
+    },
+    "info": {
+      "info": "Info",
+      "reportFeatureComingSoon": "Report feature coming soon"
     }
+  },
+  "post": {
+    "createPost": {
+      "share": "Post",
+      "placeholder": "What's happening?",
+      "links": "Links",
+      "error": "An error occurred while sharing the post.",
+      "emptyContent": "Please enter post content."
+    }
+  },
+  "story": {
+    "userStoryCard": {
+      "you": "@You"
+    }
+  },
+  "auth": {
+    "logout": {
+      "title": "Logout",
+      "confirmation": "Are you sure you want to logout from your account?",
+      "logout": "Logout"
+    }
+  },
+  "comments": {
+    "input": {
+      "placeholder": "Write a comment..."
+    }
+  },
+  "share": {
+    "title": "Share",
+    "platforms": {
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn"
+    },
+    "actions": {
+      "copy": "Copy"
+    },
+    "subjects": {
+      "whatsapp": "Share via WhatsApp",
+      "telegram": "Share via Telegram",
+      "twitter": "Share via Twitter",
+      "facebook": "Share via Facebook",
+      "linkedin": "Share via LinkedIn"
+    },
+    "copySuccess": "Text copied to clipboard"
+  },
+  "notification": {
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "accept": "Accept",
+    "decline": "Decline"
+  },
+  "time": {
+    "justNow": "just now",
+    "minute": "min",
+    "hour": "h",
+    "day": "d",
+    "week": "w",
+    "month": "mo",
+    "year": "y"
   }
-} 
+}

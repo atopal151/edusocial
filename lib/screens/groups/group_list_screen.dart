@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../controllers/group_controller/group_controller.dart';
 import '../../components/cards/group_card.dart';
+import '../../services/language_service.dart';
 
 class GroupListScreen extends StatelessWidget {
   const GroupListScreen({super.key});
@@ -11,6 +12,7 @@ class GroupListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GroupController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
 
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
@@ -32,7 +34,7 @@ class GroupListScreen extends StatelessWidget {
                 child: CustomButton(
                   height: 45,
                   borderRadius: 15,
-                  text: "Yeni Grup Oluştur",
+                  text: languageService.tr("groups.groupList.createGroupButton"),
                   onPressed: () {
                     controller.getCreateGroup();
                   },
@@ -46,7 +48,7 @@ class GroupListScreen extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: Text("Bulunduğun Gruplar",
+                child: Text(languageService.tr("groups.groupList.myGroups"),
                     style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               SizedBox(
@@ -68,7 +70,7 @@ class GroupListScreen extends StatelessWidget {
                           groupName: group.name,
                           groupDescription: group.description,
                           memberCount: group.userCountWithAdmin,
-                          action: "Katıldınız",
+                          action: languageService.tr("groups.groupList.joined"),
                           onJoinPressed: () {},
                         ),
                       ),
@@ -81,7 +83,7 @@ class GroupListScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Tüm Gruplar",
+                    Text(languageService.tr("groups.groupList.allGroups"),
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
                     SizedBox(
@@ -142,8 +144,8 @@ class GroupListScreen extends StatelessWidget {
                           groupDescription: group.description,
                           memberCount: group.userCountWithAdmin,
                           action: group.isMember
-                              ? "Katıldınız"
-                              : (group.isPending ? "Onay Bekliyor" : "Katıl"),
+                              ? languageService.tr("groups.groupList.joined")
+                              : (group.isPending ? languageService.tr("groups.groupList.pending") : languageService.tr("groups.groupList.join")),
                           onJoinPressed: () {
                             if (!group.isMember && !group.isPending) {
                               controller.joinGroup(group.id);

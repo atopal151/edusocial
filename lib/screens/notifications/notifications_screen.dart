@@ -7,6 +7,7 @@ import 'package:edusocial/models/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../services/language_service.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -20,12 +21,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Scaffold(
       backgroundColor: const Color(0xfffafafa),
       appBar: BackAppBar(
         iconBackgroundColor: const Color(0xffffffff),
         backgroundColor: const Color(0xfffafafa),
-        title: "Bildirimler",
+        title: languageService.tr("notifications.title"),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -92,6 +95,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget buildNotificationTile(NotificationModel n) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return ListTile(
       tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),
       leading: Stack(
@@ -147,6 +152,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget? _buildTrailingButton(NotificationModel notif) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     // Takip istekleri için butonlar
     if (notif.type == 'follow-join-request' || notif.type == 'follow-request') {
       debugPrint("🔍 Building button for notification:");
@@ -158,12 +165,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
       if (notif.isAccepted) {
         debugPrint("🔍   - Durum: Onaylandı");
-        return NotificationActionButtonStyles.accepted(text: "Onaylandı");
+        return NotificationActionButtonStyles.accepted(text: languageService.tr("notifications.actions.accepted"));
       }
 
       if (notif.isRejected) {
         debugPrint("🔍   - Durum: Reddedildi");
-        return NotificationActionButtonStyles.rejected(text: "Reddedildi");
+        return NotificationActionButtonStyles.rejected(text: languageService.tr("notifications.actions.rejected"));
       }
 
       // Her durumda Onayla ve X göster
@@ -172,7 +179,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           NotificationActionButtonStyles.accept(
-            text: "Onayla",
+            text: languageService.tr("notifications.actions.accept"),
             onPressed: () {
               controller.handleFollowRequest(notif.senderUserId, 'accept');
             },
@@ -220,13 +227,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
       if (notif.isAccepted) {
         debugPrint(
             "🔍   - Request is already accepted, showing 'Onaylandı' button");
-        return NotificationActionButtonStyles.accepted(text: "Onaylandı");
+        return NotificationActionButtonStyles.accepted(text: languageService.tr("notifications.actions.accepted"));
       }
 
       // Eğer istek reddedilmişse
       if (notif.isRejected) {
         debugPrint("🔍   - Request is rejected, showing 'Reddedildi' button");
-        return NotificationActionButtonStyles.rejected(text: "Reddedildi");
+        return NotificationActionButtonStyles.rejected(text: languageService.tr("notifications.actions.rejected"));
       }
 
       debugPrint("🔍   - Request is pending, showing accept/decline buttons");
@@ -235,7 +242,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           NotificationActionButtonStyles.accept(
-            text: "Onayla",
+            text: languageService.tr("notifications.actions.accept"),
             onPressed: () {
               controller.handleGroupJoinRequest(
                 notif.senderUserId,
@@ -319,15 +326,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   String _timeAgo(DateTime date) {
+    final LanguageService languageService = Get.find<LanguageService>();
     final now = DateTime.now();
     final diff = now.difference(date);
 
-    if (diff.inMinutes < 1) return "az önce";
-    if (diff.inMinutes < 60) return "${diff.inMinutes}dk";
-    if (diff.inHours < 24) return "${diff.inHours}s";
-    if (diff.inDays < 7) return "${diff.inDays}g";
-    if (diff.inDays < 30) return "${(diff.inDays / 7).floor()}h";
-    if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}a";
-    return "${(diff.inDays / 365).floor()}y";
+    if (diff.inMinutes < 1) return languageService.tr("notifications.timeAgo.justNow");
+    if (diff.inMinutes < 60) return "${diff.inMinutes}${languageService.tr("notifications.timeAgo.minutesAgo")}";
+    if (diff.inHours < 24) return "${diff.inHours}${languageService.tr("notifications.timeAgo.hoursAgo")}";
+    if (diff.inDays < 7) return "${diff.inDays}${languageService.tr("notifications.timeAgo.daysAgo")}";
+    if (diff.inDays < 30) return "${(diff.inDays / 7).floor()}${languageService.tr("notifications.timeAgo.weeksAgo")}";
+    if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}${languageService.tr("notifications.timeAgo.monthsAgo")}";
+    return "${(diff.inDays / 365).floor()}${languageService.tr("notifications.timeAgo.yearsAgo")}";
   }
 }

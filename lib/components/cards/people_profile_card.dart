@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'package:edusocial/controllers/people_profile_controller.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../routes/app_routes.dart';
+import 'package:edusocial/services/language_service.dart';
 
 Widget buildPeopleProfileHeader(PeopleProfileController controller) {
+  final LanguageService languageService = Get.find<LanguageService>();
+  
   return Obx(() {
     if (controller.isLoading.value) {
       return Container(
@@ -21,7 +23,7 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
 
     final profile = controller.profile.value;
     if (profile == null) {
-      return const Center(child: Text("Profil bilgisi yüklenemedi."));
+      return Center(child: Text(languageService.tr("profile.peopleProfile.loadError")));
     }
 
     return Column(
@@ -96,7 +98,7 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildProfileInfo("Gönderi", profile.posts.length),
+            _buildProfileInfo(languageService.tr("profile.header.posts"), profile.posts.length),
             _buildDivider(),
             InkWell(
               onTap: () {
@@ -105,7 +107,7 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
                   'screenTitle': '${profile.name} ${profile.surname} - Takipçi',
                 });*/
               },
-              child: _buildProfileInfo("Takipçi", profile.followerCount),
+              child: _buildProfileInfo(languageService.tr("profile.header.followers"), profile.followerCount),
             ),
             _buildDivider(),
             InkWell(
@@ -115,7 +117,7 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
                   'screenTitle': '${profile.name} ${profile.surname} - Takip Edilen',
                 });*/
               },
-              child: _buildProfileInfo("Takip Edilen", profile.followingCount),
+              child: _buildProfileInfo(languageService.tr("profile.header.following"), profile.followingCount),
             ),
           ],
         ),
