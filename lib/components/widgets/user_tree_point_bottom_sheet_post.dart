@@ -50,29 +50,7 @@ class UserTreePointBottomSheet extends StatelessWidget {
                 postController.deletePost(postId.toString());
               },
             ),
-            ListTile(
-              leading: CircleAvatar(
-                radius: 18,
-                backgroundColor: Color(0xfffff5f5),
-                child: const Icon(Icons.warning_rounded, color: Color(0xffef5050), size: 20),
-              ),
-              title: Text(
-                languageService.tr("common.actions.report"),
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff272727),
-                ),
-              ),
-              onTap: () {
-                Get.back(); // Bottom sheet'i kapat
-                CustomSnackbar.show(
-                  title: languageService.tr("common.info.info"),
-                  message: languageService.tr("common.info.reportFeatureComingSoon"),
-                  type: SnackbarType.info,
-                );
-              },
-            ),
+           
           ],
         ),
       ),

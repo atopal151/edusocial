@@ -1,3 +1,4 @@
+import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,20 +9,42 @@ import '../input_fields/comment_input_field.dart';
 
 class CommentBottomSheet extends StatefulWidget {
   final String postId;
-  const CommentBottomSheet({super.key, required this.postId});
+  final VoidCallback? onCommentAdded;
+  const CommentBottomSheet({super.key, required this.postId, this.onCommentAdded});
 
   @override
   State<CommentBottomSheet> createState() => _CommentBottomSheetState();
 }
 
 class _CommentBottomSheetState extends State<CommentBottomSheet> {
-  final CommentController controller = Get.put(CommentController());
+  late final CommentController controller;
   final TextEditingController messageController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    controller.fetchComments(widget.postId);
+    // Controller'ın var olup olmadığını kontrol et
+    try {
+      if (Get.isRegistered<CommentController>(tag: widget.postId)) {
+        controller = Get.find<CommentController>(tag: widget.postId);
+      } else {
+        controller = Get.put(CommentController(), tag: widget.postId);
+      }
+    } catch (e) {
+      // Eğer hata olursa yeni instance oluştur
+      controller = Get.put(CommentController(), tag: widget.postId);
+    }
+    
+    // Yorumlar daha önce yüklenmediyse yükle
+    if (controller.commentList.isEmpty) {
+      controller.fetchComments(widget.postId);
+    }
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -65,6 +88,41 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               // 🧾 Yorumlar listesi
               Expanded(
                 child: Obx(() {
+                  // Loading durumu
+                  if (controller.isLoading.value) {
+                    return  Center(
+                      child: GeneralLoadingIndicator(
+                        size: 32,
+                        color: Color(0xFFef5050),
+                      ),
+                    );
+                  }
+                  
+                  // Yorum yoksa
+                  if (controller.commentList.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline,
+                            size: 48,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            Get.find<LanguageService>().tr("comments.noComments"),
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  
+                  // Yorumlar listesi
                   return ListView.separated(
                     itemCount: controller.commentList.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
@@ -81,6 +139,10 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                             CircleAvatar(
                               backgroundImage: NetworkImage(comment.userAvatar),
                               radius: 20,
+                              onBackgroundImageError: (_, __) {},
+                              child: comment.userAvatar.isEmpty 
+                                ? Icon(Icons.person, color: Colors.grey.shade600)
+                                : null,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -111,7 +173,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                   const SizedBox(height: 4),
                                   Text(
                                     comment.content,
-                                    style: GoogleFonts.inter(fontSize: 12,color: Color(0xff9ca3ae)),
+                                    style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
                                   ),
                                 ],
                               ),
@@ -128,7 +190,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               Padding(
                   padding: const EdgeInsets.all(5),
                   child: buildCommentInputField(
-                      controller, widget.postId, messageController)),
+                      controller, widget.postId, messageController, widget.onCommentAdded)),
             ],
           ),
         ),

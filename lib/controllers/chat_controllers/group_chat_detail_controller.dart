@@ -11,6 +11,7 @@ import '../../models/document_model.dart';
 import '../../models/link_model.dart';
 import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
+import '../../services/socket_services.dart';
 import '../profile_controller.dart';
 
 class GroupChatDetailController extends GetxController {
@@ -23,6 +24,10 @@ class GroupChatDetailController extends GetxController {
   final RxString currentGroupId = ''.obs;
   final groupData = Rx<GroupDetailModel?>(null);
   final TextEditingController messageController = TextEditingController();
+
+  // Socket service ile ilgili değişkenler
+  late SocketService _socketService;
+  late StreamSubscription _groupMessageSubscription;
   final ScrollController scrollController = ScrollController();
 
   // Grup chat verilerinden çıkarılan belge, bağlantı ve fotoğraf listeleri
@@ -76,6 +81,10 @@ class GroupChatDetailController extends GetxController {
     debugPrint('🔍 Group chat detail controller onInit called');
     debugPrint('🔍 Get.arguments: ${Get.arguments}');
     debugPrint('🔍 Get.arguments type: ${Get.arguments.runtimeType}');
+    
+    // Socket servisini initialize et
+    _socketService = Get.find<SocketService>();
+    _setupSocketListeners();
     
     if (Get.arguments != null && Get.arguments['groupId'] != null) {
       currentGroupId.value = Get.arguments['groupId'];
@@ -145,6 +154,51 @@ class GroupChatDetailController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     }
+  }
+
+  /// Socket event dinleyicilerini ayarla
+  void _setupSocketListeners() {
+    _groupMessageSubscription = _socketService.onGroupMessage.listen((data) {
+      _onNewGroupMessage(data);
+    });
+  }
+
+  /// Yeni grup mesajı geldiğinde işle
+  void _onNewGroupMessage(dynamic data) {
+    try {
+      debugPrint('📡 GroupChatDetailController - Yeni grup mesajı geldi: $data');
+      
+      if (data is Map<String, dynamic>) {
+        final incomingGroupId = data['group_id']?.toString();
+        
+        // Sadece bu grup için gelen mesajları işle
+        if (incomingGroupId != null && incomingGroupId == currentGroupId.value) {
+          debugPrint('✅ Yeni grup mesajı bu gruba ait, mesaj listesine ekleniyor');
+          
+          // Mesajları yeniden yükle
+          refreshMessagesOnly();
+          
+          debugPrint('✅ Yeni grup mesajı işlendi');
+        } else {
+          debugPrint('📨 Gelen grup mesajı bu gruba ait değil. Gelen: $incomingGroupId, Mevcut: ${currentGroupId.value}');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ _onNewGroupMessage error: $e');
+    }
+  }
+
+  /// Socket ve listener durumunu kontrol et
+  void checkSocketConnection() {
+    debugPrint('🔍 === GRUP CHAT SOCKET DURUM RAPORU ===');
+    debugPrint('🔍 Current Group ID: ${currentGroupId.value}');
+    debugPrint('🔍 Socket Service bağlı: ${_socketService.isConnected.value}');
+    
+    // Socket service'den durum kontrolü yap
+    _socketService.checkSocketStatus();
+    
+    debugPrint('🔍 Grup mesaj subscription aktif: ${!_groupMessageSubscription.isPaused}');
+    debugPrint('🔍 ================================');
   }
 
   void convertGroupChatsToMessages() {
@@ -697,6 +751,7 @@ class GroupChatDetailController extends GetxController {
     messageController.dispose();
     pollTitleController.dispose();
     scrollController.dispose();
+    _groupMessageSubscription.cancel();
     super.onClose();
   }
 }

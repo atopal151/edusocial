@@ -16,7 +16,7 @@ static Future<List<CommentModel>> fetchComments(String postId) async {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
       },
-    );
+    ).timeout(const Duration(seconds: 10)); // 10 saniye timeout
 
     /*debugPrint('🟡 Post ID: $postId');*/
 
@@ -57,7 +57,7 @@ static Future<List<CommentModel>> fetchComments(String postId) async {
           'post_id': postId,
           'content': content,
         }),
-      );
+      ).timeout(const Duration(seconds: 10)); // 10 saniye timeout
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {

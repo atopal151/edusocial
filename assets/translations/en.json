@@ -1361,6 +1361,24 @@
     "info": {
       "info": "Info",
       "reportFeatureComingSoon": "Report feature coming soon"
+    },
+    "report": {
+      "dialog": {
+        "title": "Report",
+        "message": "Are you sure you want to report this post? Your report will be forwarded to our review team.",
+        "cancel": "Cancel",
+        "confirm": "Report"
+      },
+      "success": {
+        "title": "✅ Reported",
+        "message": "Post has been successfully reported. Review process has been initiated."
+      },
+      "error": {
+        "title": "❌ Report Failed",
+        "message": "Report operation could not be completed. Please try again.",
+        "networkTitle": "⚠️ Connection Error",
+        "networkMessage": "Please check your internet connection and try again."
+      }
     }
   },
   "post": {
@@ -1399,6 +1417,7 @@
   },
   "comments": {
     "title": "Comments",
+    "noComments": "No comments yet",
     "input": {
       "placeholder": "Write a comment..."
     }

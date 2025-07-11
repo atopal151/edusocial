@@ -186,4 +186,31 @@ class PostServices {
       return false;
     }
   }
+
+  /// Post şikayet etme fonksiyonu
+  static Future<bool> reportPost(int postId) async {
+    final token = _box.read('token');
+
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/post-report'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'post_id': postId,
+        }),
+      );
+
+      debugPrint("📤 Report Post Response: ${response.statusCode}");
+      debugPrint("📤 Report Post Body: ${response.body}");
+
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      debugPrint("❌ reportPost Hatası: $e");
+      return false;
+    }
+  }
 }

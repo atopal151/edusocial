@@ -54,12 +54,14 @@ class _PostCardState extends State<PostCard> {
   int currentPage = 0;
   late bool isLiked;
   late int likeCount;
+  late int commentCount; // Yorum sayısı için state değişkeni
 
   @override
   void initState() {
     super.initState();
     isLiked = widget.isLiked;
     likeCount = widget.likeCount;
+    commentCount = widget.commentCount; // Initial comment count
   }
 
   @override
@@ -156,7 +158,7 @@ class _PostCardState extends State<PostCard> {
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(25)),
                             ),
-                            builder: (_) => const TreePointBottomSheet(),
+                            builder: (_) => TreePointBottomSheet(postId: widget.postId),
                           );
                         }
                         if (widget.isOwner == true) {
@@ -173,13 +175,16 @@ class _PostCardState extends State<PostCard> {
                           );
                         }
                       },
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: SvgPicture.asset(
-                          "images/icons/tree_dot.svg",
-                          colorFilter: const ColorFilter.mode(
-                              Color(0xff414751), BlendMode.srcIn),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: SvgPicture.asset(
+                            "images/icons/tree_dot.svg",
+                            colorFilter: const ColorFilter.mode(
+                                Color(0xff414751), BlendMode.srcIn),
+                          ),
                         ),
                       ),
                     ),
@@ -360,7 +365,14 @@ class _PostCardState extends State<PostCard> {
                         minChildSize: 0.95,
                         expand: false,
                         builder: (_, controller) => CommentBottomSheet(
-                            postId: widget.postId.toString()),
+                          postId: widget.postId.toString(),
+                          onCommentAdded: () {
+                            // Yorum eklendiğinde comment count'u artır
+                            setState(() {
+                              commentCount++;
+                            });
+                          },
+                        ),
                       ),
                     );
                   },
@@ -372,7 +384,7 @@ class _PostCardState extends State<PostCard> {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  widget.commentCount.toString(),
+                  commentCount.toString(),
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,

@@ -8,18 +8,36 @@ class CommentController extends GetxController {
   var isLoading = false.obs;
 
   Future<void> fetchComments(String postId) async {
-    isLoading.value = true;
-    final comments = await CommentService.fetchComments(postId);
-    commentList.assignAll(comments);
-
-        debugPrint('Comment: $comments');
-    isLoading.value = false;
+    try {
+      isLoading.value = true;
+      debugPrint('🔄 Yorumlar yükleniyor... Post ID: $postId');
+      
+      final comments = await CommentService.fetchComments(postId);
+      commentList.assignAll(comments);
+      
+      debugPrint('✅ ${comments.length} yorum yüklendi');
+    } catch (e) {
+      debugPrint('❌ Yorumlar yüklenirken hata: $e');
+      commentList.clear();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> addComment(String postId, String content) async {
-    final success = await CommentService.postComment(postId, content);
-    if (success) {
-      fetchComments(postId);
+    try {
+      debugPrint('🔄 Yorum ekleniyor... Post ID: $postId');
+      final success = await CommentService.postComment(postId, content);
+      
+      if (success) {
+        debugPrint('✅ Yorum başarıyla eklendi');
+        // Yorumları yeniden yükle
+        await fetchComments(postId);
+      } else {
+        debugPrint('❌ Yorum eklenemedi');
+      }
+    } catch (e) {
+      debugPrint('❌ Yorum eklenirken hata: $e');
     }
   }
 }

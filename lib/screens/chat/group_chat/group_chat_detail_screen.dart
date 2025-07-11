@@ -135,7 +135,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                 ),
-                builder: (context) => const TreePointBottomSheet(),
+                builder: (context) =>  TreePointBottomSheet(),
               );
             },
             child: Padding(

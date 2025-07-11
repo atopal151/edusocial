@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/post_model.dart';
 import '../components/snackbars/custom_snackbar.dart';
+import '../services/language_service.dart';
 
 class PostController extends GetxController {
   final ProfileController profileController = Get.find<ProfileController>();
+  final LanguageService languageService = Get.find<LanguageService>();
 
   var isLoading = true.obs;
   var isHomeLoading = true.obs;
@@ -120,6 +122,32 @@ class PostController extends GetxController {
       CustomSnackbar.show(
         title: "Hata",
         message: "Bir hata oluştu: $e",
+        type: SnackbarType.error,
+      );
+    }
+  }
+
+  /// Post şikayet etme
+  Future<void> reportPost(int postId) async {
+    try {
+      final success = await PostServices.reportPost(postId);
+      if (success) {
+        CustomSnackbar.show(
+          title: languageService.tr("common.report.success.title"),
+          message: languageService.tr("common.report.success.message"),
+          type: SnackbarType.success,
+        );
+      } else {
+        CustomSnackbar.show(
+          title: languageService.tr("common.report.error.title"),
+          message: languageService.tr("common.report.error.message"),
+          type: SnackbarType.error,
+        );
+      }
+    } catch (e) {
+      CustomSnackbar.show(
+        title: languageService.tr("common.report.error.networkTitle"),
+        message: languageService.tr("common.report.error.networkMessage"),
         type: SnackbarType.error,
       );
     }

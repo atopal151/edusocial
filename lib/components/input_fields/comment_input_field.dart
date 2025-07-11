@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../services/language_service.dart';
 
 Widget buildCommentInputField(CommentController commentController,
-    String postId, TextEditingController messageController) {
+    String postId, TextEditingController messageController, [VoidCallback? onCommentAdded]) {
   final LanguageService languageService = Get.find<LanguageService>();
   return Container(
     decoration: BoxDecoration(
@@ -50,7 +50,10 @@ Widget buildCommentInputField(CommentController commentController,
           onPressed: () {
             final content = messageController.text.trim();
             if (content.isNotEmpty) {
-              commentController.addComment(postId, content);
+              commentController.addComment(postId, content).then((_) {
+                // Yorum başarıyla eklendiyse callback'i çağır
+                onCommentAdded?.call();
+              });
               messageController.clear();
             }
           },

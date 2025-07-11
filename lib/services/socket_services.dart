@@ -42,7 +42,7 @@ class SocketService extends GetxService {
     
     // Socket.IO options
     final options = io.OptionBuilder()
-        .setTransports(['websocket', 'polling']) // Hem websocket hem polling dene
+        .setTransports(['websocket']) // Sadece websocket kullan
         .setAuth({
           "auth": {
             "token": jwtToken
@@ -155,6 +155,31 @@ class SocketService extends GetxService {
     } else {
       debugPrint('❌ Socket bağlı değil, mesaj gönderilemedi');
       debugPrint('❌ Socket durumu: ${_socket?.connected}');
+    }
+  }
+
+  // Socket durumunu kontrol etme
+  void checkSocketStatus() {
+    debugPrint('🔍 === SOCKET DURUM RAPORU ===');
+    debugPrint('🔍 Socket nesnesi: ${_socket != null ? "✅ Var" : "❌ Yok"}');
+    debugPrint('🔍 Bağlantı durumu: ${_socket?.connected ?? false ? "✅ Bağlı" : "❌ Bağlı değil"}');
+    debugPrint('🔍 Socket ID: ${_socket?.id ?? "Yok"}');
+    debugPrint('🔍 isConnected observable: ${isConnected.value}');
+    debugPrint('🔍 Dinlenen event\'ler:');
+    debugPrint('  - conversation:new_message');
+    debugPrint('  - group_conversation:new_message');
+    debugPrint('  - conversation:un_read_message_count');
+    debugPrint('🔍 ===========================');
+  }
+
+  // Test mesajı gönder
+  void sendTestGroupMessage() {
+    debugPrint('🧪 Test grup mesajı gönderiliyor...');
+    if (_socket != null && _socket!.connected) {
+      _socket!.emit('test', {'message': 'Test grup mesajı'});
+      debugPrint('✅ Test mesajı gönderildi');
+    } else {
+      debugPrint('❌ Socket bağlı değil, test mesajı gönderilemedi');
     }
   }
 

@@ -1345,6 +1345,24 @@
     "info": {
       "info": "Bilgi",
       "reportFeatureComingSoon": "Şikayet özelliği yakında eklenecek"
+    },
+    "report": {
+      "dialog": {
+        "title": "Şikayet Et",
+        "message": "Bu gönderiyi şikayet etmek istediğinizden emin misiniz? Şikayetiniz inceleme ekibimize iletilecektir.",
+        "cancel": "İptal",
+        "confirm": "Şikayet Et"
+      },
+      "success": {
+        "title": "✅ Şikayet Edildi",
+        "message": "Gönderi başarıyla şikayet edildi. İnceleme süreci başlatıldı."
+      },
+      "error": {
+        "title": "❌ Şikayet Gönderilemedi",
+        "message": "Şikayet işlemi tamamlanamadı. Lütfen tekrar deneyin.",
+        "networkTitle": "⚠️ Bağlantı Hatası",
+        "networkMessage": "İnternet bağlantınızı kontrol edip tekrar deneyin."
+      }
     }
   },
   "settings": {
@@ -1432,6 +1450,7 @@
   },
   "comments": {
     "title": "Yorumlar",
+    "noComments": "Henüz yorum yapılmamış",
     "input": {
       "placeholder": "Yorum yaz..."
     }

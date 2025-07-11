@@ -169,8 +169,8 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Katıldığı Gruplar",
+                     Text(
+                      languageService.tr("profile.details.joinedGroups"),
                       style: TextStyle(
                         fontSize: 13.28,
                         fontWeight: FontWeight.w600,
