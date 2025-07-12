@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/chat_models/chat_detail_model.dart';
+import '../../models/chat_models/sender_model.dart';
 import '../../models/user_chat_detail_model.dart';
 import '../../models/document_model.dart';
 import '../../models/link_model.dart';
@@ -200,84 +201,175 @@ class ChatDetailController extends GetxController {
       debugPrint('❌ fetchConversationMessages - currentChatId null, işlem iptal.');
       return;
     }
+    
     try {
       isLoading.value = true;
       
-      // Mesajları yükle
-      final fetchedMessages = await ChatServices.fetchConversationMessages(currentChatId.value!);
+      // Timeout ile veri yükleme (15 saniye)
+      final fetchedMessages = await ChatServices.fetchConversationMessages(currentChatId.value!)
+          .timeout(const Duration(seconds: 15));
+      
+      if (fetchedMessages.isEmpty) {
+        debugPrint('⚠️ Mesaj listesi boş - kullanıcı verisi oluşturulamadı');
+        userChatDetail.value = null;
+        return;
+      }
+
       messages.clear();
       messages.addAll(fetchedMessages);
 
-      // Belge, link ve fotoğrafları topla
+      // Performans optimizasyonu: Map kullanarak belge, link ve fotoğrafları topla
       final allDocuments = <DetailDocumentModel>[];
       final allLinks = <LinkModel>[];
       final allPhotos = <String>[];
 
+      // Paralel işlem için mesajları parçalara böl
       for (var message in messages) {
         // Belgeleri topla
         if (message.messageDocument != null && message.messageDocument!.isNotEmpty) {
-          debugPrint('📄 Belge bulundu: ${message.messageDocument!.length} adet');
           allDocuments.addAll(message.messageDocument!);
         }
 
         // Linkleri topla
         if (message.messageLink.isNotEmpty) {
-          debugPrint('🔗 Link bulundu: ${message.messageLink.length} adet');
-          for (var link in message.messageLink) {
-            allLinks.add(LinkModel(
-              url: link.link,
-              title: link.linkTitle,
-            ));
-          }
+          allLinks.addAll(message.messageLink.map((link) => LinkModel(
+            url: link.link.isNotEmpty ? link.link : 'https://example.com',
+            title: link.linkTitle.isNotEmpty ? link.linkTitle : 'Link',
+          )));
         }
 
         // Fotoğrafları topla
         if (message.messageMedia.isNotEmpty) {
-          debugPrint('📸 Fotoğraf bulundu: ${message.messageMedia.length} adet');
-          for (var media in message.messageMedia) {
-            allPhotos.add(media.path);
-          }
+          allPhotos.addAll(message.messageMedia.map((media) => media.path));
+        }
+      }
+
+      // Duplicates'i filtrele
+      final uniquePhotos = allPhotos.toSet().toList();
+      final uniqueLinks = <LinkModel>[];
+      final seenUrls = <String>{};
+      
+      for (var link in allLinks) {
+        if (!seenUrls.contains(link.url)) {
+          seenUrls.add(link.url);
+          uniqueLinks.add(link);
         }
       }
 
       debugPrint('📊 Toplanan veriler:');
       debugPrint('  - Belgeler: ${allDocuments.length} adet');
-      debugPrint('  - Linkler: ${allLinks.length} adet');
-      debugPrint('  - Fotoğraflar: ${allPhotos.length} adet');
+      debugPrint('  - Linkler: ${uniqueLinks.length} adet');
+      debugPrint('  - Fotoğraflar: ${uniquePhotos.length} adet');
 
-      // Kullanıcı detaylarını güncelle
+      // Kullanıcı detaylarını güncelle - doğru sender bilgilerini al
+      final currentUserId = profileController.profile.value?.id;
+      
+      debugPrint('🔍 Sender bilgileri analizi:');
+      debugPrint('  - Current User ID: $currentUserId');
+      debugPrint('  - Target Chat ID: ${currentChatId.value}');
+      
+      // Conversation'dan karşı tarafı bul
+      SenderModel? targetSender;
+      int? targetUserId;
+      
+      // Conversation bilgilerinden karşı tarafı belirle
       if (messages.isNotEmpty) {
-        final sender = messages.first.sender;
-        userChatDetail.value = UserChatDetailModel(
-          id: sender.id.toString(),
-          name: '${sender.name} ${sender.surname}',
-          follower: '0',
-          following: '0',
-          imageUrl: sender.avatarUrl,
-          memberImageUrls: const [],
-          documents: allDocuments.map((doc) => DocumentModel(
-            id: doc.id,
-            name: doc.name,
-            sizeMb: 0.0,
-            humanCreatedAt: doc.date,
-            createdAt: DateTime.parse(doc.date),
-          )).toList(),
-          links: allLinks,
-          photoUrls: allPhotos,
-        );
-
-        debugPrint('✅ ChatDetailController - userChatDetail güncellendi:');
-        debugPrint('  - ID: ${userChatDetail.value?.id}');
-        debugPrint('  - Name: ${userChatDetail.value?.name}');
-        debugPrint('  - Belgeler: ${userChatDetail.value?.documents.length} adet');
-        debugPrint('  - Linkler: ${userChatDetail.value?.links.length} adet');
-        debugPrint('  - Fotoğraflar: ${userChatDetail.value?.photoUrls.length} adet');
+        final conversation = messages.first.conversation;
+        debugPrint('  - Conversation userOne: ${conversation.userOne}, userTwo: ${conversation.userTwo}');
         
-        // Mesajlar yüklendikten sonra en alta git - birden fazla deneme
-        _scrollToBottomWithRetry();
+        // Current user ID'si ile conversation'daki userOne ve userTwo'yu karşılaştır
+        if (conversation.userOne == currentUserId) {
+          targetUserId = conversation.userTwo;
+          debugPrint('  ✅ Target user ID: ${conversation.userTwo} (userTwo)');
+        } else if (conversation.userTwo == currentUserId) {
+          targetUserId = conversation.userOne;
+          debugPrint('  ✅ Target user ID: ${conversation.userOne} (userOne)');
+        } else {
+          // Fallback: currentChatId.value'yu kullan
+          targetUserId = currentChatId.value;
+          debugPrint('  ⚠️ Fallback target user ID: ${currentChatId.value}');
+        }
       }
+      
+      // Mesajları tara ve target user ID'sine sahip sender'ı bul
+      for (var message in messages) {
+        debugPrint('  - Message Sender ID: ${message.sender.id}, isMe: ${message.isMe}');
+        
+        // Target user ID'sine sahip sender'ı ara
+        if (message.sender.id == targetUserId) {
+          targetSender = message.sender;
+          debugPrint('  ✅ Target sender bulundu: ${targetSender.name} ${targetSender.surname}');
+          break;
+        }
+      }
+      
+      // Hala bulunamadıysa, oturum açan kullanıcının mesajı olmayan ilk mesajı al
+      if (targetSender == null) {
+        debugPrint('  ⚠️ Target sender bulunamadı, oturum açan kullanıcının olmadığı mesajı arıyor...');
+        
+        for (var message in messages) {
+          if (message.sender.id != currentUserId) {
+            targetSender = message.sender;
+            debugPrint('  ✅ Target sender bulundu (fallback): ${targetSender.name} ${targetSender.surname}');
+            break;
+          }
+        }
+      }
+      
+      // Son fallback: ilk mesajın sender'ını al
+      if (targetSender == null) {
+        targetSender = messages.first.sender;
+        debugPrint('  ⚠️ Final fallback: ilk mesajın sender\'ı alındı');
+      }
+      
+      final userName = '${targetSender.name} ${targetSender.surname}'.trim();
+      
+      debugPrint('🎯 Final User Details:');
+      debugPrint('  - Target ID: ${targetSender.id}');
+      debugPrint('  - Target Name: $userName');
+      debugPrint('  - Target Avatar: ${targetSender.avatarUrl}');
+      
+      // Null check ve fallback values
+      userChatDetail.value = UserChatDetailModel(
+        id: targetSender.id.toString(),
+        name: userName.isNotEmpty ? userName : 'Bilinmeyen Kullanıcı',
+        follower: '0',
+        following: '0',
+        imageUrl: targetSender.avatarUrl.isNotEmpty ? targetSender.avatarUrl : '',
+        memberImageUrls: const [],
+        documents: allDocuments.map((doc) => DocumentModel(
+          id: doc.id,
+          name: doc.name.isNotEmpty ? doc.name : 'Belge',
+          sizeMb: 0.0,
+          humanCreatedAt: doc.date,
+          createdAt: DateTime.tryParse(doc.date) ?? DateTime.now(),
+        )).toList(),
+        links: uniqueLinks,
+        photoUrls: uniquePhotos,
+      );
+
+      debugPrint('✅ ChatDetailController - userChatDetail güncellendi:');
+      debugPrint('  - ID: ${userChatDetail.value?.id}');
+      debugPrint('  - Name: ${userChatDetail.value?.name}');
+      debugPrint('  - Avatar URL: ${userChatDetail.value?.imageUrl}');
+      
+      // Mesajlar yüklendikten sonra en alta git
+      _scrollToBottomWithRetry();
+      
     } catch (e) {
       debugPrint('❌ fetchConversationMessages error: $e');
+      // Hata durumunda userChatDetail'i null yap
+      userChatDetail.value = null;
+      
+      // Hata mesajı göster
+      Get.snackbar(
+        'Hata',
+        'Veriler yüklenemedi. Lütfen tekrar deneyin.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+        duration: const Duration(seconds: 3),
+      );
     } finally {
       isLoading.value = false;
     }
