@@ -44,7 +44,34 @@ class AuthService {
 
   String? getToken() => _box.read('token');
 
-  Future<bool> register({
+  /// Kullanıcı bilgilerini çek (school_id ve department_id kontrol için)
+  Future<Map<String, dynamic>?> getCurrentUser() async {
+    final token = getToken();
+    if (token == null) return null;
+
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/me'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data']; // Kullanıcı bilgilerini döndür
+      } else {
+        debugPrint("❗ Kullanıcı bilgisi alınamadı: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      debugPrint("❗ Kullanıcı bilgisi alma hatası: $e");
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> register({
     required String name,
     required String surname,
     required String username,
@@ -73,20 +100,19 @@ class AuthService {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data["status"] == true) {
-        final token = data['data']['token']; // 🔥 BURAYI DÜZELTTİK
+        final token = data['data']['token'];
         
         if (token != null) {
           _box.write('token', token);
-          return true;
+          return data['data']['user']; // 🛑 Kullanıcı bilgilerini döndür
         }
       }
       lastErrorMessage = data["message"] ?? "Bilinmeyen bir hata oluştu.";
-      // Eğer status false ise, mesajı döndür.
       debugPrint("Register failed: ${data["message"] ?? response.body}",wrapWidth: 1024);
-      return false;
+      return null;
     } catch (e) {
       debugPrint("Register error: $e",wrapWidth: 1024);
-      return false;
+      return null;
     }
   }
 

@@ -96,7 +96,12 @@
       "schoolsLoadFailed": "Okullar yüklenemedi",
       "departmentsLoadFailed": "Bölümler yüklenemedi",
       "networkError": "Ağ bağlantısı hatası",
-      "serverError": "Sunucu hatası oluştu"
+      "serverError": "Sunucu hatası oluştu",
+      "schoolUpdateFailed": "Okul ve bölüm bilgileri kaydedilemedi"
+    },
+    "snackbars": {
+      "missingInfo": "Eksik Bilgi",
+      "schoolSelectionRequired": "Lütfen okul ve bölüm seçimini tamamlayınız."
     }
   },
   "step2": {
@@ -157,13 +162,20 @@
       "joinGroupFailed": "Gruba katılma işlemi başarısız",
       "completeOnboardingFailed": "Hesap tamamlama işlemi başarısız",
       "networkError": "Ağ bağlantısı hatası",
-      "serverError": "Sunucu hatası oluştu"
+      "serverError": "Sunucu hatası oluştu",
+      "groupAlreadyJoined": "Zaten bu grubun üyesisiniz",
+      "groupRequestPending": "Bu grup için zaten bekleyen bir katılım isteğiniz var",
+      "invalidGroupId": "Geçersiz grup ID'si"
     },
     "success": {
+      "title": "Başarılı",
       "groupJoined": "Gruba başarıyla katıldınız",
-      "joinRequestSent": "Katılma isteği gönderildi",
+      "joinRequestSent": "Gruba katılım isteğiniz gönderildi",
       "onboardingCompleted": "Hesabınız başarıyla tamamlandı!",
       "welcomeMessage": "EduSocial'e hoş geldiniz!"
+    },
+    "snackbars": {
+      "joinRequestFailed": "Gruba katılım isteği gönderilemedi. Lütfen daha sonra tekrar deneyin."
     }
   },
   
@@ -351,6 +363,10 @@
       "option": "Seçenek ekleyin",
       "addOption": "Seçenek Ekle",
       "send": "Anket Gönder"
+    },
+    "dateSeparator": {
+      "today": "Bugün",
+      "yesterday": "Dün"
     }
   },
   "entry": {
@@ -1195,6 +1211,9 @@
     }
   },
   "common": {
+    "success": "Başarılı",
+    "error": "Hata",
+    "warning": "Uyarı",
     "buttons": {
       "ok": "Tamam",
       "cancel": "İptal",

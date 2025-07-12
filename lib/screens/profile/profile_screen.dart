@@ -172,37 +172,39 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildPosts() {
-    final posts = controller.profilePosts;
+    final LanguageService languageService = Get.find<LanguageService>();
+    
+    return Obx(() {
+      if (controller.profilePosts.isEmpty) {
+        return Center(child: Text(languageService.tr("profile.mainProfile.noPostsFound")));
+      }
 
-    if (posts.isEmpty) {
-      return const Center();
-    }
-
-    return Container(
-      decoration: BoxDecoration(color: Color(0xfffafafa)),
-      child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: posts.length,
-        itemBuilder: (context, index) {
-          final post = posts[index];
-          return PostCard(
-            postId: post.id,
-            profileImage: post.profileImage,
-            userName: post.username,
-            name: post.name,
-            postDate: post.postDate,
-            postDescription: post.postDescription,
-            mediaUrls: post.mediaUrls,
-            likeCount: post.likeCount,
-            commentCount: post.commentCount,
-            isLiked: post.isLiked,
-            isOwner: post.isOwner,
-            links: post.links,
-            slug: post.slug,
-          );
-        },
-      ),
-    );
+      return Container(
+        decoration: BoxDecoration(color: Color(0xfffafafa)),
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: controller.profilePosts.length,
+          itemBuilder: (context, index) {
+            final post = controller.profilePosts[index];
+            return PostCard(
+              postId: post.id,
+              profileImage: post.profileImage,
+              userName: post.username,
+              name: post.name,
+              postDate: post.postDate,
+              postDescription: post.postDescription,
+              mediaUrls: post.mediaUrls,
+              likeCount: post.likeCount,
+              commentCount: post.commentCount,
+              isLiked: post.isLiked,
+              isOwner: post.isOwner,
+              links: post.links,
+              slug: post.slug,
+            );
+          },
+        ),
+      );
+    });
   }
 
   /// **Entryler Sekmesi İçeriği**

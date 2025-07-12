@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
-import '../../../utils/date_format.dart';
 
 class TextMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -9,98 +10,73 @@ class TextMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment:
-          message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        // 🔹 Kullanıcı Bilgileri ve Saat
-        Row(
-          mainAxisAlignment:
-              message.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: [
-            if (!message.isMe)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage: (message.senderAvatarUrl != null &&
-                          message.senderAvatarUrl!.isNotEmpty &&
-                          !message.senderAvatarUrl!.endsWith('/0'))
-                      ? NetworkImage(message.senderAvatarUrl!)
-                      : null,
-                  child: (message.senderAvatarUrl == null ||
-                          message.senderAvatarUrl!.isEmpty ||
-                          message.senderAvatarUrl!.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
-                ),
-              ),
-            Text(
-              '${message.sender.name} ${message.sender.surname}',
-              style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
-            ),
-            const SizedBox(width: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: Text(
-                formatSimpleDateClock(message.createdAt),
-                style: const TextStyle(fontSize: 10, color: Colors.grey),
-              ),
-            ),
-            if (message.isMe)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage: (message.senderAvatarUrl != null &&
-                          message.senderAvatarUrl!.isNotEmpty &&
-                          !message.senderAvatarUrl!.endsWith('/0'))
-                      ? NetworkImage(message.senderAvatarUrl!)
-                      : null,
-                  child: (message.senderAvatarUrl == null ||
-                          message.senderAvatarUrl!.isEmpty ||
-                          message.senderAvatarUrl!.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
-                ),
-              ),
-          ],
-        ),
-        // 🔹 Mesaj Balonu
-        Align(
-          alignment:
-              message.isMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Align(
+        alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
             constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.6,
+              maxWidth: MediaQuery.of(context).size.width * 0.75,
             ),
-            margin: const EdgeInsets.symmetric(horizontal: 35, vertical: 4),
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: message.isMe ? const Color(0xFFFF7C7C) : Colors.white,
+              color: message.isMe 
+                  ? const Color(0xFFff7c7c) // Kırmızı
+                  : Colors.white,
               borderRadius: BorderRadius.only(
-                topLeft: message.isMe
-                    ? const Radius.circular(20)
-                    : const Radius.circular(0),
-                topRight: message.isMe
-                    ? const Radius.circular(0)
-                    : const Radius.circular(20),
-                bottomLeft: const Radius.circular(20),
-                bottomRight: const Radius.circular(20),
+                topLeft: const Radius.circular(18),
+                topRight: const Radius.circular(18),
+                bottomLeft: message.isMe 
+                    ? const Radius.circular(18) 
+                    : const Radius.circular(4),
+                bottomRight: message.isMe 
+                    ? const Radius.circular(4) 
+                    : const Radius.circular(18),
               ),
+             
             ),
-            child: Text(
-              message.message,
-              style: TextStyle(
-                color: message.isMe ? Colors.white : const Color(0xff414751),
-                fontSize: 12,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  message.message,
+                  style: GoogleFonts.inter(
+                    color: message.isMe ? Colors.white : const Color(0xff000000),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // Saat bilgisi mesaj balonunun içinde sağ altta
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      _formatTime(message.createdAt),
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: message.isMe 
+                            ? Colors.white.withOpacity(0.8)
+                            : const Color(0xff8E8E93),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+      ),
     );
+  }
+
+  String _formatTime(String dateTimeString) {
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('HH:mm').format(dateTime);
+    } catch (e) {
+      return '';
+    }
   }
 } 

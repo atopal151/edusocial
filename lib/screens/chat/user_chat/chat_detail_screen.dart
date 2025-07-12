@@ -1,3 +1,4 @@
+import 'package:edusocial/components/widgets/chat_widget/date_separator_widget.dart';
 import 'package:edusocial/components/widgets/chat_widget/message_widget_factory.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../components/input_fields/message_input_field.dart';
 import '../../../controllers/chat_controllers/chat_detail_controller.dart';
+import '../../../models/chat_models/chat_detail_model.dart';
 import '../../../services/language_service.dart';
 
 class ChatDetailScreen extends StatelessWidget {
@@ -13,6 +15,54 @@ class ChatDetailScreen extends StatelessWidget {
 
   final ChatDetailController controller = Get.put(ChatDetailController());
   final ProfileController profileController = Get.find<ProfileController>();
+
+  /// Mesajları tarihlere göre grupla ve tarih separatorları ile birlikte göster
+  Widget _buildMessagesWithDateSeparators() {
+    final List<MessageModel> messages = controller.messages;
+
+    if (messages.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return ListView.builder(
+      controller: controller.scrollController,
+      itemCount: messages.length,
+      padding: const EdgeInsets.only(bottom: 75),
+      addAutomaticKeepAlives: false,
+      addRepaintBoundaries: true,
+      cacheExtent: 500.0,
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        final widgets = <Widget>[];
+
+        // Tarih separator kontrolü
+        if (index == 0 || _shouldShowDateSeparator(messages, index)) {
+          final messageDate = DateTime.parse(message.createdAt);
+          widgets.add(DateSeparatorWidget(date: messageDate));
+        }
+
+        // Mesaj widget'ı
+        widgets.add(MessageWidgetFactory.buildMessageWidget(message));
+
+        return Column(
+          children: widgets,
+        );
+      },
+    );
+  }
+
+  /// İki mesaj arasında tarih separator gösterilip gösterilmeyeceğini kontrol et
+  bool _shouldShowDateSeparator(List<MessageModel> messages, int currentIndex) {
+    if (currentIndex == 0) return true;
+
+    final currentDate = DateTime.parse(messages[currentIndex].createdAt);
+    final previousDate = DateTime.parse(messages[currentIndex - 1].createdAt);
+
+    final currentDateOnly = DateTime(currentDate.year, currentDate.month, currentDate.day);
+    final previousDateOnly = DateTime(previousDate.year, previousDate.month, previousDate.day);
+
+    return currentDateOnly != previousDateOnly;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,16 +169,7 @@ class ChatDetailScreen extends StatelessWidget {
                           ),
                         ),
                       )
-                    : ListView.builder(
-                        controller: controller.scrollController,
-                        itemCount: controller.messages.length,
-                        padding: const EdgeInsets.only(bottom: 75),
-                        itemBuilder: (context, index) {
-                          final message = controller.messages[index];
-                          return MessageWidgetFactory.buildMessageWidget(
-                              message);
-                        },
-                      ),
+                    : _buildMessagesWithDateSeparators(),
               ),
               Container(
                 decoration: const BoxDecoration(color: Color(0xffffffff)),

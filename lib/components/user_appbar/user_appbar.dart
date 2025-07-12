@@ -19,7 +19,7 @@ final GroupController groupController = Get.find<GroupController>();
       backgroundColor: Color(0xffFAFAFA),
       surfaceTintColor: Color(0xffFAFAFA),
       elevation: 0,
-      leading: GestureDetector(
+      /*leading: GestureDetector(
         onTap: controller.navigateToProfile,
         child: Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
@@ -55,7 +55,7 @@ final GroupController groupController = Get.find<GroupController>();
                       ),
               );
             })),
-      ),
+      ),*/
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

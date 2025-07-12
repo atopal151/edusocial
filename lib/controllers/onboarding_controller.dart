@@ -1,8 +1,19 @@
 import 'package:edusocial/components/widgets/edusocial_dialog.dart';
+import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:edusocial/models/group_models/group_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../services/onboarding_service.dart';
+import '../services/language_service.dart';
+import '../controllers/profile_controller.dart';
+import '../controllers/group_controller/group_controller.dart';
+import '../controllers/notification_controller.dart';
+import '../controllers/post_controller.dart';
+import '../controllers/appbar_controller.dart';
+import '../controllers/entry_controller.dart';
+import '../controllers/match_controller.dart';
+import '../controllers/story_controller.dart';
+import 'package:get_storage/get_storage.dart';
 
 class OnboardingController extends GetxController {
   RxString selectedSchool = "".obs;
@@ -27,7 +38,35 @@ class OnboardingController extends GetxController {
   //-------------------------------------------------------------//
 
 
+  Future<void> _reloadAllData() async {
+    try {
+      debugPrint("🔄 Login sonrası veriler yeniden yükleniyor...");
+      
+      // Sadece mevcut controller'ları kullan
+      final profileController = Get.find<ProfileController>();
+      final groupController = Get.find<GroupController>();
+      final notificationController = Get.find<NotificationController>();
+      final appBarController = Get.find<AppBarController>();
+      final storyController = Get.find<StoryController>();
 
+      // Sıralı olarak tüm verileri yükle
+      profileController.loadProfile();
+      groupController.fetchUserGroups();
+      groupController.fetchAllGroups();
+      groupController.fetchSuggestionGroups();
+      groupController.fetchGroupAreas();
+      notificationController.fetchNotifications();
+      appBarController.fetchAndSetProfileImage();
+      storyController.fetchStories();
+
+      debugPrint("✅ Login sonrası veriler başarıyla yüklendi");
+      
+  
+      
+    } catch (e) {
+      debugPrint("❌ Veri yeniden yükleme hatası: $e");
+    }
+  }
 
 
   void addCourse() {
@@ -77,36 +116,68 @@ class OnboardingController extends GetxController {
 
   //-------------------------------------------------------------//
   void joinGroup(String groupName) async {
+    final languageService = Get.find<LanguageService>();
     int index = groups.indexWhere((group) => group.name == groupName);
     if (index != -1) {
       final group = groups[index];
       
       // Önce grup durumunu kontrol et
       if (group.isMember) {
-        Get.snackbar("Uyarı", "Zaten bu grubun üyesisiniz.");
+        CustomSnackbar.show(
+          title: languageService.tr("common.warning"),
+          message: languageService.tr("step3.errors.groupAlreadyJoined"),
+          type: SnackbarType.warning,
+        );
         return;
       }
       
       if (group.isPending) {
-        Get.snackbar("Uyarı", "Bu grup için zaten bekleyen bir katılım isteğiniz var.");
+        CustomSnackbar.show(
+          title: languageService.tr("common.warning"),
+          message: languageService.tr("step3.errors.groupRequestPending"),
+          type: SnackbarType.warning,
+        );
         return;
       }
 
       final groupId = int.tryParse(group.id) ?? 0;
       if (groupId == 0) {
-        Get.snackbar("Hata", "Geçersiz grup ID'si.");
+        CustomSnackbar.show(
+          title: languageService.tr("common.error"),
+          message: languageService.tr("step3.errors.invalidGroupId"),
+          type: SnackbarType.error,
+        );
         return;
       }
 
       final success = await OnboardingServices.requestGroupJoin(groupId);
 
       if (success) {
+        // Reactivity için daha güvenli bir yaklaşım
         final updatedGroup = group.copyWith(isPending: true);
-        groups[index] = updatedGroup;
+        
+        // Listeyi tamamen yeniden oluştur
+        final updatedGroups = List<GroupModel>.from(groups);
+        updatedGroups[index] = updatedGroup;
+        groups.assignAll(updatedGroups);
+        
+        // Ek güvenlik için refresh çağrısı
         groups.refresh();
-        Get.snackbar("Başarılı", "Gruba katılım isteğiniz gönderildi.");
+        
+        // Debug için
+        debugPrint("✅ Grup durumu güncellendi: ${updatedGroup.name} - isPending: ${updatedGroup.isPending}");
+        
+        CustomSnackbar.show(
+          title: languageService.tr("step3.success.title"),
+          message: languageService.tr("step3.success.joinRequestSent"),
+          type: SnackbarType.success,
+        );
       } else {
-        Get.snackbar("Hata", "Gruba katılım isteği gönderilemedi. Lütfen daha sonra tekrar deneyin.");
+        CustomSnackbar.show(
+          title: languageService.tr("common.error"),
+          message: languageService.tr("step3.snackbars.joinRequestFailed"),
+          type: SnackbarType.error,
+        );
       }
     }
   }
@@ -211,6 +282,8 @@ class OnboardingController extends GetxController {
 
   //-------------------------------------------------------------//
   void proceedToNextStep() async {
+    final languageService = Get.find<LanguageService>();
+    
     if (selectedSchoolId != null && selectedDepartmentId != null) {
       isLoading.value = true;
 
@@ -222,25 +295,49 @@ class OnboardingController extends GetxController {
         Get.toNamed("/step2");
       } else {
         // ❌ Başarısızsa ekrana mesaj bas (isteğe bağlı)
-        Get.snackbar("Hata", "Okul ve bölüm bilgileri kaydedilemedi.");
+        CustomSnackbar.show(
+          title: languageService.tr("common.error"),
+          message: languageService.tr("step1.errors.schoolUpdateFailed"),
+          type: SnackbarType.error,
+        );
       }
 
       isLoading.value = false;
     } else {
-      Get.snackbar(
-          "Eksik Bilgi", "Lütfen okul ve bölüm seçimini tamamlayınız.");
+      CustomSnackbar.show(
+        title: languageService.tr("step1.snackbars.missingInfo"),
+        message: languageService.tr("step1.snackbars.schoolSelectionRequired"),
+        type: SnackbarType.warning,
+      );
     }
   }
 
   //-------------------------------------------------------------//
-  void completeOnboarding() {
+  void completeOnboarding() async {
     //onboarding alanının tamamlama işleminin yapılacağı alan
     isLoading.value = true;
-    Future.delayed(Duration(seconds: 2), () {
+    
+    try {
+      debugPrint("🔄 Onboarding tamamlanıyor...");
+      
+      // Tüm verileri yeniden yükle ve tamamlanmasını bekle
+      await _reloadAllData();
+      
+      debugPrint("✅ Onboarding tamamlandı, ana ekrana geçiliyor...");
+      
       isLoading.value = false;
       Get.offAllNamed("/main");
-    });
+      
+    } catch (e) {
+      debugPrint("❌ Onboarding tamamlama hatası: $e");
+      isLoading.value = false;
+      
+      // Hata durumunda yine de ana ekrana geç
+      Get.offAllNamed("/main");
+    }
   }
+
+  
 
   //-------------------------------------------------------------//
 
@@ -250,3 +347,4 @@ class OnboardingController extends GetxController {
 
   //-------------------------------------------------------------//
 }
+

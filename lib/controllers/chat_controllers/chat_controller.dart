@@ -181,8 +181,9 @@ class ChatController extends GetxController {
     required String avatarUrl,
     required bool isOnline,
     required String username,
-  }) {
-    Get.toNamed('/chat_detail', arguments: {
+  }) async {
+    // Chat detail sayfasına git ve döndüğünde chat listesini yenile
+    await Get.toNamed('/chat_detail', arguments: {
       'userId': userId,
       'conversationId': conversationId,
       'name': name,
@@ -190,12 +191,34 @@ class ChatController extends GetxController {
       'isOnline': isOnline,
       'username': username,
     });
+    
+    // Chat detail sayfasından döndüğünde verileri yenile
+    debugPrint("🔄 Chat detail sayfasından dönüldü, chat listesi yenileniyor...");
+    await refreshAllChatData();
   }
 
-  void getGroupChatPage(String groupId) {
-    Get.toNamed("/group_chat_detail", arguments: {
+  void getGroupChatPage(String groupId) async {
+    // Grup chat sayfasına git ve döndüğünde chat listesini yenile
+    await Get.toNamed("/group_chat_detail", arguments: {
       'groupId': groupId,
     });
+    
+    // Grup chat sayfasından döndüğünde verileri yenile
+    debugPrint("🔄 Grup chat sayfasından dönüldü, chat listesi yenileniyor...");
+    await refreshAllChatData();
+  }
+
+  /// 🔄 Tüm chat verilerini yenile
+  Future<void> refreshAllChatData() async {
+    try {
+      await Future.wait([
+        fetchChatList(),
+        fetchOnlineFriends(),
+      ]);
+      debugPrint("✅ Tüm chat verileri başarıyla yenilendi");
+    } catch (e) {
+      debugPrint("❌ Chat verileri yenileme hatası: $e");
+    }
   }
 
   /// 🔍 Arama filtresi

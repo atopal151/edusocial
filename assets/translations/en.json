@@ -96,7 +96,12 @@
       "schoolsLoadFailed": "Failed to load schools",
       "departmentsLoadFailed": "Failed to load departments",
       "networkError": "Network connection error",
-      "serverError": "Server error occurred"
+      "serverError": "Server error occurred",
+      "schoolUpdateFailed": "Failed to save school and department information"
+    },
+    "snackbars": {
+      "missingInfo": "Missing Information",
+      "schoolSelectionRequired": "Please complete school and department selection."
     }
   },
   "step2": {
@@ -157,13 +162,20 @@
       "joinGroupFailed": "Failed to join group",
       "completeOnboardingFailed": "Failed to complete account",
       "networkError": "Network connection error",
-      "serverError": "Server error occurred"
+      "serverError": "Server error occurred",
+      "groupAlreadyJoined": "You are already a member of this group",
+      "groupRequestPending": "You already have a pending join request for this group",
+      "invalidGroupId": "Invalid group ID"
     },
     "success": {
+      "title": "Success",
       "groupJoined": "Successfully joined the group",
-      "joinRequestSent": "Join request sent",
+      "joinRequestSent": "Group join request sent",
       "onboardingCompleted": "Your account has been completed successfully!",
       "welcomeMessage": "Welcome to EduSocial!"
+    },
+    "snackbars": {
+      "joinRequestFailed": "Failed to send group join request. Please try again later."
     }
   },
   "calendar": {
@@ -334,6 +346,10 @@
       "option": "Add option",
       "addOption": "Add Option",
       "send": "Send Poll"
+    },
+    "dateSeparator": {
+      "today": "Today",
+      "yesterday": "Yesterday"
     },
     "groupChat": {
       "fileSelected": "File selected. You can write a message or send directly...",
@@ -1209,6 +1225,9 @@
     }
   },
   "common": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
     "buttons": {
       "ok": "OK",
       "cancel": "Cancel",

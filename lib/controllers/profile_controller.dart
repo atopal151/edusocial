@@ -13,6 +13,7 @@ import '../models/entry_model.dart';
 import '../models/user_model.dart';
 import '../services/profile_service.dart';
 import '../services/people_profile_services.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ProfileController extends GetxController {
   final AppBarController appBarController = Get.find<AppBarController>();
@@ -61,28 +62,14 @@ String formatSimpleDate(String dateStr) {
 
   /// Profil postlarını ayrı bir endpoint'ten çek
   Future<void> fetchProfilePosts() async {
-    debugPrint("🔄 ProfileController.fetchProfilePosts() çağrıldı");
-    
     try {
       final posts = await PostServices.fetchHomePosts();
-      debugPrint("✅ Profile postları başarıyla yüklendi: ${posts.length} post");
-      
-      // Sadece kullanıcının kendi postlarını filtrele
       final userPosts = posts.where((post) => post.isOwner).toList();
-      debugPrint("✅ Kullanıcının kendi postları: ${userPosts.length} post");
       
       profilePosts.assignAll(userPosts);
       postCount.value = userPosts.length;
       
-      // Her postun link verilerini debug et
-      for (int i = 0; i < userPosts.length; i++) {
-        final post = userPosts[i];
-        debugPrint("📝 Profile Post $i:");
-        debugPrint("  - ID: ${post.id}");
-        debugPrint("  - Content: ${post.postDescription}");
-        debugPrint("  - Links: ${post.links}");
-        debugPrint("  - Media: ${post.mediaUrls}");
-      }
+      debugPrint("✅ Profile postları yüklendi: ${userPosts.length} post");
       
     } catch (e) {
       debugPrint("❌ Profile postları yükleme hatası: $e");
@@ -90,72 +77,81 @@ String formatSimpleDate(String dateStr) {
   }
 
   Future<void> loadProfile() async {
-    debugPrint("🔄 ProfileController.loadProfile() çağrıldı");
     isLoading.value = true;
     
     try {
-      final profileData = await _profileService.fetchProfileData();
-      debugPrint("✅ Profil verisi başarıyla yüklendi: ${profileData.name} ${profileData.surname}");
+      // Token kontrolü
+      final box = GetStorage();
+      final token = box.read('token');
+      if (token == null || token.isEmpty) {
+        throw Exception("Token bulunamadı");
+      }
       
       // Ana profil verisi
+      final profileData = await _profileService.fetchProfileData();
       profile.value = profileData;
       userId.value = profileData.id.toString();
       
-      // 📌 Temel veriler
+      // Temel veriler
       fullName.value = "${profileData.name} ${profileData.surname}";
       username.value = "@${profileData.username}";
       profileImage.value = profileData.avatarUrl;
       coverImage.value = profileData.bannerUrl;
       bio.value = profileData.description ?? '';
       birthDate.value = profileData.birthDate;
-      
       lessons.value = profileData.lessons;
       
-      // 📌 Okul ve Bölüm Bilgileri
+      // Okul ve Bölüm Bilgileri
       schoolName.value = profileData.school?.name ?? 'Okul bilgisi yok';
       schoolDepartment.value = profileData.schoolDepartment?.title ?? 'Bölüm bilgisi yok';
       
-      // 📌 Takipçi ve takip edilen sayıları
+      // Takipçi ve takip edilen sayıları
       followers.value = profileData.followers.length;
       following.value = profileData.followings.length;
-      
-      // 📌 Takipçi ve Takip Edilen Listesi
       followerList.assignAll(profileData.followers);
       followingList.assignAll(profileData.followings);
       
-      // 📌 Postlar - Artık ayrı bir endpoint'ten çekiyoruz
-      await fetchProfilePosts();
+      // 🚀 Ana profil verisi yüklendi, UI'ı hemen göster
+      isLoading.value = false;
       
-      // 📝 Entries'ları yeni endpoint'ten çek
-      await _fetchEntriesFromUsername(profileData.username);
+      // 🔄 Diğer veriler paralel olarak arka planda yüklenir
+      Future.wait([
+        fetchProfilePosts(),
+        _fetchEntriesFromUsername(profileData.username),
+      ]).then((_) {
+        _updateRelatedData();
+        debugPrint("✅ Tüm profil verileri yüklendi");
+      }).catchError((e) {
+        debugPrint("❌ Arka plan veri yükleme hatası: $e");
+      });
       
-      // Profil yüklendikten sonra diğer verileri de güncelle
-      _updateRelatedData();
     } catch (e) {
       debugPrint("❌ Profil yükleme hatası: $e");
-    } finally {
       isLoading.value = false;
+      rethrow;
     }
   } 
 
   /// Profil yüklendikten sonra ilgili verileri güncelle
   void _updateRelatedData() {
-    debugPrint("🔄 İlgili veriler güncelleniyor...");
-    
-    // AppBar'daki profil resmini güncelle
-    try {
-      appBarController.fetchAndSetProfileImage();
-    } catch (e) {
-      debugPrint("❌ AppBar güncelleme hatası: $e");
-    }
-    
-    // Story'leri güncelle
-    try {
-      final storyController = Get.find<StoryController>();
-      storyController.fetchStories();
-    } catch (e) {
-      debugPrint("❌ Story güncelleme hatası: $e");
-    }
+    // AppBar ve Story'leri paralel güncelle
+    Future.wait([
+      Future(() async {
+        try {
+          appBarController.fetchAndSetProfileImage();
+        } catch (e) {
+          debugPrint("❌ AppBar güncelleme hatası: $e");
+        }
+      }),
+      Future(() async {
+        try {
+          final storyController = Get.find<StoryController>();
+          storyController.fetchStories();
+        } catch (e) {
+          debugPrint("❌ Story güncelleme hatası: $e");
+        }
+      }),
+    ]);
   }
 
   void getToSettingScreen() async {
@@ -176,21 +172,15 @@ String formatSimpleDate(String dateStr) {
     bio.value = newBio;
   }
 
-  /// 🔥 YENİ: Entry'ye oy verme işlemi
+  /// Entry'ye oy verme işlemi
   Future<void> voteEntry(int entryId, String vote) async {
     try {
-      debugPrint("🔄 ProfileController - Entry'ye oy veriliyor: $entryId, vote: $vote");
-      
-      // API'ye oy verme isteği gönder
       final success = await EntryServices.voteEntry(
         vote: vote,
         entryId: entryId,
       );
 
       if (success) {
-        debugPrint("✅ ProfileController - Oy verme başarılı");
-        
-        // Profile entries listesindeki ilgili entry'yi güncelle
         final indexInProfile = personEntries.indexWhere((entry) => entry.id == entryId);
         if (indexInProfile != -1) {
           final currentEntry = personEntries[indexInProfile];
@@ -201,11 +191,9 @@ String formatSimpleDate(String dateStr) {
 
           if (vote == "up") {
             if (newIsLike == true) {
-              // Zaten beğenilmiş, beğeniyi kaldır
               newUpvotes--;
               newIsLike = false;
             } else {
-              // Beğen
               newUpvotes++;
               newIsLike = true;
               if (newIsDislike == true) {
@@ -215,11 +203,9 @@ String formatSimpleDate(String dateStr) {
             }
           } else if (vote == "down") {
             if (newIsDislike == true) {
-              // Zaten beğenilmemiş, beğenmemeyi kaldır
               newDownvotes--;
               newIsDislike = false;
             } else {
-              // Beğenme
               newDownvotes++;
               newIsDislike = true;
               if (newIsLike == true) {
@@ -237,31 +223,22 @@ String formatSimpleDate(String dateStr) {
           );
 
           personEntries[indexInProfile] = updatedEntry;
-          debugPrint("✅ ProfileController - Entry oy durumu güncellendi: Upvotes: $newUpvotes, Downvotes: $newDownvotes");
         }
-      } else {
-        debugPrint("❌ ProfileController - Oy verme başarısız");
       }
     } catch (e) {
-      debugPrint("❌ ProfileController - Oy verme hatası: $e");
+      debugPrint("❌ Entry oy verme hatası: $e");
     }
   }
 
-  /// 🔥 YENİ: Username'den entries'ları çek
+  /// Username'den entries'ları çek
   Future<void> _fetchEntriesFromUsername(String username) async {
     try {
-      debugPrint("🔄 ProfileController - Entries çekiliyor: $username");
-      
       final userData = await ProfileService.fetchUserByUsername(username);
       
       if (userData != null && userData.entries.isNotEmpty) {
-        debugPrint("✅ ProfileController - ${userData.entries.length} entries bulundu");
-        
-        // People profile'daki gibi entries'ları işle
         final processedEntries = <EntryModel>[];
         
         for (final entry in userData.entries) {
-          // Entry'nin user bilgilerini userData'dan al
           final user = UserModel(
             id: int.tryParse(userData.id.toString()) ?? 0,
             accountType: userData.accountType,
@@ -292,7 +269,6 @@ String formatSimpleDate(String dateStr) {
             isSelf: userData.isSelf,
           );
           
-          // Entry'yi user bilgileriyle oluştur
           final processedEntry = EntryModel(
             id: entry.id,
             content: entry.content,
@@ -310,15 +286,14 @@ String formatSimpleDate(String dateStr) {
         }
         
         personEntries.assignAll(processedEntries);
-        debugPrint("✅ ProfileController - ${processedEntries.length} entries yüklendi");
+        debugPrint("✅ Profile entries yüklendi: ${processedEntries.length}");
         
       } else {
-        debugPrint("⚠️ ProfileController - Entries bulunamadı");
         personEntries.clear();
       }
       
     } catch (e) {
-      debugPrint("❌ ProfileController - Entries çekme hatası: $e");
+      debugPrint("❌ Profile entries yükleme hatası: $e");
       personEntries.clear();
     }
   }
@@ -329,33 +304,14 @@ String formatSimpleDate(String dateStr) {
       final processedEntries = <EntryModel>[];
       
       for (final entry in entries) {
-        // Topic'in user_id'sini al
         final topicUserId = entry.topic?.userId;
         
         if (topicUserId != null) {
-          debugPrint("👤 Topic kullanıcısı için bilgi çekiliyor: user_id = $topicUserId");
-          
-          // Kullanıcı bilgilerini API'den çek
           final userData = await PeopleProfileService.fetchUserById(topicUserId);
           
           if (userData != null) {
-            // Kullanıcı bilgilerini debug et
-            debugPrint("📸 Kullanıcı avatar bilgileri:");
-            debugPrint("  - Avatar URL: ${userData.avatarUrl}");
-            debugPrint("  - Avatar: ${userData.avatar}");
-            debugPrint("  - Name: ${userData.name} ${userData.surname}");
-            debugPrint("  - Username: ${userData.username}");
-            
-            // Kullanıcı bilgilerini UserModel'e dönüştür
             final user = _createUserModelFromProfile(userData);
             
-            // UserModel'deki avatar bilgilerini de debug et
-            debugPrint("🖼️ UserModel avatar bilgileri:");
-            debugPrint("  - Avatar URL: ${user.avatarUrl}");
-            debugPrint("  - Avatar: ${user.avatar}");
-            debugPrint("  - Kullanılan avatar alanı: ${user.avatarUrl.isNotEmpty ? 'avatarUrl' : 'avatar'}");
-            
-            // Entry'yi güncellenmiş kullanıcı bilgileriyle oluştur
             final processedEntry = EntryModel(
               id: entry.id,
               content: entry.content,
@@ -370,23 +326,19 @@ String formatSimpleDate(String dateStr) {
             );
             
             processedEntries.add(processedEntry);
-            debugPrint("✅ Entry ${entry.id} için kullanıcı bilgileri yüklendi: ${user.name} ${user.surname}");
           } else {
-            debugPrint("⚠️ Kullanıcı bilgileri alınamadı: user_id = $topicUserId");
-            processedEntries.add(entry); // Orijinal entry'yi ekle
+            processedEntries.add(entry);
           }
         } else {
-          debugPrint("⚠️ Topic user_id bulunamadı, orijinal entry kullanılıyor");
-          processedEntries.add(entry); // Orijinal entry'yi ekle
+          processedEntries.add(entry);
         }
       }
       
       personEntries.assignAll(processedEntries);
-      debugPrint("✅ Tüm entries kullanıcı bilgileriyle işlendi");
+      debugPrint("✅ Entries kullanıcı bilgileriyle işlendi: ${processedEntries.length}");
       
     } catch (e) {
       debugPrint("❌ Entries işleme hatası: $e");
-      // Hata durumunda orijinal entries'ları kullan
       personEntries.assignAll(entries);
     }
   }

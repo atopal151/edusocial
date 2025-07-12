@@ -1,5 +1,6 @@
 import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:edusocial/utils/date_format.dart';
+import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,7 +17,7 @@ class ChatListScreen extends StatefulWidget {
 }
 
 class _ChatListScreenState extends State<ChatListScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final ChatController chatController = Get.find<ChatController>();
   final GroupController groupController = Get.find<GroupController>();
 
@@ -26,12 +27,77 @@ class _ChatListScreenState extends State<ChatListScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Uygulama ön plana geldiğinde chat verilerini yenile
+      _refreshChatData();
+    }
+  }
+
+  /// Chat verilerini yenile
+  Future<void> _refreshChatData() async {
+    debugPrint("🔄 Chat verileri yenileniyor...");
+    try {
+      await Future.wait([
+        chatController.refreshAllChatData(),
+        groupController.fetchUserGroups(),
+      ]);
+      debugPrint("✅ Chat verileri başarıyla yenilendi");
+    } catch (e) {
+      debugPrint("❌ Chat verileri yenileme hatası: $e");
+    }
+  }
+
+  /// Avatar widget'ı oluştur - URL varsa resim, yoksa person icon
+  Widget _buildAvatarWidget(String? avatarUrl) {
+    final fixedUrl = AppConstants.fixAvatarUrl(avatarUrl);
+    
+    // Eğer default avatar URL'i ise direkt person icon göster
+    if (fixedUrl.contains('pravatar.cc')) {
+      return Icon(
+        Icons.person,
+        color: Color(0xff9ca3ae),
+      );
+    }
+    
+    return ClipOval(
+      child: Image.network(
+        fixedUrl,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          debugPrint("❌ Avatar yükleme hatası: $error");
+          return Icon(
+            Icons.person,
+            color: Color(0xff9ca3ae),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Icon(
+            Icons.person,
+            color: Color(0xff9ca3ae),
+          );
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final LanguageService languageService = Get.find<LanguageService>();
-    
+
     return Scaffold(
       appBar: UserAppBar(),
       backgroundColor: const Color(0xFFFAFAFA),
@@ -46,91 +112,93 @@ class _ChatListScreenState extends State<ChatListScreen>
             ),
           ),
           const SizedBox(height: 10),
+          if (chatController.onlineFriends.isNotEmpty)
 
-          /// **Online Arkadaşlar Alanı**
-          Container(
-            color: Color(0xffffffff),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child:  Text(
-                    languageService.tr("chat.chatList.onlineFriends"),
-                    style: GoogleFonts.inter(
-                        fontSize: 13.28,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff272727)),
+            /// **Online Arkadaşlar Alanı**
+            Container(
+              color: Color(0xffffffff),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      languageService.tr("chat.chatList.onlineFriends"),
+                      style: GoogleFonts.inter(
+                          fontSize: 13.28,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff272727)),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                Obx(() => SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: chatController.onlineFriends.length,
-                        itemBuilder: (context, index) {
-                          final friend = chatController.onlineFriends[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 10, right: 1),
-                            child: GestureDetector(
-                              onTap: () {
-                                chatController.getChatDetailPage(
-                                  userId: friend.id,
-                                  name: friend.name,
-                                  avatarUrl: friend.profileImage,
-                                  isOnline: friend.isOnline, 
-                                  username: friend.username,
-                                );
-                              },
-                              child: Column(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundColor: Color(0xfffafafa),
-                                        radius: 28,
-                                        backgroundImage:
-                                            NetworkImage(friend.profileImage),
-                                      ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Container(
-                                          width: 15,
-                                          height: 15,
-                                          decoration: BoxDecoration(
-                                            color: friend.isOnline
-                                                ? Color(0xff65d384)
-                                                : Color(0xffd9d9d9),
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            border: Border.all(
-                                                color: Color(0xffffffff), width: 2),
+                  const SizedBox(height: 5),
+                  Obx(() => SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: chatController.onlineFriends.length,
+                          itemBuilder: (context, index) {
+                            final friend = chatController.onlineFriends[index];
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 1),
+                              child: GestureDetector(
+                                onTap: () {
+                                  chatController.getChatDetailPage(
+                                    userId: friend.id,
+                                    name: friend.name,
+                                    avatarUrl: friend.profileImage,
+                                    isOnline: friend.isOnline,
+                                    username: friend.username,
+                                  );
+                                },
+                                child: Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundColor: Color(0xfffafafa),
+                                          radius: 28,
+                                          child: _buildAvatarWidget(friend.profileImage),
+                                        ),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Container(
+                                            width: 15,
+                                            height: 15,
+                                            decoration: BoxDecoration(
+                                              color: friend.isOnline
+                                                  ? Color(0xff65d384)
+                                                  : Color(0xffd9d9d9),
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              border: Border.all(
+                                                  color: Color(0xffffffff),
+                                                  width: 2),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text('@${friend.username}',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 10,
-                                            color: Color(0xff272727),
-                                            fontWeight: FontWeight.w400)),
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text('@${friend.username}',
+                                          style: GoogleFonts.inter(
+                                              fontSize: 10,
+                                              color: Color(0xff272727),
+                                              fontWeight: FontWeight.w400)),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    )),
-              ],
+                            );
+                          },
+                        ),
+                      )),
+                ],
+              ),
             ),
-          ),
 
           /// ✅ TabBar (Kişisel & Grup)
           Container(
@@ -175,20 +243,21 @@ class _ChatListScreenState extends State<ChatListScreen>
   Widget _buildPrivateMessages() {
     return RefreshIndicator(
       onRefresh: () async {
-        await chatController.fetchChatList();
-        debugPrint("✅ Kişisel mesajlar başarıyla yenilendi");
+        await _refreshChatData();
       },
       color: Color(0xFFEF5050),
       backgroundColor: Color(0xfffafafa),
       strokeWidth: 2.0,
-      displacement: 10.0,
+      displacement: 40.0,
       child: Obx(() => ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: chatController.filteredChatList.length,
             itemBuilder: (context, index) {
               final chat = chatController.filteredChatList[index];
               return GestureDetector(
                 onTap: () {
-                  debugPrint('tıklanan user id:${chat.id}, conversation id:${chat.conversationId}');
+                  debugPrint(
+                      'tıklanan user id:${chat.id}, conversation id:${chat.conversationId}');
                   chatController.getChatDetailPage(
                     userId: chat.id,
                     conversationId: chat.conversationId,
@@ -214,7 +283,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                             CircleAvatar(
                               radius: 25,
                               backgroundColor: Color(0xfffafafa),
-                              backgroundImage: NetworkImage(chat.avatar),
+                              child: _buildAvatarWidget(chat.avatar),
                             ),
                             Positioned(
                               bottom: 0,
@@ -227,8 +296,8 @@ class _ChatListScreenState extends State<ChatListScreen>
                                       ? const Color(0xff65d384)
                                       : const Color(0xffd9d9d9),
                                   borderRadius: BorderRadius.circular(50),
-                                  border:
-                                      Border.all(color: Color(0xffffffff), width: 2),
+                                  border: Border.all(
+                                      color: Color(0xffffffff), width: 2),
                                 ),
                               ),
                             ),
@@ -242,14 +311,18 @@ class _ChatListScreenState extends State<ChatListScreen>
                               Text(
                                 chat.name,
                                 style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xff414751)),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                    color: Color(0xff414751)),
                               ),
                               Text(
                                 chat.lastMessage?.message ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.inter(
-                                    fontSize: 10, color: Color(0xff9ca3ae), fontWeight: FontWeight.w500),
+                                    fontSize: 10,
+                                    color: Color(0xff9ca3ae),
+                                    fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -260,7 +333,9 @@ class _ChatListScreenState extends State<ChatListScreen>
                               formatSimpleDateClock(
                                   chat.lastMessage?.createdAt ?? ''),
                               style: GoogleFonts.inter(
-                                  fontSize: 10, color: Color(0xff9ca3ae), fontWeight: FontWeight.w600),
+                                  fontSize: 10,
+                                  color: Color(0xff9ca3ae),
+                                  fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 8),
                             if (chat.unreadCount > 0)
@@ -270,7 +345,9 @@ class _ChatListScreenState extends State<ChatListScreen>
                                 child: Text(
                                   chat.unreadCount.toString(),
                                   style: GoogleFonts.inter(
-                                      fontSize: 10, color: Color(0xffffffff), fontWeight: FontWeight.w400),
+                                      fontSize: 10,
+                                      color: Color(0xffffffff),
+                                      fontWeight: FontWeight.w400),
                                 ),
                               ),
                           ],
@@ -289,15 +366,14 @@ class _ChatListScreenState extends State<ChatListScreen>
   Widget _buildGroupMessages() {
     return RefreshIndicator(
       onRefresh: () async {
-        debugPrint("🔄 Grup mesajları yenileniyor...");
-        await groupController.fetchUserGroups();
-        debugPrint("✅ Grup mesajları başarıyla yenilendi");
+        await _refreshChatData();
       },
       color: Color(0xFFEF5050),
       backgroundColor: Color(0xfffafafa),
       strokeWidth: 2.0,
       displacement: 40.0,
       child: Obx(() => ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: groupController.userGroups.length,
             itemBuilder: (context, index) {
               final group = groupController.userGroups[index];
@@ -318,8 +394,8 @@ class _ChatListScreenState extends State<ChatListScreen>
                       children: [
                         CircleAvatar(
                           radius: 25,
-                              backgroundColor: Color(0xfffafafa),
-                          backgroundImage: NetworkImage(group.avatarUrl),
+                          backgroundColor: Color(0xfffafafa),
+                          child: _buildAvatarWidget(group.avatarUrl),
                         ),
                         const SizedBox(width: 10),
                         Expanded(

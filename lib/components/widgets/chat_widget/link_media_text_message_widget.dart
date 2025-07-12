@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
-import '../../../utils/date_format.dart';
 import '../../../services/language_service.dart';
 
 class LinkMediaTextMessageWidget extends StatelessWidget {
@@ -62,8 +62,43 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
             child: Image.file(
               file,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image),
+              errorBuilder: (context, error, stackTrace) => Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.broken_image,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Dosya bulunamadı',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                if (wasSynchronouslyLoaded) return child;
+                
+                return AnimatedOpacity(
+                  opacity: frame == null ? 0 : 1,
+                  duration: const Duration(milliseconds: 200),
+                  child: child,
+                );
+              },
             ),
           );
         } else {
@@ -104,8 +139,68 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
             child: Image.network(
               mediaUrl,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image),
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: const Color(0xFFff7c7c),
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          ),
+                          
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) => Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.broken_image,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Görsel yüklenemedi',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           );
         } else {
@@ -141,93 +236,30 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
       }
     }
 
-    return Column(
-      crossAxisAlignment:
-          message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        // 🔹 Kullanıcı Bilgileri ve Saat
-        Row(
-          mainAxisAlignment:
-              message.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: [
-            if (!message.isMe)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Color(0xffd9d9d9),
-                  backgroundImage: (message.senderAvatarUrl != null &&
-                          message.senderAvatarUrl!.isNotEmpty &&
-                          !message.senderAvatarUrl!.endsWith('/0'))
-                      ? NetworkImage(message.senderAvatarUrl!)
-                      : null,
-                  child: (message.senderAvatarUrl == null ||
-                          message.senderAvatarUrl!.isEmpty ||
-                          message.senderAvatarUrl!.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
-                ),
-              ),
-            Text(
-              '${message.sender.name} ${message.sender.surname}',
-              style: GoogleFonts.inter(
-                  fontSize: 10,
-                  color: Color(0xff414751),
-                  fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(width: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: Text(
-                formatSimpleDateClock(message.createdAt),
-                style: GoogleFonts.inter(
-                    fontSize: 10,
-                    color: Color(0xff9ca3ae),
-                    fontWeight: FontWeight.w500),
-              ),
-            ),
-            if (message.isMe)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Color(0xffd9d9d9),
-                  backgroundImage: (message.senderAvatarUrl != null &&
-                          message.senderAvatarUrl!.isNotEmpty &&
-                          !message.senderAvatarUrl!.endsWith('/0'))
-                      ? NetworkImage(message.senderAvatarUrl!)
-                      : null,
-                  child: (message.senderAvatarUrl == null ||
-                          message.senderAvatarUrl!.isEmpty ||
-                          message.senderAvatarUrl!.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
-                ),
-              ),
-          ],
-        ),
-        // 🔹 Mesaj Balonu
-        Align(
-          alignment:
-              message.isMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Align(
+        alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
             constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.6,
+              maxWidth: MediaQuery.of(context).size.width * 0.75,
             ),
-            margin: const EdgeInsets.symmetric(horizontal: 35, vertical: 4),
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: message.isMe ? const Color(0xFFFF7C7C) : Colors.white,
+              color: message.isMe 
+                  ? const Color(0xFFff7c7c) // Kırmızı
+                  : Colors.white,
               borderRadius: BorderRadius.only(
-                topLeft: message.isMe
-                    ? const Radius.circular(20)
-                    : const Radius.circular(0),
-                topRight: message.isMe
-                    ? const Radius.circular(0)
-                    : const Radius.circular(20),
-                bottomLeft: const Radius.circular(20),
-                bottomRight: const Radius.circular(20),
+                topLeft: const Radius.circular(18),
+                topRight: const Radius.circular(18),
+                bottomLeft: message.isMe 
+                    ? const Radius.circular(18) 
+                    : const Radius.circular(4),
+                bottomRight: message.isMe 
+                    ? const Radius.circular(4) 
+                    : const Radius.circular(18),
               ),
+             
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,95 +268,132 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
                   mediaWidget,
                   const SizedBox(height: 8),
                 ],
-                if (message.message.isNotEmpty)
+                if (message.message.isNotEmpty) ...[
                   Text(
                     message.message,
-                    style: TextStyle(
-                      color:
-                          message.isMe ? Colors.white : const Color(0xff414751),
-                      fontSize: 12,
+                    style: GoogleFonts.inter(
+                      color: message.isMe ? Colors.white : const Color(0xff000000),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
+                  const SizedBox(height: 4),
+                ],
                 if (linkUrl != null && linkUrl.isNotEmpty) ...[
-                  GestureDetector(
-                    onTap: () async {
-                      try {
-                        debugPrint(
-                            "🔗 LinkMediaText - Link açma deneniyor: $linkUrl");
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(top: 4),
+                    decoration: BoxDecoration(
+                      color: message.isMe 
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : const Color(0xFFF0F0F0),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: GestureDetector(
+                      onTap: () async {
+                        try {
+                          debugPrint("🔗 LinkMediaText - Link açma deneniyor: $linkUrl");
 
-                        // URL'yi temizle ve kontrol et
-                        String cleanLink = linkUrl!.trim();
-                        if (!cleanLink.startsWith('http://') &&
-                            !cleanLink.startsWith('https://')) {
-                          cleanLink = 'https://$cleanLink';
-                        }
+                          // URL'yi temizle ve kontrol et
+                          String cleanLink = linkUrl!.trim();
+                          if (!cleanLink.startsWith('http://') &&
+                              !cleanLink.startsWith('https://')) {
+                            cleanLink = 'https://$cleanLink';
+                          }
 
-                        debugPrint(
-                            "🔗 LinkMediaText - Temizlenmiş link: $cleanLink");
+                          debugPrint("🔗 LinkMediaText - Temizlenmiş link: $cleanLink");
 
-                        final Uri url = Uri.parse(cleanLink);
-                        debugPrint("🔗 LinkMediaText - Parsed URL: $url");
+                          final Uri url = Uri.parse(cleanLink);
+                          debugPrint("🔗 LinkMediaText - Parsed URL: $url");
 
-                        // URL'nin açılabilir olup olmadığını kontrol et
-                        final canLaunch = await canLaunchUrl(url);
-                        debugPrint(
-                            "🔗 LinkMediaText - canLaunchUrl sonucu: $canLaunch");
+                          // URL'nin açılabilir olup olmadığını kontrol et
+                          final canLaunch = await canLaunchUrl(url);
+                          debugPrint("🔗 LinkMediaText - canLaunchUrl sonucu: $canLaunch");
 
-                        if (canLaunch) {
-                          debugPrint("🔗 LinkMediaText - URL açılıyor...");
-                          final result = await launchUrl(url,
-                              mode: LaunchMode.externalApplication);
-                          debugPrint(
-                              "🔗 LinkMediaText - launchUrl sonucu: $result");
+                          if (canLaunch) {
+                            debugPrint("🔗 LinkMediaText - URL açılıyor...");
+                            final result = await launchUrl(url,
+                                mode: LaunchMode.externalApplication);
+                            debugPrint("🔗 LinkMediaText - launchUrl sonucu: $result");
 
-                          if (!result) {
+                            if (!result) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(languageService.tr("chat.link.cannotOpen")),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
+                          } else {
+                            debugPrint("🔗 LinkMediaText - URL açılamıyor: $url");
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(languageService.tr("chat.link.cannotOpen")),
+                                  content: Text("${languageService.tr("chat.link.cannotOpenThis")}: $cleanLink"),
                                   backgroundColor: Colors.red,
                                 ),
                               );
                             }
                           }
-                        } else {
-                          debugPrint("🔗 LinkMediaText - URL açılamıyor: $url");
+                        } catch (e) {
+                          debugPrint("🔗 LinkMediaText - Link açma hatası: $e");
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("${languageService.tr("chat.link.cannotOpenThis")}: $cleanLink"),
+                                content: Text("${languageService.tr("chat.link.openError")}: ${e.toString()}"),
                                 backgroundColor: Colors.red,
                               ),
                             );
                           }
                         }
-                      } catch (e) {
-                        debugPrint("🔗 LinkMediaText - Link açma hatası: $e");
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("${languageService.tr("chat.link.openError")}: ${e.toString()}"),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    child: Text(
-                      linkUrl,
-                      style: GoogleFonts.inter(
-                          color: Color(0xff2c96ff),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600),
+                      },
+                      child: Text(
+                        linkUrl,
+                        style: GoogleFonts.inter(
+                          color: const Color(0xff2c96ff),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                          decorationColor: const Color(0xff2c96ff),
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
                 ],
+                
+                // Saat bilgisi mesaj balonunun içinde sağ altta
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      _formatTime(message.createdAt),
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: message.isMe 
+                            ? Colors.white.withValues(alpha: 0.8)
+                            : const Color(0xff8E8E93),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-        ),
-      ],
+      ),
     );
+  }
+
+  String _formatTime(String dateTimeString) {
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('HH:mm').format(dateTime);
+    } catch (e) {
+      return '';
+    }
   }
 }

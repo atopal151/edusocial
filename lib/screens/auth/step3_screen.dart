@@ -39,10 +39,10 @@ class Step3View extends StatelessWidget {
             SizedBox(height: 10),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: controller.groups.map((group) {
-                  return Obx(
-                    () => Padding(
+              child: Obx(
+                () => Row(
+                  children: controller.groups.map((group) {
+                    return Padding(
                       padding: const EdgeInsets.only(right: 10),
                       child: GroupCard(
                         action: group.isMember
@@ -56,9 +56,9 @@ class Step3View extends StatelessWidget {
                           controller.joinGroup(group.name);
                         },
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
             SizedBox(height: 30),

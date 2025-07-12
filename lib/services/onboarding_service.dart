@@ -127,7 +127,6 @@ class OnboardingServices {
     try {
       debugPrint("🟢 Grup katılım isteği gönderiliyor...");
       debugPrint("🟢 Group ID: $groupId");
-      debugPrint("🟢 Token: $token");
 
       final response = await http.post(
         Uri.parse('${AppConstants.baseUrl}/group-join'),

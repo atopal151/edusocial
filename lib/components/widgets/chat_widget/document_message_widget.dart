@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
-import '../../../utils/date_format.dart';
 import '../../../services/language_service.dart';
 
 class DocumentMessageWidget extends StatelessWidget {
@@ -38,70 +38,11 @@ class DocumentMessageWidget extends StatelessWidget {
     final documentUrl = getDocumentUrl();
     final documentName = getDocumentName();
 
-    return Column(
-      crossAxisAlignment:
-          message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        // 🔹 Kullanıcı Bilgileri ve Saat
-        Row(
-          mainAxisAlignment:
-              message.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: [
-            if (!message.isMe)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Color(0xffd9d9d9),
-                  backgroundImage: (message.senderAvatarUrl != null &&
-                          message.senderAvatarUrl!.isNotEmpty &&
-                          !message.senderAvatarUrl!.endsWith('/0'))
-                      ? NetworkImage(message.senderAvatarUrl!)
-                      : null,
-                  child: (message.senderAvatarUrl == null ||
-                          message.senderAvatarUrl!.isEmpty ||
-                          message.senderAvatarUrl!.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
-                ),
-              ),
-            Text(
-              '${message.sender.name} ${message.sender.surname}',
-              style: GoogleFonts.inter(fontSize: 10, color: Color(0xff414751), fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(width: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              child: Text(
-                formatSimpleDateClock(message.createdAt),
-                style: GoogleFonts.inter(fontSize: 10, color: Color(0xff9ca3ae), fontWeight: FontWeight.w400),
-              ),
-            ),
-            if (message.isMe)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Color(0xffd9d9d9),
-                  backgroundImage: (message.senderAvatarUrl != null &&
-                          message.senderAvatarUrl!.isNotEmpty &&
-                          !message.senderAvatarUrl!.endsWith('/0'))
-                      ? NetworkImage(message.senderAvatarUrl!)
-                      : null,
-                  child: (message.senderAvatarUrl == null ||
-                          message.senderAvatarUrl!.isEmpty ||
-                          message.senderAvatarUrl!.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
-                ),
-              ),
-          ],
-        ),
-        // 🔹 Mesaj Balonu
-        Align(
-          alignment:
-              message.isMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: GestureDetector(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Align(
+        alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: GestureDetector(
             onTap: documentUrl != null ? () async {
               try {
                 final uri = Uri.parse(documentUrl);
@@ -123,7 +64,7 @@ class DocumentMessageWidget extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('${languageService.tr("chat.document.openError")}: $e'),
-                      backgroundColor: Color(0xffFF5050),
+                      backgroundColor: Color(0xffff7c7c),
                     ),
                   );
                 }
@@ -131,71 +72,106 @@ class DocumentMessageWidget extends StatelessWidget {
             } : null,
             child: Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.6,
+                maxWidth: MediaQuery.of(context).size.width * 0.75,
               ),
-              margin: const EdgeInsets.symmetric(horizontal: 35, vertical: 4),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: message.isMe ? const Color(0xFFFF7C7C) : Colors.white,
+                color: message.isMe 
+                    ? const Color(0xFFff7c7c) // Kırmızı
+                    : Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: message.isMe
-                      ? const Radius.circular(20)
-                      : const Radius.circular(0),
-                  topRight: message.isMe
-                      ? const Radius.circular(0)
-                      : const Radius.circular(20),
-                  bottomLeft: const Radius.circular(20),
-                  bottomRight: const Radius.circular(20),
+                  topLeft: const Radius.circular(18),
+                  topRight: const Radius.circular(18),
+                  bottomLeft: message.isMe 
+                      ? const Radius.circular(18) 
+                      : const Radius.circular(4),
+                  bottomRight: message.isMe 
+                      ? const Radius.circular(4) 
+                      : const Radius.circular(18),
                 ),
+               
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.insert_drive_file, 
-                    color: message.isMe ? Colors.white : const Color(0xff414751),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          documentName,
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: message.isMe ? Colors.white : const Color(0xff414751),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (documentUrl != null)
-                          Text(
-                            languageService.tr("chat.document.clickToDownload"),
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
-                              color: message.isMe ? Colors.white70 : Color(0xff9ca3ae),
-                              
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.insert_drive_file, 
+                        color: message.isMe ? Colors.white : const Color(0xff000000),
+                        size: 24,
+                      ),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              documentName,
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: message.isMe ? Colors.white : const Color(0xff000000),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
+                            if (documentUrl != null)
+                              Text(
+                                languageService.tr("chat.document.clickToDownload"),
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: message.isMe 
+                                      ? Colors.white.withOpacity(0.8)
+                                      : const Color(0xff8E8E93),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      if (documentUrl != null) ...[
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.download,
+                          color: message.isMe 
+                              ? Colors.white.withOpacity(0.8)
+                              : const Color(0xff8E8E93),
+                          size: 20,
+                        ),
                       ],
-                    ),
+                    ],
                   ),
-                  if (documentUrl != null) ...[
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.download,
-                      color: message.isMe ? Colors.white70 : Color(0xff9ca3ae),
-                      size: 16,
-                    ),
-                  ],
+                  const SizedBox(height: 4),
+                  // Saat bilgisi
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        _formatTime(message.createdAt),
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: message.isMe 
+                              ? Colors.white.withOpacity(0.8)
+                              : const Color(0xff8E8E93),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
-        ),
-      ],
+      ),
     );
+  }
+
+  String _formatTime(String dateTimeString) {
+    try {
+      final dateTime = DateTime.parse(dateTimeString);
+      return DateFormat('HH:mm').format(dateTime);
+    } catch (e) {
+      return '';
+    }
   }
 }
