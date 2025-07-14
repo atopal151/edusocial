@@ -71,10 +71,25 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       try {
         isPosting.value = true;
         final StoryController storyController = Get.find<StoryController>();
-        final File imageFile = File(_selectedImages.first.path);
-        await storyController.createStory(imageFile);
+        
+        // Tüm seçilen görselleri File listesine çevir
+        final List<File> imageFiles = _selectedImages
+            .map((xfile) => File(xfile.path))
+            .toList();
+        
+        // Birden fazla story oluştur
+        await storyController.createMultipleStories(imageFiles);
+        
         isPosting.value = false;
         Get.back();
+        
+        // Başarı mesajı göster
+        final LanguageService languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("common.success"),
+          message: "${imageFiles.length} ${languageService.tr("home.story.addStory.storiesShared")}",
+          type: SnackbarType.success,
+        );
       } catch (e) {
         isPosting.value = false;
         final LanguageService languageService = Get.find<LanguageService>();

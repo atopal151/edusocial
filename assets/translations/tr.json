@@ -676,7 +676,8 @@
         "photoSelectionError": "Fotoğraf seçilirken bir hata oluştu",
         "cameraError": "Kamera açılırken bir hata oluştu",
         "shareError": "Hikaye paylaşılırken bir hata oluştu",
-        "selectPhotoWarning": "Lütfen bir fotoğraf seçin"
+        "selectPhotoWarning": "Lütfen bir fotoğraf seçin",
+        "storiesShared": "hikaye başarıyla paylaşıldı"
       },
       "myStoryList": {
         "you": "@Sen"

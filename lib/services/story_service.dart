@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
@@ -68,44 +69,61 @@ class StoryService {
     }
   }
 
+  /// Tek hikaye oluştur (eski metod - geriye dönük uyumluluk için)
   static Future<bool> createStory(File mediaFile) async {
+    return await createMultipleStories([mediaFile]);
+  }
+
+  /// Birden fazla hikaye oluştur
+  static Future<bool> createMultipleStories(List<File> mediaFiles) async {
+    if (mediaFiles.isEmpty) return false;
+
     final token = box.read('token');
-    final uri = Uri.parse("${AppConstants.baseUrl}/timeline/stories");
-
-    // MIME tipini dosya uzantısından al
-    final mimeType = lookupMimeType(mediaFile.path) ?? 'image/jpeg';
-
-    // İstek oluştur
-    var request = http.MultipartRequest('POST', uri);
-    request.headers['Authorization'] = 'Bearer $token';
-
-    // Dosyayı ekle
-    final multipartFile = await http.MultipartFile.fromPath(
-      'media', // 🟡 Bu alan Postman'de neyse onunla aynı olmalı!
-      mediaFile.path,
-      contentType: MediaType.parse(mimeType),
-    );
-    request.files.add(multipartFile);
+    int successCount = 0;
 
     try {
-      // İsteği gönder
-      final response = await request.send();
+      // Her dosya için ayrı ayrı story oluştur
+      for (File mediaFile in mediaFiles) {
+        final uri = Uri.parse("${AppConstants.baseUrl}/timeline/stories");
 
-      // Cevabı oku
-    
+        // MIME tipini dosya uzantısından al
+        final mimeType = lookupMimeType(mediaFile.path) ?? 'image/jpeg';
 
-      // debugPrint("📥 Story Upload Status: ${response.statusCode}");
-      // debugPrint("�� Story Upload Body: $responseBody");
+        // İstek oluştur
+        var request = http.MultipartRequest('POST', uri);
+        request.headers['Authorization'] = 'Bearer $token';
 
-      if (response.statusCode == 200) {
-        // debugPrint("✅ Hikaye başarıyla yüklendi.");
-        return true;
-      } else {
-        // debugPrint("❌ Hikaye yükleme başarısız. Status: ${response.statusCode}");
-        return false;
+        // Dosyayı ekle
+        final multipartFile = await http.MultipartFile.fromPath(
+          'media', // 🟡 Bu alan Postman'de neyse onunla aynı olmalı!
+          mediaFile.path,
+          contentType: MediaType.parse(mimeType),
+        );
+        request.files.add(multipartFile);
+
+        // İsteği gönder
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          successCount++;
+          debugPrint("✅ Story ${successCount}/${mediaFiles.length} başarıyla yüklendi.");
+        } else {
+          debugPrint("❌ Story yükleme başarısız. Status: ${response.statusCode}");
+        }
       }
+
+      // En az bir story başarılı ise true döndür
+      final isSuccess = successCount > 0;
+      
+      if (isSuccess) {
+        debugPrint("✅ Toplam ${successCount}/${mediaFiles.length} story başarıyla yüklendi.");
+      } else {
+        debugPrint("❌ Hiçbir story yüklenemedi.");
+      }
+
+      return isSuccess;
     } catch (e) {
-      // debugPrint("❗ createStory hatası: $e");
+      debugPrint("❗ createMultipleStories hatası: $e");
       return false;
     }
   }

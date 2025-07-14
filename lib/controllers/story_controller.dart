@@ -81,21 +81,25 @@ class StoryController extends GetxController {
     myStory.value = updated;
   }
 */
-  /// 📤 Yeni hikaye oluştur
+  /// 📤 Yeni hikaye oluştur (tek dosya)
   Future<void> createStory(File imageFile) async {
+    await createMultipleStories([imageFile]);
+  }
+
+  /// 📤 Birden fazla hikaye oluştur
+  Future<void> createMultipleStories(List<File> imageFiles) async {
+    if (imageFiles.isEmpty) return;
+
     isLoading.value = true;
 
-    //final userId = profileController.userId.value;
-
-    final success = await StoryService.createStory(imageFile);
+    final success = await StoryService.createMultipleStories(imageFiles);
     if (success) {
-      debugPrint("✅ Story başarıyla oluşturuldu");
+      debugPrint("✅ ${imageFiles.length} story başarıyla oluşturuldu");
 
       // Yeniden yükle
       await fetchStories();
-      // await loadMyStoryFromServer(userId);
     } else {
-      debugPrint("❌ Story yüklenemedi");
+      debugPrint("❌ Story'ler yüklenemedi");
     }
 
     isLoading.value = false;

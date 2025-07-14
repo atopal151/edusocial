@@ -655,7 +655,8 @@
         "photoSelectionError": "An error occurred while selecting photo",
         "cameraError": "An error occurred while opening camera",
         "shareError": "An error occurred while sharing story",
-        "selectPhotoWarning": "Please select a photo"
+        "selectPhotoWarning": "Please select a photo",
+        "storiesShared": "stories shared successfully"
       },
       "myStoryList": {
         "you": "@You"
