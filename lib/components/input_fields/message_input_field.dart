@@ -128,6 +128,10 @@ class _MessageInputFieldState extends State<MessageInputField> {
               Expanded(
                 child: TextField(
                   controller: messageController,
+                  autofocus: false, // Keyboard açılışını optimize et
+                  enableSuggestions: true,
+                  autocorrect: true,
+                  textInputAction: TextInputAction.send,
                   decoration: InputDecoration(
                     hintText: widget.controller.selectedFiles.isNotEmpty
                         ? languageService.tr("chat.messageInput.fileSelected")
@@ -135,6 +139,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
                     hintStyle:
                         TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
                     border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                   onSubmitted: (value) async {
                     if (value.isNotEmpty ||

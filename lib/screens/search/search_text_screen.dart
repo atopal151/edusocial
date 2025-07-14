@@ -69,10 +69,8 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                         fontSize: 13.28, fontWeight: FontWeight.w600),
                     controller: controller.searchTextController,
                     onChanged: (value) {
-                      controller
-                          .fetchSearchResults(value); // backend'den veri getir
-                      controller
-                          .filterResults(value); // gelen verilerde filtrele
+                      controller.fetchSearchResults(value); // backend'den veri getir
+                      controller.filterResults(value); // gelen verilerde filtrele
                     },
                     decoration: InputDecoration(
                       hintText: languageService.tr("search.searchField.placeholder"),

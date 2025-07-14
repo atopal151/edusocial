@@ -17,44 +17,53 @@ Widget buildCommentInputField(CommentController commentController,
         Expanded(
           child: TextField(
             controller: messageController,
+            textInputAction: TextInputAction.send,
+            enableSuggestions: true,
+            autocorrect: true,
             decoration: InputDecoration(
               hintText: languageService.tr("comments.input.placeholder"),
               hintStyle: TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             ),
             minLines: 1,
             maxLines: 4,
+            onSubmitted: (value) async {
+              if (value.trim().isNotEmpty) {
+                await commentController.addComment(postId, value);
+                messageController.clear();
+                if (onCommentAdded != null) {
+                  onCommentAdded();
+                }
+              }
+            },
           ),
         ),
         IconButton(
           icon: Container(
-            width: 40,
-            height: 40,
+            padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [Color(0xFFFF7743), Color(0xFFEF5050)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Center(
-              child: SvgPicture.asset(
-                'images/icons/send_icon.svg',
-                width: 18,
-                height: 18,
-              ),
+            child: SvgPicture.asset(
+              'images/icons/send_icon.svg',
+              width: 16,
+              height: 16,
             ),
           ),
-          onPressed: () {
-            final content = messageController.text.trim();
-            if (content.isNotEmpty) {
-              commentController.addComment(postId, content).then((_) {
-                // Yorum başarıyla eklendiyse callback'i çağır
-                onCommentAdded?.call();
-              });
+          onPressed: () async {
+            final text = messageController.text.trim();
+            if (text.isNotEmpty) {
+              await commentController.addComment(postId, text);
               messageController.clear();
+              if (onCommentAdded != null) {
+                onCommentAdded();
+              }
             }
           },
         ),

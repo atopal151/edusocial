@@ -2,6 +2,7 @@ import 'package:edusocial/models/topic_model.dart';
 import 'package:edusocial/services/entry_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:async';
 import '../models/entry_model.dart';
 import '../models/user_model.dart';
 import 'package:edusocial/controllers/profile_controller.dart'; // Import ProfileController
@@ -35,15 +36,25 @@ class EntryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // fetchAllTopics(); // Artık fetchAndPrepareEntries() çağrılacak
+    fetchAndPrepareEntries();
 
     // ProfileController'dan kullanıcı bilgisini al ve EntryController.user'a ata
-    final ProfileController profileController = Get.find<ProfileController>();
-    ever(profileController.profile, (ProfileModel? profileModel) {
-      if (profileModel != null) {
-        user.value = profileModel.toUserModel();
-      }
-    });
+    if (Get.isRegistered<ProfileController>()) {
+      final ProfileController profileController = Get.find<ProfileController>();
+      ever(profileController.profile, (ProfileModel? profileModel) {
+        if (profileModel != null) {
+          user.value = profileModel.toUserModel();
+        }
+      });
+    }
+  }
+
+  @override
+  void onClose() {
+    titleEntryController.dispose();
+    bodyEntryController.dispose();
+    entrySearchController.dispose();
+    super.onClose();
   }
 
   // Tüm kategorileri çek, ilk entry'lerini al ve DisplayEntryItem olarak hazırla

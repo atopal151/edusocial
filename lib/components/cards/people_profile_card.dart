@@ -96,29 +96,36 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
         const SizedBox(height: 10),
 
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildProfileInfo(languageService.tr("profile.header.posts"), profile.posts.length),
-            _buildDivider(),
-            InkWell(
-              onTap: () {
-                /* Get.toNamed(Routes.followers, arguments: {
-                  'followers': profile.followers.map((item) => item as Map<String, dynamic>).toList(),
-                  'screenTitle': '${profile.name} ${profile.surname} - Takipçi',
-                });*/
-              },
-              child: _buildProfileInfo(languageService.tr("profile.header.followers"), profile.followerCount),
+            const SizedBox(width: 50),
+            Expanded(
+              child: _buildProfileInfo(languageService.tr("profile.header.posts"), profile.posts.length),
             ),
-            _buildDivider(),
-            InkWell(
-              onTap: () {
-                /*Get.toNamed(Routes.following, arguments: {
-                  'followings': profile.followings.map((item) => item as Map<String, dynamic>).toList(),
-                  'screenTitle': '${profile.name} ${profile.surname} - Takip Edilen',
-                });*/
-              },
-              child: _buildProfileInfo(languageService.tr("profile.header.following"), profile.followingCount),
+            
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  /* Get.toNamed(Routes.followers, arguments: {
+                    'followers': profile.followers.map((item) => item as Map<String, dynamic>).toList(),
+                    'screenTitle': '${profile.name} ${profile.surname} - Takipçi',
+                  });*/
+                },
+                child: _buildProfileInfo(languageService.tr("profile.header.followers"), profile.followerCount),
+              ),
             ),
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  /*Get.toNamed(Routes.following, arguments: {
+                    'followings': profile.followings.map((item) => item as Map<String, dynamic>).toList(),
+                    'screenTitle': '${profile.name} ${profile.surname} - Takip Edilen',
+                  });*/
+                },
+                child: _buildProfileInfo(languageService.tr("profile.header.following"), profile.followingCount),
+              ),
+            ),
+            const SizedBox(width: 50),
           ],
         ),
         const SizedBox(height: 20),
@@ -129,6 +136,7 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
 
 Widget _buildProfileInfo(String title, int value) {
   return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Text(
         value.toString(),
@@ -137,6 +145,7 @@ Widget _buildProfileInfo(String title, int value) {
           fontWeight: FontWeight.w700,
           color: Color(0xff414751),
         ),
+        textAlign: TextAlign.center,
       ),
       Text(
         title,
@@ -145,14 +154,10 @@ Widget _buildProfileInfo(String title, int value) {
           color: Color(0xff9ca3ae),
           fontWeight: FontWeight.w400,
         ),
+        textAlign: TextAlign.center,
       ),
     ],
   );
 }
 
-Widget _buildDivider() {
-  return const Padding(
-    padding: EdgeInsets.symmetric(horizontal: 20),
-    child: VerticalDivider(thickness: 1, color: Colors.grey),
-  );
-}
+

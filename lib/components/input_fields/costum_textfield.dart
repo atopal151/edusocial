@@ -12,7 +12,9 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({super.key, 
     required this.hintText,
     this.isPassword = false,
-    required this.controller, required this.backgroundColor, required this.textColor,
+    required this.controller, 
+    required this.backgroundColor, 
+    required this.textColor,
   });
 
   @override
@@ -38,6 +40,9 @@ class CustomTextField extends StatelessWidget {
             style: GoogleFonts.inter(fontSize: 13.28),
             controller: controller,
             obscureText: isPassword,
+            enableSuggestions: !isPassword,
+            autocorrect: !isPassword,
+            textInputAction: isPassword ? TextInputAction.done : TextInputAction.next,
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),

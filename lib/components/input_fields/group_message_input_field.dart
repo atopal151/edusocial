@@ -21,45 +21,49 @@ Widget buildGroupMessageInputField() {
         Obx(() {
           if (controller.selectedFiles.isNotEmpty) {
             return Container(
-              padding: EdgeInsets.all(8),
-              child: Column(
-                children: [
-                  // Seçilen dosyalar
-                  ...controller.selectedFiles.map((file) => Container(
-                    margin: EdgeInsets.only(bottom: 4),
-                    padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(16),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: controller.selectedFiles.map((file) {
+                  return Container(
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(
                       color: Color(0xfff5f5f5),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Row(
+                    child: Stack(
                       children: [
-                        Icon(Icons.attach_file, size: 16),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            file.path.split('/').last,
-                            style: TextStyle(fontSize: 12),
-                            overflow: TextOverflow.ellipsis,
+                        Center(
+                          child: Icon(
+                            Icons.insert_drive_file,
+                            color: Color(0xffc9c9c9),
                           ),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.close, size: 16),
-                          onPressed: () {
-                            controller.selectedFiles.remove(file);
-                          },
+                        Positioned(
+                          top: -8,
+                          right: -8,
+                          child: IconButton(
+                            onPressed: () {
+                              controller.selectedFiles.remove(file);
+                            },
+                            icon: Icon(
+                              Icons.cancel,
+                              color: Color(0xffef5050),
+                              size: 20,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  )),
-                ],
+                  );
+                }).toList(),
               ),
             );
-          } else {
-            return SizedBox.shrink();
           }
+          return SizedBox.shrink();
         }),
-        // Ana input alanı
         Container(
           decoration: BoxDecoration(
               color: Color(0xfffafafa),
@@ -86,14 +90,16 @@ Widget buildGroupMessageInputField() {
                 ),
               ),
               Expanded(
-                child: Obx(() => TextField(
+                child: TextField(
                   controller: messageController,
+                  textInputAction: TextInputAction.send,
+                  enableSuggestions: true,
+                  autocorrect: true,
                   decoration: InputDecoration(
-                    hintText: controller.selectedFiles.isNotEmpty 
-                        ? languageService.tr("chat.groupChat.fileSelected")
-                        : languageService.tr("chat.groupChat.messagePlaceholder"),
+                    hintText: languageService.tr("chat.groupChat.messagePlaceholder"),
                     hintStyle: TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
                     border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                   onSubmitted: (value) async {
                     if (value.isNotEmpty || controller.selectedFiles.isNotEmpty) {
@@ -101,25 +107,6 @@ Widget buildGroupMessageInputField() {
                       messageController.clear();
                     }
                   },
-                )),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InkWell(
-                  onTap: controller.isSendingMessage.value
-                      ? null
-                      : () {
-                          controller.openPollBottomSheet();
-                        },
-                  child: SvgPicture.asset(
-                    "images/icons/poll_icon.svg",
-                    colorFilter: ColorFilter.mode(
-                      controller.isSendingMessage.value 
-                          ? Color(0xffe5e5e5) 
-                          : Color(0xffc9c9c9),
-                      BlendMode.srcIn,
-                    ),
-                  ),
                 ),
               ),
               Padding(

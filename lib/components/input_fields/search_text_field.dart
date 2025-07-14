@@ -10,7 +10,8 @@ class SearchTextField extends StatelessWidget {
   const SearchTextField({
     super.key,
     required this.controller,
-    this.onChanged, required this.label,
+    this.onChanged, 
+    required this.label,
   });
 
   @override
@@ -24,6 +25,9 @@ class SearchTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        textInputAction: TextInputAction.search,
+        enableSuggestions: true,
+        autocorrect: false, // Search için autocorrect kapalı
         style: GoogleFonts.inter(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -31,12 +35,12 @@ class SearchTextField extends StatelessWidget {
         ),
         decoration: InputDecoration(
           icon: SvgPicture.asset(
-                        "images/icons/search_icon.svg",
-                        colorFilter: ColorFilter.mode(
-                          Color(0xff9ca3ae),
-                          BlendMode.srcIn,
-                        ),
-                      ),
+            "images/icons/search_icon.svg",
+            colorFilter: ColorFilter.mode(
+              Color(0xff9ca3ae),
+              BlendMode.srcIn,
+            ),
+          ),
           hintText: label,
           hintStyle: GoogleFonts.inter(
             color: Color(0xff9CA3AE),
@@ -44,6 +48,7 @@ class SearchTextField extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
           border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(vertical: 8),
         ),
       ),
     );

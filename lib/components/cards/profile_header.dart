@@ -12,6 +12,7 @@ Widget buildProfileHeader() {
   final LanguageService languageService = Get.find<LanguageService>();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Stack(
         clipBehavior: Clip.none,
@@ -111,29 +112,39 @@ Widget buildProfileHeader() {
 
       // Gönderi / Takipçi / Takip Edilen
       Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildProfileInfo(languageService.tr("profile.header.posts"), controller.postCount),
-          _buildDivider(),
-          InkWell(
-            onTap: () {
-              Get.toNamed(Routes.followers, arguments: {
-                'followers': controller.followerList.map((item) => item as Map<String, dynamic>).toList(),
-                'screenTitle': languageService.tr("profile.header.followers"),
-              });
-            },
-            child: _buildProfileInfo(languageService.tr("profile.header.followers"), controller.followers),
+
+      const SizedBox(width: 50),
+          Expanded(
+            child: _buildProfileInfo(languageService.tr("profile.header.posts"), controller.postCount),
           ),
-          _buildDivider(),
-          InkWell(
-            onTap: () {
-              Get.toNamed(Routes.following, arguments: {
-                'followings': controller.followingList.map((item) => item as Map<String, dynamic>).toList(),
-                'screenTitle': languageService.tr("profile.header.following"),
-              });
-            },
-            child: _buildProfileInfo(languageService.tr("profile.header.following"), controller.following),
+         
+          Expanded(
+            child: InkWell(
+              onTap: () {
+                Get.toNamed(Routes.followers, arguments: {
+                  'followers': controller.followerList.map((item) => item as Map<String, dynamic>).toList(),
+                  'screenTitle': languageService.tr("profile.header.followers"),
+                });
+              },
+              child: _buildProfileInfo(languageService.tr("profile.header.followers"), controller.followers),
+            ),
           ),
+         
+          Expanded(
+            child: InkWell(
+              onTap: () {
+                Get.toNamed(Routes.following, arguments: {
+                  'followings': controller.followingList.map((item) => item as Map<String, dynamic>).toList(),
+                  'screenTitle': languageService.tr("profile.header.following"),
+                });
+              },
+              child: _buildProfileInfo(languageService.tr("profile.header.following"), controller.following),
+            ),
+          ),
+
+      const SizedBox(width: 50),
         ],
       ),
       const SizedBox(height: 20),
@@ -143,6 +154,7 @@ Widget buildProfileHeader() {
 
 Widget _buildProfileInfo(String title, RxInt value) {
   return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Obx(() => Text(
             value.value.toString(),
@@ -150,6 +162,7 @@ Widget _buildProfileInfo(String title, RxInt value) {
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Color(0xff414751)),
+            textAlign: TextAlign.center,
           )),
       Text(
         title,
@@ -157,14 +170,10 @@ Widget _buildProfileInfo(String title, RxInt value) {
             fontSize: 12,
             color: Color(0xff9ca3ae),
             fontWeight: FontWeight.w400),
+        textAlign: TextAlign.center,
       ),
     ],
   );
 }
 
-Widget _buildDivider() {
-  return const Padding(
-    padding: EdgeInsets.symmetric(horizontal: 20),
-    child: VerticalDivider(thickness: 1, color: Color(0xff9ca3ae)),
-  );
-}
+
