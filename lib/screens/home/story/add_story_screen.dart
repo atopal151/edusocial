@@ -132,18 +132,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       ),
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              languageService.tr("home.story.addStory.nearby"),
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF414751),
-              ),
-            ),
-          ),
+          
           Expanded(
             child: _selectedImages.isEmpty
                 ? Center(
