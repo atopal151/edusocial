@@ -25,7 +25,10 @@ class EntryServices {
     final token = GetStorage().read("token");
 
     try {
-      // debugPrint("🔍 Fetching entries for topic ID: $topicId");
+      debugPrint("🔍 Fetching entries for topic ID: $topicId");
+      debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
+      debugPrint("🌐 URL: ${AppConstants.baseUrl}/timeline/topics/$topicId?sort=latest");
+      
       final response = await http.get(
         Uri.parse("${AppConstants.baseUrl}/timeline/topics/$topicId?sort=latest"),
         headers: {
@@ -34,29 +37,55 @@ class EntryServices {
         },
       );
 
+      debugPrint("📥 Response Status: ${response.statusCode}");
+      debugPrint("📥 Response Body: ${response.body}");
+
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
+        debugPrint("📦 Decoded JSON: $jsonBody");
 
         if (jsonBody != null && jsonBody["data"] != null) {
           final data = jsonBody["data"];
+          debugPrint("📊 Data field: $data");
+          debugPrint("📊 Data type: ${data.runtimeType}");
 
           if (data is Map<String, dynamic>) {
+            // Topic bilgilerini debug et
+            debugPrint("🏷️ Topic info:");
+            debugPrint("  - Topic ID: ${data['topic']?['id']}");
+            debugPrint("  - Topic Name: ${data['topic']?['name']}");
+            debugPrint("  - Entries Count: ${data['entrys']?.length ?? 0}");
+            
+            if (data['entrys'] != null) {
+              debugPrint("📝 Entries details:");
+              final entries = data['entrys'] as List;
+              for (int i = 0; i < entries.length; i++) {
+                debugPrint("  [$i] Entry ID: ${entries[i]['id']}, Content: ${entries[i]['content']?.substring(0, entries[i]['content']?.length > 50 ? 50 : entries[i]['content']?.length)}...");
+              }
+            } else {
+              debugPrint("⚠️ No entries found in data");
+            }
+            
             final result = TopicEntryResponse.fromJson(data);
+            debugPrint("✅ TopicEntryResponse created successfully");
             return result;
           } else {
+            debugPrint("❌ Data is not a Map<String, dynamic>, type: ${data.runtimeType}");
             return null;
           }
         } else {
-          // debugPrint("⚠️ 'data' alanı null veya eksik!");
+          debugPrint("⚠️ 'data' alanı null veya eksik!");
+          debugPrint("📦 Full response body: ${response.body}");
           return null;
         }
       } else {
-        // debugPrint("⚠️ Topic entries failed: ${response.statusCode}");
+        debugPrint("⚠️ Topic entries failed: ${response.statusCode}");
+        debugPrint("❌ Error response body: ${response.body}");
         return null;
       }
-    } catch (e) {
-      // debugPrint("❗ fetchEntriesByTopicId error: $e");
-      // debugPrint("❗ StackTrace: $stackTrace");
+    } catch (e, stackTrace) {
+      debugPrint("❗ fetchEntriesByTopicId error: $e");
+      debugPrint("❗ StackTrace: $stackTrace");
       return null;
     }
   }

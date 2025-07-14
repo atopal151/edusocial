@@ -62,14 +62,14 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
+      id: json['id'] ?? 0,
       accountType: json['account_type'] ?? '',
-      languageId: json['language_id'],
+      languageId: json['language_id'] ?? 1,
       avatar: json['avatar'] ?? '',
       banner: json['banner'] ?? '',
       description: json['description'],
-      schoolId: json['school_id'],
-      schoolDepartmentId: json['school_department_id'],
+      schoolId: json['school_id'] ?? 0,
+      schoolDepartmentId: json['school_department_id'] ?? 0,
       name: json['name'] ?? '',
       surname: json['surname'] ?? '',
       username: json['username'] ?? '',
@@ -81,15 +81,15 @@ class UserModel {
       twitter: json['twitter'],
       facebook: json['facebook'],
       linkedin: json['linkedin'],
-      notificationEmail: json['notification_email'],
-      notificationMobile: json['notification_mobile'],
-      isActive: json['is_active'],
-      isOnline: json['is_online'],
+      notificationEmail: json['notification_email'] ?? true,
+      notificationMobile: json['notification_mobile'] ?? true,
+      isActive: json['is_active'] ?? true,
+      isOnline: json['is_online'] ?? false,
       avatarUrl: json['avatar_url'] ?? '',
       bannerUrl: json['banner_url'] ?? '',
-      isFollowing: json['is_following'],
-      isFollowingPending: json['is_following_pending'],
-      isSelf: json['is_self'],
+      isFollowing: json['is_following'] ?? false,
+      isFollowingPending: json['is_following_pending'] ?? false,
+      isSelf: json['is_self'] ?? false,
     );
   }
 
