@@ -108,30 +108,72 @@ class NotificationModel {
     bool isAccepted = false;
     bool isRejected = false;
     
-    if (json['type'] == 'follow-join-request' || json['type'] == 'follow-request') {
+        // Takip ile ilgili tüm bildirim tiplerini kontrol et
+    if (json['type'] == 'follow-join-request' || 
+        json['type'] == 'follow-request' ||
+        json['type'] == 'user.folow.request' ||
+        json['type'] == 'user.follow.request' ||
+        json['type'] == 'user.folow.request.accepted' ||
+        json['type'] == 'follow-request-accepted' ||
+        json['type'] == 'user.folow.start' ||
+        json['type'] == 'follow-start') {
+      
       bool userIsFollowing = user['is_following'] ?? false;
       bool userIsFollowingPending = user['is_following_pending'] ?? false;
       
-      //debugPrint("🔍 User is_following: $userIsFollowing");
-      //debugPrint("🔍 User is_following_pending: $userIsFollowingPending");
+      debugPrint("🔍 [FOLLOW NOTIFICATION] API Data:");
+      debugPrint("🔍   - Type: ${json['type']}");
+      debugPrint("🔍   - User is_following: $userIsFollowing");
+      debugPrint("🔍   - User is_following_pending: $userIsFollowingPending");
       
-      // Mantık: Eğer user.is_following true ise, kullanıcıyı takip ediyoruz
-      // Eğer user.is_following_pending true ise, takip isteği beklemede
-      // Eğer ikisi de false ise, takip etmiyoruz
-      
-      if (userIsFollowing) {
+      // Bildirim tipine göre durumu belirle
+      if (json['type'] == 'user.folow.request.accepted' || 
+          json['type'] == 'follow-request-accepted') {
+        // Takip isteği onaylanmış bildirimi
         isFollowing = true;
         isFollowingPending = false;
         isAccepted = true;
-      } else if (userIsFollowingPending) {
-        isFollowing = false;
-        isFollowingPending = true;
-        isAccepted = false;
-      } else {
-        isFollowing = false;
+        isRejected = false;
+        debugPrint("🔍   → RESULT: Takip isteği onaylandı");
+      } else if (json['type'] == 'user.folow.start' || 
+                 json['type'] == 'follow-start') {
+        // Direkt takip başladı bildirimi (açık profil)
+        isFollowing = true;
         isFollowingPending = false;
-        isAccepted = false;
+        isAccepted = true;
+        isRejected = false;
+        debugPrint("🔍   → RESULT: Direkt takip başladı");
+      } else {
+        // Takip isteği bildirimi (pending)
+        if (userIsFollowing) {
+          // Kullanıcı zaten takip ediyor
+          isFollowing = true;
+          isFollowingPending = false;
+          isAccepted = true;
+          isRejected = false;
+          debugPrint("🔍   → RESULT: Zaten takip ediyor");
+        } else if (userIsFollowingPending) {
+          // Takip isteği beklemede
+          isFollowing = false;
+          isFollowingPending = true;
+          isAccepted = false;
+          isRejected = false;
+          debugPrint("🔍   → RESULT: Takip isteği beklemede");
+        } else {
+          // Yeni takip isteği
+          isFollowing = false;
+          isFollowingPending = true;
+          isAccepted = false;
+          isRejected = false;
+          debugPrint("🔍   → RESULT: Yeni takip isteği");
+        }
       }
+    
+      debugPrint("🔍 [FOLLOW NOTIFICATION] Final State:");
+      debugPrint("🔍   - isFollowing: $isFollowing");
+      debugPrint("🔍   - isFollowingPending: $isFollowingPending");
+      debugPrint("🔍   - isAccepted: $isAccepted");
+      debugPrint("🔍   - isRejected: $isRejected");
     } else if (json['type'] == 'group-join-request' || json['type'] == 'group-join') {
       // Grup katılma istekleri için answer.status'a göre belirle
       String answerStatus = answer['status']?.toString().toLowerCase() ?? '';

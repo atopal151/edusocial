@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../controllers/appbar_controller.dart';
+import '../../controllers/notification_controller.dart';
 
 class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBarController controller = Get.put(AppBarController());
+  final NotificationController notificationController = Get.find<NotificationController>();
 
   GroupAppBar({super.key});
 
@@ -119,24 +121,63 @@ class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         SizedBox(width: 10),
-        GestureDetector(
-          onTap: controller.navigateToNotifications,
-          child: Container(
-            height: 44,
-            width: 44,
-            padding: EdgeInsets.all(13),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: SvgPicture.asset(
-              "images/icons/notification_icon.svg",
-              colorFilter: ColorFilter.mode(
-                Color(0xff414751),
-                BlendMode.srcIn,
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            GestureDetector(
+              onTap: controller.navigateToNotifications,
+              child: Container(
+                height: 44,
+                width: 44,
+                padding: EdgeInsets.all(13),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(
+                  "images/icons/notification_icon.svg",
+                  colorFilter: ColorFilter.mode(
+                    Color(0xff414751),
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
             ),
-          ),
+                         // Bildirim badge'i
+             Obx(() {
+               final unreadCount = notificationController.unreadCount.value;
+               if (unreadCount > 0) {
+                return Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    constraints: BoxConstraints(minWidth: 18),
+                    height: 18,
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFEF5050),
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        unreadCount > 99 ? '99+' : unreadCount.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return SizedBox.shrink();
+            }),
+          ],
         ),
         SizedBox(width: 10),
       ],

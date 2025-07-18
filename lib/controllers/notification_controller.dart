@@ -3,11 +3,144 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
+import '../services/socket_services.dart';
+import 'dart:async';
 
 class NotificationController extends GetxController {
   var notifications = <NotificationModel>[].obs;
   var isLoading = false.obs;
+  var unreadCount = 0.obs;
 
+  // Socket servisi için
+  late SocketService _socketService;
+  late StreamSubscription _notificationSubscription;
+
+  /// Okunmamış bildirim sayısını hesapla ve güncelle
+  void _updateUnreadCount() {
+    unreadCount.value = notifications.where((n) => !n.isRead).length;
+    debugPrint('📊 Okunmamış bildirim sayısı güncellendi: ${unreadCount.value}');
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    _socketService = Get.find<SocketService>();
+    _setupSocketListener();
+  }
+
+  @override
+  void onClose() {
+    _notificationSubscription.cancel();
+    super.onClose();
+  }
+
+  /// Socket event dinleyicisini ayarla
+  void _setupSocketListener() {
+    _notificationSubscription = _socketService.onNotification.listen((data) {
+      debugPrint('🔔 Yeni bildirim geldi (NotificationController): $data');
+      _handleNewNotification(data);
+    });
+  }
+
+  /// Yeni bildirim geldiğinde listeye ekle
+  void _handleNewNotification(dynamic data) {
+    try {
+      // Socket'ten gelen veriyi NotificationModel'e çevir
+      final notification = NotificationModel.fromJson(data);
+      
+      // Listeye en başa ekle (en yeni önce olsun)
+      notifications.insert(0, notification);
+      
+      // Okunmamış sayısını güncelle
+      _updateUnreadCount();
+      
+      debugPrint('✅ Yeni bildirim listeye eklendi: ${notification.message}');
+      
+      // İsteğe bağlı: Kullanıcıya bildirim göster
+      Get.snackbar(
+        'Yeni Bildirim',
+        notification.message,
+        duration: Duration(seconds: 3),
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Color(0xFFEEF3F8),
+        colorText: Color(0xFF414751),
+        icon: Icon(Icons.notifications, color: Color(0xFFFF7743)),
+      );
+      
+    } catch (e) {
+      debugPrint('❌ Socket bildirim işleme hatası: $e');
+    }
+  }
+
+  /// Bildirimi okundu olarak işaretle
+  void markAsRead(String notificationId) {
+    final index = notifications.indexWhere((n) => n.id == notificationId);
+    if (index != -1) {
+      // NotificationModel immutable olduğu için yeni bir instance oluştur
+      final notification = notifications[index];
+      final updatedNotification = NotificationModel(
+        id: notification.id,
+        userId: notification.userId,
+        senderUserId: notification.senderUserId,
+        userName: notification.userName,
+        profileImageUrl: notification.profileImageUrl,
+        type: notification.type,
+        message: notification.message,
+        timestamp: notification.timestamp,
+        isRead: true, // Okundu olarak işaretle
+        groupId: notification.groupId,
+        eventId: notification.eventId,
+        groupName: notification.groupName,
+        isAccepted: notification.isAccepted,
+        isFollowing: notification.isFollowing,
+        isFollowingPending: notification.isFollowingPending,
+        isRejected: notification.isRejected,
+      );
+      
+      notifications[index] = updatedNotification;
+      debugPrint('📖 Bildirim okundu olarak işaretlendi: $notificationId');
+      
+      // Okunmamış sayısını güncelle
+      _updateUnreadCount();
+    }
+  }
+
+  /// Tüm bildirimleri okundu olarak işaretle
+  void markAllAsRead() {
+    bool hasChanges = false;
+    for (int i = 0; i < notifications.length; i++) {
+      if (!notifications[i].isRead) {
+        // Her bir bildirimi işaretle ama _updateUnreadCount çağırma
+        final notification = notifications[i];
+        final updatedNotification = NotificationModel(
+          id: notification.id,
+          userId: notification.userId,
+          senderUserId: notification.senderUserId,
+          userName: notification.userName,
+          profileImageUrl: notification.profileImageUrl,
+          type: notification.type,
+          message: notification.message,
+          timestamp: notification.timestamp,
+          isRead: true,
+          groupId: notification.groupId,
+          eventId: notification.eventId,
+          groupName: notification.groupName,
+          isAccepted: notification.isAccepted,
+          isFollowing: notification.isFollowing,
+          isFollowingPending: notification.isFollowingPending,
+          isRejected: notification.isRejected,
+        );
+        notifications[i] = updatedNotification;
+        hasChanges = true;
+      }
+    }
+    
+    if (hasChanges) {
+      debugPrint('📚 Tüm bildirimler okundu olarak işaretlendi');
+      // Sadece değişiklik varsa güncelle
+      _updateUnreadCount();
+    }
+  }
 
   /// Bildirimleri çek
   Future<void> fetchNotifications() async {
@@ -19,6 +152,9 @@ class NotificationController extends GetxController {
       //debugPrint(notif.toJson().toString());
       //}
       notifications.value = fetched;
+      
+      // Okunmamış sayısını güncelle
+      _updateUnreadCount();
     } catch (e) {
       debugPrint("❗ Bildirimleri çekerken hata: $e");
     }

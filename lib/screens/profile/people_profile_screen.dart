@@ -35,6 +35,13 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   late TabController _tabController;
   final RxInt selectedTabIndex = 0.obs;
 
+  /// Profil verilerini yenile
+  Future<void> _refreshProfile() async {
+    debugPrint("🔄 People Profile sayfası yenileniyor...");
+    await controller.loadUserProfileByUsername(widget.username);
+    debugPrint("✅ People Profile sayfası yenilendi");
+  }
+
   @override
   void initState() {
     super.initState();
@@ -165,27 +172,46 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
               controller: _tabController,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                Column(
-                  children: [
-                    Container(
-                      color: const Color(0xfffafafa),
-                      child: ToggleTabBar(
-                        selectedIndex: selectedTabIndex,
-                        onTabChanged: (index) {
-                          selectedTabIndex.value = index;
-                        },
+                RefreshIndicator(
+                  onRefresh: _refreshProfile,
+                  color: const Color(0xFFEF5050),
+                  backgroundColor: Colors.white,
+                  strokeWidth: 2.0,
+                  displacement: 40.0,
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Container(
+                          color: const Color(0xfffafafa),
+                          child: ToggleTabBar(
+                            selectedIndex: selectedTabIndex,
+                            onTabChanged: (index) {
+                              selectedTabIndex.value = index;
+                            },
+                          ),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: Obx(() {
-                        return selectedTabIndex.value == 0
-                            ? _buildPosts()
-                            : _buildEntries();
-                      }),
-                    ),
-                  ],
+                      SliverFillRemaining(
+                        child: Obx(() {
+                          return selectedTabIndex.value == 0
+                              ? _buildPosts()
+                              : _buildEntries();
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
-                _buildProfileDetails(),
+                RefreshIndicator(
+                  onRefresh: _refreshProfile,
+                  color: const Color(0xFFEF5050),
+                  backgroundColor: Colors.white,
+                  strokeWidth: 2.0,
+                  displacement: 40.0,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: _buildProfileDetails(),
+                  ),
+                ),
               ],
             ),
           ),
@@ -210,14 +236,19 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
     }
 
     if (posts.isEmpty) {
-      return Center(
-          child:
-              Text(languageService.tr("profile.peopleProfile.noPostsFound")));
+      return Container(
+        height: 200,
+        child: Center(
+          child: Text(languageService.tr("profile.peopleProfile.noPostsFound")),
+        ),
+      );
     }
 
     return Container(
       decoration: BoxDecoration(color: Color(0xfffafafa)),
       child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[index];
@@ -260,21 +291,29 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 
       // Entries loading durumu
       if (controller.isEntriesLoading.value) {
-        return Center(
-          child: GeneralLoadingIndicator(
-            size: 24,
-            color: const Color(0xFFEF5050),
+        return Container(
+          height: 200,
+          child: Center(
+            child: GeneralLoadingIndicator(
+              size: 24,
+              color: const Color(0xFFEF5050),
+            ),
           ),
         );
       }
 
       if (controller.peopleEntries.isEmpty) {
-        return Center(
-            child: Text(
-                languageService.tr("profile.peopleProfile.noEntriesFound")));
+        return Container(
+          height: 200,
+          child: Center(
+            child: Text(languageService.tr("profile.peopleProfile.noEntriesFound")),
+          ),
+        );
       }
 
       return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: controller.peopleEntries.length,
         itemBuilder: (context, index) {
           final entry = controller.peopleEntries[index];
@@ -370,7 +409,9 @@ ${languageService.tr("profile.peopleProfile.shareText.hashtags")} #$categoryTitl
   Widget _buildLockedContent() {
     final LanguageService languageService = Get.find<LanguageService>();
 
-    return Center(
+    return Container(
+      height: 300,
+      child: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -406,8 +447,8 @@ ${languageService.tr("profile.peopleProfile.shareText.hashtags")} #$categoryTitl
               color: Color(0xff9ca3ae),
             ),
           ),
-        ],
+                ],
       ),
-    );
+    ));
   }
 }

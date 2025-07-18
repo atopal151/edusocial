@@ -12,11 +12,13 @@ class SocketService extends GetxService {
   final _privateMessageController = StreamController<dynamic>.broadcast();
   final _groupMessageController = StreamController<dynamic>.broadcast();
   final _unreadMessageCountController = StreamController<dynamic>.broadcast();
+  final _notificationController = StreamController<dynamic>.broadcast();
 
   // Public streams that other parts of the app can listen to
   Stream<dynamic> get onPrivateMessage => _privateMessageController.stream;
   Stream<dynamic> get onGroupMessage => _groupMessageController.stream;
   Stream<dynamic> get onUnreadMessageCount => _unreadMessageCountController.stream;
+  Stream<dynamic> get onNotification => _notificationController.stream;
 
   // Bağlantı adresi - farklı endpoint'leri deneyeceğiz
   static const String _socketUrl = 'https://stageapi.edusocial.pl';
@@ -132,6 +134,11 @@ class SocketService extends GetxService {
       debugPrint('📨 Okunmamış mesaj sayısı (SocketService): $data');
       _unreadMessageCountController.add(data);
     });
+    // 4. Yeni bildirim
+    _socket!.on('notification:new', (data) {
+      debugPrint('🔔 Yeni bildirim geldi (SocketService): $data');
+      _notificationController.add(data);
+    });
 
     debugPrint('🔌 Socket bağlantısı başlatılıyor... ($urlName)');
     _socket!.connect();
@@ -169,6 +176,7 @@ class SocketService extends GetxService {
     debugPrint('  - conversation:new_message');
     debugPrint('  - group_conversation:new_message');
     debugPrint('  - conversation:un_read_message_count');
+    debugPrint('  - notification:new');
     debugPrint('🔍 ===========================');
   }
 
@@ -180,6 +188,20 @@ class SocketService extends GetxService {
       debugPrint('✅ Test mesajı gönderildi');
     } else {
       debugPrint('❌ Socket bağlı değil, test mesajı gönderilemedi');
+    }
+  }
+
+  // Test bildirimi gönder
+  void sendTestNotification() {
+    debugPrint('🧪 Test bildirimi gönderiliyor...');
+    if (_socket != null && _socket!.connected) {
+      _socket!.emit('test_notification', {
+        'message': 'Test bildirimi',
+        'timestamp': DateTime.now().toIso8601String()
+      });
+      debugPrint('✅ Test bildirimi gönderildi');
+    } else {
+      debugPrint('❌ Socket bağlı değil, test bildirimi gönderilemedi');
     }
   }
 
@@ -203,6 +225,7 @@ class SocketService extends GetxService {
     _privateMessageController.close();
     _groupMessageController.close();
     _unreadMessageCountController.close();
+    _notificationController.close();
     disconnect();
     super.onClose();
   }

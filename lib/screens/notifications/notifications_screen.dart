@@ -146,6 +146,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
       ),
       trailing: _buildTrailingButton(n),
       onTap: () {
+        // Bildirimi okundu olarak işaretle
+        if (!n.isRead) {
+          controller.markAsRead(n.id);
+        }
         // İstenirse detay ekranına yönlendirme yapılabilir
       },
     );
@@ -154,61 +158,116 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget? _buildTrailingButton(NotificationModel notif) {
     final LanguageService languageService = Get.find<LanguageService>();
     
-    // Takip istekleri için butonlar
-    if (notif.type == 'follow-join-request' || notif.type == 'follow-request') {
-      debugPrint("🔍 Building button for notification:");
-      debugPrint("🔍   - isType: ${notif.type}");
-      debugPrint("🔍   - isFollowing: ${notif.isFollowing.toString()}");
-      debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending.toString()}");
-      debugPrint("🔍   - isAccepted: ${notif.isAccepted.toString()}");
-      debugPrint("🔍   - isRejected: ${notif.isRejected.toString()}");
+    debugPrint("🔍 ===============================");
+    debugPrint("🔍 Building button for notification:");
+    debugPrint("🔍   - type: ${notif.type}");
+    debugPrint("🔍   - message: '${notif.message}'");
+    debugPrint("🔍   - isFollowing: ${notif.isFollowing.toString()}");
+    debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending.toString()}");
+    debugPrint("🔍   - isAccepted: ${notif.isAccepted.toString()}");
+    debugPrint("🔍   - isRejected: ${notif.isRejected.toString()}");
 
-      if (notif.isAccepted) {
-        debugPrint("🔍   - Durum: Onaylandı");
-        return NotificationActionButtonStyles.accepted(text: languageService.tr("notifications.actions.accepted"));
-      }
-
-      if (notif.isRejected) {
-        debugPrint("🔍   - Durum: Reddedildi");
-        return NotificationActionButtonStyles.rejected(text: languageService.tr("notifications.actions.rejected"));
-      }
-
-      // Her durumda Onayla ve X göster
-      debugPrint("🔍   - Durum: Onayla ve X gösteriliyor");
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          NotificationActionButtonStyles.accept(
-            text: languageService.tr("notifications.actions.accept"),
-            onPressed: () {
-              controller.handleFollowRequest(notif.senderUserId, 'accept');
-            },
-          ),
-          SizedBox(width: 8),
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                Icons.close,
-                color: Colors.grey[600],
-                size: 18,
-              ),
-              onPressed: () {
-                controller.handleFollowRequest(notif.senderUserId, 'decline');
-              },
-            ),
-          ),
-        ],
-      );
+    // System bildirimleri (buton gösterilmez)
+    List<String> systemMessages = [
+      'user.folow.request.accepted',
+      'user.folow.request.declined',
+      'user.folow.start', 
+      'user.follow.start',
+      'user.liked.post',
+      'user.commented.post',
+      'follow-request-accepted',
+      'follow-request-declined',
+      'follow-start'
+    ];
+    
+    if (systemMessages.contains(notif.message)) {
+      debugPrint("🔍   - SONUÇ: System bildirimi '${notif.message}' - buton gösterilmiyor");
+      debugPrint("🔍 ===============================");
+      return null;
+    }
+    
+        // Takip başladı bildirimi (sadece bilgi amaçlı)
+    if (notif.type == 'follow-request') {
+      debugPrint("🔍 Takip başladı bildirimi (bilgi amaçlı):");
+      debugPrint("🔍   - type: ${notif.type}");
+      debugPrint("🔍   - message: ${notif.message}");
+      debugPrint("🔍   - SONUÇ: Takip başlamış - buton gösterilmiyor");
+      debugPrint("🔍 ===============================");
+      return null; // Takip başlamış, buton gösterme
     }
 
-    // Grup katılma istekleri için butonlar
-    if (notif.type == 'group-join-request' || notif.type == 'group-join') {
+    // Takip istekleri için butonlar (sadece follow-join-request)
+    if (notif.type == 'follow-join-request') {
+      debugPrint("🔍   - Takip isteği kontrolü yapılıyor...");
+
+      // Onaylanmış takip istekleri - buton gösterme
+      if (notif.isAccepted && notif.isFollowing) {
+        debugPrint("🔍   - SONUÇ: Zaten onaylanmış ve takip ediyor - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
+        return null;
+      }
+
+      // Reddedilmiş takip istekleri - buton gösterme
+      if (notif.isRejected) {
+        debugPrint("🔍   - SONUÇ: Zaten reddedilmiş - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
+        return null;
+      }
+
+      // Sadece bekleyen takip istekleri için buton göster (gizli profil)
+      if (!notif.isAccepted && !notif.isRejected) {
+        debugPrint("🔍   - SONUÇ: Takip İsteği Beklemede (Onayla/Reddet butonları gösteriliyor)");
+        debugPrint("🔍 ===============================");
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            NotificationActionButtonStyles.accept(
+              text: languageService.tr("notifications.actions.accept"),
+              onPressed: () {
+                controller.handleFollowRequest(notif.senderUserId, 'accept');
+              },
+            ),
+            SizedBox(width: 8),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.close,
+                  color: Colors.grey[600],
+                  size: 18,
+                ),
+                onPressed: () {
+                  controller.handleFollowRequest(notif.senderUserId, 'decline');
+                },
+              ),
+            ),
+          ],
+        );
+      }
+
+      // Varsayılan durum
+      debugPrint("🔍   - SONUÇ: Beklenmeyen takip isteği durumu - buton gösterilmiyor");
+      debugPrint("🔍 ===============================");
+      return null;
+    }
+
+        // Grup katılım bildirimi (sadece bilgi amaçlı)
+    if (notif.type == 'group-join') {
+      debugPrint("🔍 Grup katılım bildirimi (bilgi amaçlı):");
+      debugPrint("🔍   - type: ${notif.type}");
+      debugPrint("🔍   - message: ${notif.message}");
+      debugPrint("🔍   - SONUÇ: Grup katılımı gerçekleşmiş - buton gösterilmiyor");
+      debugPrint("🔍 ===============================");
+      return null; // Katılım gerçekleşmiş, buton gösterme
+    }
+
+    // Grup katılma istekleri için butonlar (sadece group-join-request)
+    if (notif.type == 'group-join-request') {
       debugPrint("🔍 Building group join request button for notification:");
       debugPrint("🔍   - type: ${notif.type}");
       debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
@@ -219,25 +278,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
       // groupId null ise buton gösterme
       if (notif.groupId == null) {
-        debugPrint("🔍   - groupId is null, not showing button");
+        debugPrint("🔍   - SONUÇ: groupId null - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
         return null;
       }
 
-      // Eğer istek zaten onaylanmışsa
+      // Eğer istek zaten onaylanmışsa veya reddedilmişse - buton gösterme
       if (notif.isAccepted) {
-        debugPrint(
-            "🔍   - Request is already accepted, showing 'Onaylandı' button");
-        return NotificationActionButtonStyles.accepted(text: languageService.tr("notifications.actions.accepted"));
+        debugPrint("🔍   - SONUÇ: Grup isteği zaten onaylandı - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
+        return null;
       }
 
-      // Eğer istek reddedilmişse
       if (notif.isRejected) {
-        debugPrint("🔍   - Request is rejected, showing 'Reddedildi' button");
-        return NotificationActionButtonStyles.rejected(text: languageService.tr("notifications.actions.rejected"));
+        debugPrint("🔍   - SONUÇ: Grup isteği zaten reddedildi - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
+        return null;
       }
 
-      debugPrint("🔍   - Request is pending, showing accept/decline buttons");
-      // İstek beklemedeyse onaylama/reddetme butonları
+      // Sadece bekleyen istekler için buton göster
+      debugPrint("🔍   - SONUÇ: Grup isteği beklemede - Onayla/Reddet butonları gösteriliyor");
+      debugPrint("🔍 ===============================");
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -278,6 +339,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
       );
     }
 
+    debugPrint("🔍   - SONUÇ: Bilinmeyen bildirim tipi '${notif.type}' - buton gösterilmiyor");
+    debugPrint("🔍 ===============================");
     return null;
   }
 
@@ -285,7 +348,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
     switch (type) {
       case 'follow-request':
       case 'follow-join-request':
+      case 'user.folow.request':
+      case 'user.follow.request':
         return Icons.person_add_alt_1;
+      case 'user.folow.request.accepted':
+      case 'follow-request-accepted':
+      case 'user.folow.start':
+      case 'follow-start':
+        return Icons.person_add;
       case 'post-like':
         return Icons.favorite;
       case 'post-comment':
@@ -307,7 +377,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
     switch (type) {
       case 'follow-request':
       case 'follow-join-request':
+      case 'user.folow.request':
+      case 'user.follow.request':
         return const Color(0xFF64B5F6);
+      case 'user.folow.request.accepted':
+      case 'follow-request-accepted':
+      case 'user.folow.start':
+      case 'follow-start':
+        return const Color(0xFF4CAF50); // Yeşil - onaylandı/başladı
       case 'post-like':
         return const Color(0xFFE57373);
       case 'post-comment':

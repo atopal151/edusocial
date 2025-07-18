@@ -109,11 +109,55 @@ class MainScreen extends StatelessWidget {
       if (token != null && token.isNotEmpty) {
         debugPrint('🔌 Socket bağlantısı başlatılıyor...');
         socketService.connect(token);
+        
+        // Socket test için 3 saniye bekle sonra test et
+        Future.delayed(Duration(seconds: 3), () {
+          _testSocketConnection();
+        });
       } else {
         debugPrint('⚠️ Token bulunamadı, socket bağlantısı kurulamıyor.');
       }
     } catch (e) {
       debugPrint('❌ Socket başlatma hatası: $e');
+    }
+  }
+
+  /// Socket bağlantısını test et
+  void _testSocketConnection() {
+    try {
+      final socketService = Get.find<SocketService>();
+      final notificationController = Get.find<NotificationController>();
+      
+      debugPrint('🧪 === SOCKET TEST BAŞLADI ===');
+      
+      // 1. Socket durumunu kontrol et
+      socketService.checkSocketStatus();
+      
+      // 2. Mevcut bildirim sayısını kontrol et
+      debugPrint('🧪 Mevcut okunmamış bildirim sayısı: ${notificationController.unreadCount.value}');
+      
+      // 3. Test bildirimi gönder
+      if (socketService.isConnected.value) {
+        debugPrint('🧪 Test bildirimi gönderiliyor...');
+        socketService.sendTestNotification();
+        
+        // 4. Test grup mesajı da gönder
+        debugPrint('🧪 Test grup mesajı gönderiliyor...');
+        socketService.sendTestGroupMessage();
+        
+        // 5. Badge test için kontrol
+        Future.delayed(Duration(seconds: 2), () {
+          debugPrint('🧪 Test sonrası bildirim sayısı: ${notificationController.unreadCount.value}');
+          debugPrint('🧪 AppBar badge\'inin güncellenip güncellenmediğini kontrol edin!');
+        });
+      } else {
+        debugPrint('❌ Socket bağlı değil, test yapılamıyor');
+      }
+      
+      debugPrint('🧪 === SOCKET TEST TAMAMLANDI ===');
+      
+    } catch (e) {
+      debugPrint('❌ Socket test hatası: $e');
     }
   }
 
