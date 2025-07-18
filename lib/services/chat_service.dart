@@ -40,7 +40,7 @@ class ChatServices {
     if (conversationId != null) {
       request.fields['conversation_id'] = conversationId;
     }
-    
+
     // Mesaj alanını her zaman gönder (boş string olsa bile)
     // Backend "conversation.message.required_without_all" hatası veriyor
     request.fields['message'] = message.isEmpty ? ' ' : message;
@@ -59,7 +59,7 @@ class ChatServices {
         final fileExtension = file.path.split('.').last.toLowerCase();
         String mimeType = 'application/octet-stream';
         String fieldName = 'media[]'; // Default field name
-        
+
         // MIME type belirle
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension)) {
           mimeType = 'image/$fileExtension';
@@ -74,12 +74,12 @@ class ChatServices {
           mimeType = 'text/plain';
           fieldName = 'documents[]'; // Text dosyaları için documents field
         }
-        
+
         debugPrint('  - File: ${file.path}');
         debugPrint('  - Extension: $fileExtension');
         debugPrint('  - MIME Type: $mimeType');
         debugPrint('  - Field Name: $fieldName');
-        
+
         request.files.add(
           await http.MultipartFile.fromPath(
             fieldName,
@@ -125,10 +125,10 @@ class ChatServices {
         },
       );
 
-      // debugPrint("🌐 URL: ${url.toString()}");
-      //debugPrint("🔑 Token: $token");
-       // debugPrint("📥 Response Status Code: ${response.statusCode}");
-       //debugPrint("📥 Response Body: ${response.body}");
+      //debugPrint("🌐 Online Arkadaşlar URL: ${url.toString()}");
+      //debugPrint("🔑 Online Arkadaşlar Token: $token");
+      //debugPrint("📥 Online Arkadaşlar Response Status Code: ${response.statusCode}");
+      //debugPrint("📥 Online Arkadaşlar Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -137,7 +137,7 @@ class ChatServices {
         final chatList =
             dataList.map((json) => ChatUserModel.fromJson(json)).toList();
 
-       //debugPrint("✅ Chat List: $chatList");
+        //debugPrint("✅ Chat List: $chatList");
 
         return chatList;
       } else {
@@ -149,36 +149,38 @@ class ChatServices {
     }
   }
 
-/// Mesaj detaylarını getir (Show Conversation)
-static Future<List<MessageModel>> fetchConversationMessages(int conversationId) async {
-  final token = _box.read('token');
-  final currentUserId = _box.read('userId');
-  final url = '${AppConstants.baseUrl}/conversation/$conversationId';
-  
-  debugPrint("Sohbet mesajları getiriliyor (2. deneme): $url");
+  /// Mesaj detaylarını getir (Show Conversation)
+  static Future<List<MessageModel>> fetchConversationMessages(
+      int conversationId) async {
+    final token = _box.read('token');
+    final currentUserId = _box.read('userId');
+    final url = '${AppConstants.baseUrl}/conversation/$conversationId';
 
-  final response = await http.get(
-    Uri.parse(url),
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Accept': 'application/json',
-    },
-  );
+    debugPrint("Sohbet mesajları getiriliyor (2. deneme): $url");
 
-  debugPrint("Sohbet Mesajları Yanıt Kodu: ${response.statusCode}");
-  // debugPrint("Sohbet Mesajları Yanıt Body: ${response.body}");
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
 
-  if (response.statusCode == 200) {
-    final body = jsonDecode(response.body);
-    final List<dynamic> messagesJson = body['data'];
+    debugPrint("Sohbet Mesajları Yanıt Kodu: ${response.statusCode}");
+     debugPrint("Sohbet Mesajları Yanıt Body: ${response.body}");
 
-    return messagesJson
-        .map((json) => MessageModel.fromJson(json as Map<String, dynamic>, currentUserId: currentUserId))
-        .toList();
-  } else {
-    throw Exception('Mesajlar getirilemedi!');
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final List<dynamic> messagesJson = body['data'];
+
+      return messagesJson
+          .map((json) => MessageModel.fromJson(json as Map<String, dynamic>,
+              currentUserId: currentUserId))
+          .toList();
+    } else {
+      throw Exception('Mesajlar getirilemedi!');
+    }
   }
-}
 
   /// Birebir mesaj listesi çek
   static Future<List<ChatModel>> fetchChatList() async {
@@ -194,15 +196,15 @@ static Future<List<MessageModel>> fetchConversationMessages(int conversationId) 
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-      //  debugPrint("✅ Gelen JSON Body:");
-      //  debugPrint(jsonEncode(body));
+        //  debugPrint("✅ Gelen JSON Body:");
+        //  debugPrint(jsonEncode(body));
 
         if (body is Map<String, dynamic> && body.containsKey('data')) {
           final data = body['data'];
           if (data is List) {
             return data.map((json) {
-                // debugPrint("🔍 Her chat JSON:");
-                  //debugPrint(jsonEncode(json));
+              // debugPrint("🔍 Her chat JSON:");
+              //debugPrint(jsonEncode(json));
               return ChatModel.fromJson(json);
             }).toList();
           } else {
@@ -231,7 +233,7 @@ static Future<List<MessageModel>> fetchConversationMessages(int conversationId) 
       debugPrint('🔍 fetchUserDetails - Başladı');
       final token = await _box.read('token');
       final url = '${AppConstants.baseUrl}/api/user/$userId';
-      
+
       debugPrint('  - URL: $url');
       debugPrint('  - UserID: $userId');
 
