@@ -59,6 +59,48 @@ class ChatController extends GetxController {
     });
   }
 
+  /// Private message listener'ını duraklat (ChatDetailController aktifken)
+  void pausePrivateMessageListener() {
+    try {
+      debugPrint('⏸️ PAUSE REQUEST: ChatController private message listener pause requested');
+      debugPrint('⏸️ Current state: isPaused=${_privateMessageSubscription.isPaused}');
+      
+      if (!_privateMessageSubscription.isPaused) {
+        _privateMessageSubscription.pause();
+        debugPrint('⏸️ SUCCESS: ChatController private message listener paused');
+      } else {
+        debugPrint('⏸️ ALREADY PAUSED: ChatController private message listener was already paused');
+      }
+      
+      // Verification
+      debugPrint('⏸️ VERIFICATION: isPaused=${_privateMessageSubscription.isPaused}');
+      
+    } catch (e) {
+      debugPrint('❌ PAUSE ERROR: Private message listener pause failed: $e');
+    }
+  }
+
+  /// Private message listener'ını devam ettir
+  void resumePrivateMessageListener() {
+    try {
+      debugPrint('▶️ RESUME REQUEST: ChatController private message listener resume requested');
+      debugPrint('▶️ Current state: isPaused=${_privateMessageSubscription.isPaused}');
+      
+      if (_privateMessageSubscription.isPaused) {
+        _privateMessageSubscription.resume();
+        debugPrint('▶️ SUCCESS: ChatController private message listener resumed');
+      } else {
+        debugPrint('▶️ ALREADY ACTIVE: ChatController private message listener was already active');
+      }
+      
+      // Verification  
+      debugPrint('▶️ VERIFICATION: isPaused=${_privateMessageSubscription.isPaused}');
+      
+    } catch (e) {
+      debugPrint('❌ RESUME ERROR: Private message listener resume failed: $e');
+    }
+  }
+
   /// 🔥 Online arkadaşları getir
   Future<void> fetchOnlineFriends() async {
     try {
@@ -93,12 +135,19 @@ class ChatController extends GetxController {
 
   /// 📥 Yeni birebir mesaj geldiğinde listeyi güncelle
   void handleNewPrivateMessage(dynamic data) {
-    debugPrint("📡 Yeni birebir mesaj payload: $data");
+    debugPrint("📡 [ChatController] Yeni birebir mesaj payload alındı");
+    debugPrint("📡 [ChatController] Listener State: isPaused=${_privateMessageSubscription.isPaused}");
+    debugPrint("📡 [ChatController] Processing: $data");
 
     try {
       final conversationId = data['conversation_id'] ?? 0;
       final messageContent = data['message'] ?? '';
       final timestamp = data['created_at'] ?? '';
+      
+      // Socket'ten gelen is_me field'ını kontrol et (kendi mesajını unread count'a dahil etme)
+      final isMyMessage = data['is_me'] == true;
+      
+      debugPrint("📡 [ChatController] Mesaj detayları: conversationId=$conversationId, isMyMessage=$isMyMessage");
 
       final index =
           chatList.indexWhere((chat) => chat.conversationId == conversationId);
@@ -106,12 +155,19 @@ class ChatController extends GetxController {
         // Var olan sohbeti güncelle
         final chat = chatList[index];
         
-        // Son mesajı ve okunmamış sayısını güncelle
+        // Son mesajı güncelle
         chat.lastMessage = LastMessage(
           message: messageContent,
           createdAt: timestamp,
         );
-        chat.unreadCount += 1;
+        
+        // Sadece başkasının mesajıysa unread count artır (API'den gelen değeri koru)
+        if (!isMyMessage) {
+          chat.unreadCount += 1;
+          debugPrint("📬 [ChatController] Unread count artırıldı: ${chat.name} (${chat.unreadCount})");
+        } else {
+          debugPrint("📤 [ChatController] Kendi mesajım, unread count artırılmadı");
+        }
 
         // Güncellenen sohbeti listenin en başına taşı
         chatList.removeAt(index);
@@ -128,20 +184,23 @@ class ChatController extends GetxController {
           avatar: sender['avatar_url'] ?? '',
           conversationId: conversationId,
           isOnline: true, // Yeni mesaj geldiyse online kabul edilebilir
-          unreadCount: 1,
+          unreadCount: isMyMessage ? 0 : 1, // Kendi mesajıysa 0, değilse 1
           lastMessage: LastMessage(
             message: messageContent,
             createdAt: timestamp,
           ),
         );
         chatList.insert(0, newChat);
+        debugPrint("📝 [ChatController] Yeni chat oluşturuldu: ${newChat.name} (unread: ${newChat.unreadCount})");
       }
 
       // Filtrelenmiş listeyi de güncelle
       filterChatList(searchController.text);
+      
+      debugPrint("✅ [ChatController] Mesaj işleme tamamlandı");
 
     } catch (e) {
-      debugPrint("❌ Hata handleNewPrivateMessage: $e");
+      debugPrint("❌ [ChatController] Hata handleNewPrivateMessage: $e");
     }
   }
 
@@ -191,6 +250,9 @@ class ChatController extends GetxController {
     required bool isOnline,
     required String username,
   }) async {
+    // Chat açıldığında o chat'in unreadCount'unu sıfırla
+    markChatAsRead(userId, conversationId);
+    
     // Chat detail sayfasına git ve döndüğünde chat listesini yenile
     await Get.toNamed('/chat_detail', arguments: {
       'userId': userId,
@@ -204,6 +266,44 @@ class ChatController extends GetxController {
     // Chat detail sayfasından döndüğünde verileri yenile
     debugPrint("🔄 Chat detail sayfasından dönüldü, chat listesi yenileniyor...");
     await refreshAllChatData();
+  }
+
+  /// 📖 Chat'i okundu olarak işaretle (Local state'i güncelle)
+  void markChatAsRead(int userId, int? conversationId) {
+    try {
+      // UserId veya conversationId ile chat bul
+      int chatIndex = -1;
+      
+      if (conversationId != null) {
+        // Önce conversationId ile bul
+        chatIndex = chatList.indexWhere((chat) => chat.conversationId == conversationId);
+      }
+      
+      if (chatIndex == -1) {
+        // conversationId ile bulunamadıysa userId ile bul
+        chatIndex = chatList.indexWhere((chat) => chat.id == userId);
+      }
+      
+      if (chatIndex != -1) {
+        final chat = chatList[chatIndex];
+        if (chat.unreadCount > 0) {
+          debugPrint("📖 Chat okundu olarak işaretleniyor: ${chat.name} (unread: ${chat.unreadCount} -> 0)");
+          chat.unreadCount = 0;
+          
+          // Filtrelenmiş listeyi de güncelle
+          final filteredIndex = filteredChatList.indexWhere((c) => c.id == chat.id);
+          if (filteredIndex != -1) {
+            filteredChatList[filteredIndex].unreadCount = 0;
+          }
+          
+          // Observable'ları tetikle
+          chatList.refresh();
+          filteredChatList.refresh();
+        }
+      }
+    } catch (e) {
+      debugPrint("❌ markChatAsRead hatası: $e");
+    }
   }
 
   void getGroupChatPage(String groupId) async {
@@ -252,5 +352,10 @@ class ChatController extends GetxController {
     int privateChatUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
     int groupChatUnread = groupChatList.fold(0, (sum, group) => sum + group.unreadCount);
     return privateChatUnread + groupChatUnread;
+  }
+
+  /// 📊 Kişisel mesajların toplam okunmamış sayısını hesapla (API'den gelen değerlere göre)
+  int get privateUnreadCount {
+    return chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
   }
 }

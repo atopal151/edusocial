@@ -150,25 +150,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
                   },
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InkWell(
-                  onTap: widget.controller.isSendingMessage.value
-                      ? null
-                      : () {
-                          widget.controller.openPollBottomSheet();
-                        },
-                  child: SvgPicture.asset(
-                    "images/icons/poll_icon.svg",
-                    colorFilter: ColorFilter.mode(
-                      widget.controller.isSendingMessage.value
-                          ? Color(0xffe5e5e5)
-                          : Color(0xffc9c9c9),
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                ),
-              ),
+              
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: InkWell(

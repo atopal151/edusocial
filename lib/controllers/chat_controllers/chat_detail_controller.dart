@@ -15,6 +15,7 @@ import '../../models/user_chat_detail_model.dart';
 import '../../models/document_model.dart';
 import '../../models/link_model.dart';
 import 'package:edusocial/services/language_service.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_controller.dart';
 
 class ChatDetailController extends GetxController {
   final isLoading = false.obs;
@@ -38,21 +39,16 @@ class ChatDetailController extends GetxController {
   final RxString avatarUrl = ''.obs;
   final RxBool isOnline = false.obs;
 
-  RxString pollQuestion = ''.obs;
-  RxList<String> pollOptions = <String>[].obs;
-  RxMap<String, int> pollVotes = <String, int>{}.obs;
-  RxString selectedPollOption = ''.obs;
-
   // Media seçimi için yeni değişkenler
   final RxList<File> selectedFiles = <File>[].obs;
   final RxBool isSendingMessage = false.obs;
-  TextEditingController pollTitleController = TextEditingController();
 
   // Controllers
   final ProfileController profileController = Get.find<ProfileController>();
 
   late SocketService _socketService;
   late StreamSubscription _privateMessageSubscription;
+  bool _isSocketListenerSetup = false; // Multiple subscription guard
 
   // URL algılama için regex pattern
   static final RegExp urlRegex = RegExp(
@@ -130,6 +126,9 @@ class ChatDetailController extends GetxController {
     
     _initializeScrollController();
     _setupSocketListeners();
+    
+    // Socket durumunu kontrol et
+    checkSocketConnection();
   }
 
   void _initializeScrollController() {
@@ -142,10 +141,28 @@ class ChatDetailController extends GetxController {
   }
 
   void _setupSocketListeners() {
+    // Multiple subscription guard
+    if (_isSocketListenerSetup) {
+      debugPrint('⚠️ Socket listeners already setup, skipping...');
+      return;
+    }
+    
+    // Chat liste controller'ın private message listener'ını durdur
+    try {
+      final chatController = Get.find<ChatController>();
+      chatController.pausePrivateMessageListener();
+      debugPrint('📴 ChatController private message listener duraklatıldı');
+    } catch (e) {
+      debugPrint('⚠️ ChatController bulunamadı: $e');
+    }
+    
     // Birebir mesaj dinleyicisi - sadece bu chat için
     _privateMessageSubscription = _socketService.onPrivateMessage.listen((data) {
       _onNewPrivateMessage(data);
     });
+    
+    _isSocketListenerSetup = true;
+    debugPrint('✅ ChatDetailController socket listeners setup completed');
   }
 
   void _loadMoreMessages() {
@@ -154,6 +171,18 @@ class ChatDetailController extends GetxController {
 
   @override
   void onClose() {
+    // Chat liste controller'ın private message listener'ını tekrar başlat
+    try {
+      final chatController = Get.find<ChatController>();
+      chatController.resumePrivateMessageListener();
+      debugPrint('▶️ ChatController private message listener tekrar başlatıldı');
+    } catch (e) {
+      debugPrint('⚠️ ChatController resume edilemedi: $e');
+    }
+    
+    // Socket listener guard'ı reset et
+    _isSocketListenerSetup = false;
+    
     scrollController.dispose();
     documentsScrollController.dispose();
     linksScrollController.dispose();
@@ -164,35 +193,49 @@ class ChatDetailController extends GetxController {
 
   void _onNewPrivateMessage(dynamic data) {
     try {
-      debugPrint('📡 ChatDetailController - Yeni mesaj geldi: $data');
+      debugPrint('📡 [ChatDetailController] Yeni mesaj payload alındı');
+      debugPrint('📡 [ChatDetailController] Current Chat ID: ${currentChatId.value}');
+      debugPrint('📡 [ChatDetailController] Current Conversation ID: ${currentConversationId.value}');
+      debugPrint('📡 [ChatDetailController] Processing: $data');
       
       if (data is Map<String, dynamic>) {
         // Gelen mesajın conversation_id'sini string olarak al
         final incomingConversationId = data['conversation_id']?.toString();
         
+        debugPrint('📡 [ChatDetailController] Incoming Conversation ID: $incomingConversationId');
+        
         // Sadece bu chat için gelen mesajları işle
         if (incomingConversationId != null && incomingConversationId == currentConversationId.value) {
           final currentUserId = profileController.profile.value?.id;
           if (currentUserId == null) {
-            debugPrint('❌ _onNewPrivateMessage: Current user ID is null.');
+            debugPrint('❌ [ChatDetailController] Current user ID is null.');
             return;
           }
           
           final message = MessageModel.fromJson(data, currentUserId: currentUserId);
+          
+          // DUPLICATE CHECK: Aynı ID'li mesaj var mı kontrol et
+          final isDuplicate = messages.any((existingMessage) => existingMessage.id == message.id);
+          if (isDuplicate) {
+            debugPrint('🚫 [ChatDetailController] DUPLICATE MESSAGE BLOCKED: ID ${message.id} already exists');
+            return;
+          }
+          
           messages.add(message);
+          debugPrint('✅ [ChatDetailController] Yeni mesaj eklendi: ID ${message.id}, Content: "${message.message}"');
+          debugPrint('✅ [ChatDetailController] Toplam mesaj sayısı: ${messages.length}');
           
           // Yeni mesaj geldiğinde en alta git
           WidgetsBinding.instance.addPostFrameCallback((_) {
             scrollToBottom(animated: true);
           });
           
-          debugPrint('✅ Yeni mesaj chat listesine eklendi');
         } else {
-          debugPrint('📨 Gelen mesaj bu sohbete ait değil. Gelen: $incomingConversationId, Mevcut: ${currentConversationId.value}');
+          debugPrint('📨 [ChatDetailController] Gelen mesaj bu sohbete ait değil. Gelen: $incomingConversationId, Mevcut: ${currentConversationId.value}');
         }
       }
     } catch (e) {
-      debugPrint('❌ _onNewPrivateMessage error: $e');
+      debugPrint('❌ [ChatDetailController] _onNewPrivateMessage error: $e');
     }
   }
 
@@ -415,114 +458,7 @@ class ChatDetailController extends GetxController {
     });
   }
 
-  void openPollBottomSheet() {
-    pollQuestion.value = '';
-    pollOptions.assignAll(['', '']);
-    final LanguageService languageService = Get.find<LanguageService>();
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 20),
-              TextField(
-                style: const TextStyle(fontSize: 12),
-                controller: pollTitleController,
-                decoration: InputDecoration(
-                  hintText: languageService.tr("chat.poll.title"),
-                  filled: true,
-                  fillColor: const Color(0xfff5f5f5),
-                  hintStyle:
-                      const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                onChanged: (val) => pollQuestion.value = val,
-              ),
-              const SizedBox(height: 30),
-              Obx(() => Column(
-                    children: List.generate(pollOptions.length, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                style: const TextStyle(fontSize: 12),
-                                decoration: InputDecoration(
-                                  hintText: languageService.tr("chat.poll.option"),
-                                  filled: true,
-                                  fillColor: const Color(0xfff5f5f5),
-                                  hintStyle: const TextStyle(
-                                      color: Color(0xFF9CA3AF), fontSize: 12),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 14),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                onChanged: (val) => pollOptions[index] = val,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            if (pollOptions.length > 2)
-                              IconButton(
-                                icon: const Icon(Icons.remove_circle),
-                                onPressed: () => pollOptions.removeAt(index),
-                              ),
-                          ],
-                        ),
-                      );
-                    }),
-                  )),
-              TextButton.icon(
-                onPressed: () => pollOptions.add(''),
-                icon: const Icon(Icons.add, color: Color(0xffED7474), size: 15),
-                label: Text(
-                  languageService.tr("chat.poll.addOption"),
-                  style: const TextStyle(color: Color(0xffED7474), fontSize: 12),
-                ),
-              ),
-              const SizedBox(height: 30),
-              CustomButton(
-                  text: languageService.tr("chat.poll.send"),
-                  height: 45,
-                  borderRadius: 15,
-                  onPressed: () {
-                    final filledOptions =
-                        pollOptions.where((e) => e.trim().isNotEmpty).toList();
-                    if (pollTitleController.text.trim().isNotEmpty &&
-                        filledOptions.length >= 2) {
-                      sendPoll(pollTitleController.text, filledOptions);
-                      Get.back();
-                    }
-                  },
-                  isLoading: isLoading,
-                  backgroundColor: const Color(0xffFFF6F6),
-                  textColor: const Color(0xffED7474)),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-      isScrollControlled: true,
-    );
-  }
 
-  void sendPoll(String question, List<String> options) {
-    scrollToBottom();
-  }
 
   void pickImageFromGallery() async {
     final pickedFile =
@@ -672,5 +608,18 @@ class ChatDetailController extends GetxController {
 
   void clearSelectedItems() {
     selectedFiles.clear();
+  }
+
+  void checkSocketConnection() {
+    debugPrint('📡 === PRIVATE CHAT SOCKET DURUM RAPORU ===');
+    debugPrint('📡 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
+    debugPrint('📡 Aktif Chat ID: ${currentChatId.value}');
+    debugPrint('📡 Conversation ID: ${currentConversationId.value}');
+    
+    // Socket service'den detaylı durum raporu al
+    _socketService.checkSocketStatus();
+    
+    debugPrint('📡 Private Message Subscription Aktif: ${!_privateMessageSubscription.isPaused}');
+    debugPrint('📡 =======================================');
   }
 }

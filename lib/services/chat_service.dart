@@ -203,8 +203,6 @@ class ChatServices {
           final data = body['data'];
           if (data is List) {
             return data.map((json) {
-              // debugPrint("🔍 Her chat JSON:");
-              //debugPrint(jsonEncode(json));
               return ChatModel.fromJson(json);
             }).toList();
           } else {

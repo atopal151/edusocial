@@ -217,8 +217,68 @@ class _ChatListScreenState extends State<ChatListScreen>
                 color: Color(0xff272727),
               ),
               tabs: [
-                Tab(text: languageService.tr("chat.chatList.tabs.people")),
-                Tab(text: languageService.tr("chat.chatList.tabs.groups")),
+                // Kişisel Mesajlar Tab'ı (API'den gelen unread count ile)
+                Obx(() {
+                  final unreadCount = chatController.privateUnreadCount;
+                  final peopleText = languageService.tr("chat.chatList.tabs.people");
+                  return Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(peopleText),
+                        if (unreadCount > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xffef5050),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              unreadCount.toString(),
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                }),
+                // Grup Mesajları Tab'ı (API'den gelen messageCount ile)
+                Obx(() {
+                  final unreadCount = groupController.groupUnreadCount;
+                  final groupsText = languageService.tr("chat.chatList.tabs.groups");
+                  return Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(groupsText),
+                        if (unreadCount > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xffef5050),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              unreadCount.toString(),
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                }),
               ],
             ),
           ),

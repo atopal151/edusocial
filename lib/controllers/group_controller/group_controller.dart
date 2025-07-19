@@ -173,4 +173,9 @@ class GroupController extends GetxController {
       );
     }
   }
+
+  /// 📊 Grup mesajlarının toplam okunmamış sayısını hesapla (API'den gelen değerlere göre)
+  int get groupUnreadCount {
+    return userGroups.fold(0, (sum, group) => sum + group.messageCount);
+  }
 }
