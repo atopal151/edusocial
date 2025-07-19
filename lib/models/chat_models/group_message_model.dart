@@ -12,6 +12,7 @@ class GroupMessageModel {
   final String? additionalText;
   final String name;
   final String surname;
+  final String username;
   final String profileImage;
   final List<String>? links;
 
@@ -20,6 +21,7 @@ class GroupMessageModel {
     required this.senderId,
     required this.name,
     required this.surname,
+    required this.username,
     required this.profileImage,
     required this.receiverId,
     required this.content,

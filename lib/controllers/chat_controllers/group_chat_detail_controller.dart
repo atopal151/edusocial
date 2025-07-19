@@ -217,12 +217,21 @@ class GroupChatDetailController extends GetxController {
       final user = chat.user;
       final isSentByMe = user['id'].toString() == currentUserId;
       
+      // Debug: Kullanıcı verilerini logla
+      print('📊 User data for ${chat.userId}: $user');
+      
       GroupMessageType messageType = GroupMessageType.text;
       String content = chat.message;
       List<String>? links;
       
       // Mesaj türünü belirle - optimize edilmiş
-      if (chat.media.isNotEmpty) {
+      List<String>? pollOptions;
+      if (chat.messageType == 'poll') {
+        messageType = GroupMessageType.poll;
+        content = chat.message;
+        // TODO: Poll options'ı backend'den parse et
+        pollOptions = ['Seçenek 1', 'Seçenek 2']; // Geçici
+      } else if (chat.media.isNotEmpty) {
         final media = chat.media.first;
         if (media.type.startsWith('image/')) {
           messageType = GroupMessageType.image;
@@ -250,11 +259,13 @@ class GroupChatDetailController extends GetxController {
         receiverId: chat.groupId.toString(),
         name: user['name'] ?? '',
         surname: user['surname'] ?? '',
+        username: user['username'] ?? user['name'] ?? '',
         profileImage: user['avatar_url'] ?? '',
         content: content,
         messageType: messageType,
         timestamp: DateTime.parse(chat.createdAt),
         isSentByMe: isSentByMe,
+        pollOptions: pollOptions,
         additionalText: chat.messageType == 'poll' ? chat.message : null,
         links: links,
       );

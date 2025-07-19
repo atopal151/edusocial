@@ -9,6 +9,7 @@ import '../../../components/widgets/group_chat_widget/group_poll_message_widget.
 import '../../../components/widgets/group_chat_widget/group_text_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_text_with_links_message_widget.dart';
 import '../../../components/widgets/tree_point_bottom_sheet.dart';
+import '../../../components/widgets/chat_widget/date_separator_widget.dart';
 import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../components/widgets/custom_loading_indicator.dart';
@@ -216,32 +217,10 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
 
                 return ListView.builder(
                   controller: controller.scrollController,
-                  itemCount: controller.messages.length,
+                  itemCount: _getItemCount(controller.messages),
                   padding: EdgeInsets.only(bottom: 120),
                   itemBuilder: (context, index) {
-                    final message = controller.messages[index];
-                    if (message.messageType == GroupMessageType.text) {
-                      return GroupTextMessageWidget(message: message);
-                    } else if (message.messageType ==
-                        GroupMessageType.document) {
-                      return GroupDocumentMessageWidget(message: message);
-                    } else if (message.messageType == GroupMessageType.image) {
-                      return GroupImageMessageWidget(message: message);
-                    } else if (message.messageType == GroupMessageType.link) {
-                      return GroupLinkMessageWidget(message: message);
-                    } else if (message.messageType ==
-                        GroupMessageType.textWithLinks) {
-                      return GroupTextWithLinksMessageWidget(message: message);
-                    } else if (message.messageType == GroupMessageType.poll) {
-                      return GroupPollMessageWidget(
-                        message: message,
-                        pollVotes: controller.pollVotes,
-                        selectedOption: controller.selectedPollOption,
-                        onVote: controller.votePoll,
-                      );
-                    } else {
-                      return Container();
-                    }
+                    return _buildMessageWithDateSeparator(context, controller.messages, index);
                   },
                 );
               }),
@@ -258,5 +237,90 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
         ),
       ),
     );
+  }
+
+  // Tarih separatörü ile beraber item sayısını hesapla
+  int _getItemCount(List<GroupMessageModel> messages) {
+    if (messages.isEmpty) return 0;
+    
+    int count = 0;
+    DateTime? lastDate;
+    
+    for (var message in messages) {
+      final messageDate = DateTime(
+        message.timestamp.year,
+        message.timestamp.month,
+        message.timestamp.day,
+      );
+      
+      // Tarih değişmişse separatör ekle
+      if (lastDate == null || messageDate != lastDate) {
+        count++; // Tarih separatörü için
+        lastDate = messageDate;
+      }
+      count++; // Mesaj için
+    }
+    
+    return count;
+  }
+
+  // Tarih separatörü ile mesaj widget'ını oluştur
+  Widget _buildMessageWithDateSeparator(BuildContext context, List<GroupMessageModel> messages, int index) {
+    if (messages.isEmpty) return Container();
+    
+    int messageIndex = 0;
+    int currentIndex = 0;
+    DateTime? lastDate;
+    
+    for (int i = 0; i < messages.length; i++) {
+      final message = messages[i];
+      final messageDate = DateTime(
+        message.timestamp.year,
+        message.timestamp.month,
+        message.timestamp.day,
+      );
+      
+      // Tarih değişmişse separatör ekle
+      if (lastDate == null || messageDate != lastDate) {
+        if (currentIndex == index) {
+          // Tarih separatörü göster
+          return DateSeparatorWidget(date: messageDate);
+        }
+        currentIndex++;
+        lastDate = messageDate;
+      }
+      
+      if (currentIndex == index) {
+        // Mesaj widget'ını göster
+        return _buildMessageWidget(message);
+      }
+      currentIndex++;
+    }
+    
+    return Container();
+  }
+
+  // Mesaj tipine göre widget oluştur
+  Widget _buildMessageWidget(GroupMessageModel message) {
+    if (message.messageType == GroupMessageType.text) {
+      return GroupTextMessageWidget(message: message);
+    } else if (message.messageType == GroupMessageType.document) {
+      return GroupDocumentMessageWidget(message: message);
+    } else if (message.messageType == GroupMessageType.image) {
+      return GroupImageMessageWidget(message: message);
+    } else if (message.messageType == GroupMessageType.link) {
+      return GroupLinkMessageWidget(message: message);
+    } else if (message.messageType == GroupMessageType.textWithLinks) {
+      return GroupTextWithLinksMessageWidget(message: message);
+    } else if (message.messageType == GroupMessageType.poll) {
+      return GroupPollMessageWidget(
+        message: message,
+        pollVotes: controller.pollVotes,
+        selectedOption: controller.selectedPollOption,
+        onVote: controller.votePoll,
+      );
+    } else {
+      return Container();
+    }
   }
 }
