@@ -128,6 +128,25 @@ Widget buildGroupMessageInputField() {
                   ),
                 ),
               ),
+              
+              // Document picker butonu
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: controller.isSendingMessage.value
+                      ? null
+                      : () {
+                          controller.pickDocument();
+                        },
+                  child: Icon(
+                    Icons.description,
+                    color: controller.isSendingMessage.value
+                        ? Color(0xffe5e5e5)
+                        : Color(0xffc9c9c9),
+                    size: 24,
+                  ),
+                ),
+              ),
               Obx(() => IconButton(
                 icon: Container(
                   width: 40,

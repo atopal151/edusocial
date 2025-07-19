@@ -296,9 +296,30 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
 
                           // URL'yi temizle ve kontrol et
                           String cleanLink = linkUrl!.trim();
-                          if (!cleanLink.startsWith('http://') &&
-                              !cleanLink.startsWith('https://')) {
-                            cleanLink = 'https://$cleanLink';
+                          
+                          // URL validation ve normalization
+                          if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
+                            // www. ile başlıyorsa https ekle
+                            if (cleanLink.startsWith('www.')) {
+                              cleanLink = 'https://$cleanLink';
+                            } 
+                            // Diğer durumlarda da https ekle
+                            else if (cleanLink.contains('.')) {
+                              cleanLink = 'https://$cleanLink';
+                            } else {
+                              // Geçersiz URL formatı
+                              debugPrint("🔗 LinkMediaText - Geçersiz URL formatı: $cleanLink");
+                              return;
+                            }
+                          }
+                          
+                          // Boşlukları temizle
+                          cleanLink = cleanLink.replaceAll(' ', '');
+                          
+                          // Geçerli URL formatı kontrolü
+                          if (!Uri.parse(cleanLink).hasAbsolutePath && !cleanLink.contains('.')) {
+                            debugPrint("🔗 LinkMediaText - URL yapısı geçersiz: $cleanLink");
+                            return;
                           }
 
                           debugPrint("🔗 LinkMediaText - Temizlenmiş link: $cleanLink");
@@ -312,8 +333,8 @@ class LinkMediaTextMessageWidget extends StatelessWidget {
 
                           if (canLaunch) {
                             debugPrint("🔗 LinkMediaText - URL açılıyor...");
-                            final result = await launchUrl(url,
-                                mode: LaunchMode.externalApplication);
+                                                      final result = await launchUrl(url,
+                              mode: LaunchMode.platformDefault);
                             debugPrint("🔗 LinkMediaText - launchUrl sonucu: $result");
 
                             if (!result) {

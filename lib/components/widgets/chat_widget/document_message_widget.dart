@@ -11,8 +11,9 @@ class DocumentMessageWidget extends StatelessWidget {
 
   const DocumentMessageWidget({super.key, required this.message});
 
-  // Document URL'sini al
+  // Document URL'sini al (messageDocument veya messageMedia'dan)
   String? getDocumentUrl() {
+    // Önce messageDocument field'ını kontrol et
     if (message.messageDocument != null && message.messageDocument!.isNotEmpty) {
       final document = message.messageDocument!.first;
       if (document.url.startsWith('http')) {
@@ -21,14 +22,50 @@ class DocumentMessageWidget extends StatelessWidget {
         return 'https://stageapi.edusocial.pl/storage/${document.url}';
       }
     }
+    
+    // messageMedia'da document var mı kontrol et
+    if (message.messageMedia.isNotEmpty) {
+      for (var media in message.messageMedia) {
+        final mediaPath = media.path.toLowerCase();
+        if (mediaPath.endsWith('.pdf') ||
+            mediaPath.endsWith('.doc') ||
+            mediaPath.endsWith('.docx') ||
+            mediaPath.endsWith('.txt')) {
+          // Media document'i için URL oluştur
+          if (media.path.startsWith('http')) {
+            return media.path;
+          } else {
+            return 'https://stageapi.edusocial.pl/storage/${media.path}';
+          }
+        }
+      }
+    }
+    
     return null;
   }
 
-  // Document adını al
+  // Document adını al (messageDocument veya messageMedia'dan)
   String getDocumentName() {
+    // Önce messageDocument field'ını kontrol et
     if (message.messageDocument != null && message.messageDocument!.isNotEmpty) {
       return message.messageDocument!.first.name;
     }
+    
+    // messageMedia'da document var mı kontrol et
+    if (message.messageMedia.isNotEmpty) {
+      for (var media in message.messageMedia) {
+        final mediaPath = media.path.toLowerCase();
+        if (mediaPath.endsWith('.pdf') ||
+            mediaPath.endsWith('.doc') ||
+            mediaPath.endsWith('.docx') ||
+            mediaPath.endsWith('.txt')) {
+          // Media document'i için dosya ismini al
+          return media.path.split('/').last;
+        }
+      }
+    }
+    
+    // Fallback olarak message'dan al
     return message.message.split('/').last;
   }
 
@@ -47,7 +84,7 @@ class DocumentMessageWidget extends StatelessWidget {
               try {
                 final uri = Uri.parse(documentUrl);
                 if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  await launchUrl(uri, mode: LaunchMode.platformDefault);
                 } else {
                   // URL açılamadığında kullanıcıya bilgi ver
                   if (context.mounted) {

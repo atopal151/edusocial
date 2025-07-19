@@ -116,8 +116,30 @@ class LinkMessageWidget extends StatelessWidget {
                                   
                                   // URL'yi temizle ve kontrol et
                                   String cleanLink = link.trim();
+                                  
+                                  // URL validation ve normalization
                                   if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
-                                    cleanLink = 'https://$cleanLink';
+                                    // www. ile başlıyorsa https ekle
+                                    if (cleanLink.startsWith('www.')) {
+                                      cleanLink = 'https://$cleanLink';
+                                    } 
+                                    // Diğer durumlarda da https ekle
+                                    else if (cleanLink.contains('.')) {
+                                      cleanLink = 'https://$cleanLink';
+                                    } else {
+                                      // Geçersiz URL formatı
+                                      debugPrint("🔗 Chat - Geçersiz URL formatı: $cleanLink");
+                                      return;
+                                    }
+                                  }
+                                  
+                                  // Boşlukları temizle
+                                  cleanLink = cleanLink.replaceAll(' ', '');
+                                  
+                                  // Geçerli URL formatı kontrolü
+                                  if (!Uri.parse(cleanLink).hasAbsolutePath && !cleanLink.contains('.')) {
+                                    debugPrint("🔗 Chat - URL yapısı geçersiz: $cleanLink");
+                                    return;
                                   }
                                   
                                   debugPrint("🔗 Chat - Temizlenmiş link: $cleanLink");
@@ -129,13 +151,23 @@ class LinkMessageWidget extends StatelessWidget {
                                   final canLaunch = await canLaunchUrl(url);
                                   debugPrint("🔗 Chat - canLaunchUrl sonucu: $canLaunch");
                                   
-                                  if (canLaunch) {
-                                    debugPrint("🔗 Chat - URL açılıyor...");
-                                    final result = await launchUrl(
+                                                                    if (canLaunch) {
+                                    debugPrint("🔗 Chat - URL açılıyor (platformDefault)...");
+                                    bool result = await launchUrl(
                                       url, 
-                                      mode: LaunchMode.externalApplication
+                                      mode: LaunchMode.platformDefault
                                     );
-                                    debugPrint("🔗 Chat - launchUrl sonucu: $result");
+                                    debugPrint("🔗 Chat - platformDefault sonucu: $result");
+                                    
+                                    // Eğer platformDefault başarısız olursa externalApplication dene
+                                    if (!result) {
+                                      debugPrint("🔗 Chat - Fallback: externalApplication deneniyor...");
+                                      result = await launchUrl(
+                                        url, 
+                                        mode: LaunchMode.externalApplication
+                                      );
+                                      debugPrint("🔗 Chat - externalApplication sonucu: $result");
+                                    }
                                     
                                     if (!result) {
                                       if (context.mounted) {

@@ -52,43 +52,39 @@ class ChatServices {
       }
     }
 
-    // Medya dosyalarını ekle
+    // Medya dosyalarını ekle (Sadece image dosyaları - private conversation limitation)
     if (mediaFiles != null && mediaFiles.isNotEmpty) {
       debugPrint('📁 Adding media files to request:');
-      for (var file in mediaFiles) {
+      
+      // Private conversation sadece image dosyalarını destekliyor
+      final imageFiles = mediaFiles.where((file) {
         final fileExtension = file.path.split('.').last.toLowerCase();
-        String mimeType = 'application/octet-stream';
-        String fieldName = 'media[]'; // Default field name
-
-        // MIME type belirle
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension)) {
-          mimeType = 'image/$fileExtension';
-          fieldName = 'media[]'; // Resimler için media field
-        } else if (['pdf'].contains(fileExtension)) {
-          mimeType = 'application/pdf';
-          fieldName = 'documents[]'; // PDF'ler için documents field
-        } else if (['doc', 'docx'].contains(fileExtension)) {
-          mimeType = 'application/msword';
-          fieldName = 'documents[]'; // Word dosyaları için documents field
-        } else if (['txt'].contains(fileExtension)) {
-          mimeType = 'text/plain';
-          fieldName = 'documents[]'; // Text dosyaları için documents field
-        }
+        return ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension);
+      }).toList();
+      
+      if (imageFiles.length != mediaFiles.length) {
+        debugPrint('⚠️ Private conversation sadece resim dosyalarını destekliyor!');
+        debugPrint('⚠️ Toplam dosya: ${mediaFiles.length}, Geçerli resim: ${imageFiles.length}');
+      }
+      
+      for (var file in imageFiles) {
+        final fileExtension = file.path.split('.').last.toLowerCase();
+        String mimeType = 'image/$fileExtension';
 
         debugPrint('  - File: ${file.path}');
         debugPrint('  - Extension: $fileExtension');
         debugPrint('  - MIME Type: $mimeType');
-        debugPrint('  - Field Name: $fieldName');
+        debugPrint('  - Field Name: media[]');
 
         request.files.add(
           await http.MultipartFile.fromPath(
-            fieldName,
+            'media[]',
             file.path,
             contentType: MediaType.parse(mimeType),
           ),
         );
       }
-      debugPrint('📁 Total files added: ${request.files.length}');
+      debugPrint('📁 Total image files added: ${request.files.length}');
     }
 
     try {
