@@ -1,5 +1,4 @@
 import 'package:edusocial/components/widgets/course_chip.dart';
-import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
@@ -15,17 +14,7 @@ final ProfileController controller = Get.find();
 Widget buildProfileDetails() {
   final LanguageService languageService = Get.find<LanguageService>();
   return Obx(() {
-    if (controller.isLoading.value) {
-      return Container(
-        padding: EdgeInsets.symmetric(vertical: 40),
-        child: GeneralLoadingIndicator(
-          size: 32,
-          color: Color(0xFF2196F3),
-          icon: Icons.person,
-          showText: true,
-        ),
-      );
-    }
+
 
     if (controller.profile.value == null) {
       return const Center(child: Text("Profil bilgileri alınamadı."));

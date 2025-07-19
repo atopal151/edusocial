@@ -41,6 +41,21 @@ class _ProfileScreenState extends State<ProfileScreen>
     _tabController = TabController(length: 2, vsync: this);
   }
 
+  /// Profil verilerini yenile
+  Future<void> _refreshProfile() async {
+    debugPrint("🔄 Profile sayfası yenileniyor...");
+    try {
+      await Future.wait([
+        controller.loadProfile(),
+        postController.fetchHomePosts(),
+        entryController.fetchAllEntries(),
+      ]);
+      debugPrint("✅ Profile sayfası başarıyla yenilendi");
+    } catch (e) {
+      debugPrint("❌ Profile sayfası yenileme hatası: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final LanguageService languageService = Get.find<LanguageService>();
@@ -80,21 +95,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           )
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          debugPrint("🔄 Profil verileri yenileniyor...");
-          await controller.loadProfile();
-          await postController.fetchHomePosts();
-          await entryController.fetchAllEntries();
-          debugPrint("✅ Profil verileri başarıyla yenilendi");
-        },
-        color: Color(0xFFEF5050),
-        backgroundColor: Color(0xfffafafa),
-        strokeWidth: 2.0,
-        displacement: 40.0,
-        child: DefaultTabController(
-          length: 2,
-          child: NestedScrollView(
+      body: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
               SliverToBoxAdapter(
                 child: Column(
@@ -140,34 +143,53 @@ class _ProfileScreenState extends State<ProfileScreen>
               physics: NeverScrollableScrollPhysics(),
               children: [
                 /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
-                Column(
-                  children: [
-                    Container(
-                      color: Color(0xfffafafa),
-                      child: ToggleTabBar(
-                        selectedIndex: selectedTabIndex,
-                        onTabChanged: (index) {
-                          selectedTabIndex.value = index;
-                        },
+                RefreshIndicator(
+                  onRefresh: _refreshProfile,
+                  color: const Color(0xFFEF5050),
+                  backgroundColor: Colors.white,
+                  strokeWidth: 2.0,
+                  displacement: 40.0,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Container(
+                          color: Color(0xfffafafa),
+                          child: ToggleTabBar(
+                            selectedIndex: selectedTabIndex,
+                            onTabChanged: (index) {
+                              selectedTabIndex.value = index;
+                            },
+                          ),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: Obx(() {
-                        return selectedTabIndex.value == 0
-                            ? _buildPosts()
-                            : _buildEntries();
-                      }),
-                    ),
-                  ],
+                      SliverFillRemaining(
+                        child: Obx(() {
+                          return selectedTabIndex.value == 0
+                              ? _buildPosts()
+                              : _buildEntries();
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
 
                 /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
-                buildProfileDetails(),
+                RefreshIndicator(
+                  onRefresh: _refreshProfile,
+                  color: const Color(0xFFEF5050),
+                  backgroundColor: Colors.white,
+                  strokeWidth: 2.0,
+                  displacement: 40.0,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: buildProfileDetails(),
+                  ),
+                ),
               ],
             ),
           ),
         ),
-      ),
     );
   }
 
@@ -176,13 +198,19 @@ class _ProfileScreenState extends State<ProfileScreen>
     
     return Obx(() {
       if (controller.profilePosts.isEmpty) {
-        return Center(child: Text(languageService.tr("profile.mainProfile.noPostsFound")));
+        return Container(
+          height: 200,
+          child: Center(
+            child: Text(languageService.tr("profile.mainProfile.noPostsFound")),
+          ),
+        );
       }
 
       return Container(
         decoration: BoxDecoration(color: Color(0xfffafafa)),
         child: ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: controller.profilePosts.length,
           itemBuilder: (context, index) {
             final post = controller.profilePosts[index];
@@ -213,11 +241,17 @@ class _ProfileScreenState extends State<ProfileScreen>
     
     return Obx(() {
       if (controller.personEntries.isEmpty) {
-        return Center(child: Text(languageService.tr("profile.mainProfile.noEntriesFound")));
+        return Container(
+          height: 200,
+          child: Center(
+            child: Text(languageService.tr("profile.mainProfile.noEntriesFound")),
+          ),
+        );
       }
 
       return ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: controller.personEntries.length,
         itemBuilder: (context, index) {
