@@ -105,7 +105,10 @@ class GroupChatDetailController extends GetxController {
   Future<void> _loadGroupDataProgressive() async {
     try {
       isGroupDataLoading.value = true;
-      await fetchGroupDetails();
+      
+      // STEP 1: Quick message loading (önce sadece mesajları al)
+      await fetchGroupDetailsOptimized();
+      
       isGroupDataLoading.value = false;
       
       // İlk yükleme sonrası scroll
@@ -123,60 +126,47 @@ class GroupChatDetailController extends GetxController {
     }
   }
 
-  Future<void> fetchGroupDetails() async {
+  /// OPTIMIZED: Faster group details fetching
+  Future<void> fetchGroupDetailsOptimized() async {
     if (currentGroupId.value.isEmpty) {
       debugPrint('❌ Cannot fetch group details: No group ID provided');
       return;
     }
 
     try {
-      debugPrint('🔍 Fetching group details for group ID: ${currentGroupId.value}');
+      debugPrint('🚀 Fast-fetching group details for group ID: ${currentGroupId.value}');
       
-      // OPTIMIZE: Retry mechanism with progressive timeout
+      // OPTIMIZE: Try cache first, then API
       GroupDetailModel? group;
       
-      for (int attempt = 1; attempt <= 3; attempt++) {
-        try {
-          final timeoutDuration = Duration(seconds: 5 + (attempt * 3)); // 5s, 8s, 11s
-          debugPrint('🔄 Attempt $attempt with ${timeoutDuration.inSeconds}s timeout');
-          
-          group = await _groupServices.fetchGroupDetail(currentGroupId.value)
-              .timeout(timeoutDuration);
-          
-          break; // Success, exit retry loop
-        } catch (e) {
-          debugPrint('⚠️ Attempt $attempt failed: $e');
-          
-          if (attempt == 3) {
-            rethrow; // Final attempt failed, throw error
-          }
-          
-          // Wait before retry
-          await Future.delayed(Duration(milliseconds: 500));
-        }
+      try {
+        // Try cached version first
+        group = await _groupServices.fetchGroupDetailCached(currentGroupId.value)
+            .timeout(const Duration(seconds: 3)); // Even shorter timeout for cache
+      } catch (e) {
+        debugPrint('⚠️ Cache failed, trying direct API: $e');
+        // Fallback to direct API call
+        group = await _groupServices.fetchGroupDetail(currentGroupId.value)
+            .timeout(const Duration(seconds: 5));
       }
       
       if (group != null) {
         groupData.value = group;
         
-        // Group chats verilerini mesajlara dönüştür
-        convertGroupChatsToMessagesOptimized();
+        // OPTIMIZE: Process messages in background
+        Future.microtask(() {
+          convertGroupChatsToMessagesOptimized();
+        });
         
-        debugPrint('✅ Group details loaded successfully');
+        debugPrint('✅ Group details loaded successfully (optimized)');
       }
       
     } catch (e) {
-      debugPrint('❌ Error fetching group details after all retries: $e');
-      
-      // More user-friendly error message
-      String errorMessage = 'Network error. Please check your connection.';
-      if (e.toString().contains('TimeoutException')) {
-        errorMessage = 'Loading took too long. Please try again.';
-      }
+      debugPrint('❌ Error fetching group details: $e');
       
       Get.snackbar(
-        'Connection Error',
-        errorMessage,
+        'Bağlantı Hatası',
+        'Grup verileri yüklenemedi. Lütfen tekrar deneyin.',
         snackPosition: SnackPosition.BOTTOM,
         duration: Duration(seconds: 3),
         backgroundColor: Colors.orange.shade100,
@@ -251,62 +241,86 @@ class GroupChatDetailController extends GetxController {
     }
   }
 
-  /// OPTIMIZE: Message conversion with caching
-  void convertGroupChatsToMessagesOptimized() {
+  /// OPTIMIZE: Background message conversion with error handling
+  Future<void> convertGroupChatsToMessagesOptimized() async {
     if (groupData.value?.groupChats == null) return;
     
-    final groupChats = groupData.value!.groupChats;
-    final currentUserId = Get.find<ProfileController>().userId.value;
-    
-    // Performance: Batch processing
-    final processedMessages = <GroupMessageModel>[];
-    
-    // Cache kullanıcı verilerini tek seferde
-    for (final chat in groupChats) {
-      final userId = chat.userId.toString();
-      if (!_userCache.containsKey(userId)) {
-        _userCache[userId] = chat.user;
+    try {
+      final groupChats = groupData.value!.groupChats;
+      final currentUserId = Get.find<ProfileController>().userId.value;
+      
+      // Performance: Batch processing
+      final processedMessages = <GroupMessageModel>[];
+      
+      // Cache kullanıcı verilerini tek seferde
+      for (final chat in groupChats) {
+        final userId = chat.userId.toString();
+        if (!_userCache.containsKey(userId)) {
+          _userCache[userId] = chat.user;
+        }
       }
+      
+      // OPTIMIZE: Process in smaller batches to prevent UI freeze
+      const batchSize = 10;
+      for (int i = 0; i < groupChats.length; i += batchSize) {
+        final batch = groupChats.skip(i).take(batchSize);
+        
+        for (final chat in batch) {
+          try {
+            final userId = chat.userId.toString();
+            final user = _userCache[userId]!;
+            final isSentByMe = userId == currentUserId;
+            
+            // FIXED: Safe message type determination
+            final messageData = _determineMessageType(chat);
+            
+            final message = GroupMessageModel(
+              id: chat.id.toString(),
+              senderId: userId,
+              receiverId: chat.groupId.toString(),
+              name: user['name'] ?? '',
+              surname: user['surname'] ?? '',
+              username: user['username'] ?? user['name'] ?? '',
+              profileImage: user['avatar_url'] ?? '',
+              content: messageData['content'],
+              messageType: messageData['type'],
+              timestamp: DateTime.parse(chat.createdAt),
+              isSentByMe: isSentByMe,
+              pollOptions: messageData['pollOptions'],
+              additionalText: messageData['additionalText'],
+              links: messageData['links'],
+            );
+            
+            processedMessages.add(message);
+          } catch (e) {
+            debugPrint('⚠️ Error processing message ${chat.id}: $e');
+            // Skip this message and continue
+          }
+        }
+        
+        // Allow UI to update between batches
+        if (i + batchSize < groupChats.length) {
+          await Future.delayed(Duration(milliseconds: 1));
+        }
+      }
+      
+      // Sort ve assign
+      processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      messages.assignAll(processedMessages);
+      
+      // Extract media in background
+      Future.microtask(() {
+        extractGroupChatMedia();
+      });
+      
+      debugPrint('✅ Processed ${processedMessages.length} messages successfully');
+      
+    } catch (e) {
+      debugPrint('❌ Error in convertGroupChatsToMessagesOptimized: $e');
     }
-    
-    // Mesajları process et
-    for (final chat in groupChats) {
-      final userId = chat.userId.toString();
-      final user = _userCache[userId]!;
-      final isSentByMe = userId == currentUserId;
-      
-      // Optimize: Message type determination
-      final messageData = _determineMessageType(chat);
-      
-      final message = GroupMessageModel(
-        id: chat.id.toString(),
-        senderId: userId,
-        receiverId: chat.groupId.toString(),
-        name: user['name'] ?? '',
-        surname: user['surname'] ?? '',
-        username: user['username'] ?? user['name'] ?? '',
-        profileImage: user['avatar_url'] ?? '',
-        content: messageData['content'],
-        messageType: messageData['type'],
-        timestamp: DateTime.parse(chat.createdAt),
-        isSentByMe: isSentByMe,
-        pollOptions: messageData['pollOptions'],
-        additionalText: messageData['additionalText'],
-        links: messageData['links'],
-      );
-      
-      processedMessages.add(message);
-    }
-    
-    // Sort ve assign
-    processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    messages.assignAll(processedMessages);
-    
-    // Extract media
-    extractGroupChatMedia();
   }
 
-  /// Helper function for message type determination
+  /// Helper function for message type determination - FIXED
   Map<String, dynamic> _determineMessageType(dynamic chat) {
     GroupMessageType messageType = GroupMessageType.text;
     String content = chat.message ?? '';
@@ -321,7 +335,7 @@ class GroupChatDetailController extends GetxController {
         pollOptions = ['Seçenek 1', 'Seçenek 2']; // TODO: Backend'den parse et
       } else if (chat.media != null && chat.media.isNotEmpty) {
         final media = chat.media.first;
-        if (media.type != null && media.type.startsWith('image/')) {
+        if (media.type != null && media.type.toString().startsWith('image/')) {
           messageType = GroupMessageType.image;
           content = media.fullPath ?? '';
         } else {
@@ -329,15 +343,21 @@ class GroupChatDetailController extends GetxController {
           content = media.fullPath ?? '';
         }
       } else if (chat.groupChatLink != null && chat.groupChatLink.isNotEmpty) {
-        // FIXED: Proper type casting for links
-        final chatLinks = chat.groupChatLink
-            .map<String>((link) => link.link?.toString() ?? '')
-            .where((link) => link.isNotEmpty)
-            .toList();
+        // FIXED: Safe type casting for links
+        final chatLinks = <String>[];
         
-        if (chat.message != null && chat.message.isNotEmpty) {
+        for (var link in chat.groupChatLink) {
+          if (link?.link != null) {
+            final linkStr = link.link.toString();
+            if (linkStr.isNotEmpty) {
+              chatLinks.add(linkStr);
+            }
+          }
+        }
+        
+        if (chat.message != null && chat.message.toString().isNotEmpty) {
           messageType = GroupMessageType.textWithLinks;
-          content = chat.message;
+          content = chat.message.toString();
           links = chatLinks.isNotEmpty ? chatLinks : null;
         } else if (chatLinks.isNotEmpty) {
           messageType = GroupMessageType.link;

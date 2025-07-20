@@ -55,9 +55,47 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           },
           child: Obx(() {
             final group = controller.groupData.value;
-            if (group == null) {
-              return Center();
+            final isLoading = controller.isGroupDataLoading.value;
+            
+            if (isLoading || group == null) {
+              // OPTIMIZE: Skeleton loading for app bar
+              return Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Container(
+                        width: 80,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
             }
+            
             return Row(
               children: [
                 CircleAvatar(
@@ -153,20 +191,18 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           children: [
             Expanded(
               child: Obx(() {
-                final isMessagesLoading = controller.isMessagesLoading.value;
                 final isGroupLoading = controller.isGroupDataLoading.value;
                 final group = controller.groupData.value;
                 final messages = controller.messages;
 
-                // Grup verisi veya mesajlar yükleniyorsa loading göster
-                if (isGroupLoading || isMessagesLoading || group == null) {
-                  return Center(
-                    child: CustomLoadingIndicator(
-                      size: 40,
-                      color: Color(0xFFFF7C7C),
-                      strokeWidth: 3,
-                    ),
-                  );
+                // OPTIMIZE: Progressive loading states
+                if (isGroupLoading) {
+                  return _buildSkeletonLoader();
+                }
+
+                // Grup verisi yok ama loading bitmişse hata
+                if (group == null) {
+                  return _buildErrorState();
                 }
 
                 // Mesajlar boşsa
@@ -227,6 +263,160 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// OPTIMIZE: Skeleton loader for better UX
+  Widget _buildSkeletonLoader() {
+    return Column(
+      children: [
+        // Skeleton messages
+        Expanded(
+          child: ListView.builder(
+            itemCount: 8, // Show 8 skeleton messages
+            padding: EdgeInsets.all(16),
+            itemBuilder: (context, index) {
+              final isMe = index % 3 == 0; // Vary message alignment
+              return Container(
+                margin: EdgeInsets.only(bottom: 16),
+                child: Row(
+                  mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  children: [
+                    if (!isMe) ...[
+                      // Avatar skeleton
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                    ],
+                    // Message bubble skeleton
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 250),
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Message text skeleton
+                          Container(
+                            width: double.infinity,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          if (index % 2 == 0) ...[
+                            SizedBox(height: 4),
+                            Container(
+                              width: 120,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (isMe) ...[
+                      SizedBox(width: 8),
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        // Input skeleton
+        Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(color: Colors.white),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Error state widget
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.grey[400],
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Grup verileri yüklenemedi',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Lütfen tekrar deneyin',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+            ),
+          ),
+          SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              controller.fetchGroupDetailsOptimized();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFFFF7C7C),
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Tekrar Dene'),
+          ),
+        ],
       ),
     );
   }

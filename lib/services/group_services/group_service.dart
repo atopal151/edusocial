@@ -174,37 +174,96 @@ class GroupServices {
     }
   }
 
+  /// OPTIMIZED: Faster group detail fetching with minimal data
   Future<GroupDetailModel> fetchGroupDetail(String groupId) async {
     final box = GetStorage();
     try {
+      debugPrint('🚀 Optimized group detail fetch for ID: $groupId');
+      
+      // OPTIMIZE: Add query parameters to request only essential data
+      final uri = Uri.parse('${AppConstants.baseUrl}/group-detail/$groupId').replace(
+        queryParameters: {
+          'minimal': 'true', // Request minimal data if backend supports
+          'limit_messages': '50', // Limit recent messages
+          'include': 'messages,basic_info', // Only essential data
+        }
+      );
+      
       final response = await http.get(
-        Uri.parse('${AppConstants.baseUrl}/group-detail/$groupId'),
+        uri,
         headers: {
           'Authorization': 'Bearer ${box.read('token')}',
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-      ).timeout(const Duration(seconds: 8)); // OPTIMIZE: 8 saniye timeout
+      ).timeout(const Duration(seconds: 4)); // Reduced from 8s to 4s
+
+      debugPrint('📡 Group detail response time: ${DateTime.now()}');
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
           final groupData = jsonBody['data']['group'];
 
-          debugPrint('📋 GRUP DETAY VERİLERİ:');
+          debugPrint('📋 GRUP DETAY VERİLERİ (OPTIMIZED):');
           debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           debugPrint('ID: ${groupData['id']}');
-          debugPrint('Group Chats: ${jsonBody['data']['group']['group_chats']}');
-          debugPrint('Group Event: ${jsonBody['data']['group']['group_events']}');
-          debugPrint('Group users: ${jsonBody['data']['users']}');
+          
+          // OPTIMIZE: Count instead of logging full data
+          final groupChats = groupData['group_chats'] as List? ?? [];
+          final groupEvents = groupData['group_events'] as List? ?? [];
+          final users = jsonBody['data']['users'] as List? ?? [];
+          
+          debugPrint('Messages: ${groupChats.length} adet');
+          debugPrint('Events: ${groupEvents.length} adet');
+          debugPrint('Users: ${users.length} adet');
+          debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
         throw Exception('No group data found');
       } else {
-        throw Exception('Failed to fetch group details');
+        debugPrint('❌ API Error: ${response.statusCode} - ${response.body}');
+        throw Exception('Failed to fetch group details: ${response.statusCode}');
       }
     } catch (e) {
+      debugPrint('❌ Group detail fetch error: $e');
       rethrow;
     }
+  }
+
+  /// CACHE: Simple in-memory cache for group details
+  static final Map<String, GroupDetailModel> _groupCache = {};
+  static final Map<String, DateTime> _cacheTimestamps = {};
+  static const Duration _cacheTimeout = Duration(minutes: 5);
+
+  /// Get group detail with caching
+  Future<GroupDetailModel> fetchGroupDetailCached(String groupId) async {
+    // Check cache first
+    if (_groupCache.containsKey(groupId) && _cacheTimestamps.containsKey(groupId)) {
+      final cacheTime = _cacheTimestamps[groupId]!;
+      if (DateTime.now().difference(cacheTime) < _cacheTimeout) {
+        debugPrint('✅ Returning cached group data for ID: $groupId');
+        return _groupCache[groupId]!;
+      }
+    }
+
+    // Fetch fresh data
+    final groupDetail = await fetchGroupDetail(groupId);
+    
+    // Cache the result
+    _groupCache[groupId] = groupDetail;
+    _cacheTimestamps[groupId] = DateTime.now();
+    
+    debugPrint('💾 Cached group data for ID: $groupId');
+    return groupDetail;
+  }
+
+  /// Clear cache when needed
+  static void clearGroupCache() {
+    _groupCache.clear();
+    _cacheTimestamps.clear();
+    debugPrint('🗑️ Group cache cleared');
   }
 
   Future<bool> sendGroupMessage({
