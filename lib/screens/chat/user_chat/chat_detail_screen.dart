@@ -24,31 +24,71 @@ class ChatDetailScreen extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return ListView.builder(
-      controller: controller.scrollController,
-      itemCount: messages.length,
-      padding: const EdgeInsets.only(bottom: 75),
-      addAutomaticKeepAlives: false,
-      addRepaintBoundaries: true,
-      cacheExtent: 500.0,
-      itemBuilder: (context, index) {
-        final message = messages[index];
-        final widgets = <Widget>[];
+    return Obx(() {
+      final int itemCount = messages.length + (controller.isLoadingMoreMessages.value ? 1 : 0);
+      
+      return ListView.builder(
+        controller: controller.scrollController,
+        itemCount: itemCount,
+        padding: const EdgeInsets.only(bottom: 75),
+        addAutomaticKeepAlives: false,
+        addRepaintBoundaries: true,
+        cacheExtent: 500.0,
+        itemBuilder: (context, index) {
+          // PAGINATION: Show loading indicator at the top when loading more messages
+          if (index == 0 && controller.isLoadingMoreMessages.value) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFef5050)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Eski mesajlar yükleniyor...',
+                    style: TextStyle(
+                      color: Color(0xff9ca3ae),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          
+          // Adjust message index based on whether loading indicator is shown
+          final messageIndex = controller.isLoadingMoreMessages.value ? index - 1 : index;
+          
+          if (messageIndex < 0 || messageIndex >= messages.length) {
+            return const SizedBox.shrink();
+          }
+          
+          final message = messages[messageIndex];
+          final widgets = <Widget>[];
 
-        // Tarih separator kontrolü
-        if (index == 0 || _shouldShowDateSeparator(messages, index)) {
-          final messageDate = DateTime.parse(message.createdAt);
-          widgets.add(DateSeparatorWidget(date: messageDate));
-        }
+          // Tarih separator kontrolü
+          if (messageIndex == 0 || _shouldShowDateSeparator(messages, messageIndex)) {
+            final messageDate = DateTime.parse(message.createdAt);
+            widgets.add(DateSeparatorWidget(date: messageDate));
+          }
 
-        // Mesaj widget'ı
-        widgets.add(MessageWidgetFactory.buildMessageWidget(message));
+          // Mesaj widget'ı
+          widgets.add(MessageWidgetFactory.buildMessageWidget(message));
 
-        return Column(
-          children: widgets,
-        );
-      },
-    );
+          return Column(
+            children: widgets,
+          );
+        },
+      );
+    });
   }
 
   /// İki mesaj arasında tarih separator gösterilip gösterilmeyeceğini kontrol et

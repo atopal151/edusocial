@@ -1,4 +1,5 @@
 // group_services.dart
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
@@ -11,6 +12,85 @@ import '../../models/group_models/group_model.dart';
 import '../../models/group_models/group_detail_model.dart';
 
 class GroupServices {
+  // OPTIMIZE: HTTP client configuration for better network resilience
+  static final http.Client _httpClient = http.Client();
+  
+  // RETRY: Configuration for retry mechanism
+  static const int _maxRetries = 3;
+  static const Duration _baseDelay = Duration(seconds: 2);
+  static const Duration _requestTimeout = Duration(seconds: 15);
+
+  /// RETRY: Generic retry mechanism for HTTP requests
+  static Future<http.Response> _makeRequestWithRetry(
+    Future<http.Response> Function() request,
+    {String operation = 'API call'}
+  ) async {
+    Exception? lastException;
+    
+    for (int attempt = 1; attempt <= _maxRetries; attempt++) {
+      try {
+        debugPrint('🔄 $operation - Attempt $attempt/$_maxRetries');
+        
+        final response = await request().timeout(_requestTimeout);
+        
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (attempt > 1) {
+            debugPrint('✅ $operation - Success on attempt $attempt');
+          }
+          return response;
+        } else {
+          throw HttpException('HTTP ${response.statusCode}: ${response.reasonPhrase}');
+        }
+        
+      } on SocketException catch (e) {
+        lastException = e;
+        debugPrint('🌐 $operation - Network error on attempt $attempt: ${e.message}');
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt; // Exponential backoff
+          debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
+          await Future.delayed(delay);
+        }
+        
+      } on TimeoutException catch (e) {
+        lastException = e;
+        debugPrint('⏰ $operation - Timeout on attempt $attempt');
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt;
+          debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
+          await Future.delayed(delay);
+        }
+        
+      } on HttpException catch (e) {
+        lastException = e;
+        debugPrint('🔴 $operation - HTTP error on attempt $attempt: $e');
+        
+        // Don't retry for 4xx errors (client errors)
+        if (e.toString().contains('4')) {
+          throw e;
+        }
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt;
+          await Future.delayed(delay);
+        }
+        
+      } catch (e) {
+        lastException = Exception(e.toString());
+        debugPrint('❌ $operation - Unexpected error on attempt $attempt: $e');
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt;
+          await Future.delayed(delay);
+        }
+      }
+    }
+    
+    debugPrint('💥 $operation - All $_maxRetries attempts failed');
+    throw lastException ?? Exception('All retry attempts failed');
+  }
+
 //ana sayfa içerisinde çıkacak olan önerilen group alanı endpointi
   Future<List<GroupSuggestionModel>> fetchSuggestionGroups() async {
     final box = GetStorage();
@@ -174,6 +254,58 @@ class GroupServices {
     }
   }
 
+  /// PAGINATION: Fetch group messages with pagination support
+  Future<List<dynamic>> fetchGroupMessagesWithPagination(
+    String groupId, {
+    int limit = 25,
+    int offset = 0,
+  }) async {
+    final box = GetStorage();
+    try {
+      debugPrint('📱 Fetching paginated group messages for ID: $groupId');
+      debugPrint('📊 Pagination: limit=$limit, offset=$offset');
+      
+      final uri = Uri.parse('${AppConstants.baseUrl}/group-messages/$groupId').replace(
+        queryParameters: {
+          'limit': limit.toString(),
+          'offset': offset.toString(),
+          'sort': 'desc', // En yeniden eskiye
+        }
+      );
+      
+      // RETRY: Use retry mechanism for network resilience
+      final response = await _makeRequestWithRetry(
+        () => _httpClient.get(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${box.read('token')}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+        operation: 'Fetch Paginated Group Messages',
+      );
+
+      debugPrint('📥 Paginated group messages response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        if (jsonBody['status'] == true && jsonBody['data'] != null) {
+          final messages = jsonBody['data'] as List? ?? [];
+          debugPrint('✅ ${messages.length} group messages loaded (paginated)');
+          return messages;
+        }
+      }
+      
+      debugPrint('❌ Failed to fetch paginated group messages: ${response.statusCode}');
+      return [];
+      
+    } catch (e) {
+      debugPrint('❌ Paginated group messages fetch error: $e');
+      return [];
+    }
+  }
+
   /// OPTIMIZED: Faster group detail fetching with minimal data
   Future<GroupDetailModel> fetchGroupDetail(String groupId) async {
     final box = GetStorage();
@@ -189,14 +321,18 @@ class GroupServices {
         }
       );
       
-      final response = await http.get(
-        uri,
-        headers: {
-          'Authorization': 'Bearer ${box.read('token')}',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 4)); // Reduced from 8s to 4s
+      // RETRY: Use retry mechanism for network resilience  
+      final response = await _makeRequestWithRetry(
+        () => _httpClient.get(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${box.read('token')}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+        operation: 'Fetch Group Detail',
+      );
 
       debugPrint('📡 Group detail response time: ${DateTime.now()}');
 

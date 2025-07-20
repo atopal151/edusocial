@@ -326,8 +326,9 @@ class OptimizedMessageListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final messageList = messages.toList();
+      final int itemCount = messageList.length + (controller.isLoadingMoreMessages.value ? 1 : 0);
       
-      if (messageList.isEmpty) {
+      if (messageList.isEmpty && !controller.isLoadingMoreMessages.value) {
         return Center(
           child: Text(
             'No messages yet',
@@ -355,19 +356,55 @@ class OptimizedMessageListView extends StatelessWidget {
       return ListView.builder(
         controller: controller.scrollController,
         padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
-        itemCount: messageList.length,
+        itemCount: itemCount,
         // OPTIMIZE: Caching for better scroll performance
         cacheExtent: 1000,
         physics: ClampingScrollPhysics(),
         itemBuilder: (context, index) {
-          final message = messageList[index];
+          // PAGINATION: Show loading indicator at the top when loading more messages
+          if (index == 0 && controller.isLoadingMoreMessages.value) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFef5050)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Eski mesajlar yükleniyor...',
+                    style: TextStyle(
+                      color: Color(0xff9ca3ae),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          
+          // Adjust message index based on whether loading indicator is shown
+          final messageIndex = controller.isLoadingMoreMessages.value ? index - 1 : index;
+          
+          if (messageIndex < 0 || messageIndex >= messageList.length) {
+            return const SizedBox.shrink();
+          }
+          
+          final message = messageList[messageIndex];
           
           // OPTIMIZE: RepaintBoundary for each message
           return RepaintBoundary(
             child: Column(
               children: [
                 // Date separator (if needed)
-                if (_shouldShowDateSeparator(messageList, index))
+                if (_shouldShowDateSeparator(messageList, messageIndex))
                   DateSeparatorWidget(
                     date: message.timestamp,
                   ),

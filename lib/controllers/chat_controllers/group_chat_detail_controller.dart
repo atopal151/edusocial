@@ -30,6 +30,13 @@ class GroupChatDetailController extends GetxController {
   late StreamSubscription _groupMessageSubscription;
   final ScrollController scrollController = ScrollController();
 
+  // PAGINATION: New state variables for lazy loading group messages
+  final RxBool isLoadingMoreMessages = false.obs;
+  final RxBool hasMoreMessages = true.obs;
+  final RxInt currentOffset = 0.obs;
+  final int messagesPerPage = 25;
+  final RxBool isFirstLoad = true.obs;
+
   // Grup chat verilerinden çıkarılan belge, bağlantı ve fotoğraf listeleri
   final RxList<DocumentModel> groupDocuments = <DocumentModel>[].obs;
   final RxList<LinkModel> groupLinks = <LinkModel>[].obs;
@@ -88,6 +95,9 @@ class GroupChatDetailController extends GetxController {
     _socketService = Get.find<SocketService>();
     _setupSocketListeners();
     
+    // PAGINATION: Initialize scroll listener for lazy loading
+    _setupPaginationScrollListener();
+    
     if (Get.arguments != null && Get.arguments['groupId'] != null) {
       currentGroupId.value = Get.arguments['groupId'];
       debugPrint('✅ Current group ID set to: ${currentGroupId.value}');
@@ -98,6 +108,122 @@ class GroupChatDetailController extends GetxController {
       debugPrint('❌ No group ID provided in arguments');
       Get.snackbar('Error', 'No group selected', snackPosition: SnackPosition.BOTTOM);
       Get.back();
+    }
+  }
+
+  /// PAGINATION: Setup scroll listener for loading more messages
+  void _setupPaginationScrollListener() {
+    scrollController.addListener(() {
+      // Load more messages when scrolling UP (towards older messages)
+      if (scrollController.position.pixels <= 100 && 
+          !isLoadingMoreMessages.value && 
+          hasMoreMessages.value) {
+        debugPrint('📜 Group: User scrolled to top, loading more messages...');
+        _loadMoreGroupMessages();
+      }
+    });
+  }
+
+  /// PAGINATION: Load more older group messages
+  Future<void> _loadMoreGroupMessages() async {
+    if (isLoadingMoreMessages.value || !hasMoreMessages.value || currentGroupId.value.isEmpty) {
+      return;
+    }
+
+    try {
+      isLoadingMoreMessages.value = true;
+      
+      // Use current message count as offset
+      final nextOffset = messages.length;
+      debugPrint('📜 Group: Loading more messages. Current: ${messages.length}, Offset: $nextOffset');
+
+      // Fetch older messages using the new pagination service
+      final olderMessages = await _groupServices.fetchGroupMessagesWithPagination(
+        currentGroupId.value,
+        limit: messagesPerPage,
+        offset: nextOffset,
+      );
+
+      if (olderMessages.isEmpty) {
+        hasMoreMessages.value = false;
+        debugPrint('📜 Group: No more messages to load');
+        return;
+      }
+
+      // Convert to GroupMessageModel and check for duplicates
+      final currentUserId = Get.find<ProfileController>().userId.value;
+      final newMessages = <GroupMessageModel>[];
+      
+      for (final chatData in olderMessages) {
+        try {
+          final userId = chatData['user_id']?.toString() ?? '';
+          final user = chatData['user'] ?? {};
+          
+          final messageData = _determineMessageType(chatData);
+          
+          final message = GroupMessageModel(
+            id: chatData['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+            senderId: userId,
+            receiverId: currentGroupId.value,
+            name: user['name'] ?? '',
+            surname: user['surname'] ?? '',
+            username: user['username'] ?? user['name'] ?? '',
+            profileImage: user['avatar_url'] ?? '',
+            content: messageData['content'],
+            messageType: messageData['type'],
+            timestamp: DateTime.parse(chatData['created_at'] ?? DateTime.now().toIso8601String()),
+            isSentByMe: userId == currentUserId,
+            pollOptions: messageData['pollOptions'],
+            additionalText: messageData['additionalText'],
+            links: messageData['links'],
+          );
+          
+          // Check for duplicates
+          final isDuplicate = messages.any((existingMsg) => existingMsg.id == message.id);
+          if (!isDuplicate) {
+            newMessages.add(message);
+          } else {
+            debugPrint('🚫 Group: Duplicate message blocked: ${message.id}');
+          }
+        } catch (e) {
+          debugPrint('⚠️ Group: Error processing message: $e');
+        }
+      }
+
+      if (newMessages.isEmpty) {
+        hasMoreMessages.value = false;
+        debugPrint('📜 Group: All messages were duplicates');
+        return;
+      }
+
+      // Remember scroll position
+      final currentScrollOffset = scrollController.offset;
+      final currentMaxScrollExtent = scrollController.position.maxScrollExtent;
+
+      // Add older messages to the beginning
+      messages.insertAll(0, newMessages);
+
+      debugPrint('✅ Group: Added ${newMessages.length} older messages. Total: ${messages.length}');
+
+      // Maintain scroll position
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          final newMaxScrollExtent = scrollController.position.maxScrollExtent;
+          final scrollDifference = newMaxScrollExtent - currentMaxScrollExtent;
+          scrollController.jumpTo(currentScrollOffset + scrollDifference);
+        }
+      });
+
+      // Check if we reached the end
+      if (newMessages.length < messagesPerPage) {
+        hasMoreMessages.value = false;
+        debugPrint('📜 Group: Reached end of messages');
+      }
+
+    } catch (e) {
+      debugPrint('❌ Group: Error loading more messages: $e');
+    } finally {
+      isLoadingMoreMessages.value = false;
     }
   }
 
@@ -241,7 +367,7 @@ class GroupChatDetailController extends GetxController {
     }
   }
 
-  /// OPTIMIZE: Background message conversion with error handling
+  /// OPTIMIZE: Background message conversion with pagination support
   Future<void> convertGroupChatsToMessagesOptimized() async {
     if (groupData.value?.groupChats == null) return;
     
@@ -249,11 +375,16 @@ class GroupChatDetailController extends GetxController {
       final groupChats = groupData.value!.groupChats;
       final currentUserId = Get.find<ProfileController>().userId.value;
       
+      // PAGINATION: Only process latest messages for initial load
+      final messagesToProcess = isFirstLoad.value 
+        ? groupChats.take(messagesPerPage).toList()
+        : groupChats;
+      
       // Performance: Batch processing
       final processedMessages = <GroupMessageModel>[];
       
       // Cache kullanıcı verilerini tek seferde
-      for (final chat in groupChats) {
+      for (final chat in messagesToProcess) {
         final userId = chat.userId.toString();
         if (!_userCache.containsKey(userId)) {
           _userCache[userId] = chat.user;
@@ -262,8 +393,8 @@ class GroupChatDetailController extends GetxController {
       
       // OPTIMIZE: Process in smaller batches to prevent UI freeze
       const batchSize = 10;
-      for (int i = 0; i < groupChats.length; i += batchSize) {
-        final batch = groupChats.skip(i).take(batchSize);
+      for (int i = 0; i < messagesToProcess.length; i += batchSize) {
+        final batch = messagesToProcess.skip(i).take(batchSize);
         
         for (final chat in batch) {
           try {
@@ -299,14 +430,30 @@ class GroupChatDetailController extends GetxController {
         }
         
         // Allow UI to update between batches
-        if (i + batchSize < groupChats.length) {
+        if (i + batchSize < messagesToProcess.length) {
           await Future.delayed(Duration(milliseconds: 1));
         }
       }
       
       // Sort ve assign
       processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-      messages.assignAll(processedMessages);
+      
+      // PAGINATION: Update state based on first load or not
+      if (isFirstLoad.value) {
+        messages.assignAll(processedMessages);
+        
+        // Check if there are more messages available
+        if (groupChats.length > messagesPerPage) {
+          hasMoreMessages.value = true;
+        } else {
+          hasMoreMessages.value = false;
+        }
+        
+        isFirstLoad.value = false;
+        debugPrint('✅ Initial ${processedMessages.length} group messages loaded');
+      } else {
+        messages.assignAll(processedMessages);
+      }
       
       // Extract media in background
       Future.microtask(() {

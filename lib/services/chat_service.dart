@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -13,6 +14,85 @@ import '../models/user_chat_detail_model.dart';
 
 class ChatServices {
   static final _box = GetStorage();
+  
+  // OPTIMIZE: HTTP client configuration for better network resilience
+  static final http.Client _httpClient = http.Client();
+  
+  // RETRY: Configuration for retry mechanism
+  static const int _maxRetries = 3;
+  static const Duration _baseDelay = Duration(seconds: 2);
+  static const Duration _requestTimeout = Duration(seconds: 15);
+
+  /// RETRY: Generic retry mechanism for HTTP requests
+  static Future<http.Response> _makeRequestWithRetry(
+    Future<http.Response> Function() request,
+    {String operation = 'API call'}
+  ) async {
+    Exception? lastException;
+    
+    for (int attempt = 1; attempt <= _maxRetries; attempt++) {
+      try {
+        debugPrint('🔄 $operation - Attempt $attempt/$_maxRetries');
+        
+        final response = await request().timeout(_requestTimeout);
+        
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (attempt > 1) {
+            debugPrint('✅ $operation - Success on attempt $attempt');
+          }
+          return response;
+        } else {
+          throw HttpException('HTTP ${response.statusCode}: ${response.reasonPhrase}');
+        }
+        
+      } on SocketException catch (e) {
+        lastException = e;
+        debugPrint('🌐 $operation - Network error on attempt $attempt: ${e.message}');
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt; // Exponential backoff
+          debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
+          await Future.delayed(delay);
+        }
+        
+      } on TimeoutException catch (e) {
+        lastException = e;
+        debugPrint('⏰ $operation - Timeout on attempt $attempt');
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt;
+          debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
+          await Future.delayed(delay);
+        }
+        
+      } on HttpException catch (e) {
+        lastException = e;
+        debugPrint('🔴 $operation - HTTP error on attempt $attempt: $e');
+        
+        // Don't retry for 4xx errors (client errors)
+        if (e.toString().contains('4')) {
+          throw e;
+        }
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt;
+          await Future.delayed(delay);
+        }
+        
+      } catch (e) {
+        lastException = Exception(e.toString());
+        debugPrint('❌ $operation - Unexpected error on attempt $attempt: $e');
+        
+        if (attempt < _maxRetries) {
+          final delay = _baseDelay * attempt;
+          await Future.delayed(delay);
+        }
+      }
+    }
+    
+    debugPrint('💥 $operation - All $_maxRetries attempts failed');
+    throw lastException ?? Exception('All retry attempts failed');
+  }
 
   static Future<void> sendMessage(
     int receiverId,
@@ -113,12 +193,16 @@ class ChatServices {
     final url = Uri.parse("${AppConstants.baseUrl}/timeline/last-conversation");
 
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+      // RETRY: Use retry mechanism for network resilience
+      final response = await _makeRequestWithRetry(
+        () => _httpClient.get(
+          url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
+        ),
+        operation: 'Fetch Online Friends',
       );
 
       //debugPrint("🌐 Online Arkadaşlar URL: ${url.toString()}");
@@ -126,94 +210,108 @@ class ChatServices {
       //debugPrint("📥 Online Arkadaşlar Response Status Code: ${response.statusCode}");
       //debugPrint("📥 Online Arkadaşlar Response Body: ${response.body}");
 
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        final dataList = body['data'] as List<dynamic>;
+      final body = jsonDecode(response.body);
+      final dataList = body['data'] as List<dynamic>;
 
-        final chatList =
-            dataList.map((json) => ChatUserModel.fromJson(json)).toList();
+      final chatList =
+          dataList.map((json) => ChatUserModel.fromJson(json)).toList();
 
-        //debugPrint("✅ Chat List: $chatList");
+      //debugPrint("✅ Chat List: $chatList");
 
-        return chatList;
-      } else {
-        throw Exception("Failed to fetch last conversation.");
-      }
+      return chatList;
     } catch (e) {
-      debugPrint("🛑 Hata: $e");
+      debugPrint("🛑 Online Friends Error: $e");
       rethrow;
     }
   }
 
-  /// Mesaj detaylarını getir (Show Conversation)
+  /// Mesaj detaylarını getir (Show Conversation) - PAGINATION SUPPORT ADDED
   static Future<List<MessageModel>> fetchConversationMessages(
-      int conversationId) async {
+    int conversationId, {
+    int limit = 25,  // Varsayılan 25 mesaj
+    int offset = 0,  // Hangi mesajdan başlayacağı
+  }) async {
     final token = _box.read('token');
     final currentUserId = _box.read('userId');
-    final url = '${AppConstants.baseUrl}/conversation/$conversationId';
-
-    debugPrint("Sohbet mesajları getiriliyor (2. deneme): $url");
-
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
+    
+    // OPTIMIZE: Query parameters ile pagination
+    final uri = Uri.parse('${AppConstants.baseUrl}/conversation/$conversationId').replace(
+      queryParameters: {
+        'limit': limit.toString(),
+        'offset': offset.toString(),
+        'sort': 'desc', // En yeniden eskiye doğru
       },
     );
 
-    debugPrint("Sohbet Mesajları Yanıt Kodu: ${response.statusCode}");
-     debugPrint("Sohbet Mesajları Yanıt Body: ${response.body}");
+    debugPrint("📱 Sohbet mesajları getiriliyor (PAGINATED): $uri");
+    debugPrint("📊 Pagination: limit=$limit, offset=$offset");
 
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      final List<dynamic> messagesJson = body['data'];
+    // RETRY: Use retry mechanism for network resilience
+    final response = await _makeRequestWithRetry(
+      () => _httpClient.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      ),
+      operation: 'Fetch Conversation Messages',
+    );
 
-      return messagesJson
-          .map((json) => MessageModel.fromJson(json as Map<String, dynamic>,
-              currentUserId: currentUserId))
-          .toList();
-    } else {
-      throw Exception('Mesajlar getirilemedi!');
-    }
+    debugPrint("📥 Paginated Mesajlar Yanıt Kodu: ${response.statusCode}");
+    // debugPrint("📥 Paginated Mesajlar Yanıt Body: ${response.body}");
+
+    final body = jsonDecode(response.body);
+    final List<dynamic> messagesJson = body['data'];
+    
+    debugPrint("✅ ${messagesJson.length} mesaj yüklendi (pagination)");
+
+    return messagesJson
+        .map((json) => MessageModel.fromJson(json as Map<String, dynamic>,
+            currentUserId: currentUserId))
+        .toList();
+  }
+
+  /// Eski API metodu (backward compatibility)
+  static Future<List<MessageModel>> fetchAllConversationMessages(int conversationId) async {
+    return fetchConversationMessages(conversationId, limit: 1000, offset: 0);
   }
 
   /// Birebir mesaj listesi çek
   static Future<List<ChatModel>> fetchChatList() async {
     try {
       final token = _box.read('token');
-      final response = await http.get(
-        Uri.parse('${AppConstants.baseUrl}/conversation'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Accept': 'application/json',
-        },
+      
+      // RETRY: Use retry mechanism for network resilience
+      final response = await _makeRequestWithRetry(
+        () => _httpClient.get(
+          Uri.parse('${AppConstants.baseUrl}/conversation'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
+        ),
+        operation: 'Fetch Chat List',
       );
 
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        //  debugPrint("✅ Gelen JSON Body:");
-        //  debugPrint(jsonEncode(body));
+      final body = jsonDecode(response.body);
+      //  debugPrint("✅ Gelen JSON Body:");
+      //  debugPrint(jsonEncode(body));
 
-        if (body is Map<String, dynamic> && body.containsKey('data')) {
-          final data = body['data'];
-          if (data is List) {
-            return data.map((json) {
-              return ChatModel.fromJson(json);
-            }).toList();
-          } else {
-            debugPrint(
-                "⚠️ 'data' alanı liste değilmiş. Tip: ${data.runtimeType}");
-            return [];
-          }
+      if (body is Map<String, dynamic> && body.containsKey('data')) {
+        final data = body['data'];
+        if (data is List) {
+          return data.map((json) {
+            return ChatModel.fromJson(json);
+          }).toList();
         } else {
-          debugPrint("⚠️ 'data' alanı yok veya map değil!");
+          debugPrint(
+              "⚠️ 'data' alanı liste değilmiş. Tip: ${data.runtimeType}");
           return [];
         }
       } else {
-        debugPrint(
-            "❌ Chat listesi çekilemedi. StatusCode: ${response.statusCode}");
-        throw Exception('Chat listesi alınamadı.');
+        debugPrint("⚠️ 'data' alanı yok veya map değil!");
+        return [];
       }
     } catch (e) {
       debugPrint("❌ Chat listesi çekilirken hata: $e");
