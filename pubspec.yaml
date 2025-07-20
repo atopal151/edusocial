@@ -94,6 +94,7 @@ flutter:
     - images/icons/post.svg
     - images/icons/post_selected.svg
     - images/icons/match.svg
+    - images/icons/entry.svg
     - images/icons/notification_icon.svg
     - images/icons/search_icon.svg
     - images/icons/group_icon.svg

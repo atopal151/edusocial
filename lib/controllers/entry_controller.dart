@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'dart:async';
 import '../models/entry_model.dart';
 import '../models/user_model.dart';
+import '../models/topic_category_model.dart';
 import 'package:edusocial/controllers/profile_controller.dart'; // Import ProfileController
 import 'package:edusocial/models/profile_model.dart'; // Import ProfileModel
 import 'package:edusocial/controllers/entry_detail_controller.dart'; 
@@ -30,6 +31,11 @@ class EntryController extends GetxController {
   // Yeni eklenenler: Ana ekran için merkezi entry listeleri
   final RxList<DisplayEntryItem> allDisplayEntries = <DisplayEntryItem>[].obs;
   final RxList<DisplayEntryItem> displayEntries = <DisplayEntryItem>[].obs; // Filtered list for UI
+
+  // CATEGORY MANAGEMENT: Kategori yönetimi için yeni state'ler
+  final RxList<TopicCategoryModel> categories = <TopicCategoryModel>[].obs;
+  final RxString selectedCategory = 'Tümü'.obs; // Varsayılan olarak "Tümü" seçili
+  final RxBool isCategoryLoading = false.obs;
 
   final EntryServices entryServices = EntryServices();
 
@@ -63,6 +69,10 @@ class EntryController extends GetxController {
       isEntryLoading.value = true;
       final fetchedCategories = await entryServices.fetchTopicCategories();
       
+      // CATEGORY MANAGEMENT: Kategorileri kaydet
+      categories.assignAll(fetchedCategories);
+      debugPrint('✅ ${fetchedCategories.length} kategori yüklendi');
+      
       final List<DisplayEntryItem> preparedEntries = [];
       for (var category in fetchedCategories) {
         if (category.firstentry != null) {
@@ -80,12 +90,40 @@ class EntryController extends GetxController {
         }
       }
       allDisplayEntries.assignAll(preparedEntries);
-      displayEntries.assignAll(preparedEntries); // Initially, display all entries
+      
+      // CATEGORY MANAGEMENT: Seçilen kategoriye göre filtrele
+      applyCategoryFilter();
+      
     } catch (e) {
       debugPrint("⚠️ EntryController'da entry'ler hazırlanırken hata: $e");
     } finally {
       isEntryLoading.value = false;
     }
+  }
+
+  /// CATEGORY MANAGEMENT: Kategori seçimi fonksiyonu
+  void selectCategory(String categoryName) {
+    selectedCategory.value = categoryName;
+    applyCategoryFilter();
+    debugPrint('📂 Kategori seçildi: $categoryName');
+  }
+
+  /// CATEGORY MANAGEMENT: Seçilen kategoriye göre entry'leri filtrele
+  void applyCategoryFilter() {
+    if (selectedCategory.value == 'Tümü') {
+      // Tüm entry'leri göster
+      displayEntries.assignAll(allDisplayEntries);
+    } else {
+      // Seçilen kategoriye ait entry'leri filtrele
+      final filtered = allDisplayEntries.where((item) => 
+        item.categoryTitle == selectedCategory.value
+      ).toList();
+      displayEntries.assignAll(filtered);
+    }
+    
+    // Arama filtresini de uygula
+    applySearchFilterToDisplayList();
+    debugPrint('📊 Filtrelenmiş entry sayısı: ${displayEntries.length}');
   }
 
   // Tüm tartışma konularını getir (Eski, artık sadece topic-categories için kullanılacak)
@@ -294,20 +332,34 @@ class EntryController extends GetxController {
     }
   }
 
-  // Arama filtresini displayEntries listesine uygular
+  // IMPROVED: Arama ve kategori filtresini birlikte uygular
   void applySearchFilterToDisplayList() {
     final query = entrySearchController.text.toLowerCase();
+    
+    // Önce kategori filtresini uygula
+    List<DisplayEntryItem> categoryFiltered;
+    if (selectedCategory.value == 'Tümü') {
+      categoryFiltered = allDisplayEntries.toList();
+    } else {
+      categoryFiltered = allDisplayEntries.where((item) => 
+        item.categoryTitle == selectedCategory.value
+      ).toList();
+    }
+    
+    // Sonra arama filtresini uygula
     if (query.isEmpty) {
-      displayEntries.assignAll(allDisplayEntries);
+      displayEntries.assignAll(categoryFiltered);
     } else {
       displayEntries.assignAll(
-        allDisplayEntries.where((item) {
+        categoryFiltered.where((item) {
           return item.entry.content.toLowerCase().contains(query) ||
               (item.topicName?.toLowerCase().contains(query) ?? false) ||
               (item.categoryTitle?.toLowerCase().contains(query) ?? false);
         }).toList(),
       );
     }
+    
+    debugPrint('🔍 Filter sonucu: ${displayEntries.length} entry (Kategori: ${selectedCategory.value}, Arama: "$query")');
   }
 
   // Fetch Topic Categories With Topics (Bu metod artık fetchAndPrepareEntries ile entegre edilebilir)

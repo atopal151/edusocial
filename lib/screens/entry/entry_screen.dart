@@ -83,27 +83,14 @@ class EntryScreenState extends State<EntryScreen> {
                           label: languageService.tr("entry.entryScreen.searchPlaceholder"),
                           controller: entryController.entrySearchController,
                           onChanged: (value) {
-                            final query = value.toLowerCase();
-                            entryController.displayEntries.assignAll(
-                              entryController.allDisplayEntries.where((item) {
-                                return item.entry.content
-                                        .toLowerCase()
-                                        .contains(query) ||
-                                    (item.topicName?.toLowerCase().contains(query) ??
-                                        false) ||
-                                    (item.categoryTitle
-                                            ?.toLowerCase()
-                                            .contains(query) ??
-                                        false);
-                              }).toList(),
-                            );
+                            // IMPROVED: Kategori + arama filtresini birlikte kullan
+                            entryController.applySearchFilterToDisplayList();
                           },
                         ),
                       ),
 
                       const SizedBox(height: 10),
-
-                      // ➕ Yeni Konu Butonu
+                        // ➕ Yeni Konu Butonu
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: CustomButton(
@@ -118,6 +105,143 @@ class EntryScreenState extends State<EntryScreen> {
                       ),
 
                       const SizedBox(height: 10),
+
+                      // 📂 CATEGORY SELECTION: Horizontal category list
+                      Container(
+                        height: 45,
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Obx(() {
+                          // Loading state
+                          if (entryController.categories.isEmpty) {
+                            return const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xfffb535c)),
+                                ),
+                              ),
+                            );
+                          }
+                          
+                          // "Tümü" seçeneği + kategoriler
+                          final allCategories = ['Tümü'] + entryController.categories.map((cat) => cat.title).toList();
+                          
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: allCategories.length,
+                            itemBuilder: (context, index) {
+                              final categoryName = allCategories[index];
+                              final isSelected = entryController.selectedCategory.value == categoryName;
+                              
+                              // Kategori için entry sayısını hesapla
+                              int entryCount;
+                              if (categoryName == 'Tümü') {
+                                entryCount = entryController.allDisplayEntries.length;
+                              } else {
+                                entryCount = entryController.allDisplayEntries
+                                    .where((item) => item.categoryTitle == categoryName)
+                                    .length;
+                              }
+                              
+                              return Container(
+                                margin: const EdgeInsets.only(right: 8),
+                                child: InkWell(
+                                  onTap: () => entryController.selectCategory(categoryName),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? const Color(0xfffb535c) : const Color(0xffffffff),
+                                      borderRadius: BorderRadius.circular(16),
+                                     
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          categoryName,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: isSelected ? Colors.white : const Color(0xff666666),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: isSelected ? Colors.white.withValues(alpha: 0.2) : const Color(0xfff0f0f0),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Text(
+                                            entryCount.toString(),
+                                            style: GoogleFonts.inter(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: isSelected ? Colors.white : const Color(0xff888888),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // 📊 CATEGORY INFO: Selected category and count
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Obx(() {
+                          final selectedCat = entryController.selectedCategory.value;
+                          final entryCount = entryController.displayEntries.length;
+                          final totalEntries = entryController.allDisplayEntries.length;
+                          
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                selectedCat == 'Tümü' 
+                                  ? languageService.tr("entry.entryScreen.allCategories")
+                                  : selectedCat,
+                                style: GoogleFonts.inter(
+                                  fontSize: 13.78,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xff272727),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xfff5f5f5),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Text(
+                                  selectedCat == 'Tümü' 
+                                    ? '$totalEntries ${languageService.tr("entry.entryScreen.entries")}'
+                                    : '$entryCount ${languageService.tr("entry.entryScreen.entries")}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xff666666),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                    
 
                       // 📄 Entry Listesi
                       Expanded(

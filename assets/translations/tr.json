@@ -375,7 +375,9 @@
       "newTopicButton": "+ Yeni Konu Aç",
       "noEntriesFound": "Gösterilecek entry bulunamadı.",
       "refreshSuccess": "Entry verileri başarıyla yenilendi",
-      "refreshLoading": "Entry verileri yenileniyor..."
+      "refreshLoading": "Entry verileri yenileniyor...",
+      "allCategories": "Tüm Kategoriler",
+      "entries": "entry"
     },
     "entryDetail": {
       "categoryNotFound": "Kategori Yok",

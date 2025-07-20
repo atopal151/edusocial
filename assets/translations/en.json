@@ -372,7 +372,9 @@
       "newTopicButton": "+ Create New Topic",
       "noEntriesFound": "No entries found to display.",
       "refreshSuccess": "Entry data refreshed successfully",
-      "refreshLoading": "Refreshing entry data..."
+      "refreshLoading": "Refreshing entry data...",
+      "allCategories": "All Categories",
+      "entries": "entries"
     },
     "entryDetail": {
       "noCategory": "No Category",

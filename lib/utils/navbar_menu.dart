@@ -17,7 +17,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
   final NavigationController controller = Get.find();
   final ChatController chatController = Get.find();
 
-  final List<String> icons = ["post", "chat", "match", "event", "profile"];
+  final List<String> icons = ["post", "chat", "match", "entry", "profile"];
   static const double centerButtonWidth = 57;
 
   @override
