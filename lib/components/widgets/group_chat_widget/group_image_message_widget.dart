@@ -154,8 +154,11 @@ class GroupImageMessageWidget extends StatelessWidget {
                                         loadingBuilder: (context, child, loadingProgress) {
                                           if (loadingProgress == null) return child;
                                           return Container(
+                                             width: 200,
+                                             height: 150,
                                             color: Colors.grey[100],
                                             child: Center(
+                                              
                                               child: CircularProgressIndicator(
                                                 value: loadingProgress.expectedTotalBytes != null
                                                     ? loadingProgress.cumulativeBytesLoaded /
