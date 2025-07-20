@@ -183,7 +183,7 @@ class GroupServices {
           'Authorization': 'Bearer ${box.read('token')}',
           'Content-Type': 'application/json',
         },
-      ).timeout(const Duration(seconds: 12)); // 12 saniye timeout
+      ).timeout(const Duration(seconds: 8)); // OPTIMIZE: 8 saniye timeout
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);

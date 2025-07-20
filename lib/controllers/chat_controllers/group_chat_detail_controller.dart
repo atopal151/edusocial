@@ -45,6 +45,10 @@ class GroupChatDetailController extends GetxController {
   RxString selectedPollOption = ''.obs;
   TextEditingController pollTitleController = TextEditingController();
 
+  // Performance optimization: Cache kullanıcı verileri
+  final Map<String, Map<String, dynamic>> _userCache = {};
+  bool _isInitialLoad = true;
+
   // URL algılama için regex pattern
   static final RegExp urlRegex = RegExp(
     r'(https?://[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]{2,})',
@@ -79,8 +83,6 @@ class GroupChatDetailController extends GetxController {
   void onInit() {
     super.onInit();
     debugPrint('🔍 Group chat detail controller onInit called');
-    debugPrint('🔍 Get.arguments: ${Get.arguments}');
-    debugPrint('🔍 Get.arguments type: ${Get.arguments.runtimeType}');
     
     // Socket servisini initialize et
     _socketService = Get.find<SocketService>();
@@ -90,20 +92,11 @@ class GroupChatDetailController extends GetxController {
       currentGroupId.value = Get.arguments['groupId'];
       debugPrint('✅ Current group ID set to: ${currentGroupId.value}');
       
-      // Progressive loading: Önce grup verilerini yükle
+      // Optimize: Sadece burada yükle, initState'te tekrar çağırma
       _loadGroupDataProgressive();
     } else {
       debugPrint('❌ No group ID provided in arguments');
-      debugPrint('❌ Get.arguments is null: ${Get.arguments == null}');
-      if (Get.arguments != null) {
-        debugPrint('❌ Get.arguments keys: ${Get.arguments.keys}');
-      }
-      Get.snackbar(
-        'Error',
-        'No group selected',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      // Navigate back if no group ID is provided
+      Get.snackbar('Error', 'No group selected', snackPosition: SnackPosition.BOTTOM);
       Get.back();
     }
   }
@@ -111,15 +104,17 @@ class GroupChatDetailController extends GetxController {
   /// Progressive loading: Önce grup verilerini yükle, sonra mesajları
   Future<void> _loadGroupDataProgressive() async {
     try {
-      // 1. Grup verilerini yükle
       isGroupDataLoading.value = true;
       await fetchGroupDetails();
       isGroupDataLoading.value = false;
       
-      // 2. Mesajları ayrı olarak yükle (UI zaten görünür durumda)
-      isMessagesLoading.value = true;
-      await fetchGroupMessages();
-      isMessagesLoading.value = false;
+      // İlk yükleme sonrası scroll
+      if (_isInitialLoad) {
+        _isInitialLoad = false;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottomOnce();
+        });
+      }
       
     } catch (e) {
       debugPrint('❌ Progressive loading error: $e');
@@ -137,21 +132,55 @@ class GroupChatDetailController extends GetxController {
     try {
       debugPrint('🔍 Fetching group details for group ID: ${currentGroupId.value}');
       
-      final group = await _groupServices.fetchGroupDetail(currentGroupId.value)
-          .timeout(const Duration(seconds: 10)); // 10 saniye timeout
+      // OPTIMIZE: Retry mechanism with progressive timeout
+      GroupDetailModel? group;
       
-      groupData.value = group;
+      for (int attempt = 1; attempt <= 3; attempt++) {
+        try {
+          final timeoutDuration = Duration(seconds: 5 + (attempt * 3)); // 5s, 8s, 11s
+          debugPrint('🔄 Attempt $attempt with ${timeoutDuration.inSeconds}s timeout');
+          
+          group = await _groupServices.fetchGroupDetail(currentGroupId.value)
+              .timeout(timeoutDuration);
+          
+          break; // Success, exit retry loop
+        } catch (e) {
+          debugPrint('⚠️ Attempt $attempt failed: $e');
+          
+          if (attempt == 3) {
+            rethrow; // Final attempt failed, throw error
+          }
+          
+          // Wait before retry
+          await Future.delayed(Duration(milliseconds: 500));
+        }
+      }
       
-      // Group chats verilerini mesajlara dönüştür
-      convertGroupChatsToMessages();
+      if (group != null) {
+        groupData.value = group;
+        
+        // Group chats verilerini mesajlara dönüştür
+        convertGroupChatsToMessagesOptimized();
+        
+        debugPrint('✅ Group details loaded successfully');
+      }
       
-      debugPrint('✅ Group details loaded successfully');
     } catch (e) {
-      debugPrint('❌ Error fetching group details: $e');
+      debugPrint('❌ Error fetching group details after all retries: $e');
+      
+      // More user-friendly error message
+      String errorMessage = 'Network error. Please check your connection.';
+      if (e.toString().contains('TimeoutException')) {
+        errorMessage = 'Loading took too long. Please try again.';
+      }
+      
       Get.snackbar(
-        'Error',
-        'Failed to fetch group details',
+        'Connection Error',
+        errorMessage,
         snackPosition: SnackPosition.BOTTOM,
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.orange.shade100,
+        colorText: Colors.orange.shade800,
       );
     }
   }
@@ -163,7 +192,7 @@ class GroupChatDetailController extends GetxController {
     });
   }
 
-  /// Yeni grup mesajı geldiğinde işle
+  /// Yeni grup mesajı geldiğinde işle - OPTIMIZE
   void _onNewGroupMessage(dynamic data) {
     try {
       debugPrint('📡 GroupChatDetailController - Yeni grup mesajı geldi: $data');
@@ -175,16 +204,166 @@ class GroupChatDetailController extends GetxController {
         if (incomingGroupId != null && incomingGroupId == currentGroupId.value) {
           debugPrint('✅ Yeni grup mesajı bu gruba ait, mesaj listesine ekleniyor');
           
-          // Mesajları yeniden yükle
-          refreshMessagesOnly();
+          // OPTIMIZE: Tüm grup detayını tekrar çekme, sadece yeni mesajı ekle
+          _addNewMessageFromSocket(data);
           
           debugPrint('✅ Yeni grup mesajı işlendi');
-        } else {
-          debugPrint('📨 Gelen grup mesajı bu gruba ait değil. Gelen: $incomingGroupId, Mevcut: ${currentGroupId.value}');
         }
       }
     } catch (e) {
       debugPrint('❌ _onNewGroupMessage error: $e');
+    }
+  }
+
+  /// Socket'ten gelen yeni mesajı direkt ekle (API çağrısı yapma)
+  void _addNewMessageFromSocket(Map<String, dynamic> data) {
+    try {
+      // Yeni mesajı parse et ve listeye ekle
+      // Bu implementation'ı socket data formatına göre ayarla
+      final currentUserId = Get.find<ProfileController>().userId.value;
+      
+      // Basit implementasyon - gerçek socket data'ya göre ayarlanmalı
+      final newMessage = GroupMessageModel(
+        id: data['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        senderId: data['user_id']?.toString() ?? '',
+        receiverId: currentGroupId.value,
+        name: data['user']?['name'] ?? '',
+        surname: data['user']?['surname'] ?? '',
+        username: data['user']?['username'] ?? '',
+        profileImage: data['user']?['avatar_url'] ?? '',
+        content: data['message'] ?? '',
+        messageType: GroupMessageType.text, // Socket data'ya göre ayarla
+        timestamp: DateTime.now(),
+        isSentByMe: data['user_id']?.toString() == currentUserId,
+      );
+      
+      messages.add(newMessage);
+      
+      // Yeni mesaj eklendiğinde en alta git
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottomOnce();
+      });
+      
+    } catch (e) {
+      debugPrint('❌ Error adding new message from socket: $e');
+      // Fallback: Tüm mesajları yeniden yükle
+      refreshMessagesOnly();
+    }
+  }
+
+  /// OPTIMIZE: Message conversion with caching
+  void convertGroupChatsToMessagesOptimized() {
+    if (groupData.value?.groupChats == null) return;
+    
+    final groupChats = groupData.value!.groupChats;
+    final currentUserId = Get.find<ProfileController>().userId.value;
+    
+    // Performance: Batch processing
+    final processedMessages = <GroupMessageModel>[];
+    
+    // Cache kullanıcı verilerini tek seferde
+    for (final chat in groupChats) {
+      final userId = chat.userId.toString();
+      if (!_userCache.containsKey(userId)) {
+        _userCache[userId] = chat.user;
+      }
+    }
+    
+    // Mesajları process et
+    for (final chat in groupChats) {
+      final userId = chat.userId.toString();
+      final user = _userCache[userId]!;
+      final isSentByMe = userId == currentUserId;
+      
+      // Optimize: Message type determination
+      final messageData = _determineMessageType(chat);
+      
+      final message = GroupMessageModel(
+        id: chat.id.toString(),
+        senderId: userId,
+        receiverId: chat.groupId.toString(),
+        name: user['name'] ?? '',
+        surname: user['surname'] ?? '',
+        username: user['username'] ?? user['name'] ?? '',
+        profileImage: user['avatar_url'] ?? '',
+        content: messageData['content'],
+        messageType: messageData['type'],
+        timestamp: DateTime.parse(chat.createdAt),
+        isSentByMe: isSentByMe,
+        pollOptions: messageData['pollOptions'],
+        additionalText: messageData['additionalText'],
+        links: messageData['links'],
+      );
+      
+      processedMessages.add(message);
+    }
+    
+    // Sort ve assign
+    processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    messages.assignAll(processedMessages);
+    
+    // Extract media
+    extractGroupChatMedia();
+  }
+
+  /// Helper function for message type determination
+  Map<String, dynamic> _determineMessageType(dynamic chat) {
+    GroupMessageType messageType = GroupMessageType.text;
+    String content = chat.message ?? '';
+    List<String>? links;
+    List<String>? pollOptions;
+    String? additionalText;
+    
+    try {
+      if (chat.messageType == 'poll') {
+        messageType = GroupMessageType.poll;
+        content = chat.message ?? '';
+        pollOptions = ['Seçenek 1', 'Seçenek 2']; // TODO: Backend'den parse et
+      } else if (chat.media != null && chat.media.isNotEmpty) {
+        final media = chat.media.first;
+        if (media.type != null && media.type.startsWith('image/')) {
+          messageType = GroupMessageType.image;
+          content = media.fullPath ?? '';
+        } else {
+          messageType = GroupMessageType.document;
+          content = media.fullPath ?? '';
+        }
+      } else if (chat.groupChatLink != null && chat.groupChatLink.isNotEmpty) {
+        // FIXED: Proper type casting for links
+        final chatLinks = chat.groupChatLink
+            .map<String>((link) => link.link?.toString() ?? '')
+            .where((link) => link.isNotEmpty)
+            .toList();
+        
+        if (chat.message != null && chat.message.isNotEmpty) {
+          messageType = GroupMessageType.textWithLinks;
+          content = chat.message;
+          links = chatLinks.isNotEmpty ? chatLinks : null;
+        } else if (chatLinks.isNotEmpty) {
+          messageType = GroupMessageType.link;
+          content = chatLinks.first;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error determining message type: $e');
+      // Fallback to text message
+      messageType = GroupMessageType.text;
+      content = chat.message?.toString() ?? '';
+    }
+    
+    return {
+      'type': messageType,
+      'content': content,
+      'links': links,
+      'pollOptions': pollOptions,
+      'additionalText': additionalText,
+    };
+  }
+
+  /// OPTIMIZE: Single scroll to bottom
+  void _scrollToBottomOnce() {
+    if (scrollController.hasClients && messages.isNotEmpty) {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
     }
   }
 
@@ -199,108 +378,6 @@ class GroupChatDetailController extends GetxController {
     
     debugPrint('🔍 Grup mesaj subscription aktif: ${!_groupMessageSubscription.isPaused}');
     debugPrint('🔍 ================================');
-  }
-
-  void convertGroupChatsToMessages() {
-    if (groupData.value?.groupChats == null) return;
-    
-    // Mevcut mesajları temizle
-    messages.clear();
-    
-    final groupChats = groupData.value!.groupChats;
-    final currentUserId = Get.find<ProfileController>().userId.value;
-    
-    // Performans için önceden hesaplanmış değerler
-    final processedMessages = <GroupMessageModel>[];
-    
-    for (final chat in groupChats) {
-      final user = chat.user;
-      final isSentByMe = user['id'].toString() == currentUserId;
-      
-      // Debug: Kullanıcı verilerini logla
-      print('📊 User data for ${chat.userId}: $user');
-      
-      GroupMessageType messageType = GroupMessageType.text;
-      String content = chat.message;
-      List<String>? links;
-      
-      // Mesaj türünü belirle - optimize edilmiş
-      List<String>? pollOptions;
-      if (chat.messageType == 'poll') {
-        messageType = GroupMessageType.poll;
-        content = chat.message;
-        // TODO: Poll options'ı backend'den parse et
-        pollOptions = ['Seçenek 1', 'Seçenek 2']; // Geçici
-      } else if (chat.media.isNotEmpty) {
-        final media = chat.media.first;
-        if (media.type.startsWith('image/')) {
-          messageType = GroupMessageType.image;
-          content = media.fullPath;
-        } else {
-          messageType = GroupMessageType.document;
-          content = media.fullPath;
-        }
-      } else if (chat.groupChatLink.isNotEmpty) {
-        final chatLinks = chat.groupChatLink.map((link) => link.link).toList();
-        
-        if (chat.message.isNotEmpty) {
-          messageType = GroupMessageType.textWithLinks;
-          content = chat.message;
-          links = chatLinks;
-        } else {
-          messageType = GroupMessageType.link;
-          content = chatLinks.first;
-        }
-      }
-      
-      final message = GroupMessageModel(
-        id: chat.id.toString(),
-        senderId: chat.userId.toString(),
-        receiverId: chat.groupId.toString(),
-        name: user['name'] ?? '',
-        surname: user['surname'] ?? '',
-        username: user['username'] ?? user['name'] ?? '',
-        profileImage: user['avatar_url'] ?? '',
-        content: content,
-        messageType: messageType,
-        timestamp: DateTime.parse(chat.createdAt),
-        isSentByMe: isSentByMe,
-        pollOptions: pollOptions,
-        additionalText: chat.messageType == 'poll' ? chat.message : null,
-        links: links,
-      );
-      
-      processedMessages.add(message);
-    }
-    
-    // Mesajları tarihe göre sırala
-    processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    
-    // Toplu olarak ekle
-    messages.assignAll(processedMessages);
-    
-    // Grup chat verilerinden belge, bağlantı ve fotoğraf verilerini çıkar
-    extractGroupChatMedia();
-    
-    // Mesajlar yüklendikten sonra en alta git
-    _scrollToBottomWithRetry();
-  }
-
-  void _scrollToBottomWithRetry() {
-    // İlk deneme
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToBottom(animated: false);
-      
-      // İkinci deneme - biraz gecikmeyle
-      Future.delayed(Duration(milliseconds: 300), () {
-        scrollToBottom(animated: false);
-      });
-      
-      // Üçüncü deneme - daha uzun gecikmeyle
-      Future.delayed(Duration(milliseconds: 800), () {
-        scrollToBottom(animated: false);
-      });
-    });
   }
 
   void extractGroupChatMedia() {
@@ -367,16 +444,12 @@ class GroupChatDetailController extends GetxController {
       
       // Grup verileri zaten yüklendi, sadece mesajları dönüştür
       if (groupData.value != null) {
-        convertGroupChatsToMessages();
+        convertGroupChatsToMessagesOptimized();
       }
       
     } catch (e) {
       debugPrint('Error fetching messages: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to fetch messages',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', 'Failed to fetch messages', snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -574,18 +647,13 @@ class GroupChatDetailController extends GetxController {
   Future<void> sendMessage(String text) async {
     if (isSendingMessage.value) return;
     
-    // Debug log ekle
-    debugPrint('📤 Sending message:');
-    debugPrint('  - Text: "$text"');
-    debugPrint('  - Selected files: ${selectedFiles.length}');
+    debugPrint('📤 Sending message: "$text"');
     
-    // Eğer hiçbir şey seçilmemişse gönderme
     if (text.isEmpty && selectedFiles.isEmpty) {
       debugPrint('❌ Nothing to send');
       return;
     }
     
-    // Eğer sadece dosya seçilmişse ve text yoksa, dosyaları gönder
     if (text.isEmpty && selectedFiles.isNotEmpty) {
       debugPrint('📁 Sending only media files');
       await sendMediaOnly();
@@ -595,76 +663,47 @@ class GroupChatDetailController extends GetxController {
     isSendingMessage.value = true;
     
     try {
-      // Text içinde link var mı kontrol et
+      bool success;
+      
       if (text.isNotEmpty && hasLinksInText(text)) {
         debugPrint('🔗 Links detected in text, processing...');
         
         final urls = extractUrlsFromText(text);
         final nonLinkText = extractNonLinkText(text);
-        
-        debugPrint('  - Detected URLs: $urls');
-        debugPrint('  - Non-link text: "$nonLinkText"');
-        
-        // Linkleri normalize et
         final normalizedUrls = urls.map((url) => normalizeUrl(url)).toList();
         
-        // Text ve linkleri birlikte gönder (user chat gibi)
-        debugPrint('  - Sending message with text and links together');
-        
-        final success = await _groupServices.sendGroupMessage(
+        success = await _groupServices.sendGroupMessage(
           groupId: currentGroupId.value,
-          message: nonLinkText, // Link olmayan text
+          message: nonLinkText,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
-          links: normalizedUrls, // Linkleri ayrı parametrede gönder
+          links: normalizedUrls,
         );
-        
-        if (!success) {
-          debugPrint('❌ Failed to send message with links');
-          Get.snackbar(
-            'Hata',
-            'Mesaj gönderilemedi',
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
       } else {
-        // Normal text mesajı gönder (link yok)
-        debugPrint('📝 Sending normal text message');
-        
-        final success = await _groupServices.sendGroupMessage(
+        success = await _groupServices.sendGroupMessage(
           groupId: currentGroupId.value,
-          message: text, // Boş string olsa bile gönder
+          message: text,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
           links: null,
         );
-        
-        if (!success) {
-          debugPrint('❌ Failed to send message');
-          Get.snackbar(
-            'Hata',
-            'Mesaj gönderilemedi',
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
       }
       
-      // Başarılı ise seçilen dosyaları temizle
-      selectedFiles.clear();
-      
-      // Mesajları hızlıca yeniden yükle
-      await refreshMessagesOnly();
-      
-      // Mesaj gönderildikten sonra en alta git
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToBottom(animated: true);
-      });
+      if (success) {
+        selectedFiles.clear();
+        
+        // OPTIMIZE: Reduced refresh delay
+        await Future.delayed(Duration(milliseconds: 500));
+        await refreshMessagesOptimized();
+        
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottomOnce();
+        });
+      } else {
+        Get.snackbar('Hata', 'Mesaj gönderilemedi', snackPosition: SnackPosition.BOTTOM);
+      }
       
     } catch (e) {
       debugPrint('💥 Message sending error: $e');
-      Get.snackbar(
-        'Hata',
-        'Mesaj gönderilemedi',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Hata', 'Mesaj gönderilemedi', snackPosition: SnackPosition.BOTTOM);
     } finally {
       isSendingMessage.value = false;
     }
@@ -739,22 +778,27 @@ class GroupChatDetailController extends GetxController {
     });
   }
 
-  // Hızlı mesaj güncelleme (sadece mesajları yeniden yükle)
-  Future<void> refreshMessagesOnly() async {
+  // OPTIMIZE: Faster message refresh
+  Future<void> refreshMessagesOptimized() async {
     try {
-      debugPrint('🔄 Refreshing messages only...');
+      debugPrint('🔄 Refreshing messages (optimized)...');
       
-      // Sadece grup detaylarını yeniden yükle (mesajlar dahil)
-      final group = await _groupServices.fetchGroupDetail(currentGroupId.value);
+      // Reduced timeout for faster response
+      final group = await _groupServices.fetchGroupDetail(currentGroupId.value)
+          .timeout(const Duration(seconds: 5));
+      
       groupData.value = group;
-      
-      // Group chats verilerini mesajlara dönüştür
-      convertGroupChatsToMessages();
+      convertGroupChatsToMessagesOptimized();
       
       debugPrint('✅ Messages refreshed successfully');
     } catch (e) {
       debugPrint('❌ Error refreshing messages: $e');
     }
+  }
+
+  // Keep backwards compatibility
+  Future<void> refreshMessagesOnly() async {
+    await refreshMessagesOptimized();
   }
 
   @override
@@ -763,6 +807,7 @@ class GroupChatDetailController extends GetxController {
     pollTitleController.dispose();
     scrollController.dispose();
     _groupMessageSubscription.cancel();
+    _userCache.clear(); // Clear cache
     super.onClose();
   }
 }

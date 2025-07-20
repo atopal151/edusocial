@@ -28,18 +28,17 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
 
   TextEditingController messageController = TextEditingController();
 
+  // OPTIMIZE: Cache için message items listesi
+  List<Widget> _cachedMessageItems = [];
+  List<GroupMessageModel> _lastProcessedMessages = [];
+
   @override
   void initState() {
     super.initState();
     debugPrint('🚀 GroupChatDetailScreen initialized');
-    controller.fetchGroupDetails();
-
-    // Mesajlar yüklendikten sonra en alta git
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Duration(milliseconds: 500), () {
-        controller.scrollToBottom(animated: false);
-      });
-    });
+    
+    // OPTIMIZE: Controller'da zaten çağrılıyor, burada tekrar çağırma
+    // controller.fetchGroupDetails(); // Bu satırı kaldır
   }
 
   @override
@@ -66,23 +65,25 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                   backgroundColor: Colors.grey[200],
                   child: group.avatarUrl != null && group.avatarUrl!.isNotEmpty
                       ? ClipOval(
-                          child: Image.network(
-                            group.avatarUrl!,
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              // Network image yüklenemezse SVG göster
-                              return SvgPicture.asset(
-                                "images/icons/group_icon.svg",
-                                colorFilter: const ColorFilter.mode(
-                                  Color(0xff9ca3ae),
-                                  BlendMode.srcIn,
-                                ),
-                                width: 24,
-                                height: 24,
-                              );
-                            },
+                          // OPTIMIZE: Network image with RepaintBoundary for better performance
+                          child: RepaintBoundary(
+                            child: Image.network(
+                              group.avatarUrl!,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return SvgPicture.asset(
+                                  "images/icons/group_icon.svg",
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xff9ca3ae),
+                                    BlendMode.srcIn,
+                                  ),
+                                  width: 24,
+                                  height: 24,
+                                );
+                              },
+                            ),
                           ),
                         )
                       : SvgPicture.asset(
@@ -155,13 +156,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                 final isMessagesLoading = controller.isMessagesLoading.value;
                 final isGroupLoading = controller.isGroupDataLoading.value;
                 final group = controller.groupData.value;
-
-                // Mesajlar yüklendiğinde en alta git
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (controller.messages.isNotEmpty) {
-                    controller.scrollToBottom(animated: false);
-                  }
-                });
+                final messages = controller.messages;
 
                 // Grup verisi veya mesajlar yükleniyorsa loading göster
                 if (isGroupLoading || isMessagesLoading || group == null) {
@@ -175,7 +170,7 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                 }
 
                 // Mesajlar boşsa
-                if (controller.messages.isEmpty) {
+                if (messages.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -215,13 +210,10 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                   );
                 }
 
-                return ListView.builder(
-                  controller: controller.scrollController,
-                  itemCount: _getItemCount(controller.messages),
-                  padding: EdgeInsets.only(bottom: 120),
-                  itemBuilder: (context, index) {
-                    return _buildMessageWithDateSeparator(context, controller.messages, index);
-                  },
+                // OPTIMIZE: Improved ListView with better performance
+                return OptimizedMessageListView(
+                  controller: controller,
+                  messages: messages,
                 );
               }),
             ),
@@ -238,89 +230,135 @@ class _GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
       ),
     );
   }
+}
 
-  // Tarih separatörü ile beraber item sayısını hesapla
-  int _getItemCount(List<GroupMessageModel> messages) {
-    if (messages.isEmpty) return 0;
-    
-    int count = 0;
-    DateTime? lastDate;
-    
-    for (var message in messages) {
-      final messageDate = DateTime(
-        message.timestamp.year,
-        message.timestamp.month,
-        message.timestamp.day,
-      );
-      
-      // Tarih değişmişse separatör ekle
-      if (lastDate == null || messageDate != lastDate) {
-        count++; // Tarih separatörü için
-        lastDate = messageDate;
-      }
-      count++; // Mesaj için
-    }
-    
-    return count;
-  }
+// OPTIMIZE: Separate optimized ListView widget
+class OptimizedMessageListView extends StatefulWidget {
+  final GroupChatDetailController controller;
+  final List<GroupMessageModel> messages;
 
-  // Tarih separatörü ile mesaj widget'ını oluştur
-  Widget _buildMessageWithDateSeparator(BuildContext context, List<GroupMessageModel> messages, int index) {
-    if (messages.isEmpty) return Container();
-    
-    int messageIndex = 0;
-    int currentIndex = 0;
-    DateTime? lastDate;
-    
-    for (int i = 0; i < messages.length; i++) {
-      final message = messages[i];
-      final messageDate = DateTime(
-        message.timestamp.year,
-        message.timestamp.month,
-        message.timestamp.day,
-      );
+  const OptimizedMessageListView({
+    Key? key,
+    required this.controller,
+    required this.messages,
+  }) : super(key: key);
+
+  @override
+  State<OptimizedMessageListView> createState() => _OptimizedMessageListViewState();
+}
+
+class _OptimizedMessageListViewState extends State<OptimizedMessageListView> {
+  List<MessageListItem> _cachedItems = [];
+  List<GroupMessageModel> _lastProcessedMessages = [];
+
+  @override
+  Widget build(BuildContext context) {
+    // OPTIMIZE: Only rebuild cache if messages changed
+    if (!_areMessagesEqual(widget.messages, _lastProcessedMessages)) {
+      _rebuildCache();
+      _lastProcessedMessages = List.from(widget.messages);
       
-      // Tarih değişmişse separatör ekle
-      if (lastDate == null || messageDate != lastDate) {
-        if (currentIndex == index) {
-          // Tarih separatörü göster
-          return DateSeparatorWidget(date: messageDate);
+      // Auto scroll to bottom when messages change
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.controller.scrollController.hasClients && widget.messages.isNotEmpty) {
+          widget.controller.scrollController.jumpTo(
+            widget.controller.scrollController.position.maxScrollExtent,
+          );
         }
-        currentIndex++;
+      });
+    }
+
+    return ListView.builder(
+      controller: widget.controller.scrollController,
+      itemCount: _cachedItems.length,
+      padding: EdgeInsets.only(bottom: 120),
+      // OPTIMIZE: Use cacheExtent for better performance
+      cacheExtent: 1000,
+      itemBuilder: (context, index) {
+        final item = _cachedItems[index];
+        
+        if (item.isDateSeparator) {
+          return DateSeparatorWidget(date: item.date!);
+        } else {
+          return _buildMessageWidget(item.message!);
+        }
+      },
+    );
+  }
+
+  // OPTIMIZE: Pre-calculate list items with date separators
+  void _rebuildCache() {
+    _cachedItems.clear();
+    
+    if (widget.messages.isEmpty) return;
+    
+    DateTime? lastDate;
+    
+    for (var message in widget.messages) {
+      final messageDate = DateTime(
+        message.timestamp.year,
+        message.timestamp.month,
+        message.timestamp.day,
+      );
+      
+      // Add date separator if date changed
+      if (lastDate == null || messageDate != lastDate) {
+        _cachedItems.add(MessageListItem.dateSeparator(messageDate));
         lastDate = messageDate;
       }
       
-      if (currentIndex == index) {
-        // Mesaj widget'ını göster
-        return _buildMessageWidget(message);
-      }
-      currentIndex++;
+      // Add message item
+      _cachedItems.add(MessageListItem.message(message));
     }
-    
-    return Container();
   }
 
-  // Mesaj tipine göre widget oluştur
+  bool _areMessagesEqual(List<GroupMessageModel> a, List<GroupMessageModel> b) {
+    if (a.length != b.length) return false;
+    
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id) return false;
+    }
+    
+    return true;
+  }
+
+  // OPTIMIZE: Cached message widget builder
   Widget _buildMessageWidget(GroupMessageModel message) {
-    if (message.messageType == GroupMessageType.text) {
-      return GroupTextMessageWidget(message: message);
-    } else if (message.messageType == GroupMessageType.document) {
-      return GroupDocumentMessageWidget(message: message);
-    } else if (message.messageType == GroupMessageType.image) {
-      return GroupImageMessageWidget(message: message);
-    } else if (message.messageType == GroupMessageType.link) {
-      return GroupLinkMessageWidget(message: message);
-    } else if (message.messageType == GroupMessageType.textWithLinks) {
-      return GroupTextWithLinksMessageWidget(message: message);
-    } else if (message.messageType == GroupMessageType.poll) {
-      return GroupPollMessageWidget(
-        message: message,
-        pollVotes: controller.pollVotes,
-        selectedOption: controller.selectedPollOption,
-        onVote: controller.votePoll,
-      );
-    } else {
-      return Container();
+    switch (message.messageType) {
+      case GroupMessageType.text:
+        return GroupTextMessageWidget(message: message);
+      case GroupMessageType.document:
+        return GroupDocumentMessageWidget(message: message);
+      case GroupMessageType.image:
+        return GroupImageMessageWidget(message: message);
+      case GroupMessageType.link:
+        return GroupLinkMessageWidget(message: message);
+      case GroupMessageType.textWithLinks:
+        return GroupTextWithLinksMessageWidget(message: message);
+      case GroupMessageType.poll:
+        return GroupPollMessageWidget(
+          message: message,
+          pollVotes: widget.controller.pollVotes,
+          selectedOption: widget.controller.selectedPollOption,
+          onVote: widget.controller.votePoll,
+        );
+      default:
+        return Container();
     }
   }
+}
+
+// Helper class for list items
+class MessageListItem {
+  final bool isDateSeparator;
+  final DateTime? date;
+  final GroupMessageModel? message;
+
+  MessageListItem.dateSeparator(this.date) 
+    : isDateSeparator = true, 
+      message = null;
+
+  MessageListItem.message(this.message) 
+    : isDateSeparator = false, 
+      date = null;
 }
