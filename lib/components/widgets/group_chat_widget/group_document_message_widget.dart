@@ -44,7 +44,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
           children: [
             if (!message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0, right: 6.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],
@@ -65,7 +65,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
             ),
             if (message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all( 8.0),
+                padding: const EdgeInsets.only(left: 6.0, right: 8.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],
@@ -83,85 +83,60 @@ class GroupDocumentMessageWidget extends StatelessWidget {
         ),
         // 🔹 Mesaj Balonu (Private Chat Tasarımı)
         Padding(
-          padding: const EdgeInsets.only(left: 16.0,right: 16.0),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-            child: Align(
-              alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: GestureDetector(
-                onTap: documentUrl != null ? () async {
-                  try {
-                    final uri = Uri.parse(documentUrl);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.platformDefault);
-                    } else {
-                      // URL açılamadığında kullanıcıya bilgi ver
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${languageService.tr("chat.document.cannotOpen")}: $documentName'),
-                            backgroundColor: Color(0xffFF5050),
-                          ),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${languageService.tr("chat.document.openError")}: $e'),
-                          backgroundColor: Color(0xffff7c7c),
-                        ),
-                      );
-                    }
-                  }
-                } : null,
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.75,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: message.isSentByMe 
-                        ? const Color(0xFFff7c7c) // Kırmızı
-                        : Colors.white,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: const Radius.circular(18),
-                      bottomRight: const Radius.circular(18),
-                      topLeft: message.isSentByMe 
-                          ? const Radius.circular(18) 
-                          : const Radius.circular(4),
-                      topRight: message.isSentByMe 
-                          ? const Radius.circular(4) 
-                          : const Radius.circular(18),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          padding: EdgeInsets.only(
+            left: message.isSentByMe ? 48.0 : 30.0,
+            right: message.isSentByMe ? 30.0 : 48.0,
+            top: 2.0,
+            bottom: 4.0,
+          ),
+          child: Align(
+            alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: message.isSentByMe 
+                    ? const Color(0xFFff7c7c) // Kırmızı
+                    : Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: const Radius.circular(18),
+                  bottomRight: const Radius.circular(18),
+                  topLeft: message.isSentByMe 
+                      ? const Radius.circular(18) 
+                      : const Radius.circular(4),
+                  topRight: message.isSentByMe 
+                      ? const Radius.circular(4) 
+                      : const Radius.circular(18),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.insert_drive_file, 
-                            color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                            size: 24,
-                          ),
-                          const SizedBox(width: 12),
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  documentName,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                if (documentUrl != null)
+                      Icon(
+                        Icons.insert_drive_file, 
+                        color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                        size: 24,
+                      ),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              documentName,
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (documentUrl != null)
                                                                    Text(
                                      languageService.tr("chat.document.clickToDownload"),
                                      style: GoogleFonts.inter(
@@ -171,27 +146,27 @@ class GroupDocumentMessageWidget extends StatelessWidget {
                                            : const Color(0xff8E8E93),
                                      ),
                                    ),
-                              ],
-                            ),
-                          ),
-                          if (documentUrl != null) ...[
-                            const SizedBox(width: 8),
-                                                       Icon(
-                               Icons.download,
-                               color: message.isSentByMe 
-                                   ? Colors.white.withValues(alpha: 0.8)
-                                   : const Color(0xff8E8E93),
-                               size: 16,
-                             ),
                           ],
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      // Saat bilgisi mesaj balonunun içinde sağ altta
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
+                      if (documentUrl != null) ...[
+                        const SizedBox(width: 8),
+                                                           Icon(
+                             Icons.download,
+                             color: message.isSentByMe 
+                                 ? Colors.white.withValues(alpha: 0.8)
+                                 : const Color(0xff8E8E93),
+                             size: 16,
+                           ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  // Saat bilgisi mesaj balonunun içinde sağ altta
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
                                                    Text(
                              _formatTime(message.timestamp),
                              style: GoogleFonts.inter(
@@ -202,11 +177,9 @@ class GroupDocumentMessageWidget extends StatelessWidget {
                                fontWeight: FontWeight.w400,
                              ),
                            ),
-                        ],
-                      ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
           ),

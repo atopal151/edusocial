@@ -115,7 +115,7 @@ class GroupChatDetailController extends GetxController {
       if (_isInitialLoad) {
         _isInitialLoad = false;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _scrollToBottomOnce();
+          scrollToBottomAfterLoad();
         });
       }
       
@@ -231,7 +231,7 @@ class GroupChatDetailController extends GetxController {
       
       // Yeni mesaj eklendiğinde en alta git
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottomOnce();
+        scrollToBottomForNewMessage();
       });
       
     } catch (e) {
@@ -380,11 +380,26 @@ class GroupChatDetailController extends GetxController {
     };
   }
 
-  /// OPTIMIZE: Single scroll to bottom
-  void _scrollToBottomOnce() {
-    if (scrollController.hasClients && messages.isNotEmpty) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    }
+  /// FIXED: Proper scroll to bottom with timing
+  void scrollToBottomAfterLoad() {
+    // Allow UI to render first
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration(milliseconds: 100), () {
+        if (scrollController.hasClients && messages.isNotEmpty) {
+          scrollToBottom(animated: false);
+        }
+      });
+    });
+  }
+
+  /// FIXED: Scroll to bottom for new messages
+  void scrollToBottomForNewMessage() {
+    // Immediate scroll for new messages
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        scrollToBottom(animated: true);
+      }
+    });
   }
 
   /// Socket ve listener durumunu kontrol et
@@ -710,12 +725,14 @@ class GroupChatDetailController extends GetxController {
       if (success) {
         selectedFiles.clear();
         
-        // OPTIMIZE: Reduced refresh delay
-        await Future.delayed(Duration(milliseconds: 500));
-        await refreshMessagesOptimized();
+        // FIXED: Immediate scroll for better UX, then refresh
+        scrollToBottomForNewMessage();
         
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _scrollToBottomOnce();
+        // OPTIMIZE: Reduced refresh delay
+        Future.delayed(Duration(milliseconds: 300), () async {
+          await refreshMessagesOptimized();
+          // Ensure we stay at bottom after refresh
+          scrollToBottomForNewMessage();
         });
       } else {
         Get.snackbar('Hata', 'Mesaj gönderilemedi', snackPosition: SnackPosition.BOTTOM);
@@ -745,29 +762,22 @@ class GroupChatDetailController extends GetxController {
       );
       
       if (success) {
-        debugPrint('✅ Media files sent successfully');
         selectedFiles.clear();
-        await refreshMessagesOnly();
         
-        // Medya gönderildikten sonra en alta git
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          scrollToBottom(animated: true);
+        // FIXED: Same scroll behavior for media
+        scrollToBottomForNewMessage();
+        
+        Future.delayed(Duration(milliseconds: 300), () async {
+          await refreshMessagesOptimized();
+          scrollToBottomForNewMessage();
         });
       } else {
-        debugPrint('❌ Failed to send media files');
-        Get.snackbar(
-          'Hata',
-          'Dosyalar gönderilemedi',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        Get.snackbar('Hata', 'Medya gönderilemedi', snackPosition: SnackPosition.BOTTOM);
       }
+      
     } catch (e) {
       debugPrint('💥 Media sending error: $e');
-      Get.snackbar(
-        'Hata',
-        'Dosyalar gönderilemedi',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Hata', 'Medya gönderilemedi', snackPosition: SnackPosition.BOTTOM);
     } finally {
       isSendingMessage.value = false;
     }

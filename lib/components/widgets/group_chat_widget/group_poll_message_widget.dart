@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 import '../../../models/chat_models/group_message_model.dart';
-import '../../../services/language_service.dart';
 
 class GroupPollMessageWidget extends StatelessWidget {
   final GroupMessageModel message;
-  final RxMap<String, int> pollVotes;
-  final RxString selectedOption;
-  final Function(String) onVote;
 
-  const GroupPollMessageWidget({
-    super.key,
-    required this.message,
-    required this.pollVotes,
-    required this.selectedOption,
-    required this.onVote,
-  });
+  const GroupPollMessageWidget({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
-    
     return Column(
       crossAxisAlignment: message.isSentByMe
           ? CrossAxisAlignment.end
@@ -35,7 +24,7 @@ class GroupPollMessageWidget extends StatelessWidget {
           children: [
             if (!message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0, right: 6.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],
@@ -56,7 +45,7 @@ class GroupPollMessageWidget extends StatelessWidget {
             ),
             if (message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all( 8.0),
+                padding: const EdgeInsets.only(left: 6.0, right: 8.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],
@@ -74,162 +63,65 @@ class GroupPollMessageWidget extends StatelessWidget {
         ),
         // 🔹 Mesaj Balonu (Private Chat Tasarımı)
         Padding(
-          padding: const EdgeInsets.only(left: 16.0,right: 16.0),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-            child: Align(
-              alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.75,
+          padding: EdgeInsets.only(
+            left: message.isSentByMe ? 48.0 : 30.0,
+            right: message.isSentByMe ? 30.0 : 48.0,
+            top: 2.0,
+            bottom: 4.0,
+          ),
+          child: Align(
+            alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: message.isSentByMe 
+                    ? const Color(0xFFff7c7c) // Kırmızı
+                    : Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: const Radius.circular(18),
+                  bottomRight: const Radius.circular(18),
+                  topLeft: message.isSentByMe 
+                      ? const Radius.circular(18) 
+                      : const Radius.circular(4),
+                  topRight: message.isSentByMe 
+                      ? const Radius.circular(4) 
+                      : const Radius.circular(18),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: message.isSentByMe 
-                      ? const Color(0xFFff7c7c) // Kırmızı
-                      : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: const Radius.circular(18),
-                    bottomRight: const Radius.circular(18),
-                    topLeft: message.isSentByMe 
-                        ? const Radius.circular(18) 
-                        : const Radius.circular(4),
-                    topRight: message.isSentByMe 
-                        ? const Radius.circular(4) 
-                        : const Radius.circular(18),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Poll content placeholder
+                  Text(
+                    message.content,
+                    style: GoogleFonts.inter(
+                      color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Poll başlığı
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.poll,
-                          color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                          size: 20,
+                  const SizedBox(height: 4),
+                  // Saat bilgisi mesaj balonunun içinde sağ altta
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        _formatTime(message.timestamp),
+                        style: GoogleFonts.inter(
+                          fontSize: 8,
+                          color: message.isSentByMe 
+                              ? Colors.white.withValues(alpha: 0.8)
+                              : const Color(0xff8E8E93),
+                          fontWeight: FontWeight.w400,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            message.content,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // Poll seçenekleri
-                    if (message.pollOptions != null) ...[
-                      ...message.pollOptions!.map((option) {
-                        final isSelected = selectedOption.value == option;
-                        final voteCount = pollVotes[option] ?? 0;
-                        
-                        return Obx(() => Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: InkWell(
-                            onTap: () => onVote(option),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? (message.isSentByMe 
-                                        ? Colors.white.withValues(alpha: 0.3)
-                                        : const Color(0xFFE3F2FD))
-                                    : (message.isSentByMe 
-                                        ? Colors.white.withValues(alpha: 0.1)
-                                        : const Color(0xFFF5F5F5)),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: isSelected 
-                                      ? (message.isSentByMe 
-                                          ? Colors.white
-                                          : const Color(0xFF2196F3))
-                                      : Colors.transparent,
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                                    color: isSelected
-                                        ? (message.isSentByMe 
-                                            ? Colors.white
-                                            : const Color(0xFF2196F3))
-                                        : (message.isSentByMe 
-                                            ? Colors.white.withValues(alpha: 0.7)
-                                            : Colors.grey),
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      option,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 13,
-                                        color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                                        fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                  if (voteCount > 0) ...[
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: message.isSentByMe 
-                                            ? Colors.white.withValues(alpha: 0.2)
-                                            : const Color(0xFFEEEEEE),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Text(
-                                        voteCount.toString(),
-                                        style: GoogleFonts.inter(
-                                          fontSize: 11,
-                                          color: message.isSentByMe 
-                                              ? Colors.white.withValues(alpha: 0.9)
-                                              : const Color(0xff666666),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ),
-                        ));
-                      }).toList(),
+                      ),
                     ],
-                    
-                    // Saat bilgisi mesaj balonunun içinde sağ altta
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          _formatTime(message.timestamp),
-                          style: GoogleFonts.inter(
-                            fontSize: 8,
-                            color: message.isSentByMe 
-                                ? Colors.white.withValues(alpha: 0.8)
-                                : const Color(0xff8E8E93),
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

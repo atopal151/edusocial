@@ -4,6 +4,7 @@ import 'package:edusocial/bindings/chat_detail_binding.dart';
 import 'package:edusocial/bindings/entry_binding.dart';
 import 'package:edusocial/bindings/event_binding.dart';
 import 'package:edusocial/bindings/group_binding.dart';
+import 'package:edusocial/bindings/group_chat_detail_binding.dart';
 import 'package:edusocial/bindings/match_binding.dart';
 import 'package:edusocial/bindings/profile_binding.dart';
 import 'package:edusocial/bindings/search_binding.dart';
@@ -149,7 +150,10 @@ class Routes {
     GetPage(
       name: groupDetailScreen,
       page: () => GroupDetailScreen(),
-      binding: GroupBinding(),
+      bindings: [
+        GroupBinding(),
+        GroupChatDetailBinding(),
+      ],
     ),
     GetPage(
       name: searchText,
@@ -200,6 +204,7 @@ class Routes {
     GetPage(
       name: groupChatDetail,
       page: () => GroupChatDetailScreen(),
+      binding: GroupChatDetailBinding(),
     ),
     GetPage(
       name: userChatDetail,

@@ -38,7 +38,7 @@ class GroupDetailScreen extends StatefulWidget {
 class _GroupDetailScreenState extends State<GroupDetailScreen> {
   final GroupController groupController = Get.put(GroupController());
   final GroupChatDetailController chatController =
-      Get.put(GroupChatDetailController());
+      Get.find<GroupChatDetailController>();
   late ScrollController documentsScrollController;
   late ScrollController linksScrollController;
   late ScrollController photosScrollController;
@@ -66,7 +66,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       Future.microtask(() {
         groupController.fetchGroupDetail(groupId);
         chatController.currentGroupId.value = groupId;
-        chatController.fetchGroupDetails();
+        chatController.fetchGroupDetailsOptimized();
         chatController.fetchGroupMessages();
       });
     } else {

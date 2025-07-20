@@ -202,84 +202,102 @@ class _ChatListScreenState extends State<ChatListScreen>
 
           /// ✅ TabBar (Kişisel & Grup)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 90),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             color: Color(0xffffffff),
-            child: TabBar(
-              controller: _tabController,
-              indicatorColor: const Color(0xffef5050),
-              indicatorWeight: 1,
-              dividerColor: Colors.transparent,
-              labelColor: const Color(0xffef5050),
-              unselectedLabelColor: Color(0xff9ca3ae),
-              labelStyle: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Color(0xff272727),
+            child: Center(
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: false,
+                labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+                indicatorColor: const Color(0xffef5050),
+                indicatorWeight: 1,
+                dividerColor: Colors.transparent,
+                labelColor: const Color(0xffef5050),
+                unselectedLabelColor: Color(0xff9ca3ae),
+                labelStyle: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Color(0xff272727),
+                ),
+                tabs: [
+                  // Kişisel Mesajlar Tab'ı (API'den gelen unread count ile)
+                  Obx(() {
+                    final unreadCount = chatController.privateUnreadCount;
+                    final peopleText = languageService.tr("chat.chatList.tabs.people");
+                    return Tab(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              peopleText,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          if (unreadCount > 0) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xffef5050),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                unreadCount.toString(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  }),
+                  // Grup Mesajları Tab'ı (API'den gelen messageCount ile)
+                  Obx(() {
+                    final unreadCount = groupController.groupUnreadCount;
+                    final groupsText = languageService.tr("chat.chatList.tabs.groups");
+                    return Tab(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              groupsText,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          if (unreadCount > 0) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xffef5050),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                unreadCount.toString(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  }),
+                ],
               ),
-              tabs: [
-                // Kişisel Mesajlar Tab'ı (API'den gelen unread count ile)
-                Obx(() {
-                  final unreadCount = chatController.privateUnreadCount;
-                  final peopleText = languageService.tr("chat.chatList.tabs.people");
-                  return Tab(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(peopleText),
-                        if (unreadCount > 0) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xffef5050),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              unreadCount.toString(),
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                }),
-                // Grup Mesajları Tab'ı (API'den gelen messageCount ile)
-                Obx(() {
-                  final unreadCount = groupController.groupUnreadCount;
-                  final groupsText = languageService.tr("chat.chatList.tabs.groups");
-                  return Tab(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(groupsText),
-                        if (unreadCount > 0) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xffef5050),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              unreadCount.toString(),
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                }),
-              ],
             ),
           ),
 

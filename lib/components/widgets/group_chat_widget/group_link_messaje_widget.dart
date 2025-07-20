@@ -47,7 +47,7 @@ class GroupLinkMessageWidget extends StatelessWidget {
           children: [
             if (!message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0, right: 6.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],  
@@ -68,7 +68,7 @@ class GroupLinkMessageWidget extends StatelessWidget {
             ),
             if (message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all( 8.0),
+                padding: const EdgeInsets.only(left: 6.0, right: 8.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],
@@ -86,193 +86,142 @@ class GroupLinkMessageWidget extends StatelessWidget {
         ),
         // 🔹 Mesaj Balonu (Private Chat Tasarımı)
         Padding(
-          padding: const EdgeInsets.only(left: 16.0,right: 16.0),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-            child: Align(
-              alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.75,
+          padding: EdgeInsets.only(
+            left: message.isSentByMe ? 48.0 : 30.0,
+            right: message.isSentByMe ? 30.0 : 48.0,
+            top: 2.0,
+            bottom: 4.0,
+          ),
+          child: Align(
+            alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: message.isSentByMe 
+                    ? const Color(0xFFff7c7c) // Kırmızı
+                    : Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: const Radius.circular(18),
+                  bottomRight: const Radius.circular(18),
+                  topLeft: message.isSentByMe 
+                      ? const Radius.circular(18) 
+                      : const Radius.circular(4),
+                  topRight: message.isSentByMe 
+                      ? const Radius.circular(4) 
+                      : const Radius.circular(18),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: message.isSentByMe 
-                      ? const Color(0xFFff7c7c) // Kırmızı
-                      : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: const Radius.circular(18),
-                    bottomRight: const Radius.circular(18),
-                    topLeft: message.isSentByMe 
-                        ? const Radius.circular(18) 
-                        : const Radius.circular(4),
-                    topRight: message.isSentByMe 
-                        ? const Radius.circular(4) 
-                        : const Radius.circular(18),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Metin varsa göster
-                    if (displayText.isNotEmpty) ...[
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Metin varsa göster
+                  if (displayText.isNotEmpty) ...[
+                    Text(
+                      displayText,
+                      style: GoogleFonts.inter(
+                        color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  
+                  // Link container'ı
+                  if (links.isNotEmpty) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: message.isSentByMe 
+                            ? Colors.white.withValues(alpha: 0.2)
+                            : const Color(0xFFF0F0F0),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: links.map((link) => GestureDetector(
+                          onTap: () async {
+                            try {
+                              final uri = Uri.parse(link);
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri, mode: LaunchMode.platformDefault);
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('${languageService.tr("chat.link.cannotOpen")}: $link'),
+                                      backgroundColor: Color(0xffFF5050),
+                                    ),
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('${languageService.tr("chat.link.openError")}: $e'),
+                                    backgroundColor: Color(0xffff7c7c),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 4),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.link,
+                                  size: 16,
+                                  color: message.isSentByMe 
+                                      ? Colors.white.withValues(alpha: 0.8)
+                                      : const Color(0xff007AFF),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    link,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      color: message.isSentByMe 
+                                          ? Colors.white.withValues(alpha: 0.9)
+                                          : const Color(0xff007AFF),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
+                  
+                  // Saat bilgisi mesaj balonunun içinde sağ altta
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
                       Text(
-                        displayText,
+                        _formatTime(message.timestamp),
                         style: GoogleFonts.inter(
-                          color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                          fontSize: 14,
+                          fontSize: 8,
+                          color: message.isSentByMe 
+                              ? Colors.white.withValues(alpha: 0.8)
+                              : const Color(0xff8E8E93),
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      const SizedBox(height: 8),
                     ],
-                    
-                    // Link container'ı
-                    if (links.isNotEmpty) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                                                   color: message.isSentByMe 
-                               ? Colors.white.withValues(alpha: 0.2)
-                               : const Color(0xFFF0F0F0),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Link'leri göster
-                            ...links.map((link) => GestureDetector(
-                                  onTap: () async {
-                                    try {
-                                      debugPrint("🔗 Group Chat - Link açma deneniyor: $link");
-                                      
-                                      // URL'yi temizle ve kontrol et
-                                      String cleanLink = link.trim();
-                                      
-                                      // URL validation ve normalization
-                                      if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
-                                        // www. ile başlıyorsa https ekle
-                                        if (cleanLink.startsWith('www.')) {
-                                          cleanLink = 'https://$cleanLink';
-                                        } 
-                                        // Diğer durumlarda da https ekle
-                                        else if (cleanLink.contains('.')) {
-                                          cleanLink = 'https://$cleanLink';
-                                        } else {
-                                          // Geçersiz URL formatı
-                                          debugPrint("🔗 Group Chat - Geçersiz URL formatı: $cleanLink");
-                                          return;
-                                        }
-                                      }
-                                      
-                                      // Boşlukları temizle
-                                      cleanLink = cleanLink.replaceAll(' ', '');
-                                      
-                                      // Geçerli URL formatı kontrolü
-                                      if (!Uri.parse(cleanLink).hasAbsolutePath && !cleanLink.contains('.')) {
-                                        debugPrint("🔗 Group Chat - URL yapısı geçersiz: $cleanLink");
-                                        return;
-                                      }
-                                      
-                                      debugPrint("🔗 Group Chat - Temizlenmiş link: $cleanLink");
-                                      
-                                      final Uri url = Uri.parse(cleanLink);
-                                      debugPrint("🔗 Group Chat - Parsed URL: $url");
-                                      
-                                      // URL'nin açılabilir olup olmadığını kontrol et
-                                      final canLaunch = await canLaunchUrl(url);
-                                      debugPrint("🔗 Group Chat - canLaunchUrl sonucu: $canLaunch");
-                                      
-                                      if (canLaunch) {
-                                        debugPrint("🔗 Group Chat - URL açılıyor (platformDefault)...");
-                                        bool result = await launchUrl(
-                                          url, 
-                                          mode: LaunchMode.platformDefault
-                                        );
-                                        debugPrint("🔗 Group Chat - platformDefault sonucu: $result");
-                                        
-                                        // Eğer platformDefault başarısız olursa externalApplication dene
-                                        if (!result) {
-                                          debugPrint("🔗 Group Chat - Fallback: externalApplication deneniyor...");
-                                          result = await launchUrl(
-                                            url, 
-                                            mode: LaunchMode.externalApplication
-                                          );
-                                          debugPrint("🔗 Group Chat - externalApplication sonucu: $result");
-                                        }
-                                        
-                                        if (!result) {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text(languageService.tr("chat.link.cannotOpen")),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      } else {
-                                        debugPrint("🔗 Group Chat - URL açılamıyor: $url");
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text("${languageService.tr("chat.link.cannotOpenThis")}: $cleanLink"),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    } catch (e) {
-                                      debugPrint("🔗 Group Chat - Link açma hatası: $e");
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text("${languageService.tr("chat.link.openError")}: ${e.toString()}"),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 4.0),
-                                    child: Text(
-                                      link,
-                                      style: GoogleFonts.inter(
-                                        color: Color(0xff2c96ff),
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12,
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: Color(0xff2c96ff),
-                                      ),
-                                    ),
-                                  ),
-                                )),
-                          ],
-                        ),
-                      ),
-                    ],
-                    
-                    // Saat bilgisi mesaj balonunun içinde sağ altta
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          _formatTime(message.timestamp),
-                          style: GoogleFonts.inter(
-                            fontSize: 8,
-                            color: message.isSentByMe 
-                                ? Colors.white.withValues(alpha: 0.8)
-                                : const Color(0xff8E8E93),
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

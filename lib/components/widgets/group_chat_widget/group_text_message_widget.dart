@@ -22,7 +22,7 @@ class GroupTextMessageWidget extends StatelessWidget {
           children: [
             if (!message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(right: 6.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],
@@ -41,9 +41,10 @@ class GroupTextMessageWidget extends StatelessWidget {
               '@${message.username}',
                 style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
+            
             if (message.isSentByMe)
               Padding(
-                padding: const EdgeInsets.all( 8.0),
+                padding: const EdgeInsets.only(left: 6.0),
                 child: CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.grey[300],
@@ -61,62 +62,64 @@ class GroupTextMessageWidget extends StatelessWidget {
         ),
         // 🔹 Mesaj Balonu (Private Chat Tasarımı)
         Padding(
-          padding: const EdgeInsets.only(left: 16.0,right: 16.0),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-            child: Align(
-              alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.75,
+          padding: EdgeInsets.only(
+            left: message.isSentByMe ? 48.0 : 30.0,
+            right: message.isSentByMe ? 30.0 : 48.0,
+            top: 2.0,
+            bottom: 4.0,
+          ),
+          child: Align(
+            alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: message.isSentByMe 
+                    ? const Color(0xFFff7c7c) // Kırmızı
+                    : Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: const Radius.circular(18),
+                  bottomRight: const Radius.circular(18),
+                  topLeft: message.isSentByMe 
+                      ? const Radius.circular(18) 
+                      : const Radius.circular(4),
+                  topRight: message.isSentByMe 
+                      ? const Radius.circular(4) 
+                      : const Radius.circular(18),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: message.isSentByMe 
-                      ? const Color(0xFFff7c7c) // Kırmızı
-                      : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: const Radius.circular(18),
-                    bottomRight: const Radius.circular(18),
-                    topLeft: message.isSentByMe 
-                        ? const Radius.circular(18) 
-                        : const Radius.circular(4),
-                    topRight: message.isSentByMe 
-                        ? const Radius.circular(4) 
-                        : const Radius.circular(18),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message.content,
+                    style: GoogleFonts.inter(
+                      color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      message.content,
-                      style: GoogleFonts.inter(
-                        color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    // Saat bilgisi mesaj balonunun içinde sağ altta
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          _formatTime(message.timestamp),
-                          style: GoogleFonts.inter(
-                            fontSize: 8,
-                            color: message.isSentByMe 
-                                ? Colors.white.withValues(alpha: 0.8)
-                                : const Color(0xff8E8E93),
-                            fontWeight: FontWeight.w400,
-                          ),
+                  const SizedBox(height: 4),
+                  // Saat bilgisi mesaj balonunun içinde sağ altta
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        _formatTime(message.timestamp),
+                        style: GoogleFonts.inter(
+                          fontSize: 8,
+                          color: message.isSentByMe 
+                              ? Colors.white.withValues(alpha: 0.8)
+                              : const Color(0xff8E8E93),
+                          fontWeight: FontWeight.w400,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
