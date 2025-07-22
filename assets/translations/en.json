@@ -463,7 +463,11 @@
     "eventScreen": {
       "title": "Events",
       "loading": "Loading events...",
-      "noEvents": "No events found to display."
+      "noEvents": "No events found to display.",
+      "emptyState": {
+        "title": "No events yet",
+        "subtitle": "New events will be added soon"
+      }
     },
     "eventCard": {
       "share": "Share",

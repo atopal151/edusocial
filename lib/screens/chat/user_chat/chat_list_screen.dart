@@ -323,8 +323,9 @@ class _ChatListScreenState extends State<ChatListScreen>
       onRefresh: () async {
         await _refreshChatData();
       },
-      color: Color(0xFFEF5050),
+      color: Color(0xFFef5050),
       backgroundColor: Color(0xfffafafa),
+      elevation: 0,
       strokeWidth: 2.0,
       displacement: 40.0,
       child: Obx(() => ListView.builder(
@@ -446,8 +447,9 @@ class _ChatListScreenState extends State<ChatListScreen>
       onRefresh: () async {
         await _refreshChatData();
       },
-      color: Color(0xFFEF5050),
+      color: Color(0xFFef5050),
       backgroundColor: Color(0xfffafafa),
+      elevation: 0,
       strokeWidth: 2.0,
       displacement: 40.0,
       child: Obx(() => ListView.builder(

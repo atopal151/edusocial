@@ -480,7 +480,11 @@
     "eventScreen": {
       "title": "Etkinlikler",
       "loading": "Etkinlikler yükleniyor...",
-      "noEvents": "Gösterilecek etkinlik bulunamadı."
+      "noEvents": "Gösterilecek etkinlik bulunamadı.",
+      "emptyState": {
+        "title": "Henüz bir etkinlik yok",
+        "subtitle": "Yakında yeni etkinlikler eklenecek"
+      }
     },
     "eventCard": {
       "share": "Paylaş",

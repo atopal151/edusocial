@@ -176,52 +176,76 @@ class _SearchTextScreenState extends State<SearchTextScreen>
               controller: _tabController,
               children: [
                 // Kişiler Listesi
-                Obx(() => ListView.builder(
-                      padding: EdgeInsets.all(12),
-                      itemCount: controller.filteredUsers.length,
-                      itemBuilder: (context, index) {
-                        var user = controller.filteredUsers[index];
-                        return UserListItem(user: user);
+                Obx(() => RefreshIndicator(
+                      color: Color(0xFFef5050),
+                      backgroundColor: Color(0xfffafafa),
+                      elevation: 0,
+                      onRefresh: () async {
+                        await controller.fetchSearchResults(controller.searchTextController.text);
                       },
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(12),
+                        itemCount: controller.filteredUsers.length,
+                        itemBuilder: (context, index) {
+                          var user = controller.filteredUsers[index];
+                          return UserListItem(user: user);
+                        },
+                      ),
                     )),
 
                 // Gruplar Listesi
-                Obx(() => ListView.builder(
-                      padding: EdgeInsets.all(12),
-                      itemCount: controller.filteredGroups.length,
-                      itemBuilder: (context, index) {
-                        var group = controller.filteredGroups[index];
-                        return GroupListItem(group: group);
+                Obx(() => RefreshIndicator(
+                      color: Color(0xFFef5050),
+                      backgroundColor: Color(0xfffafafa),
+                      elevation: 0,
+                      onRefresh: () async {
+                        await controller.fetchSearchResults(controller.searchTextController.text);
                       },
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(12),
+                        itemCount: controller.filteredGroups.length,
+                        itemBuilder: (context, index) {
+                          var group = controller.filteredGroups[index];
+                          return GroupListItem(group: group);
+                        },
+                      ),
                     )),
 
                 // Etkinlikler Listesi
-                Obx(() => ListView.builder(
-                      padding: EdgeInsets.all(12),
-                      itemCount: controller.filteredEvents.length,
-                      itemBuilder: (context, index) {
-                        var event = controller.filteredEvents[index];
-                        return EventCard(
-                          eventTitle: event.title,
-                          eventDescription: event.description,
-                          eventDate: formatSimpleDateClock(event.endTime),
-                          eventImage: event.bannerUrl,
-                          onShare: () {
-                            Get.snackbar(languageService.tr("common.messages.success"),
-                                "${event.title} ${languageService.tr("event.notifications.shared")}");
-                          },
-                          onLocation: () async {
-                            final url = event.location;
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(Uri.parse(url),
-                                  mode: LaunchMode.externalApplication);
-                            } else {
-                              Get.snackbar(languageService.tr("common.messages.error"), 
-                                  languageService.tr("event.notifications.locationView"));
-                            }
-                          },
-                        );
+                Obx(() => RefreshIndicator(
+                      color: Color(0xFFef5050),
+                      backgroundColor: Color(0xfffafafa),
+                      elevation: 0,
+                      onRefresh: () async {
+                        await controller.fetchSearchResults(controller.searchTextController.text);
                       },
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(12),
+                        itemCount: controller.filteredEvents.length,
+                        itemBuilder: (context, index) {
+                          var event = controller.filteredEvents[index];
+                          return EventCard(
+                            eventTitle: event.title,
+                            eventDescription: event.description,
+                            eventDate: formatSimpleDateClock(event.endTime),
+                            eventImage: event.bannerUrl,
+                            onShare: () {
+                              Get.snackbar(languageService.tr("common.messages.success"),
+                                  "${event.title} ${languageService.tr("event.notifications.shared")}");
+                            },
+                            onLocation: () async {
+                              final url = event.location;
+                              if (await canLaunchUrl(Uri.parse(url))) {
+                                await launchUrl(Uri.parse(url),
+                                    mode: LaunchMode.externalApplication);
+                              } else {
+                                Get.snackbar(languageService.tr("common.messages.error"), 
+                                    languageService.tr("event.notifications.locationView"));
+                              }
+                            },
+                          );
+                        },
+                      ),
                     )),
               ],
             ),

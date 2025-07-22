@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../components/buttons/custom_button.dart';
-import '../../components/cards/entry_card.dart';
 import '../../components/cards/person_entry_card.dart';
 import '../../components/cards/post_card.dart';
 import '../../components/cards/profile_cards.dart';
@@ -146,7 +145,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                 RefreshIndicator(
                   onRefresh: _refreshProfile,
                   color: const Color(0xFFEF5050),
-                  backgroundColor: Colors.white,
+                  backgroundColor: Color(0xfffafafa),
+                  elevation: 0,
                   strokeWidth: 2.0,
                   displacement: 40.0,
                   child: CustomScrollView(
@@ -177,8 +177,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                 /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
                 RefreshIndicator(
                   onRefresh: _refreshProfile,
-                  color: const Color(0xFFEF5050),
-                  backgroundColor: Colors.white,
+                  color: const Color(0xFFef5050),
+                  backgroundColor: Color(0xfffafafa),
+                  elevation: 0,
                   strokeWidth: 2.0,
                   displacement: 40.0,
                   child: SingleChildScrollView(

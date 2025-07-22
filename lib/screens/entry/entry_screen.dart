@@ -68,8 +68,9 @@ class EntryScreenState extends State<EntryScreen> {
                     await entryController.fetchAndPrepareEntries();
                     debugPrint("✅ Entry verileri başarıyla yenilendi");
                   },
-                  color: Color(0xFFEF5050),
+                  color: Color(0xFFef5050),
                   backgroundColor: Color(0xfffafafa),
+                  elevation: 0,
                   strokeWidth: 2.0,
                   displacement: 120.0,
                   edgeOffset: 10.0,

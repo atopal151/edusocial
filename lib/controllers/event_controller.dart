@@ -16,7 +16,7 @@ class EventController extends GetxController {
     fetchEvents();
   }
 
-  void fetchEvents() async {
+  Future<void> fetchEvents() async {
     isLoading.value = true;
     eventList.value = await _eventServices.fetchEvents();
     isLoading.value = false;

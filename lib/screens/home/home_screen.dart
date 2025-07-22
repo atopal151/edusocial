@@ -70,8 +70,9 @@ class HomeScreen extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: _refreshHomeData,
-        color: Color(0xFFEF5050),
+        color: Color(0xFFef5050),
         backgroundColor: Color(0xfffafafa),
+        elevation: 0,
         strokeWidth: 2.0,
         displacement: 20.0,
         edgeOffset: 10.0,

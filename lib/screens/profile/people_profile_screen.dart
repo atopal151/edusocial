@@ -178,8 +178,9 @@
                 children: [
                   RefreshIndicator(
                     onRefresh: _refreshProfile,
-                    color: const Color(0xFFEF5050),
+                    color: const Color(0xFFef5050),
                     backgroundColor: Colors.white,
+                    elevation: 0,
                     strokeWidth: 2.0,
                     displacement: 40.0,
                     child: CustomScrollView(
@@ -207,8 +208,9 @@
                   ),
                   RefreshIndicator(
                     onRefresh: _refreshProfile,
-                    color: const Color(0xFFEF5050),
+                    color: const Color(0xFFef5050),
                     backgroundColor: Colors.white,
+                    elevation: 0,
                     strokeWidth: 2.0,
                     displacement: 40.0,
                     child: SingleChildScrollView(
@@ -240,7 +242,7 @@
       }
 
       if (posts.isEmpty) {
-        return Container(
+        return SizedBox(
           height: 200,
           child: Center(
             child: Text(languageService.tr("profile.peopleProfile.noPostsFound")),

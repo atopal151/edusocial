@@ -68,14 +68,14 @@ class GroupController extends GetxController {
     }
   }
 
-  void fetchAllGroups() async {
+  Future<void> fetchAllGroups() async {
     isLoading.value = true;
     allGroups.value = await _groupServices.fetchAllGroups();
     updateFilteredGroups(); // ✅ burada tetikleniyor
     isLoading.value = false;
   }
 
-  void fetchGroupAreas() async {
+  Future<void> fetchGroupAreas() async {
     final areas = await _groupServices.fetchGroupAreas();
 
     for (var area in areas) {
