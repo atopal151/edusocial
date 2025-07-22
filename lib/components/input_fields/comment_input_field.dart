@@ -29,7 +29,7 @@ Widget buildCommentInputField(CommentController commentController,
             minLines: 1,
             maxLines: 4,
             onSubmitted: (value) async {
-              if (value.trim().isNotEmpty) {
+              if (value.trim().isNotEmpty && !commentController.isLoading.value) {
                 await commentController.addComment(postId, value);
                 messageController.clear();
                 if (onCommentAdded != null) {
@@ -39,7 +39,7 @@ Widget buildCommentInputField(CommentController commentController,
             },
           ),
         ),
-        IconButton(
+        Obx(() => IconButton(
           icon: Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -50,23 +50,34 @@ Widget buildCommentInputField(CommentController commentController,
               ),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: SvgPicture.asset(
-              'images/icons/send_icon.svg',
-              width: 16,
-              height: 16,
-            ),
+            child: commentController.isLoading.value
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : SvgPicture.asset(
+                    'images/icons/send_icon.svg',
+                    width: 16,
+                    height: 16,
+                  ),
           ),
-          onPressed: () async {
-            final text = messageController.text.trim();
-            if (text.isNotEmpty) {
-              await commentController.addComment(postId, text);
-              messageController.clear();
-              if (onCommentAdded != null) {
-                onCommentAdded();
-              }
-            }
-          },
-        ),
+          onPressed: commentController.isLoading.value
+              ? null
+              : () async {
+                  final text = messageController.text.trim();
+                  if (text.isNotEmpty) {
+                    await commentController.addComment(postId, text);
+                    messageController.clear();
+                    if (onCommentAdded != null) {
+                      onCommentAdded();
+                    }
+                  }
+                },
+        )),
       ],
     ),
   );

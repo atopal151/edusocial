@@ -19,6 +19,7 @@ import 'package:edusocial/services/language_service.dart';
 import 'package:edusocial/controllers/chat_controllers/chat_controller.dart';
 
 class ChatDetailController extends GetxController {
+  final LanguageService languageService = Get.find<LanguageService>();
   final isLoading = false.obs;
   final messages = <MessageModel>[].obs;
   final documents = <String>[].obs;
@@ -47,8 +48,11 @@ class ChatDetailController extends GetxController {
   // PAGINATION: New state variables for lazy loading
   final RxBool isLoadingMoreMessages = false.obs;
   final RxBool hasMoreMessages = true.obs;
-  final int messagesPerPage = 25;
+  final int messagesPerPage = 1000; // Increased from 25 to 1000 to remove limit
   final RxBool isFirstLoad = true.obs;
+  
+  // Scroll to bottom button visibility
+  final RxBool showScrollToBottomButton = false.obs;
 
   // Controllers
   final ProfileController profileController = Get.find<ProfileController>();
@@ -140,12 +144,13 @@ class ChatDetailController extends GetxController {
 
   void _initializeScrollController() {
     scrollController.addListener(() {
-      // PAGINATION: Load more messages when scrolling UP (towards older messages)
-      if (scrollController.position.pixels <= 100 && 
-          !isLoadingMoreMessages.value && 
-          hasMoreMessages.value) {
-        debugPrint('📜 User scrolled to top, loading more messages...');
-        _loadMoreMessages();
+      // SCROLL TO BOTTOM BUTTON: Show/hide based on scroll position
+      if (scrollController.hasClients && messages.isNotEmpty) {
+        final maxScroll = scrollController.position.maxScrollExtent;
+        final currentScroll = scrollController.position.pixels;
+        final isNearBottom = (maxScroll - currentScroll) < 200; // Show button if user scrolled up more than 200px
+        
+        showScrollToBottomButton.value = !isNearBottom && maxScroll > 0;
       }
     });
   }
@@ -175,79 +180,7 @@ class ChatDetailController extends GetxController {
     debugPrint('✅ ChatDetailController socket listeners setup completed');
   }
 
-  /// PAGINATION: Load more older messages
-  Future<void> _loadMoreMessages() async {
-    if (isLoadingMoreMessages.value || !hasMoreMessages.value || currentChatId.value == null) {
-      return;
-    }
 
-    try {
-      isLoadingMoreMessages.value = true;
-      
-      // FIXED: Offset should be current message count (to skip already loaded messages)
-      final nextOffset = messages.length;
-      debugPrint('📜 Loading more messages. Current messages: ${messages.length}, Next offset: $nextOffset');
-
-      // Fetch older messages with correct pagination
-      final olderMessages = await ChatServices.fetchConversationMessages(
-        currentChatId.value!,
-        limit: messagesPerPage,
-        offset: nextOffset, // Use current message count as offset
-      );
-
-      if (olderMessages.isEmpty) {
-        hasMoreMessages.value = false;
-        debugPrint('📜 No more messages to load');
-        return;
-      }
-
-      // DUPLICATE CHECK: Prevent loading same messages again
-      final newMessages = <MessageModel>[];
-      for (final message in olderMessages) {
-        final isDuplicate = messages.any((existingMsg) => existingMsg.id == message.id);
-        if (!isDuplicate) {
-          newMessages.add(message);
-        } else {
-          debugPrint('🚫 Duplicate message blocked: ${message.id}');
-        }
-      }
-
-      if (newMessages.isEmpty) {
-        hasMoreMessages.value = false;
-        debugPrint('📜 All messages were duplicates, stopping pagination');
-        return;
-      }
-
-      // Remember current scroll position to maintain it after adding messages
-      final currentScrollOffset = scrollController.offset;
-      final currentMaxScrollExtent = scrollController.position.maxScrollExtent;
-
-      // FIXED: Add older messages to the BEGINNING of the list (they are older chronologically)
-      messages.insertAll(0, newMessages);
-
-      debugPrint('✅ Added ${newMessages.length} new older messages. Total: ${messages.length}');
-
-      // Maintain scroll position after inserting messages
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (scrollController.hasClients) {
-          final newMaxScrollExtent = scrollController.position.maxScrollExtent;
-          final scrollDifference = newMaxScrollExtent - currentMaxScrollExtent;
-          scrollController.jumpTo(currentScrollOffset + scrollDifference);
-        }
-      });
-
-      // Stop loading if we got less than requested (means no more messages)
-      if (newMessages.length < messagesPerPage) {
-        hasMoreMessages.value = false;
-        debugPrint('📜 Reached end of messages');
-      }
-
-    } catch (e) {
-      debugPrint('❌ Error loading more messages: $e');
-    } finally {
-      isLoadingMoreMessages.value = false;
-    }
-  }
 
   @override
   void onClose() {
@@ -334,7 +267,7 @@ class ChatDetailController extends GetxController {
         messages.clear();
       }
       
-      // OPTIMIZE: Only load latest 25 messages initially
+      // OPTIMIZE: Load messages without limit
       final fetchedMessages = await ChatServices.fetchConversationMessages(
         currentChatId.value!,
         limit: messagesPerPage,
@@ -351,15 +284,17 @@ class ChatDetailController extends GetxController {
       // PAGINATION: Add messages and update state
       if (isFirstLoad.value) {
         messages.clear();
-        messages.addAll(fetchedMessages);
         
-        // If we got less than requested, no more messages exist
-        if (fetchedMessages.length < messagesPerPage) {
-          hasMoreMessages.value = false;
-        }
+        // FIXED: API returns messages in DESC order (newest first), but we need
+        // to display them in ASC order (oldest first, newest at bottom)
+        final reversedMessages = fetchedMessages.reversed.toList();
+        messages.addAll(reversedMessages);
+        
+        // Since we're loading all messages, no more messages to load
+        hasMoreMessages.value = false;
         
         isFirstLoad.value = false;
-        debugPrint('✅ Initial ${fetchedMessages.length} messages loaded');
+        debugPrint('✅ Initial ${fetchedMessages.length} messages loaded (reversed for proper display)');
       } else {
         messages.addAll(fetchedMessages);
       }
@@ -402,7 +337,24 @@ class ChatDetailController extends GetxController {
         }
       }
 
-      debugPrint('📊 Toplanan veriler:');
+      // Belgeleri tarihe göre sırala (en yeni en üstte)
+      allDocuments.sort((a, b) {
+        final dateA = DateTime.tryParse(a.date) ?? DateTime.now();
+        final dateB = DateTime.tryParse(b.date) ?? DateTime.now();
+        return dateB.compareTo(dateA); // En yeni en üstte
+      });
+
+      // Linkleri tarihe göre sırala (en yeni en üstte)
+      uniqueLinks.sort((a, b) {
+        // Link'lerin tarih bilgisi yok, mesaj tarihine göre sırala
+        // Bu durumda mesaj sırasına göre sırala (en son eklenen en üstte)
+        return 0; // Şimdilik sıralama yapmıyoruz, mesaj sırasına göre kalıyor
+      });
+
+      // Fotoğrafları tarihe göre sırala (en yeni en üstte)
+      // Fotoğraflar mesaj sırasına göre zaten sıralı geliyor
+
+      debugPrint('📊 Toplanan veriler (tarihe göre sıralandı):');
       debugPrint('  - Belgeler: ${allDocuments.length} adet');
       debugPrint('  - Linkler: ${uniqueLinks.length} adet');
       debugPrint('  - Fotoğraflar: ${uniquePhotos.length} adet');
@@ -515,7 +467,7 @@ class ChatDetailController extends GetxController {
       
               // Hata mesajı göster
         Get.snackbar(
-          'Bağlantı Hatası',
+          languageService.tr("common.messages.connectionErrorMessage"),
           errorMessage,
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange[100],
@@ -527,7 +479,7 @@ class ChatDetailController extends GetxController {
               fetchConversationMessages(); // Tekrar dene
             },
             child: Text(
-              'Tekrar Dene',
+              languageService.tr("common.messages.tryAgainButton"),
               style: TextStyle(color: Colors.orange[800], fontWeight: FontWeight.bold),
             ),
           ) : null,
@@ -708,8 +660,8 @@ class ChatDetailController extends GetxController {
     } catch (e) {
       debugPrint("🛑 Mesaj gönderilemedi: $e");
       Get.snackbar(
-        'Hata',
-        'Mesaj gönderilemedi',
+        languageService.tr("common.error"),
+        languageService.tr("common.messages.messageSendFailed"),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

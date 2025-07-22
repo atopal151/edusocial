@@ -228,7 +228,7 @@ class ChatServices {
   /// Mesaj detaylarını getir (Show Conversation) - PAGINATION SUPPORT ADDED
   static Future<List<MessageModel>> fetchConversationMessages(
     int conversationId, {
-    int limit = 25,  // Varsayılan 25 mesaj
+    int limit = 1000,  // Increased from 25 to 1000 to remove limit
     int offset = 0,  // Hangi mesajdan başlayacağı
   }) async {
     final token = _box.read('token');

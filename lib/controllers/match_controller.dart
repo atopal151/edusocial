@@ -1,10 +1,12 @@
 import 'package:edusocial/services/match_service.dart';
+import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../models/match_model.dart';
 
 class MatchController extends GetxController {
+  final LanguageService languageService = Get.find<LanguageService>();
   final TextEditingController textFieldController = TextEditingController();
   var savedTopics = <String>[].obs;
   var isLoading = false.obs;
@@ -25,18 +27,18 @@ class MatchController extends GetxController {
       for (var topic in savedTopics) {
         bool success = await MatchServices.addLesson(topic);
         if (!success) {
-          Get.snackbar("Hata", "'$topic' dersi zaten eklenmiş veya eklenemedi.",
+          Get.snackbar(languageService.tr("common.error"), "'$topic' ${languageService.tr("common.messages.courseAlreadyAdded")}",
               snackPosition: SnackPosition.BOTTOM);
         }
       }
-      Get.snackbar("Başarılı", "Dersler profilinize kaydedildi!",
+      Get.snackbar(languageService.tr("common.success"), languageService.tr("common.messages.courseSavedToProfile"),
           snackPosition: SnackPosition.BOTTOM);
       
       Get.back();
       findMatches();
     } catch (e) {
       debugPrint("❗ Ders kaydedilirken hata: $e");
-      Get.snackbar("Hata", "Bir hata oluştu.",
+      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.generalError"),
           snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading.value = false;
@@ -48,14 +50,14 @@ class MatchController extends GetxController {
 
     final success = await MatchServices.followUser(userId);
     if (success) {
-      Get.snackbar("Takip", "${currentMatch.name} takip edildi!",
+      Get.snackbar(languageService.tr("common.success"), "${currentMatch.name} ${languageService.tr("common.messages.userFollowed")}",
           snackPosition: SnackPosition.BOTTOM);
 
       // Match modelini güncelle
       matches[currentIndex.value] =
           matches[currentIndex.value].copyWith(isFollowing: true);
     } else {
-      Get.snackbar("Hata", "Takip işlemi başarısız.",
+      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.followOperationFailed"),
           snackPosition: SnackPosition.BOTTOM);
     }
   }

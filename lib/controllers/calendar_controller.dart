@@ -7,11 +7,13 @@ import '../components/buttons/custom_button.dart';
 import '../components/input_fields/costum_textfield.dart';
 import '../models/calendar_model.dart';
 import '../services/calendar_service.dart';
+import '../services/language_service.dart';
 
 class CalendarController extends GetxController {
   var selectedDate = DateFormat('dd MMM yyyy').format(DateTime.now()).obs;
   var allReminders = <Reminder>[].obs;
   var reminders = <Reminder>[].obs;
+  final LanguageService languageService = Get.find<LanguageService>();
 
   @override
   void onInit() {
@@ -93,7 +95,7 @@ class CalendarController extends GetxController {
               CustomTextField(
                 textColor: Color(0xFF9CA3AF),
                 controller: titleController,
-                hintText: "Hatırlatma Başlığı",
+                hintText: languageService.tr("calendar.reminderForm.titleHint"),
                 isPassword: false,
                 backgroundColor: Color(0xfff5f5f5),
               ),
@@ -102,13 +104,13 @@ class CalendarController extends GetxController {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      "Tarih: ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
+                      "${languageService.tr("calendar.reminderForm.dateLabel")} ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
                   SizedBox(
                     width: 120,
                     child: CustomButton(
                       height: 50,
                       borderRadius: 15,
-                      text: "Tarih Seç",
+                      text: languageService.tr("calendar.reminderForm.selectDate"),
                       onPressed: () async {
                         DateTime? pickedDate = await showDatePicker(
                           context: Get.context!,
@@ -137,13 +139,13 @@ class CalendarController extends GetxController {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Saat: ${DateFormat('HH:mm').format(selectedDateTime)}"),
+                  Text("${languageService.tr("calendar.reminderForm.timeLabel")} ${DateFormat('HH:mm').format(selectedDateTime)}"),
                   SizedBox(
                     width: 120,
                     child: CustomButton(
                       height: 50,
                       borderRadius: 15,
-                      text: "Saat Seç",
+                      text: languageService.tr("calendar.reminderForm.selectTime"),
                       onPressed: () async {
                         TimeOfDay? pickedTime = await showTimePicker(
                           context: Get.context!,
@@ -168,20 +170,20 @@ class CalendarController extends GetxController {
               ),
               SizedBox(height: 20),
               Obx(() => SwitchListTile(
-                    title: Text("Bildirim gönder"),
+                    title: Text(languageService.tr("calendar.reminderForm.sendNotification")),
                     value: sendNotification.value,
                     onChanged: (val) => sendNotification.value = val,
                   )),
               SizedBox(height: 10),
               Obx(() => Row(
                     children: [
-                      Text("Renk: "),
+                      Text("${languageService.tr("calendar.reminderForm.colorLabel")} "),
                       SizedBox(width: 8),
                       GestureDetector(
                         onTap: () {
                           Get.dialog(
                             AlertDialog(
-                              title: Text('Renk Seç'),
+                              title: Text(languageService.tr("calendar.reminderForm.selectColor")),
                               content: SingleChildScrollView(
                                 child: ColorPicker(
                                   pickerColor: selectedColor.value,
@@ -194,7 +196,7 @@ class CalendarController extends GetxController {
                               ),
                               actions: <Widget>[
                                 TextButton(
-                                  child: Text('Tamam'),
+                                  child: Text(languageService.tr("calendar.reminderForm.ok")),
                                   onPressed: () {
                                     Get.back(); // renk seçimi tamamlandı
                                   },
@@ -221,7 +223,7 @@ class CalendarController extends GetxController {
                 child: CustomButton(
                   height: 50,
                   borderRadius: 15,
-                  text: existing != null ? "Güncelle" : "Kaydet",
+                  text: existing != null ? languageService.tr("calendar.reminderForm.update") : languageService.tr("calendar.reminderForm.save"),
                   onPressed: () async {
                     final formatted = DateFormat('yyyy-MM-dd HH:mm:ss')
                         .format(selectedDateTime);
@@ -236,12 +238,12 @@ class CalendarController extends GetxController {
                     try {
                       if (existing != null) {
                         await CalendarService.updateReminder(reminder);
-                        Get.snackbar("Başarılı", "Hatırlatıcı güncellendi");
+                        Get.snackbar(languageService.tr("common.success"), languageService.tr("calendar.success.reminderUpdated"));
                       } else {
                         await CalendarService.createReminder(reminder);
                         Get.snackbar(
-                          "✅ Başarılı", // Başlık
-                          "Hatırlatıcı eklendi", // Mesaj
+                          "✅ ${languageService.tr("common.success")}", // Başlık
+                          languageService.tr("calendar.success.reminderAdded"), // Mesaj
                           snackPosition:
                               SnackPosition.TOP, // Konum: TOP / BOTTOM
                           backgroundColor: Colors.green, // Arka plan rengi
@@ -255,7 +257,7 @@ class CalendarController extends GetxController {
                       await loadReminders();
                       Get.back();
                     } catch (e) {
-                      Get.snackbar("Hata", "İşlem başarısız: $e");
+                      Get.snackbar(languageService.tr("common.error"), "${languageService.tr("calendar.errors.operationFailed")}: $e");
                     }
                   },
                   isLoading: false.obs,
@@ -277,8 +279,8 @@ class CalendarController extends GetxController {
       await CalendarService.deleteReminder(id);
       await loadReminders();
       Get.snackbar(
-        "Başarılı", // Başlık
-        "Hatırlatıcı başarı ile silindi.", // Mesaj
+        languageService.tr("common.success"), // Başlık
+        languageService.tr("calendar.success.reminderDeleted"), // Mesaj
         snackPosition: SnackPosition.TOP, // Konum: TOP / BOTTOM
         backgroundColor: Color(0xffef5050), // Arka plan rengi
         colorText: Colors.white, // Yazı rengi
@@ -288,7 +290,7 @@ class CalendarController extends GetxController {
         borderRadius: 10, // Köşe yumuşaklığı
       );
     } catch (e) {
-      Get.snackbar("Hata", "Silme başarısız: $e");
+      Get.snackbar(languageService.tr("common.error"), "${languageService.tr("calendar.errors.reminderDeleteFailed")}: $e");
     }
   }
 }

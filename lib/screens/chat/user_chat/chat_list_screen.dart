@@ -202,13 +202,13 @@ class _ChatListScreenState extends State<ChatListScreen>
 
           /// ✅ TabBar (Kişisel & Grup)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 80),
             color: Color(0xffffffff),
             child: Center(
               child: TabBar(
                 controller: _tabController,
                 isScrollable: false,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 8),
                 indicatorColor: const Color(0xffef5050),
                 indicatorWeight: 1,
                 dividerColor: Colors.transparent,

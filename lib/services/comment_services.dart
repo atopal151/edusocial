@@ -43,7 +43,7 @@ static Future<List<CommentModel>> fetchComments(String postId) async {
   }
 }
 
-  static Future<bool> postComment(String postId, String content) async {
+  static Future<CommentModel?> postComment(String postId, String content) async {
     final token = _box.read('token');
     try {
       final response = await http.post(
@@ -59,9 +59,17 @@ static Future<List<CommentModel>> fetchComments(String postId) async {
         }),
       ).timeout(const Duration(seconds: 10)); // 10 saniye timeout
 
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final body = jsonDecode(response.body);
+        // Eğer API yeni yorumu döndürüyorsa
+        if (body['data'] != null) {
+          return CommentModel.fromJson(body['data']);
+        }
+        return null;
+      }
+      return null;
     } catch (e) {
-      return false;
+      return null;
     }
   }
 }

@@ -15,8 +15,8 @@ import '../../services/socket_services.dart';
 import '../profile_controller.dart';
 
 class GroupChatDetailController extends GetxController {
-  final GroupServices _groupServices = GroupServices();
   final LanguageService languageService = Get.find<LanguageService>();
+  final GroupServices _groupServices = GroupServices();
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isGroupDataLoading = false.obs; // Grup verisi için ayrı loading
@@ -34,8 +34,14 @@ class GroupChatDetailController extends GetxController {
   final RxBool isLoadingMoreMessages = false.obs;
   final RxBool hasMoreMessages = true.obs;
   final RxInt currentOffset = 0.obs;
-  final int messagesPerPage = 25;
+  final int messagesPerPage = 1000; // Increased from 25 to 1000 to remove limit
   final RxBool isFirstLoad = true.obs;
+  
+  // Track message count for auto-scroll optimization
+  int _lastMessageCount = 0;
+  
+  // Scroll to bottom button visibility
+  final RxBool showScrollToBottomButton = false.obs;
 
   // Grup chat verilerinden çıkarılan belge, bağlantı ve fotoğraf listeleri
   final RxList<DocumentModel> groupDocuments = <DocumentModel>[].obs;
@@ -111,121 +117,21 @@ class GroupChatDetailController extends GetxController {
     }
   }
 
-  /// PAGINATION: Setup scroll listener for loading more messages
+  /// SCROLL: Setup scroll listener for scroll to bottom button
   void _setupPaginationScrollListener() {
     scrollController.addListener(() {
-      // Load more messages when scrolling UP (towards older messages)
-      if (scrollController.position.pixels <= 100 && 
-          !isLoadingMoreMessages.value && 
-          hasMoreMessages.value) {
-        debugPrint('📜 Group: User scrolled to top, loading more messages...');
-        _loadMoreGroupMessages();
+      // SCROLL TO BOTTOM BUTTON: Show/hide based on scroll position
+      if (scrollController.hasClients && messages.isNotEmpty) {
+        final maxScroll = scrollController.position.maxScrollExtent;
+        final currentScroll = scrollController.position.pixels;
+        final isNearBottom = (maxScroll - currentScroll) < 200; // Show button if user scrolled up more than 200px
+        
+        showScrollToBottomButton.value = !isNearBottom && maxScroll > 0;
       }
     });
   }
 
-  /// PAGINATION: Load more older group messages
-  Future<void> _loadMoreGroupMessages() async {
-    if (isLoadingMoreMessages.value || !hasMoreMessages.value || currentGroupId.value.isEmpty) {
-      return;
-    }
 
-    try {
-      isLoadingMoreMessages.value = true;
-      
-      // Use current message count as offset
-      final nextOffset = messages.length;
-      debugPrint('📜 Group: Loading more messages. Current: ${messages.length}, Offset: $nextOffset');
-
-      // Fetch older messages using the new pagination service
-      final olderMessages = await _groupServices.fetchGroupMessagesWithPagination(
-        currentGroupId.value,
-        limit: messagesPerPage,
-        offset: nextOffset,
-      );
-
-      if (olderMessages.isEmpty) {
-        hasMoreMessages.value = false;
-        debugPrint('📜 Group: No more messages to load');
-        return;
-      }
-
-      // Convert to GroupMessageModel and check for duplicates
-      final currentUserId = Get.find<ProfileController>().userId.value;
-      final newMessages = <GroupMessageModel>[];
-      
-      for (final chatData in olderMessages) {
-        try {
-          final userId = chatData['user_id']?.toString() ?? '';
-          final user = chatData['user'] ?? {};
-          
-          final messageData = _determineMessageType(chatData);
-          
-          final message = GroupMessageModel(
-            id: chatData['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
-            senderId: userId,
-            receiverId: currentGroupId.value,
-            name: user['name'] ?? '',
-            surname: user['surname'] ?? '',
-            username: user['username'] ?? user['name'] ?? '',
-            profileImage: user['avatar_url'] ?? '',
-            content: messageData['content'],
-            messageType: messageData['type'],
-            timestamp: DateTime.parse(chatData['created_at'] ?? DateTime.now().toIso8601String()),
-            isSentByMe: userId == currentUserId,
-            pollOptions: messageData['pollOptions'],
-            additionalText: messageData['additionalText'],
-            links: messageData['links'],
-          );
-          
-          // Check for duplicates
-          final isDuplicate = messages.any((existingMsg) => existingMsg.id == message.id);
-          if (!isDuplicate) {
-            newMessages.add(message);
-          } else {
-            debugPrint('🚫 Group: Duplicate message blocked: ${message.id}');
-          }
-        } catch (e) {
-          debugPrint('⚠️ Group: Error processing message: $e');
-        }
-      }
-
-      if (newMessages.isEmpty) {
-        hasMoreMessages.value = false;
-        debugPrint('📜 Group: All messages were duplicates');
-        return;
-      }
-
-      // Remember scroll position
-      final currentScrollOffset = scrollController.offset;
-      final currentMaxScrollExtent = scrollController.position.maxScrollExtent;
-
-      // Add older messages to the beginning
-      messages.insertAll(0, newMessages);
-
-      debugPrint('✅ Group: Added ${newMessages.length} older messages. Total: ${messages.length}');
-
-      // Maintain scroll position
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (scrollController.hasClients) {
-          final newMaxScrollExtent = scrollController.position.maxScrollExtent;
-          final scrollDifference = newMaxScrollExtent - currentMaxScrollExtent;
-          scrollController.jumpTo(currentScrollOffset + scrollDifference);
-        }
-      });
-
-      // Check if we reached the end
-      if (newMessages.length < messagesPerPage) {
-        hasMoreMessages.value = false;
-        debugPrint('📜 Group: Reached end of messages');
-      }
-
-    } catch (e) {
-      debugPrint('❌ Group: Error loading more messages: $e');
-    } finally {
-      isLoadingMoreMessages.value = false;
-    }
-  }
 
   /// Progressive loading: Önce grup verilerini yükle, sonra mesajları
   Future<void> _loadGroupDataProgressive() async {
@@ -375,10 +281,8 @@ class GroupChatDetailController extends GetxController {
       final groupChats = groupData.value!.groupChats;
       final currentUserId = Get.find<ProfileController>().userId.value;
       
-      // PAGINATION: Only process latest messages for initial load
-      final messagesToProcess = isFirstLoad.value 
-        ? groupChats.take(messagesPerPage).toList()
-        : groupChats;
+      // PAGINATION: Process all messages without limit
+      final messagesToProcess = groupChats;
       
       // Performance: Batch processing
       final processedMessages = <GroupMessageModel>[];
@@ -435,24 +339,22 @@ class GroupChatDetailController extends GetxController {
         }
       }
       
-      // Sort ve assign
-      processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      // FIXED: Since API returns messages in DESC order (newest first), 
+      // we need to reverse them for proper display (oldest first, newest at bottom)
+      processedMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp)); // First sort DESC to match API
+      final reversedMessages = processedMessages.reversed.toList(); // Then reverse for display
       
       // PAGINATION: Update state based on first load or not
       if (isFirstLoad.value) {
-        messages.assignAll(processedMessages);
+        messages.assignAll(reversedMessages);
         
-        // Check if there are more messages available
-        if (groupChats.length > messagesPerPage) {
-          hasMoreMessages.value = true;
-        } else {
-          hasMoreMessages.value = false;
-        }
+        // Since we're loading all messages, no more messages to load
+        hasMoreMessages.value = false;
         
         isFirstLoad.value = false;
-        debugPrint('✅ Initial ${processedMessages.length} group messages loaded');
+        debugPrint('✅ Initial ${processedMessages.length} group messages loaded (reversed for proper display)');
       } else {
-        messages.assignAll(processedMessages);
+        messages.assignAll(reversedMessages);
       }
       
       // Extract media in background
@@ -529,9 +431,26 @@ class GroupChatDetailController extends GetxController {
 
   /// FIXED: Proper scroll to bottom with timing
   void scrollToBottomAfterLoad() {
+    debugPrint('📜 Group Chat - scrollToBottomAfterLoad called, messages: ${messages.length}');
+    
     // Allow UI to render first
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Multiple delayed attempts for better reliability
       Future.delayed(Duration(milliseconds: 100), () {
+        if (scrollController.hasClients && messages.isNotEmpty) {
+          scrollToBottom(animated: false);
+        }
+      });
+      
+      // Second attempt with longer delay
+      Future.delayed(Duration(milliseconds: 300), () {
+        if (scrollController.hasClients && messages.isNotEmpty) {
+          scrollToBottom(animated: false);
+        }
+      });
+      
+      // Final attempt
+      Future.delayed(Duration(milliseconds: 600), () {
         if (scrollController.hasClients && messages.isNotEmpty) {
           scrollToBottom(animated: false);
         }
@@ -541,12 +460,50 @@ class GroupChatDetailController extends GetxController {
 
   /// FIXED: Scroll to bottom for new messages
   void scrollToBottomForNewMessage() {
+    final currentMessageCount = messages.length;
+    debugPrint('📜 Group Chat - scrollToBottomForNewMessage called, messages: $currentMessageCount, last: $_lastMessageCount');
+    
+    // Only scroll if message count actually increased (new message added)
+    if (currentMessageCount <= _lastMessageCount) {
+      debugPrint('📜 Group Chat - No new messages, skipping auto-scroll');
+      return;
+    }
+    
+    _lastMessageCount = currentMessageCount;
+    
+    // Check if user is already at bottom (within 100px) before scrolling
+    if (scrollController.hasClients) {
+      final position = scrollController.position;
+      final isNearBottom = position.maxScrollExtent - position.pixels < 100;
+      
+      if (!isNearBottom) {
+        debugPrint('📜 Group Chat - User scrolled away from bottom, not auto-scrolling');
+        return;
+      }
+    }
+    
     // Immediate scroll for new messages
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (scrollController.hasClients) {
+      if (scrollController.hasClients && messages.isNotEmpty) {
+        debugPrint('📜 Group Chat - Auto-scrolling to bottom for new message');
         scrollToBottom(animated: true);
       }
     });
+  }
+
+  /// Test function for manual scroll
+  void testScrollToBottom() {
+    debugPrint('🧪 === SCROLL TEST ===');
+    debugPrint('🧪 Messages count: ${messages.length}');
+    debugPrint('🧪 ScrollController hasClients: ${scrollController.hasClients}');
+    if (scrollController.hasClients) {
+      debugPrint('🧪 Current position: ${scrollController.position.pixels}');
+      debugPrint('🧪 Max extent: ${scrollController.position.maxScrollExtent}');
+      debugPrint('🧪 Has content dimensions: ${scrollController.position.hasContentDimensions}');
+    }
+    debugPrint('🧪 Attempting to scroll...');
+    scrollToBottom(animated: true);
+    debugPrint('🧪 ==================');
   }
 
   /// Socket ve listener durumunu kontrol et
@@ -615,7 +572,14 @@ class GroupChatDetailController extends GetxController {
     // Belgeleri tarihe göre sırala (en yeni önce)
     groupDocuments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     
-    debugPrint('📁 Extracted ${groupDocuments.length} documents from group chats');
+    // Linkleri tarihe göre sırala (en yeni önce)
+    // Link'lerin tarih bilgisi yok, mesaj sırasına göre sırala
+    // Bu durumda mesaj sırasına göre sırala (en son eklenen en üstte)
+    
+    // Fotoğrafları tarihe göre sırala (en yeni önce)
+    // Fotoğraflar mesaj sırasına göre zaten sıralı geliyor
+    
+    debugPrint('📁 Extracted ${groupDocuments.length} documents from group chats (sorted by date)');
     debugPrint('🔗 Extracted ${groupLinks.length} links from group chats');
     debugPrint('📸 Extracted ${groupPhotos.length} photos from group chats');
   }
@@ -631,7 +595,7 @@ class GroupChatDetailController extends GetxController {
       
     } catch (e) {
       debugPrint('Error fetching messages: $e');
-      Get.snackbar('Error', 'Failed to fetch messages', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.messageSendFailed"), snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -882,12 +846,12 @@ class GroupChatDetailController extends GetxController {
           scrollToBottomForNewMessage();
         });
       } else {
-        Get.snackbar('Hata', 'Mesaj gönderilemedi', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.messageSendFailed"), snackPosition: SnackPosition.BOTTOM);
       }
       
     } catch (e) {
       debugPrint('💥 Message sending error: $e');
-      Get.snackbar('Hata', 'Mesaj gönderilemedi', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.messageSendFailed"), snackPosition: SnackPosition.BOTTOM);
     } finally {
       isSendingMessage.value = false;
     }
@@ -919,12 +883,12 @@ class GroupChatDetailController extends GetxController {
           scrollToBottomForNewMessage();
         });
       } else {
-        Get.snackbar('Hata', 'Medya gönderilemedi', snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.mediaSendFailed"), snackPosition: SnackPosition.BOTTOM);
       }
       
     } catch (e) {
       debugPrint('💥 Media sending error: $e');
-      Get.snackbar('Hata', 'Medya gönderilemedi', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.mediaSendFailed"), snackPosition: SnackPosition.BOTTOM);
     } finally {
       isSendingMessage.value = false;
     }
@@ -935,16 +899,28 @@ class GroupChatDetailController extends GetxController {
   }
 
   void scrollToBottom({bool animated = true}) {
-    if (scrollController.hasClients) {
-      if (animated) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+    try {
+      if (scrollController.hasClients && 
+          scrollController.position.hasContentDimensions &&
+          messages.isNotEmpty) {
+        
+        final maxScroll = scrollController.position.maxScrollExtent;
+        debugPrint('📜 Group Chat - Scrolling to bottom: maxScroll = $maxScroll');
+        
+        if (animated) {
+          scrollController.animateTo(
+            maxScroll,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        } else {
+          scrollController.jumpTo(maxScroll);
+        }
       } else {
-        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+        debugPrint('⚠️ Group Chat - Cannot scroll: hasClients=${scrollController.hasClients}, messages=${messages.length}');
       }
+    } catch (e) {
+      debugPrint('❌ Group Chat - Scroll error: $e');
     }
   }
 
@@ -985,6 +961,7 @@ class GroupChatDetailController extends GetxController {
     scrollController.dispose();
     _groupMessageSubscription.cancel();
     _userCache.clear(); // Clear cache
+    _lastMessageCount = 0; // Reset message count tracker
     super.onClose();
   }
 }

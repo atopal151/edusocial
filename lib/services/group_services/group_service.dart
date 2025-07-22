@@ -257,7 +257,7 @@ class GroupServices {
   /// PAGINATION: Fetch group messages with pagination support
   Future<List<dynamic>> fetchGroupMessagesWithPagination(
     String groupId, {
-    int limit = 25,
+    int limit = 1000, // Increased from 25 to 1000 to remove limit
     int offset = 0,
   }) async {
     final box = GetStorage();
@@ -316,7 +316,7 @@ class GroupServices {
       final uri = Uri.parse('${AppConstants.baseUrl}/group-detail/$groupId').replace(
         queryParameters: {
           'minimal': 'true', // Request minimal data if backend supports
-          'limit_messages': '50', // Limit recent messages
+          'limit_messages': '1000', // Increased from 50 to 1000 to remove limit
           'include': 'messages,basic_info', // Only essential data
         }
       );

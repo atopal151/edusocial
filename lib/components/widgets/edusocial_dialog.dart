@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../services/language_service.dart';
 
 class EduSocialDialogs {
   static void showDialog({
@@ -7,6 +8,7 @@ class EduSocialDialogs {
     required String message,
     required bool isSuccess,
   }) {
+    final LanguageService languageService = Get.find<LanguageService>();
     Get.dialog(
       Center(
         child: Material(
@@ -63,7 +65,7 @@ class EduSocialDialogs {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      "Tamam",
+                      languageService.tr("common.messages.ok"),
                       style: TextStyle(
                         fontSize: 13.28,
                         color: Colors.white,

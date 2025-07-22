@@ -25,19 +25,25 @@ class CommentController extends GetxController {
   }
 
   Future<void> addComment(String postId, String content) async {
+    isLoading.value = true;
+    
     try {
       debugPrint('🔄 Yorum ekleniyor... Post ID: $postId');
-      final success = await CommentService.postComment(postId, content);
+      final newComment = await CommentService.postComment(postId, content);
       
-      if (success) {
+      if (newComment != null) {
         debugPrint('✅ Yorum başarıyla eklendi');
         // Yorumları yeniden yükle
         await fetchComments(postId);
       } else {
         debugPrint('❌ Yorum eklenemedi');
+        Get.snackbar("Hata", "Yorum eklenemedi");
       }
     } catch (e) {
       debugPrint('❌ Yorum eklenirken hata: $e');
+      Get.snackbar("Hata", "Yorum eklenirken bir hata oluştu");
+    } finally {
+      isLoading.value = false;
     }
   }
 }

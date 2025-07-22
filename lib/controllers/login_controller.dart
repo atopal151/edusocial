@@ -11,6 +11,7 @@ import 'package:email_validator/email_validator.dart';
 
 import '../components/widgets/edusocial_dialog.dart';
 import '../services/auth_service.dart';
+import '../services/language_service.dart';
 
 class LoginController extends GetxController {
   late TextEditingController emailController;
@@ -20,6 +21,7 @@ class LoginController extends GetxController {
       true.obs; // Kullanıcının ilk kez giriş yapıp yapmadığını kontrol et
 
   final AuthService _authService = AuthService();
+  final LanguageService languageService = Get.find<LanguageService>();
 
   @override
   void onInit() {
@@ -34,12 +36,12 @@ class LoginController extends GetxController {
 
   String? _validateInputs() {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      return "Lütfen tüm alanları doldurun.";
+      return languageService.tr("login.validation.allFieldsRequired");
     }
 
     // Eğer e-posta formatında ise kontrol et
     if (emailController.text.contains('@') && !_isValidEmail(emailController.text)) {
-      return "Geçerli bir e-posta adresi giriniz.";
+      return languageService.tr("login.validation.validEmailRequired");
     }
 
     return null;

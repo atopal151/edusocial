@@ -1,5 +1,7 @@
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/utils/date_format.dart';
+import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -123,65 +125,79 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   }
                   
                   // Yorumlar listesi
-                  return ListView.separated(
-                    itemCount: controller.commentList.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final comment = controller.commentList[index];
-                      return Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(comment.userAvatar),
-                              radius: 20,
-                              onBackgroundImageError: (_, __) {},
-                              child: comment.userAvatar.isEmpty 
-                                ? Icon(Icons.person, color: Colors.grey.shade600)
-                                : null,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row( 
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          comment.userName,
-                                          style: GoogleFonts.inter(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13,
+                  return RefreshIndicator(
+                    color: Color(0xFFef5050),
+                backgroundColor: Color(0xfffafafa),
+                elevation: 0,
+                    onRefresh: () async {
+                      await controller.fetchComments(widget.postId);
+                    },
+                    child: ListView.separated(
+                      itemCount: controller.commentList.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final comment = controller.commentList[index];
+                        return Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: comment.userAvatar.isNotEmpty
+                                  ? NetworkImage(comment.userAvatar.startsWith('http')
+                                      ? comment.userAvatar
+                                      : '${AppConstants.baseUrl}/${comment.userAvatar}')
+                                  : null,
+                                radius: 20,
+                                onBackgroundImageError: (_, __) {
+                                  debugPrint('❌ Avatar yüklenemedi: ${comment.userAvatar}');
+                                },
+                                child: comment.userAvatar.isEmpty
+                                  ? Icon(Icons.person, color: Colors.grey.shade600)
+                                  : null,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row( 
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            comment.userName,
+                                            style: GoogleFonts.inter(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Text(
-                                        formatSimpleDateClock(
-                                            comment.createdAt),
-                                        style: GoogleFonts.inter(
-                                          fontSize: 10,
-                                          color: Colors.grey,
+                                        Text(
+                                          formatSimpleDateClock(
+                                              comment.createdAt),
+                                          style: GoogleFonts.inter(
+                                            fontSize: 10,
+                                            color: Colors.grey,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    comment.content,
-                                    style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      comment.content,
+                                      style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   );
                 }),
               ),

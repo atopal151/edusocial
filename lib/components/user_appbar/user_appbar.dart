@@ -83,27 +83,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-             /* Positioned(
-                top: -5,
-                right: -5,
-                child: Container(
-                  height: 20,
-                  width: 20,
-                  padding: EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    '12',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),*/
+             
             ],
           ),
         ],

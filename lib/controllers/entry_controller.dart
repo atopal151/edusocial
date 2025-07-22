@@ -1,5 +1,6 @@
 import 'package:edusocial/models/topic_model.dart';
 import 'package:edusocial/services/entry_services.dart';
+import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
@@ -13,6 +14,7 @@ import 'package:edusocial/models/display_entry_item.dart'; //
 import 'package:edusocial/controllers/people_profile_controller.dart'; // Import PeopleProfileController
 
 class EntryController extends GetxController {
+  final LanguageService languageService = Get.find<LanguageService>();
   var entryList = <EntryModel>[].obs;
   var entryPersonList = <EntryModel>[].obs;
   final RxList<EntryModel> filteredByCategoryList = <EntryModel>[].obs;
@@ -20,6 +22,7 @@ class EntryController extends GetxController {
   var currentTopic = Rxn<TopicModel>();
 
   var isEntryLoading = false.obs;
+  var isSendingEntry = false.obs; // Entry gönderme loading state'i
   final TextEditingController titleEntryController = TextEditingController();
   final TextEditingController bodyEntryController = TextEditingController();
   final RxString topicName = ''.obs;
@@ -148,7 +151,7 @@ class EntryController extends GetxController {
 
     if (topicName.isEmpty || content.isEmpty || topicCategoryId == 0) {
       debugPrint("⚠️ Eksik bilgi tespit edildi!");
-      Get.snackbar("Eksik Bilgi", "Lütfen tüm alanları doldurun");
+      Get.snackbar(languageService.tr("common.messages.missingInfo"), languageService.tr("common.messages.fillAllFields"));
       return;
     }
 
@@ -167,7 +170,7 @@ class EntryController extends GetxController {
     if (success) {
       debugPrint("🎉 Konu başarıyla oluşturuldu!");
       Get.back();
-      Get.snackbar("Başarılı", "Konu başarıyla oluşturuldu");
+      Get.snackbar(languageService.tr("common.success"), languageService.tr("entry.success.topicCreated"));
       titleEntryController.clear();
       bodyEntryController.clear();
       debugPrint("🔄 Entry listesi yenileniyor...");
@@ -175,7 +178,7 @@ class EntryController extends GetxController {
       debugPrint("✅ Entry listesi güncellendi");
     } else {
       debugPrint("❌ Konu oluşturma başarısız!");
-      Get.snackbar("Hata", "Konu oluşturulamadı");
+      Get.snackbar(languageService.tr("common.error"), languageService.tr("entry.errors.topicCreateFailed"));
     }
   }
 
@@ -312,23 +315,32 @@ class EntryController extends GetxController {
 
   // Send Entry To Topic
   Future<void> sendEntryToTopic(int topicId, String content) async {
-    final success = await EntryServices.sendEntryToTopic(
-      topicId: topicId,
-      content: content,
-    );
+    isSendingEntry.value = true;
+    
+    try {
+      final success = await EntryServices.sendEntryToTopic(
+        topicId: topicId,
+        content: content,
+      );
 
-    if (success) {
-      // Başarılı entry gönderimi sonrası sadece yorumları güncelle
-      if (Get.isRegistered<EntryDetailController>()) {
-        final entryDetailController = Get.find<EntryDetailController>();
-        if (entryDetailController.currentTopic.value?.id != null) {
-          debugPrint("🔄 Yeni yorum eklendi, yorumlar güncelleniyor...");
-          await entryDetailController.fetchEntryComments();
+      if (success) {
+        // Başarılı entry gönderimi sonrası sadece yorumları güncelle
+        if (Get.isRegistered<EntryDetailController>()) {
+          final entryDetailController = Get.find<EntryDetailController>();
+          if (entryDetailController.currentTopic.value?.id != null) {
+            debugPrint("🔄 Yeni yorum eklendi, yorumlar güncelleniyor...");
+            await entryDetailController.fetchEntryComments();
+          }
         }
+        // Back işlemi ve snackbar kaldırıldı
+      } else {
+        Get.snackbar("Hata", "Entry gönderilemedi");
       }
-      // Back işlemi ve snackbar kaldırıldı
-    } else {
+    } catch (e) {
+      debugPrint("❌ Entry gönderme hatası: $e");
       Get.snackbar("Hata", "Entry gönderilemedi");
+    } finally {
+      isSendingEntry.value = false;
     }
   }
 

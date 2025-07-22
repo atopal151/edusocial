@@ -25,47 +25,15 @@ class ChatDetailScreen extends StatelessWidget {
     }
 
     return Obx(() {
-      final int itemCount = messages.length + (controller.isLoadingMoreMessages.value ? 1 : 0);
-      
       return ListView.builder(
         controller: controller.scrollController,
-        itemCount: itemCount,
+        itemCount: messages.length,
         padding: const EdgeInsets.only(bottom: 75),
         addAutomaticKeepAlives: false,
         addRepaintBoundaries: true,
         cacheExtent: 500.0,
         itemBuilder: (context, index) {
-          // PAGINATION: Show loading indicator at the top when loading more messages
-          if (index == 0 && controller.isLoadingMoreMessages.value) {
-            return Container(
-              padding: const EdgeInsets.all(16),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFef5050)),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Eski mesajlar yükleniyor...',
-                    style: TextStyle(
-                      color: Color(0xff9ca3ae),
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          // Adjust message index based on whether loading indicator is shown
-          final messageIndex = controller.isLoadingMoreMessages.value ? index - 1 : index;
+          final messageIndex = index;
           
           if (messageIndex < 0 || messageIndex >= messages.length) {
             return const SizedBox.shrink();
@@ -102,6 +70,47 @@ class ChatDetailScreen extends StatelessWidget {
     final previousDateOnly = DateTime(previousDate.year, previousDate.month, previousDate.day);
 
     return currentDateOnly != previousDateOnly;
+  }
+
+  /// Build scroll to bottom button
+  Widget _buildScrollToBottomButton() {
+    return Obx(() {
+      if (!controller.showScrollToBottomButton.value) {
+        return const SizedBox.shrink();
+      }
+      
+      return Positioned(
+        bottom: 90, // Above message input field
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              controller.scrollToBottom(animated: true);
+            },
+            borderRadius: BorderRadius.circular(28),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Color(0xffffffff),
+                borderRadius: BorderRadius.circular(28),
+               
+                border: Border.all(
+                  color: Color(0xfff5f6f7),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: Color(0xffef5050),
+                size: 28,
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   @override
@@ -196,29 +205,35 @@ class ChatDetailScreen extends StatelessWidget {
         ),
         body: Container(
           color: const Color(0xfffafafa),
-          child: Column(
+          child: Stack(
             children: [
-              Expanded(
-                child: (isLoading && controller.messages.isEmpty)
-                    ? Center(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 40),
-                          child: GeneralLoadingIndicator(
-                            size: 32,
-                            showIcon: false,
-                          ),
-                        ),
-                      )
-                    : _buildMessagesWithDateSeparators(),
+              Column(
+                children: [
+                  Expanded(
+                    child: (isLoading && controller.messages.isEmpty)
+                        ? Center(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 40),
+                              child: GeneralLoadingIndicator(
+                                size: 32,
+                                showIcon: false,
+                              ),
+                            ),
+                          )
+                        : _buildMessagesWithDateSeparators(),
+                  ),
+                  Container(
+                    decoration: const BoxDecoration(color: Color(0xffffffff)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 16.0, right: 16, top: 8, bottom: 20),
+                      child: MessageInputField(controller: controller),
+                    ),
+                  ),
+                ],
               ),
-              Container(
-                decoration: const BoxDecoration(color: Color(0xffffffff)),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16.0, right: 16, top: 8, bottom: 20),
-                  child: MessageInputField(controller: controller),
-                ),
-              ),
+              // Scroll to bottom button
+              _buildScrollToBottomButton(),
             ],
           ),
         ),

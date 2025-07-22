@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:edusocial/models/group_models/group_area_model.dart';
 import 'package:edusocial/services/group_services/create_group_service.dart';
+import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CreateGroupController extends GetxController {
+  final LanguageService languageService = Get.find<LanguageService>();
   final TextEditingController nameGroupController = TextEditingController();
   final TextEditingController descriptionGroupController =
       TextEditingController();
@@ -45,7 +47,7 @@ Future<void> createGroup() async {
   final area = selectedGroupArea.value;
 
   if (name.isEmpty || desc.isEmpty || area == null) {
-    Get.snackbar("Eksik Bilgi", "Lütfen tüm alanları doldurun");
+    Get.snackbar(languageService.tr("common.messages.missingInfo"), languageService.tr("common.messages.fillAllFields"));
     return;
   }
 
@@ -66,15 +68,15 @@ Future<void> createGroup() async {
 
     if (success) {
       Get.back();
-      Get.snackbar("Başarılı", "Grup başarıyla oluşturuldu");
+      Get.snackbar(languageService.tr("common.success"), languageService.tr("common.messages.groupCreatedSuccessfully"));
     } else {
-      Get.snackbar("Hata", "Grup oluşturulamadı (false döndü)");
+      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.groupCreationFailed"));
     }
   } catch (e, stack) {
     isLoading.value = false;
     debugPrint("❌ Grup oluşturulurken hata oluştu: $e");
     debugPrint("📛 Stack Trace:\n$stack");
-    Get.snackbar("Hata", "Grup oluşturulamadı: $e");
+    Get.snackbar(languageService.tr("common.error"), "${languageService.tr("common.messages.groupCreationFailed")}: $e");
   }
 }
 

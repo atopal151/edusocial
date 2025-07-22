@@ -119,32 +119,39 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   showIcon: false,
                 ));
               }
-              return ListView.builder(
-                itemCount: entryDetailController.entryComments.length,
-                itemBuilder: (context, index) {
-                  final comment = entryDetailController.entryComments[index];
-                  return EntryCommentCard(
-                    entry: comment,
-                    onDownvote: () =>
-                        entryController.voteEntry(comment.id, "down"),
-                    onUpvote: () => entryController.voteEntry(comment.id, "up"),
-                    onShare: () {
-                      // Konunun ilk entry'sini bul
-                      String firstEntryContent = "";
-                      if (entryDetailController.entryComments.isNotEmpty) {
-                        firstEntryContent =
-                            entryDetailController.entryComments.first.content;
-                      }
+              return RefreshIndicator(
+                color: Color(0xFFef5050),
+                backgroundColor: Color(0xfffafafa),
+                elevation: 0,
+                onRefresh: () async {
+                  await entryDetailController.fetchEntryComments();
+                },
+                child: ListView.builder(
+                  itemCount: entryDetailController.entryComments.length,
+                  itemBuilder: (context, index) {
+                    final comment = entryDetailController.entryComments[index];
+                    return EntryCommentCard(
+                      entry: comment,
+                      onDownvote: () =>
+                          entryController.voteEntry(comment.id, "down"),
+                      onUpvote: () => entryController.voteEntry(comment.id, "up"),
+                      onShare: () {
+                        // Konunun ilk entry'sini bul
+                        String firstEntryContent = "";
+                        if (entryDetailController.entryComments.isNotEmpty) {
+                          firstEntryContent =
+                              entryDetailController.entryComments.first.content;
+                        }
 
-                      // Konu bilgilerini al
-                      final topic = widget.entry.topic;
-                      final categoryTitle =
-                          topic?.category?.title ?? languageService.tr("entryDetail.noCategory");
-                      final topicName = topic?.name ?? "Konu Bilgisi Yok";
-                      final entryCount =
-                          entryDetailController.entryComments.length;
+                        // Konu bilgilerini al
+                        final topic = widget.entry.topic;
+                        final categoryTitle =
+                            topic?.category?.title ?? languageService.tr("entryDetail.noCategory");
+                        final topicName = topic?.name ?? "Konu Bilgisi Yok";
+                        final entryCount =
+                            entryDetailController.entryComments.length;
 
-                      final String shareText = """
+                        final String shareText = """
 📝 **$topicName** (#${comment.id})
 
 🏷️ **Kategori:** $categoryTitle
@@ -163,14 +170,16 @@ $firstEntryContent
 
 #EduSocial #Eğitim #$categoryTitle
 """;
-                      Share.share(shareText);
-                    },
-                    onPressed: () {},
-                  );
-                },
+                        Share.share(shareText);
+                      },
+                      onPressed: () {},
+                    );
+                  },
+                ),
               );
             }),
           ),
+
 
           // Entry Paylaşım kısmı
           Container(
@@ -198,7 +207,7 @@ $firstEntryContent
                     ),
                   ),
                   const SizedBox(width: 10),
-                  IconButton(
+                  Obx(() => IconButton(
                     icon: Container(
                       width: 40,
                       height: 40,
@@ -212,29 +221,40 @@ $firstEntryContent
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
                       child: Center(
-                        child: SvgPicture.asset(
-                          'images/icons/send_icon.svg',
-                          width: 18,
-                          height: 18,
-                          colorFilter: const ColorFilter.mode(
-                              Colors.white, BlendMode.srcIn),
-                        ),
+                        child: entryController.isSendingEntry.value
+                            ? SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : SvgPicture.asset(
+                                'images/icons/send_icon.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn),
+                              ),
                       ),
                     ),
-                    onPressed: () {
-                      if (commentController.text.isNotEmpty) {
-                        entryController
-                            .sendEntryToTopic(
-                          widget.entry.topic?.id ?? 0,
-                          commentController.text,
-                        )
-                            .then((_) {
-                          entryDetailController.fetchEntryComments();
-                          commentController.clear();
-                        });
-                      }
-                    },
-                  ),
+                    onPressed: entryController.isSendingEntry.value
+                        ? null
+                        : () {
+                            if (commentController.text.isNotEmpty) {
+                              entryController
+                                  .sendEntryToTopic(
+                                widget.entry.topic?.id ?? 0,
+                                commentController.text,
+                              )
+                                  .then((_) {
+                                entryDetailController.fetchEntryComments();
+                                commentController.clear();
+                              });
+                            }
+                          },
+                  )),
                 ],
               ),
             ),

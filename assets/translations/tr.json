@@ -59,7 +59,9 @@
     "validation": {
       "usernameOrEmailRequired": "Kullanıcı adı veya e-posta zorunludur",
       "passwordRequired": "Şifre zorunludur",
-      "invalidCredentials": "Kullanıcı adı/e-posta veya şifre hatalı"
+      "invalidCredentials": "Kullanıcı adı/e-posta veya şifre hatalı",
+      "allFieldsRequired": "Lütfen tüm alanları doldurun.",
+      "validEmailRequired": "Geçerli bir e-posta adresi giriniz."
     },
     "errors": {
       "loginFailed": "Giriş işlemi başarısız",
@@ -192,6 +194,19 @@
       "edit": "Düzenle",
       "delete": "Sil"
     },
+    "reminderForm": {
+      "titleHint": "Hatırlatma Başlığı",
+      "dateLabel": "Tarih:",
+      "timeLabel": "Saat:",
+      "colorLabel": "Renk:",
+      "selectDate": "Tarih Seç",
+      "selectTime": "Saat Seç",
+      "selectColor": "Renk Seç",
+      "sendNotification": "Bildirim gönder",
+      "save": "Kaydet",
+      "update": "Güncelle",
+      "ok": "Tamam"
+    },
     "loading": {
       "reminders": "Hatırlatmalar yükleniyor...",
       "saving": "Kaydediliyor...",
@@ -207,12 +222,14 @@
       "reminderSaveFailed": "Hatırlatma kaydedilemedi",
       "reminderDeleteFailed": "Hatırlatma silinemedi",
       "networkError": "Ağ bağlantısı hatası",
-      "serverError": "Sunucu hatası oluştu"
+      "serverError": "Sunucu hatası oluştu",
+      "operationFailed": "İşlem başarısız"
     },
     "success": {
       "reminderSaved": "Hatırlatma başarıyla kaydedildi",
       "reminderDeleted": "Hatırlatma başarıyla silindi",
-      "reminderUpdated": "Hatırlatma başarıyla güncellendi"
+      "reminderUpdated": "Hatırlatma başarıyla güncellendi",
+      "reminderAdded": "Hatırlatıcı eklendi"
     },
     "emptyState": {
       "title": "Henüz hatırlatmanız yok",
@@ -256,7 +273,9 @@
       "messagesLoadFailed": "Mesajlar yüklenemedi",
       "messageSendFailed": "Mesaj gönderilemedi",
       "networkError": "Ağ bağlantısı hatası",
-      "serverError": "Sunucu hatası oluştu"
+      "serverError": "Sunucu hatası oluştu",
+      "groupDataLoadFailed": "Grup verileri yüklenemedi",
+      "pleaseRetry": "Lütfen tekrar deneyin"
     },
     "success": {
       "messageSent": "Mesaj başarıyla gönderildi"
@@ -312,7 +331,8 @@
     "loading": {
       "messages": "Mesajlar yükleniyor...",
       "sending": "Gönderiliyor...",
-      "loadingUserInfo": "Kullanıcı bilgileri yükleniyor..."
+      "loadingUserInfo": "Kullanıcı bilgileri yükleniyor...",
+      "loadingOldMessages": "Yükleniyor..."
     },
     "errors": {
       "messageSendFailed": "Mesaj gönderilemedi",
@@ -1095,7 +1115,8 @@
     "fallbackTexts": {
       "noSchoolInfo": "Okul bilgisi yok",
       "noDepartmentInfo": "Bölüm bilgisi yok",
-      "invalidDate": "Geçersiz Tarih"
+      "invalidDate": "Geçersiz Tarih",
+      "profileInfoNotAvailable": "Profil bilgileri alınamadı."
     },
     "details": {
       "personalInfo": "Kişisel Bilgiler",
@@ -1247,7 +1268,8 @@
       "joining": "Katılınıyor...",
       "leaving": "Ayrılınıyor...",
       "following": "Takip ediliyor...",
-      "unfollowing": "Takipten çıkarılıyor..."
+      "unfollowing": "Takipten çıkarılıyor...",
+      "retry": "Tekrar Dene"
     },
     "messages": {
       "success": "Başarılı",
@@ -1283,7 +1305,26 @@
       "accessDenied": "Erişim reddedildi",
       "sessionExpired": "Oturum süresi doldu",
       "maintenanceMode": "Bakım modu",
-      "updateRequired": "Güncelleme gerekli"
+      "updateRequired": "Güncelleme gerekli",
+      "missingInfo": "Eksik Bilgi",
+      "fillAllFields": "Lütfen tüm alanları doldurun",
+      "groupCreatedSuccessfully": "Grup başarıyla oluşturuldu",
+      "groupCreationFailed": "Grup oluşturulamadı",
+      "postCreatedSuccessfully": "Gönderi başarıyla paylaşıldı",
+      "postCreationFailed": "Gönderi paylaşılamadı",
+      "courseAlreadyAdded": "dersi zaten eklenmiş veya eklenemedi",
+      "courseSavedToProfile": "Dersler profilinize kaydedildi!",
+      "userFollowed": "takip edildi!",
+      "followOperationFailed": "Takip işlemi başarısız",
+      "connectionErrorMessage": "Bağlantı Hatası",
+      "tryAgainButton": "Tekrar Dene",
+      "messageSendFailed": "Mesaj gönderilemedi",
+      "mediaSendFailed": "Medya gönderilemedi",
+      "imageNotLoaded": "Görsel yüklenemedi",
+      "documentCouldNotOpen": "Belge açılamadı",
+      "linkCouldNotOpen": "Link açılamadı",
+      "retryMessage": "Lütfen tekrar deneyin",
+      "ok": "Tamam"
     },
     "dialogs": {
       "confirmTitle": "Onay",

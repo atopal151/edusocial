@@ -1,4 +1,5 @@
 import 'package:edusocial/controllers/chat_controllers/chat_detail_controller.dart';
+import 'package:edusocial/models/document_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -272,51 +273,59 @@ class _ChatDetailBodyState extends State<ChatDetailBody> {
                       child: TabBarView(
                         children: [
                           // BELGELER
-                          Scrollbar(
-                            controller: documentsScrollController,
-                            trackVisibility: true,
-                            thumbVisibility: true,
-                            thickness: 5,
-                            radius: const Radius.circular(15),
-                            child: ListView.builder(
-                              controller: documentsScrollController,
-                              itemCount: userChatDetail.documents.length,
-                              itemBuilder: (context, index) {
-                                final doc = userChatDetail.documents[index];
-                                return ListTile(
-                                  leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xfff5f6f7),
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: SvgPicture.asset(
-                                      "images/icons/document_icon.svg",
-                                      colorFilter: const ColorFilter.mode(
-                                        Color(0xff9ca3ae),
-                                        BlendMode.srcIn,
+                          Builder(
+                            builder: (context) {
+                              // Belgeleri tarihe göre sırala (en yeni en üstte)
+                              final sortedDocuments = List<DocumentModel>.from(userChatDetail.documents);
+                              sortedDocuments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+                              
+                              return Scrollbar(
+                                controller: documentsScrollController,
+                                trackVisibility: true,
+                                thumbVisibility: true,
+                                thickness: 5,
+                                radius: const Radius.circular(15),
+                                child: ListView.builder(
+                                  controller: documentsScrollController,
+                                  itemCount: sortedDocuments.length,
+                                  itemBuilder: (context, index) {
+                                    final doc = sortedDocuments[index];
+                                    return ListTile(
+                                      leading: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xfff5f6f7),
+                                          borderRadius: BorderRadius.circular(50),
+                                        ),
+                                        child: SvgPicture.asset(
+                                          "images/icons/document_icon.svg",
+                                          colorFilter: const ColorFilter.mode(
+                                            Color(0xff9ca3ae),
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  title: Text(
-                                    doc.name,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xff414751),
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    "${doc.sizeMb} MB • ${DateFormat(languageService.currentLanguage.value == 'tr' ? 'dd.MM.yyyy' : 'MM/dd/yyyy', languageService.currentLanguage.value).format(doc.createdAt)}",
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xff9ca3ae),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
+                                      title: Text(
+                                        doc.name,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xff414751),
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        "${doc.sizeMb} MB • ${DateFormat(languageService.currentLanguage.value == 'tr' ? 'dd.MM.yyyy' : 'MM/dd/yyyy', languageService.currentLanguage.value).format(doc.createdAt)}",
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xff9ca3ae),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
                           ),
 
                           // BAĞLANTILAR

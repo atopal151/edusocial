@@ -59,7 +59,9 @@
     "validation": {
       "usernameOrEmailRequired": "Username or email is required",
       "passwordRequired": "Password is required",
-      "invalidCredentials": "Invalid username/email or password"
+      "invalidCredentials": "Invalid username/email or password",
+      "allFieldsRequired": "Please fill in all fields.",
+      "validEmailRequired": "Please enter a valid email address."
     },
     "errors": {
       "loginFailed": "Login failed",
@@ -191,6 +193,19 @@
       "edit": "Edit",
       "delete": "Delete"
     },
+    "reminderForm": {
+      "titleHint": "Reminder Title",
+      "dateLabel": "Date:",
+      "timeLabel": "Time:",
+      "colorLabel": "Color:",
+      "selectDate": "Select Date",
+      "selectTime": "Select Time",
+      "selectColor": "Select Color",
+      "sendNotification": "Send notification",
+      "save": "Save",
+      "update": "Update",
+      "ok": "OK"
+    },
     "loading": {
       "reminders": "Loading reminders...",
       "saving": "Saving...",
@@ -206,12 +221,14 @@
       "reminderSaveFailed": "Failed to save reminder",
       "reminderDeleteFailed": "Failed to delete reminder",
       "networkError": "Network connection error",
-      "serverError": "Server error occurred"
+      "serverError": "Server error occurred",
+      "operationFailed": "Operation failed"
     },
     "success": {
       "reminderSaved": "Reminder saved successfully",
       "reminderDeleted": "Reminder deleted successfully",
-      "reminderUpdated": "Reminder updated successfully"
+      "reminderUpdated": "Reminder updated successfully",
+      "reminderAdded": "Reminder added"
     },
     "emptyState": {
       "title": "No reminders yet",
@@ -255,7 +272,9 @@
       "messagesLoadFailed": "Failed to load messages",
       "messageSendFailed": "Failed to send message",
       "networkError": "Network connection error",
-      "serverError": "Server error occurred"
+      "serverError": "Server error occurred",
+      "groupDataLoadFailed": "Group data could not be loaded",
+      "pleaseRetry": "Please try again"
     },
     "success": {
       "messageSent": "Message sent successfully"
@@ -311,7 +330,8 @@
     "loading": {
       "messages": "Loading messages...",
       "sending": "Sending...",
-      "loadingUserInfo": "Loading user information..."
+      "loadingUserInfo": "Loading user information...",
+      "loadingOldMessages": "Loading..."
     },
     "errors": {
       "messageSendFailed": "Failed to send message",
@@ -1064,7 +1084,8 @@
     "fallbackTexts": {
       "noSchoolInfo": "No school information",
       "noDepartmentInfo": "No department information",
-      "invalidDate": "Invalid Date"
+      "invalidDate": "Invalid Date",
+      "profileInfoNotAvailable": "Profile information could not be retrieved."
     },
     "details": {
       "personalInfo": "Personal Information",
@@ -1263,7 +1284,8 @@
       "following": "Following...",
       "unfollowing": "Unfollowing...",
       "accepting": "Accepting...",
-      "declining": "Declining..."
+      "declining": "Declining...",
+      "retry": "Retry"
     },
     "messages": {
       "success": "Success",
@@ -1299,7 +1321,26 @@
       "accessDenied": "Access denied",
       "sessionExpired": "Session expired",
       "maintenanceMode": "Maintenance mode",
-      "updateRequired": "Update required"
+      "updateRequired": "Update required",
+      "missingInfo": "Missing Information",
+      "fillAllFields": "Please fill in all fields",
+      "groupCreatedSuccessfully": "Group created successfully",
+      "groupCreationFailed": "Group creation failed",
+      "postCreatedSuccessfully": "Post shared successfully",
+      "postCreationFailed": "Post could not be shared",
+      "courseAlreadyAdded": "course is already added or could not be added",
+      "courseSavedToProfile": "Courses saved to your profile!",
+      "userFollowed": "followed!",
+      "followOperationFailed": "Follow operation failed",
+      "connectionErrorMessage": "Connection Error",
+      "tryAgainButton": "Try Again",
+      "messageSendFailed": "Message could not be sent",
+      "mediaSendFailed": "Media could not be sent",
+      "imageNotLoaded": "Image could not be loaded",
+      "documentCouldNotOpen": "Document could not be opened",
+      "linkCouldNotOpen": "Link could not be opened",
+      "retryMessage": "Please try again",
+      "ok": "OK"
     },
     "dialogs": {
       "confirmTitle": "Confirm",

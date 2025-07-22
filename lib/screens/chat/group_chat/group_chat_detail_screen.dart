@@ -179,85 +179,91 @@ class GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
       ),
       body: Container(
         color: Color(0xfffafafa),
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              child: Obx(() {
-                final isGroupLoading = controller.isGroupDataLoading.value;
-                final group = controller.groupData.value;
-                final messages = controller.messages;
+            Column(
+              children: [
+                Expanded(
+                  child: Obx(() {
+                    final isGroupLoading = controller.isGroupDataLoading.value;
+                    final group = controller.groupData.value;
+                    final messages = controller.messages;
 
-                // FIXED: Simple centered loading instead of skeleton
-                if (isGroupLoading) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFFef5050),
-                      strokeWidth: 3.0,
-                    ),
-                  );
-                }
-
-                // Grup verisi yok ama loading bitmişse hata
-                if (group == null) {
-                  return _buildErrorState();
-                }
-
-                // Mesajlar boşsa
-                if (messages.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.chat_bubble_outline,
-                            size: 40,
-                            color: Color(0xff9ca3ae),
-                          ),
+                    // FIXED: Simple centered loading instead of skeleton
+                    if (isGroupLoading) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFef5050),
+                          strokeWidth: 3.0,
                         ),
-                        const SizedBox(height: 20),
-                        Text(
-                          languageService.tr("groupChat.noMessages"),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff414751),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          languageService.tr("groupChat.sendFirstMessage"),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xff9ca3ae),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
+                      );
+                    }
 
-                // OPTIMIZE: Improved ListView with better performance
-                return OptimizedMessageListView(
-                  controller: controller,
-                  messages: messages,
-                );
-              }),
+                    // Grup verisi yok ama loading bitmişse hata
+                    if (group == null) {
+                      return _buildErrorState();
+                    }
+
+                    // Mesajlar boşsa
+                    if (messages.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.chat_bubble_outline,
+                                size: 40,
+                                color: Color(0xff9ca3ae),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              languageService.tr("groupChatDetail.emptyState.title"),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xff414751),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              languageService.tr("groupChatDetail.emptyState.subtitle"),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xff9ca3ae),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // OPTIMIZE: Improved ListView with better performance
+                    return OptimizedMessageListView(
+                      controller: controller,
+                      messages: messages,
+                    );
+                  }),
+                ),
+                Container(
+                  decoration: BoxDecoration(color: Color(0xffffffff)),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        left: 12.0, right: 12, top: 8, bottom: 20),
+                    child: buildGroupMessageInputField(),
+                  ),
+                ),
+              ],
             ),
-            Container(
-              decoration: BoxDecoration(color: Color(0xffffffff)),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 12.0, right: 12, top: 8, bottom: 20),
-                child: buildGroupMessageInputField(),
-              ),
-            ),
+            // Scroll to bottom button
+            _buildScrollToBottomButton(),
           ],
         ),
       ),
@@ -268,6 +274,7 @@ class GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
 
   /// Error state widget
   Widget _buildErrorState() {
+    final LanguageService languageService = Get.find<LanguageService>();
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -279,7 +286,7 @@ class GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           ),
           SizedBox(height: 16),
           Text(
-            'Grup verileri yüklenemedi',
+            languageService.tr("groupChatDetail.errors.groupDataLoadFailed"),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -288,7 +295,7 @@ class GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           ),
           SizedBox(height: 8),
           Text(
-            'Lütfen tekrar deneyin',
+            languageService.tr("groupChatDetail.errors.pleaseRetry"),
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[500],
@@ -303,11 +310,52 @@ class GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
               backgroundColor: Color(0xFFFF7C7C),
               foregroundColor: Colors.white,
             ),
-            child: Text('Tekrar Dene'),
+            child: Text(languageService.tr("common.buttons.retry")),
           ),
         ],
       ),
     );
+  }
+
+  /// Build scroll to bottom button
+  Widget _buildScrollToBottomButton() {
+    return Obx(() {
+      if (!controller.showScrollToBottomButton.value) {
+        return const SizedBox.shrink();
+      }
+      
+      return Positioned(
+        bottom: 90, // Above message input field
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              controller.scrollToBottom();
+            },
+            borderRadius: BorderRadius.circular(28),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Color(0xffffffff),
+                borderRadius: BorderRadius.circular(28),
+               
+                border: Border.all(
+                  color: Color(0xfff5f6f7),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: Color(0xffef5050),
+                size: 28,
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 
@@ -326,9 +374,8 @@ class OptimizedMessageListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final messageList = messages.toList();
-      final int itemCount = messageList.length + (controller.isLoadingMoreMessages.value ? 1 : 0);
       
-      if (messageList.isEmpty && !controller.isLoadingMoreMessages.value) {
+      if (messageList.isEmpty) {
         return Center(
           child: Text(
             'No messages yet',
@@ -340,58 +387,22 @@ class OptimizedMessageListView extends StatelessWidget {
         );
       }
 
-      // FIXED: Auto-scroll when new messages arrive
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (controller.scrollController.hasClients && messageList.isNotEmpty) {
-          // Only auto-scroll if we're near the bottom (within 200px)
-          final position = controller.scrollController.position;
-          final isNearBottom = position.maxScrollExtent - position.pixels < 200;
-          
-          if (isNearBottom) {
-            controller.scrollToBottom(animated: true);
-          }
-        }
-      });
+      // OPTIMIZED: Auto-scroll only when needed - let controller handle it
+      if (messageList.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          controller.scrollToBottomForNewMessage();
+        });
+      }
 
       return ListView.builder(
         controller: controller.scrollController,
         padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
-        itemCount: itemCount,
+        itemCount: messageList.length,
         // OPTIMIZE: Caching for better scroll performance
         cacheExtent: 1000,
         physics: ClampingScrollPhysics(),
         itemBuilder: (context, index) {
-          // PAGINATION: Show loading indicator at the top when loading more messages
-          if (index == 0 && controller.isLoadingMoreMessages.value) {
-            return Container(
-              padding: const EdgeInsets.all(16),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFef5050)),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Eski mesajlar yükleniyor...',
-                    style: TextStyle(
-                      color: Color(0xff9ca3ae),
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          
-          // Adjust message index based on whether loading indicator is shown
-          final messageIndex = controller.isLoadingMoreMessages.value ? index - 1 : index;
+          final messageIndex = index;
           
           if (messageIndex < 0 || messageIndex >= messageList.length) {
             return const SizedBox.shrink();

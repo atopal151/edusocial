@@ -17,7 +17,7 @@ Widget buildProfileDetails() {
 
 
     if (controller.profile.value == null) {
-      return const Center(child: Text("Profil bilgileri alınamadı."));
+      return Center(child: Text(languageService.tr("profile.fallbackTexts.profileInfoNotAvailable")));
     }
 
     final profileData = controller.profile.value!;

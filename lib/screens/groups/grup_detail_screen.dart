@@ -26,6 +26,7 @@ import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
 import '../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../models/chat_models/group_message_model.dart';
 import '../../models/document_model.dart';
+import '../../models/link_model.dart';
 import '../../screens/groups/group_participants_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
@@ -515,8 +516,13 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                     }),
 
                                     // GRUP CHAT BAĞLANTILARI
-                                    Obx(() => chatController
-                                            .groupLinks.isNotEmpty
+                                    Obx(() {
+                                      // Linkleri tarihe göre sırala (en yeni en üstte)
+                                      final sortedLinks = List<LinkModel>.from(chatController.groupLinks);
+                                      // Link'lerin tarih bilgisi yok, mesaj sırasına göre sırala
+                                      // Bu durumda mesaj sırasına göre sırala (en son eklenen en üstte)
+                                      
+                                      return sortedLinks.isNotEmpty
                                         ? Scrollbar(
                                             controller: linksScrollController,
                                             trackVisibility: true,
@@ -525,11 +531,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                             radius: Radius.circular(15),
                                             child: ListView.builder(
                                               controller: linksScrollController,
-                                              itemCount: chatController
-                                                  .groupLinks.length,
+                                              itemCount: sortedLinks.length,
                                               itemBuilder: (context, index) {
-                                                final link = chatController
-                                                    .groupLinks[index];
+                                                final link = sortedLinks[index];
                                                 return ListTile(
                                                   onTap: () async {
                                                     final uri =
@@ -590,11 +594,16 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                                 color: Color(0xff9ca3ae),
                                               ),
                                             ),
-                                          )),
+                                          );
+                                    }),
 
                                     // GRUP CHAT FOTOĞRAFLARI
-                                    Obx(() => chatController
-                                            .groupPhotos.isNotEmpty
+                                    Obx(() {
+                                      // Fotoğrafları tarihe göre sırala (en yeni en üstte)
+                                      final sortedPhotos = List<String>.from(chatController.groupPhotos);
+                                      // Fotoğraflar mesaj sırasına göre zaten sıralı geliyor
+                                      
+                                      return sortedPhotos.isNotEmpty
                                         ? Scrollbar(
                                             controller: photosScrollController,
                                             trackVisibility: true,
@@ -623,8 +632,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                                         SliverGridDelegateWithFixedCrossAxisCount(
                                                       crossAxisCount: 3,
                                                     ),
-                                                    itemCount: chatController
-                                                        .groupPhotos.length,
+                                                    itemCount: sortedPhotos.length,
                                                     itemBuilder:
                                                         (context, index) {
                                                       return Padding(
@@ -632,9 +640,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                                             const EdgeInsets
                                                                 .all(0.6),
                                                         child: Image.network(
-                                                          getFullUrl(chatController
-                                                                  .groupPhotos[
-                                                              index]),
+                                                          getFullUrl(sortedPhotos[index]),
                                                           fit: BoxFit.cover,
                                                           errorBuilder:
                                                               (context, error,
@@ -660,7 +666,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                                                 color: Color(0xff9ca3ae),
                                               ),
                                             ),
-                                          )),
+                                          );
+                                    }),
                                   ],
                                 ),
                               ),
