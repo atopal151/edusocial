@@ -330,19 +330,26 @@ class ChatController extends GetxController {
     }
   }
 
-  /// 🔍 Arama filtresi
+  /// 🔍 Arama filtresi - Hem people hem de groups için
   void filterChatList(String value) {
     if (value.isEmpty) {
       filteredChatList.assignAll(chatList);
       filteredGroupChatList.assignAll(groupChatList);
     } else {
       final query = value.toLowerCase();
+      
+      // People listesi için filtreleme
       filteredChatList.value = chatList
-          .where((chat) => chat.username.toLowerCase().contains(query))
+          .where((chat) => 
+              chat.username.toLowerCase().contains(query) ||
+              chat.name.toLowerCase().contains(query))
           .toList();
 
+      // Groups listesi için filtreleme
       filteredGroupChatList.value = groupChatList
-          .where((group) => group.groupName.toLowerCase().contains(query))
+          .where((group) => 
+              group.groupName.toLowerCase().contains(query) ||
+              group.lastMessage.toLowerCase().contains(query))
           .toList();
     }
   }

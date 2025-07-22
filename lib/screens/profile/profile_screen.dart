@@ -163,13 +163,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ),
                         ),
                       ),
-                      SliverFillRemaining(
+                      SliverToBoxAdapter(
                         child: Obx(() {
                           return selectedTabIndex.value == 0
                               ? _buildPosts()
                               : _buildEntries();
                         }),
                       ),
+                      
                     ],
                   ),
                 ),
@@ -199,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     
     return Obx(() {
       if (controller.profilePosts.isEmpty) {
-        return Container(
+        return SizedBox(
           height: 200,
           child: Center(
             child: Text(languageService.tr("profile.mainProfile.noPostsFound")),
@@ -242,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     
     return Obx(() {
       if (controller.personEntries.isEmpty) {
-        return Container(
+        return SizedBox(
           height: 200,
           child: Center(
             child: Text(languageService.tr("profile.mainProfile.noEntriesFound")),
@@ -260,9 +261,6 @@ class _ProfileScreenState extends State<ProfileScreen>
           
           // Entry'nin kullanıcı bilgilerini al
           final user = entry.user;
-          if (user == null) {
-            return const SizedBox.shrink();
-          }
           
           return Container(
             color: const Color(0xfffafafa),
@@ -310,6 +308,7 @@ ${languageService.tr("profile.mainProfile.shareText.hashtags")}
                   Share.share(shareText);
                 },
               ),
+             
             ),
           );
         },

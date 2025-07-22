@@ -108,7 +108,11 @@ class _ChatListScreenState extends State<ChatListScreen>
             child: SearchTextField(
               label: languageService.tr("chat.chatList.searchPlaceholder"),
               controller: chatController.searchController,
-              onChanged: chatController.filterChatList,
+              onChanged: (value) {
+                // Hem people hem de groups için arama yap
+                chatController.filterChatList(value);
+                groupController.filterUserGroups(value);
+              },
             ),
           ),
           const SizedBox(height: 10),

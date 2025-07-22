@@ -174,6 +174,22 @@ class GroupController extends GetxController {
     }
   }
 
+  /// 🔍 Grup arama filtresi
+  void filterUserGroups(String value) {
+    if (value.isEmpty) {
+      // Arama boşsa tüm grupları göster - orijinal listeyi geri yükle
+      fetchUserGroups();
+    } else {
+      final query = value.toLowerCase();
+      // userGroups listesini filtrele
+      userGroups.value = userGroups
+          .where((group) => 
+              group.name.toLowerCase().contains(query) ||
+              group.description.toLowerCase().contains(query))
+          .toList();
+    }
+  }
+
   /// 📊 Grup mesajlarının toplam okunmamış sayısını hesapla (API'den gelen değerlere göre)
   int get groupUnreadCount {
     return userGroups.fold(0, (sum, group) => sum + group.messageCount);
