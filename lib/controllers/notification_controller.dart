@@ -14,11 +14,31 @@ class NotificationController extends GetxController {
   // Socket servisi için
   late SocketService _socketService;
   late StreamSubscription _notificationSubscription;
+  late StreamSubscription _commentNotificationSubscription;
+  late StreamSubscription _userNotificationSubscription;
 
   /// Okunmamış bildirim sayısını hesapla ve güncelle
   void _updateUnreadCount() {
-    unreadCount.value = notifications.where((n) => !n.isRead).length;
-    debugPrint('📊 Okunmamış bildirim sayısı güncellendi: ${unreadCount.value}');
+    final unreadNotifications = notifications.where((n) => !n.isRead).toList();
+    final readNotifications = notifications.where((n) => n.isRead).toList();
+    
+    unreadCount.value = unreadNotifications.length;
+    
+    debugPrint('📊 === BADGE SAYISI HESAPLAMA ===');
+    debugPrint('📊 Toplam bildirim sayısı: ${notifications.length}');
+    debugPrint('📊 Okunmuş bildirim sayısı: ${readNotifications.length}');
+    debugPrint('📊 Okunmamış bildirim sayısı: ${unreadCount.value}');
+    
+    if (unreadNotifications.isNotEmpty) {
+      debugPrint('📊 Okunmamış bildirimler:');
+      for (var notif in unreadNotifications) {
+        debugPrint('  - ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
+      }
+    } else {
+      debugPrint('📊 Okunmamış bildirim yok');
+    }
+    
+    debugPrint('📊 ================================');
   }
 
   @override
@@ -31,6 +51,8 @@ class NotificationController extends GetxController {
   @override
   void onClose() {
     _notificationSubscription.cancel();
+    _commentNotificationSubscription.cancel();
+    _userNotificationSubscription.cancel();
     super.onClose();
   }
 
@@ -38,7 +60,23 @@ class NotificationController extends GetxController {
   void _setupSocketListener() {
     _notificationSubscription = _socketService.onNotification.listen((data) {
       debugPrint('🔔 Yeni bildirim geldi (NotificationController): $data');
-      _handleNewNotification(data);
+      // API'den verileri yeniden çek
+      isLoading.value = true;
+      fetchNotifications();
+    });
+    
+    _commentNotificationSubscription = _socketService.onCommentNotification.listen((data) {
+      debugPrint('💬 Yeni yorum bildirimi geldi (NotificationController): $data');
+      // API'den verileri yeniden çek
+      isLoading.value = true;
+      fetchNotifications();
+    });
+    
+    _userNotificationSubscription = _socketService.onUserNotification.listen((data) {
+      debugPrint('👤 Yeni user notification geldi (NotificationController): $data');
+      // API'den verileri yeniden çek
+      isLoading.value = true;
+      fetchNotifications();
     });
   }
 
@@ -48,24 +86,23 @@ class NotificationController extends GetxController {
       // Socket'ten gelen veriyi NotificationModel'e çevir
       final notification = NotificationModel.fromJson(data);
       
-      // Listeye en başa ekle (en yeni önce olsun)
-      notifications.insert(0, notification);
+      // Aynı bildirim zaten var mı kontrol et
+      final existingIndex = notifications.indexWhere((n) => n.id == notification.id);
+      
+      if (existingIndex == -1) {
+        // Yeni bildirim ise listeye ekle
+        notifications.insert(0, notification);
+        debugPrint('✅ Yeni bildirim listeye eklendi: ${notification.message}');
+      } else {
+        // Mevcut bildirimi güncelle
+        notifications[existingIndex] = notification;
+        debugPrint('🔄 Mevcut bildirim güncellendi: ${notification.message}');
+      }
       
       // Okunmamış sayısını güncelle
       _updateUnreadCount();
       
-      debugPrint('✅ Yeni bildirim listeye eklendi: ${notification.message}');
-      
-      // İsteğe bağlı: Kullanıcıya bildirim göster
-      Get.snackbar(
-        'Yeni Bildirim',
-        notification.message,
-        duration: Duration(seconds: 3),
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Color(0xFFEEF3F8),
-        colorText: Color(0xFF414751),
-        icon: Icon(Icons.notifications, color: Color(0xFFFF7743)),
-      );
+      // Snackbar kaldırıldı - sadece badge güncellenir
       
     } catch (e) {
       debugPrint('❌ Socket bildirim işleme hatası: $e');
@@ -147,14 +184,31 @@ class NotificationController extends GetxController {
     isLoading.value = true;
     try {
       final fetched = await NotificationService.fetchMobileNotifications();
-      //debugPrint('--- APIden gelen notification verileri (toJson) ---');
-      //for (var notif in fetched) {
-      //debugPrint(notif.toJson().toString());
-      //}
+      
+      // API'den gelen isRead değerlerini kontrol et
+      debugPrint('📊 === API\'DEN GELEN BİLDİRİMLER ===');
+      for (var notif in fetched) {
+        debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
+      }
+      debugPrint('📊 ================================');
+      
+      // Okunmamış bildirimleri ayrıca listele
+      final unreadNotifications = fetched.where((n) => !n.isRead).toList();
+      if (unreadNotifications.isNotEmpty) {
+        debugPrint('📊 === OKUNMAMIŞ BİLDİRİMLER (API) ===');
+        for (var notif in unreadNotifications) {
+          debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
+        }
+        debugPrint('📊 ====================================');
+      }
+      
+      // Yeni verileri set et ve UI'ı güncelle
       notifications.value = fetched;
       
       // Okunmamış sayısını güncelle
       _updateUnreadCount();
+      
+      debugPrint('✅ Notification listesi güncellendi: ${fetched.length} bildirim');
     } catch (e) {
       debugPrint("❗ Bildirimleri çekerken hata: $e");
     }

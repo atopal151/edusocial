@@ -13,6 +13,7 @@ import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 import '../snackbars/custom_snackbar.dart';
 import '../../services/language_service.dart';
+import 'package:edusocial/controllers/notification_controller.dart';
 
 class PostCard extends StatefulWidget {
   final int postId;
@@ -460,13 +461,16 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                             maxChildSize: 0.95,
                             minChildSize: 0.95,
                             expand: false,
-                            builder: (_, controller) => CommentBottomSheet(
+                            builder: (context, controller) => CommentBottomSheet(
                               postId: widget.postId.toString(),
                               onCommentAdded: () {
                                 // Yorum eklendiğinde comment count'u artır
                                 setState(() {
                                   commentCount++;
                                 });
+                                
+                                // Badge sayısı otomatik güncellenir - fetchNotifications() kaldırıldı
+                                debugPrint('✅ Yorum eklendiğinde badge otomatik güncellenir');
                               },
                             ),
                           ),

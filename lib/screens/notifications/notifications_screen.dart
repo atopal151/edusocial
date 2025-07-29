@@ -4,10 +4,13 @@ import 'package:edusocial/components/buttons/notification_action_button.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/notification_controller.dart';
 import 'package:edusocial/models/notification_model.dart';
+import 'package:edusocial/services/socket_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/language_service.dart';
+import 'dart:async';
+import 'package:edusocial/controllers/profile_controller.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -18,6 +21,184 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   final NotificationController controller = Get.find();
+  late SocketService _socketService;
+  late StreamSubscription _userNotificationSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _socketService = Get.find<SocketService>();
+    _setupSocketListener();
+    
+    // Socket bağlantısı kurulduktan sonra user kanalına join ol
+    Future.delayed(Duration(seconds: 2), () {
+      _joinUserChannel();
+    });
+    
+    // Sayfa açıldığında bildirimleri çek
+    controller.fetchNotifications();
+  }
+
+  @override
+  void dispose() {
+    _userNotificationSubscription.cancel();
+    
+    // User kanalından ayrıl
+    _leaveUserChannel();
+    
+    super.dispose();
+  }
+
+  /// Socket event dinleyicisini ayarla
+  void _setupSocketListener() {
+    debugPrint('🔔 NotificationScreen: Socket dinleyicisi ayarlanıyor...');
+    
+    // User notification dinleyicisi (user:{user_id} kanalı)
+    _userNotificationSubscription = _socketService.onUserNotification.listen((data) {
+      debugPrint('👤 NotificationScreen: User notification geldi: $data');
+      debugPrint('👤 NotificationScreen: Data type: ${data.runtimeType}');
+      
+      // Yeni bildirim geldiğinde API'den verileri yeniden çek
+      // Loading state'i göstermek için önce loading'i true yap
+      controller.isLoading.value = true;
+      controller.fetchNotifications();
+      
+      // Badge sayısı otomatik güncellenir
+      // Snackbar kaldırıldı - sadece badge güncellenir
+    });
+    
+    debugPrint('✅ NotificationScreen: Socket dinleyicileri aktif');
+    debugPrint('✅ NotificationScreen: User notification stream aktif: ${!_userNotificationSubscription.isPaused}');
+  }
+
+
+
+  /// User kanalına join ol
+  void _joinUserChannel() {
+    try {
+      final profileController = Get.find<ProfileController>();
+      final userId = profileController.userId.value;
+      
+      if (userId.isNotEmpty) {
+        debugPrint('👤 NotificationScreen: User kanalına join olunuyor: user:$userId');
+        _socketService.joinUserChannel(userId);
+        
+        // Tüm bildirim kanallarına da join ol
+        _socketService.joinAllNotificationChannels(userId);
+      } else {
+        debugPrint('⚠️ NotificationScreen: User ID boş, kanala join olunamıyor');
+      }
+    } catch (e) {
+      debugPrint('❌ NotificationScreen: User kanalına join olma hatası: $e');
+    }
+  }
+
+  /// User kanalından ayrıl
+  void _leaveUserChannel() {
+    try {
+      final profileController = Get.find<ProfileController>();
+      final userId = profileController.userId.value;
+      
+      if (userId.isNotEmpty) {
+        debugPrint('👤 NotificationScreen: User kanalından ayrılıyor: user:$userId');
+        _socketService.leaveUserChannel(userId);
+      }
+    } catch (e) {
+      debugPrint('❌ NotificationScreen: User kanalından ayrılma hatası: $e');
+    }
+  }
+
+  /// Socket durumunu kontrol et
+  void _checkSocketConnection() {
+    debugPrint('🔍 === NOTIFICATION SCREEN SOCKET DURUMU ===');
+    debugPrint('🔍 Socket bağlı: ${_socketService.isConnected.value}');
+    debugPrint('🔍 User notification subscription aktif: ${!_userNotificationSubscription.isPaused}');
+    debugPrint('🔍 Socket ID: ${_socketService.socket?.id}');
+    debugPrint('🔍 Socket connected: ${_socketService.socket?.connected}');
+    
+    // Socket service'den detaylı durum raporu al
+    _socketService.checkSocketStatus();
+    
+    debugPrint('🔍 === SOCKET DURUM RAPORU ===');
+    debugPrint('🔍 Socket nesnesi: ${_socketService.socket != null ? "✅ Var" : "❌ Yok"}');
+    debugPrint('🔍 Bağlantı durumu: ${_socketService.socket?.connected == true ? "✅ Bağlı" : "❌ Bağlı Değil"}');
+    debugPrint('🔍 Socket ID: ${_socketService.socket?.id}');
+    debugPrint('🔍 isConnected observable: ${_socketService.isConnected.value}');
+    debugPrint('🔍 Dinlenen event\'ler:');
+    debugPrint('  - conversation:new_message');
+    debugPrint('  - group_conversation:new_message');
+    debugPrint('  - conversation:un_read_message_count');
+    debugPrint('  - notification:new');
+    debugPrint('  - user:notification');
+    debugPrint('  - user:*');
+    debugPrint('  - private:notification');
+    debugPrint('  - user:message');
+    debugPrint('  - direct:notification');
+    debugPrint('  - personal:notification');
+    debugPrint('  - post:comment');
+    debugPrint('  - comment:new');
+    debugPrint('  - post:activity');
+    debugPrint('  - timeline:notification');
+    debugPrint('  - follow:notification');
+    debugPrint('  - like:notification');
+    debugPrint('  - group:notification');
+    debugPrint('  - event:notification');
+    debugPrint('  - activity:notification');
+    debugPrint('  - realtime:notification');
+    debugPrint('  - * (wildcard)');
+    debugPrint('  - onAny (tüm event\'ler)');
+    debugPrint('🔍 ===========================');
+    debugPrint('🔍 ===========================================');
+  }
+
+  /// Test event gönder
+  void _sendTestEvent() {
+    debugPrint('🧪 Test event gönderiliyor...');
+    
+    // Tüm notification tiplerini test et
+    final testEvents = [
+      'notification:event',
+      'comment:event',
+      'like:event',
+      'follow:event',
+      'post:event',
+      'group:join_request',
+      'group:join_accepted',
+      'group:join_declined',
+      'follow:request',
+      'follow:accepted',
+      'follow:declined',
+      'event:invitation',
+      'event:reminder',
+      'post:mention',
+      'comment:mention',
+      'system:notification',
+      'notification:new',
+      'user:notification',
+      'post:comment',
+      'comment:new',
+      'like:notification',
+      'follow:notification',
+      'test:notification',
+    ];
+    
+    for (String eventName in testEvents) {
+      _socketService.sendTestEvent(eventName, {
+        'type': 'test',
+        'message': 'Test notification for $eventName',
+        'user_id': 6,
+        'timestamp': DateTime.now().toIso8601String(),
+        'conversation_id': 'test_123', // Private chat'teki gibi
+        'notification_type': eventName.replaceAll(':', '_'),
+      });
+    }
+    
+    Get.snackbar(
+      'Test',
+      'Tüm notification tipleri test edildi',
+      duration: Duration(seconds: 2),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +206,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     
     return Scaffold(
       backgroundColor: const Color(0xfffafafa),
-      appBar: BackAppBar(
-        iconBackgroundColor: const Color(0xffffffff),
-        backgroundColor: const Color(0xfffafafa),
+      appBar:BackAppBar(
         title: languageService.tr("notifications.title"),
       ),
+ 
       body: Obx(() {
         if (controller.isLoading.value) {
           return Center(
@@ -65,30 +245,63 @@ class _NotificationScreenState extends State<NotificationScreen> {
           elevation: 0,
           strokeWidth: 2.0,
           displacement: 40.0,
-          child: ListView.builder(
-            itemCount: grouped.length,
-            itemBuilder: (context, index) {
-              final group = grouped[index];
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      group.label,
-                      style: const TextStyle(
-                        fontSize: 13.28,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff414751),
+          child: Column(
+            children: [
+              // Socket bağlantı durumu göstergesi
+              Obx(() => Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: _socketService.isConnected.value ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _socketService.isConnected.value ? Icons.wifi : Icons.wifi_off,
+                      color: _socketService.isConnected.value ? Colors.green : Colors.red,
+                      size: 16,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      _socketService.isConnected.value ? 'Socket Bağlı - Gerçek Zamanlı Güncelleme Aktif' : 'Socket Bağlı Değil - Gerçek Zamanlı Güncelleme Devre Dışı',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _socketService.isConnected.value ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                  ...group.notifications.map((n) => buildNotificationTile(n)),
-                ],
-              );
-            },
+                  ],
+                ),
+              )),
+              // Bildirim listesi
+              Expanded(
+                child: ListView.builder(
+                  itemCount: grouped.length,
+                  itemBuilder: (context, index) {
+                    final group = grouped[index];
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text(
+                            group.label,
+                            style: const TextStyle(
+                              fontSize: 13.28,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff414751),
+                            ),
+                          ),
+                        ),
+                        ...group.notifications.map((n) => buildNotificationTile(n)),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         );
       }),

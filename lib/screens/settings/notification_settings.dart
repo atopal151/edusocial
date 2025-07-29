@@ -22,6 +22,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   bool _groupNotifications = true;
   bool _eventNotifications = true;
   bool _followNotifications = true;
+  bool _userNotifications = true;
+  bool _commentNotifications = true;
+  bool _likeNotifications = true;
+  bool _postMentionNotifications = true;
+  bool _commentMentionNotifications = true;
+  bool _systemNotifications = true;
 
   @override
   void initState() {
@@ -40,6 +46,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       _groupNotifications = settings['group_notifications'] ?? true;
       _eventNotifications = settings['event_notifications'] ?? true;
       _followNotifications = settings['follow_notifications'] ?? true;
+      _userNotifications = settings['user_notifications'] ?? true;
+      _commentNotifications = settings['comment_notifications'] ?? true;
+      _likeNotifications = settings['like_notifications'] ?? true;
+      _postMentionNotifications = settings['post_mention_notifications'] ?? true;
+      _commentMentionNotifications = settings['comment_mention_notifications'] ?? true;
+      _systemNotifications = settings['system_notifications'] ?? true;
     });
   }
 
@@ -54,6 +66,12 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       groupNotifications: _groupNotifications,
       eventNotifications: _eventNotifications,
       followNotifications: _followNotifications,
+      userNotifications: _userNotifications,
+      commentNotifications: _commentNotifications,
+      likeNotifications: _likeNotifications,
+      postMentionNotifications: _postMentionNotifications,
+      commentMentionNotifications: _commentMentionNotifications,
+      systemNotifications: _systemNotifications,
     );
   }
 
@@ -142,6 +160,72 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 (value) {
                   setState(() {
                     _followNotifications = value;
+                  });
+                  _saveNotificationSettings();
+                },
+              ),
+              const SizedBox(height: 20),
+              _buildSwitchTile(
+                'Kullanıcı Bildirimleri',
+                _userNotifications,
+                (value) {
+                  setState(() {
+                    _userNotifications = value;
+                  });
+                  _saveNotificationSettings();
+                },
+              ),
+              const SizedBox(height: 20),
+              _buildSwitchTile(
+                'Yorum Bildirimleri',
+                _commentNotifications,
+                (value) {
+                  setState(() {
+                    _commentNotifications = value;
+                  });
+                  _saveNotificationSettings();
+                },
+              ),
+              const SizedBox(height: 20),
+              _buildSwitchTile(
+                'Beğeni Bildirimleri',
+                _likeNotifications,
+                (value) {
+                  setState(() {
+                    _likeNotifications = value;
+                  });
+                  _saveNotificationSettings();
+                },
+              ),
+              const SizedBox(height: 20),
+              _buildSwitchTile(
+                'Post Etiketleme Bildirimleri',
+                _postMentionNotifications,
+                (value) {
+                  setState(() {
+                    _postMentionNotifications = value;
+                  });
+                  _saveNotificationSettings();
+                },
+              ),
+              const SizedBox(height: 20),
+              _buildSwitchTile(
+                'Yorum Etiketleme Bildirimleri',
+                _commentMentionNotifications,
+                (value) {
+                  setState(() {
+                    _commentMentionNotifications = value;
+                  });
+                  _saveNotificationSettings();
+                },
+              ),
+              const SizedBox(height: 20),
+              _buildSwitchTile(
+                'Sistem Bildirimleri',
+                _systemNotifications,
+                (value) {
+                  setState(() {
+                    _systemNotifications = value;
                   });
                   _saveNotificationSettings();
                 },

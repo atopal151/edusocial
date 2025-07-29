@@ -136,20 +136,19 @@ class MainScreen extends StatelessWidget {
       // 2. Mevcut bildirim sayısını kontrol et
       debugPrint('🧪 Mevcut okunmamış bildirim sayısı: ${notificationController.unreadCount.value}');
       
-      // 3. Test bildirimi gönder
+      // 3. User kanalına join ol
       if (socketService.isConnected.value) {
-        debugPrint('🧪 Test bildirimi gönderiliyor...');
-        socketService.sendTestNotification();
-        
-        // 4. Test grup mesajı da gönder
-        debugPrint('🧪 Test grup mesajı gönderiliyor...');
-        socketService.sendTestGroupMessage();
-        
-        // 5. Badge test için kontrol
-        Future.delayed(Duration(seconds: 2), () {
-          debugPrint('🧪 Test sonrası bildirim sayısı: ${notificationController.unreadCount.value}');
-          debugPrint('🧪 AppBar badge\'inin güncellenip güncellenmediğini kontrol edin!');
-        });
+        try {
+          final profileController = Get.find<ProfileController>();
+          final userId = profileController.userId.value;
+          
+          if (userId.isNotEmpty) {
+            debugPrint('🔔 User kanalına join olunuyor...');
+            socketService.joinAllNotificationChannels(userId);
+          }
+        } catch (e) {
+          debugPrint('❌ User kanalına join olma hatası: $e');
+        }
       } else {
         debugPrint('❌ Socket bağlı değil, test yapılamıyor');
       }

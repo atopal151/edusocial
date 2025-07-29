@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/services/post_service.dart';
+import 'package:edusocial/services/socket_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/post_model.dart';
 import '../components/snackbars/custom_snackbar.dart';
 import '../services/language_service.dart';
+import 'dart:async';
 
 class PostController extends GetxController {
   final ProfileController profileController = Get.find<ProfileController>();
@@ -19,22 +21,48 @@ class PostController extends GetxController {
   var selectedPost = Rxn<PostModel>();
   var isPostDetailLoading = false.obs;
   
+  // Socket servisi
+  late SocketService _socketService;
+  late StreamSubscription _commentNotificationSubscription;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _socketService = Get.find<SocketService>();
+    _setupSocketListener();
+  }
+
+  @override
+  void onClose() {
+    _commentNotificationSubscription.cancel();
+    super.onClose();
+  }
+
+  /// Socket event dinleyicisini ayarla
+  void _setupSocketListener() {
+    _commentNotificationSubscription = _socketService.onCommentNotification.listen((data) {
+      debugPrint('💬 Post yorum bildirimi geldi (PostController): $data');
+      
+      // Post listesini yenile (yorum sayısı güncellenmiş olabilir)
+      fetchHomePosts();
+    });
+  }
 
 //POST GET
   Future<void> fetchHomePosts() async {
-    //debugPrint("🔄 PostController.fetchHomePosts() çağrıldı");
+    debugPrint("🔄 PostController.fetchHomePosts() çağrıldı");
     isHomeLoading.value = true;
     try {
       final posts = await PostServices.fetchHomePosts();
-    // debugPrint("📦 API'den ${posts.length} post alındı");
+      debugPrint("📦 API'den ${posts.length} post alındı");
       postHomeList.assignAll(posts);
       
       // 🔍 Sadece bana ait gönderileri filtrele
       final myPosts = posts.where((post) => post.isOwner == true).toList();
-      //debugPrint("👤 Kullanıcıya ait ${myPosts.length} post bulundu");
+      debugPrint("👤 Kullanıcıya ait ${myPosts.length} post bulundu");
       profileController.profilePosts.assignAll(myPosts);
       
-      //debugPrint("✅ Postlar başarıyla yüklendi");
+      debugPrint("✅ Postlar başarıyla yüklendi");
     } catch (e) {
       debugPrint("❗ Post çekme hatası: $e", wrapWidth: 1024);
     } finally {

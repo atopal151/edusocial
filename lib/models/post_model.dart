@@ -1,4 +1,5 @@
 import 'package:edusocial/utils/constants.dart';
+import 'package:flutter/foundation.dart'; // Added for debugPrint
 
 class PostModel {
   final int id;
@@ -34,6 +35,9 @@ class PostModel {
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
+    debugPrint("🔍 PostModel.fromJson çağrıldı");
+    debugPrint("🔍 JSON: ${json.toString()}");
+    
     final user = json['user'] ?? {};
     final mediaList = json['media'];
 
@@ -51,7 +55,7 @@ class PostModel {
       }
     }
 
-    return PostModel(
+    final postModel = PostModel(
       id: json['id'] ?? 0,
       slug: json['slug'] ?? '',
       status: json['status'] ?? '',
@@ -73,6 +77,9 @@ class PostModel {
               .toList() ??
           [],
     );
+    
+    debugPrint("✅ PostModel oluşturuldu: ID=${postModel.id}, Username=${postModel.username}, Content=${postModel.postDescription}");
+    return postModel;
   }
 
 factory PostModel.fromJsonForProfile(

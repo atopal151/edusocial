@@ -205,6 +205,20 @@ class OneSignalService extends GetxService {
           return prefs.getBool('event_notifications') ?? true;
         case 'follow':
           return prefs.getBool('follow_notifications') ?? true;
+        case 'user_notification':
+          return prefs.getBool('user_notifications') ?? true;
+        case 'comment':
+          return prefs.getBool('comment_notifications') ?? true;
+        case 'follow':
+          return prefs.getBool('follow_notifications') ?? true;
+        case 'like':
+          return prefs.getBool('like_notifications') ?? true;
+        case 'post_mention':
+          return prefs.getBool('post_mention_notifications') ?? true;
+        case 'comment_mention':
+          return prefs.getBool('comment_mention_notifications') ?? true;
+        case 'system_notification':
+          return prefs.getBool('system_notifications') ?? true;
         default:
           return true; // Bilinmeyen tip için göster
       }
@@ -231,6 +245,28 @@ class OneSignalService extends GetxService {
         break;
       case 'event':
         Get.toNamed('/event-detail', arguments: {'event_id': id});
+        break;
+      case 'user_notification':
+        Get.toNamed('/user-notifications');
+        break;
+      case 'comment':
+        Get.toNamed('/post-detail', arguments: {'post_id': id});
+        break;
+      case 'follow':
+        Get.toNamed('/user-profile', arguments: {'user_id': id});
+        break;
+      case 'like':
+        Get.toNamed('/post-detail', arguments: {'post_id': id});
+        break;
+      case 'post_mention':
+        Get.toNamed('/post-detail', arguments: {'post_id': id});
+        break;
+      case 'comment_mention':
+        Get.toNamed('/post-detail', arguments: {'post_id': id});
+        break;
+      case 'system_notification':
+        // Sistem bildirimleri genellikle kullanıcıya özgü olmadığı için ana sayfaya yönlendir
+        Get.offAllNamed('/home');
         break;
       default:
         // Varsayılan olarak ana sayfaya git
@@ -421,6 +457,12 @@ class OneSignalService extends GetxService {
     required bool groupNotifications,
     required bool eventNotifications,
     required bool followNotifications,
+    required bool userNotifications,
+    required bool commentNotifications,
+    required bool likeNotifications,
+    required bool postMentionNotifications,
+    required bool commentMentionNotifications,
+    required bool systemNotifications,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('post_notifications', postNotifications);
@@ -428,6 +470,12 @@ class OneSignalService extends GetxService {
     await prefs.setBool('group_notifications', groupNotifications);
     await prefs.setBool('event_notifications', eventNotifications);
     await prefs.setBool('follow_notifications', followNotifications);
+    await prefs.setBool('user_notifications', userNotifications);
+    await prefs.setBool('comment_notifications', commentNotifications);
+    await prefs.setBool('like_notifications', likeNotifications);
+    await prefs.setBool('post_mention_notifications', postMentionNotifications);
+    await prefs.setBool('comment_mention_notifications', commentMentionNotifications);
+    await prefs.setBool('system_notifications', systemNotifications);
   }
 
   // Bildirim ayarlarını al
@@ -439,6 +487,12 @@ class OneSignalService extends GetxService {
       'group_notifications': prefs.getBool('group_notifications') ?? true,
       'event_notifications': prefs.getBool('event_notifications') ?? true,
       'follow_notifications': prefs.getBool('follow_notifications') ?? true,
+      'user_notifications': prefs.getBool('user_notifications') ?? true,
+      'comment_notifications': prefs.getBool('comment_notifications') ?? true,
+      'like_notifications': prefs.getBool('like_notifications') ?? true,
+      'post_mention_notifications': prefs.getBool('post_mention_notifications') ?? true,
+      'comment_mention_notifications': prefs.getBool('comment_mention_notifications') ?? true,
+      'system_notifications': prefs.getBool('system_notifications') ?? true,
     };
   }
 

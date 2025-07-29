@@ -231,6 +231,17 @@ class NotificationModel {
     //debugPrint("🔍   - senderUserId: $senderUserId");
     //debugPrint("🔍 === END DEBUG ===");
 
+    // isRead alanını kontrol et
+    final rawIsRead = json['is_read'];
+    final isReadValue = rawIsRead == true || rawIsRead == 1;
+    
+    debugPrint('🔍 === ISREAD DEBUG ===');
+    debugPrint('🔍 Raw is_read value: $rawIsRead (type: ${rawIsRead.runtimeType})');
+    debugPrint('🔍 Parsed isRead: $isReadValue');
+    debugPrint('🔍 Notification ID: ${json['id']}');
+    debugPrint('🔍 Notification Type: ${json['type']}');
+    debugPrint('🔍 ====================');
+
     return NotificationModel(
       id: json['id'].toString(),
       userId: json['user_id'].toString(),
@@ -240,7 +251,7 @@ class NotificationModel {
       type: json['type'] ?? 'other',
       message: fullData['text'] ?? '',
       timestamp: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
-      isRead: json['is_read'] == true || json['is_read'] == 1,
+      isRead: isReadValue,
       groupId: groupId,
       eventId: eventId,
       groupName: groupName,
