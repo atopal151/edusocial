@@ -68,7 +68,9 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
             ),
             PrimaryButton(
               text: languageService.tr("settings.buttons.notificationSettings"),
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed('/notification_settings');
+              },
               backgroundColor: Color(0xffffffff),
               textColor: Color(0xff414751),
               icon: SvgPicture.asset(
@@ -98,7 +100,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                 ),
               ),
               iconColor: Color(0xffef5050),
-            )
+            ),
           ],
         ),
       ),

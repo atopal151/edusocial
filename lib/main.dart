@@ -6,6 +6,8 @@ import 'bindings/initial_bindings.dart';
 import 'routes/app_routes.dart';
 import 'services/language_service.dart';
 import 'services/auth_service.dart';
+import 'services/api_service.dart';
+import 'services/onesignal_service.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -22,15 +24,21 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
 
-  // AuthService'i önce başlat
+  // ApiService'i başlat
+  Get.put(ApiService());
+  
+  // AuthService'i başlat
   Get.put(AuthService());
   
   // LanguageService'i put ile başlat
   Get.put(LanguageService());
   
+  // OneSignalService'i başlat
+  Get.put(OneSignalService());
+  
   // Debug: Dil servisinin yüklenip yüklenmediğini kontrol et
   final languageService = Get.find<LanguageService>();
-  print('Mevcut dil: ${languageService.currentLanguage.value}');
+  debugPrint('Mevcut dil: ${languageService.currentLanguage.value}');
 
   runApp(MyApp(initialRoute: Routes.main));
 }

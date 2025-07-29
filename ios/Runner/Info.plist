@@ -79,5 +79,14 @@
 			<string>com.edusocial.app</string>
 		</dict>
 	</array>
+	<!-- OneSignal için gerekli ayarlar -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>OneSignal_disable_badge_clearing</key>
+	<true/>
+	<key>OneSignal_location_shared</key>
+	<false/>
 </dict>
 </plist>

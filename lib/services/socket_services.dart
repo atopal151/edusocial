@@ -3,22 +3,28 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
+import 'onesignal_service.dart';
 
 class SocketService extends GetxService {
   io.Socket? _socket;
   final RxBool isConnected = false.obs;
+  
+  // OneSignal service
+  final OneSignalService _oneSignalService = Get.find<OneSignalService>();
 
   // Stream Controllers for broadcasting events
   final _privateMessageController = StreamController<dynamic>.broadcast();
   final _groupMessageController = StreamController<dynamic>.broadcast();
   final _unreadMessageCountController = StreamController<dynamic>.broadcast();
   final _notificationController = StreamController<dynamic>.broadcast();
+  final _postNotificationController = StreamController<dynamic>.broadcast();
 
   // Public streams that other parts of the app can listen to
   Stream<dynamic> get onPrivateMessage => _privateMessageController.stream;
   Stream<dynamic> get onGroupMessage => _groupMessageController.stream;
   Stream<dynamic> get onUnreadMessageCount => _unreadMessageCountController.stream;
   Stream<dynamic> get onNotification => _notificationController.stream;
+  Stream<dynamic> get onPostNotification => _postNotificationController.stream;
 
   // Bağlantı adresi - farklı endpoint'leri deneyeceğiz
   static const String _socketUrl = 'https://stageapi.edusocial.pl';
@@ -119,25 +125,46 @@ class SocketService extends GetxService {
 
     // Event dinleyiciler
     debugPrint('🔌 Event dinleyicileri ayarlanıyor...');
-    // 1. Birebir mesaj
+    // 1. Yeni özel mesaj
     _socket!.on('conversation:new_message', (data) {
-      debugPrint('📨 Birebir mesaj geldi (SocketService): $data');
+      debugPrint('💬 Yeni özel mesaj (SocketService): $data');
       _privateMessageController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('message', data);
     });
-    // 2. Grup mesajı
+
+    // 2. Yeni grup mesajı
     _socket!.on('group_conversation:new_message', (data) {
-      debugPrint('📨 Grup mesajı geldi (SocketService): $data');
+      debugPrint('👥 Yeni grup mesajı (SocketService): $data');
       _groupMessageController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('group', data);
     });
+
     // 3. Okunmamış mesaj sayısı
     _socket!.on('conversation:un_read_message_count', (data) {
       debugPrint('📨 Okunmamış mesaj sayısı (SocketService): $data');
       _unreadMessageCountController.add(data);
     });
+
     // 4. Yeni bildirim
     _socket!.on('notification:new', (data) {
       debugPrint('🔔 Yeni bildirim geldi (SocketService): $data');
       _notificationController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('notification', data);
+    });
+
+    // 5. Post bildirimi (yeni)
+    _socket!.on('post:notification', (data) {
+      debugPrint('📝 Post bildirimi geldi (SocketService): $data');
+      _postNotificationController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('post', data);
     });
 
     debugPrint('🔌 Socket bağlantısı başlatılıyor... ($urlName)');
@@ -202,6 +229,46 @@ class SocketService extends GetxService {
       debugPrint('✅ Test bildirimi gönderildi');
     } else {
       debugPrint('❌ Socket bağlı değil, test bildirimi gönderilemedi');
+    }
+  }
+
+  // OneSignal bildirimi gönder (uygulama açıkken)
+  void _sendOneSignalNotification(String type, dynamic data) {
+    try {
+      debugPrint('📱 OneSignal bildirimi gönderiliyor: $type');
+      
+      // Bildirim içeriğini hazırla
+      String title = '';
+      String message = '';
+      
+      switch (type) {
+        case 'message':
+          title = 'Yeni Mesaj';
+          message = data['message'] ?? 'Yeni bir mesajınız var';
+          break;
+        case 'group':
+          title = 'Grup Mesajı';
+          message = data['message'] ?? 'Grup sohbetinde yeni mesaj';
+          break;
+        case 'notification':
+          title = 'Yeni Bildirim';
+          message = data['message'] ?? 'Yeni bir bildiriminiz var';
+          break;
+        case 'post':
+          title = 'Post Aktivitesi';
+          message = data['message'] ?? 'Post\'unuzda yeni aktivite';
+          break;
+        default:
+          title = 'Bildirim';
+          message = data['message'] ?? 'Yeni bildirim';
+      }
+      
+      // OneSignal bildirimi gönder
+      _oneSignalService.sendLocalNotification(title, message, data);
+      
+      debugPrint('✅ OneSignal bildirimi gönderildi: $title - $message');
+    } catch (e) {
+      debugPrint('❌ OneSignal bildirimi gönderilemedi: $e');
     }
   }
 

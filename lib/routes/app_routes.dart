@@ -30,6 +30,7 @@ import 'package:edusocial/screens/profile/profile_following_screen.dart';
 import 'package:edusocial/screens/profile/profile_screen.dart';
 import 'package:edusocial/screens/search/search_text_screen.dart';
 import 'package:edusocial/screens/settings/settings_screen.dart';
+import 'package:edusocial/screens/settings/notification_settings.dart';
 import 'package:edusocial/utils/auth_guard.dart';
 import 'package:get/get.dart';
 import '../bindings/signup_binding.dart';
@@ -77,6 +78,7 @@ class Routes {
   static const String notifications = '/notifications';
   static const String createGroup = '/createGroup';
   static const String createPost = '/create_post';
+  static const String notificationSettings = '/notification_settings';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -222,6 +224,10 @@ class Routes {
     GetPage(
       name: createPost,
       page: () => CreatePostScreen(),
+    ),
+    GetPage(
+      name: notificationSettings,
+      page: () => NotificationSettingsScreen(),
     ),
     GetPage(
       name: main,
