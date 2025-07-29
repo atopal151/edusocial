@@ -285,16 +285,16 @@ class ChatDetailController extends GetxController {
       if (isFirstLoad.value) {
         messages.clear();
         
-        // FIXED: API returns messages in DESC order (newest first), but we need
-        // to display them in ASC order (oldest first, newest at bottom)
-        final reversedMessages = fetchedMessages.reversed.toList();
-        messages.addAll(reversedMessages);
+        // FIXED: API returns messages in DESC order (newest first), 
+        // and we want to display them in DESC order (newest at bottom)
+        // So we don't need to reverse them anymore
+        messages.addAll(fetchedMessages);
         
         // Since we're loading all messages, no more messages to load
         hasMoreMessages.value = false;
         
         isFirstLoad.value = false;
-        debugPrint('✅ Initial ${fetchedMessages.length} messages loaded (reversed for proper display)');
+        debugPrint('✅ Initial ${fetchedMessages.length} messages loaded (newest at bottom)');
       } else {
         messages.addAll(fetchedMessages);
       }

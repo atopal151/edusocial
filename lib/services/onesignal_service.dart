@@ -10,6 +10,10 @@ class OneSignalService extends GetxService {
   
   final ApiService _apiService = Get.find<ApiService>();
   
+  // Bildirim yöneticisi - çoklu bildirim önlemek için
+  final Map<String, DateTime> _activeNotifications = {};
+  final Duration _notificationCooldown = const Duration(seconds: 2);
+  
   @override
   void onInit() {
     super.onInit();
@@ -367,7 +371,18 @@ class OneSignalService extends GetxService {
   // Yerel bildirim gönder (uygulama açıkken)
   Future<void> sendLocalNotification(String title, String message, Map<String, dynamic>? data) async {
     try {
-      // Uygulama açıkken bildirim göstermek için Get.snackbar kullan
+      print('📱 sendLocalNotification çağrıldı: title=$title, message=$message');
+      print('📱 Data: $data');
+      print('📱 Data type: ${data.runtimeType}');
+      
+      // Eğer mesaj bildirimi ise özel tasarım kullan
+      if ((title == 'Yeni Mesaj' || title == 'message') && data != null) {
+        print('📱 Özel mesaj bildirimi kullanılacak');
+        await _sendCustomMessageNotificationFromData(data);
+        return;
+      }
+      
+      // Diğer bildirimler için normal tasarım
       Get.snackbar(
         title,
         message,
@@ -380,6 +395,236 @@ class OneSignalService extends GetxService {
       print('✅ Yerel bildirim gösterildi: $title - $message');
     } catch (e) {
       print('❌ Yerel bildirim gösterilemedi: $e');
+    }
+  }
+
+  // Data'dan özel mesaj bildirimi gönder
+  Future<void> _sendCustomMessageNotificationFromData(Map<String, dynamic> data) async {
+    try {
+      // Mesaj verilerini al
+      final message = data['message'] ?? '';
+      
+      // Sender bilgilerini doğru şekilde al
+      String senderName = 'Bilinmeyen';
+      String senderAvatar = '';
+      
+      if (data['sender'] is Map<String, dynamic>) {
+        final sender = data['sender'] as Map<String, dynamic>;
+        senderName = '${sender['name'] ?? ''} ${sender['surname'] ?? ''}'.trim();
+        if (senderName.isEmpty) {
+          senderName = sender['username'] ?? 'Bilinmeyen';
+        }
+        senderAvatar = sender['avatar'] ?? sender['avatar_url'] ?? '';
+      } else if (data['sender_name'] != null) {
+        senderName = data['sender_name'].toString();
+      }
+      
+      final conversationId = data['conversation_id'];
+      
+      print('💬 Mesaj detayları: sender=$senderName, message=$message');
+      
+      // Kendi mesajım ise bildirim gösterme (TEST için geçici olarak kapatıldı)
+      final isMyMessage = data['is_me'] == true;
+      if (isMyMessage) {
+        print('📤 Kendi mesajım, bildirim gösterilmeyecek (TEST için geçici olarak kapatıldı)');
+        // return; // TEST için geçici olarak kapatıldı
+      }
+      
+      // Bildirim ID'si oluştur (çoklu bildirim önlemek için)
+      final notificationId = 'message_$conversationId';
+      
+      // Çoklu bildirim kontrolü
+      if (_activeNotifications.containsKey(notificationId)) {
+        final lastNotificationTime = _activeNotifications[notificationId]!;
+        final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
+        
+        if (timeSinceLastNotification < _notificationCooldown) {
+          print('⚠️ Çoklu bildirim önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
+          return;
+        }
+      }
+      
+      // Aktif bildirimleri temizle (eski olanları)
+      _activeNotifications.removeWhere((key, value) {
+        return DateTime.now().difference(value) > _notificationCooldown;
+      });
+      
+      // Yeni bildirimi kaydet
+      _activeNotifications[notificationId] = DateTime.now();
+      
+      // Özel bildirim widget'ı oluştur
+      Get.snackbar(
+        senderName, // Başlık olarak kullanıcı adı
+        message, // Mesaj içeriği
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black87,
+        duration: const Duration(seconds: 4),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+        borderRadius: 16,
+        snackStyle: SnackStyle.FLOATING,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                icon: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Container(
+            width: 35,
+            height: 35,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade200, width: 1.5),
+              color: Colors.grey.shade100,
+            ),
+            child: ClipOval(
+              child: senderAvatar.isNotEmpty && !senderAvatar.endsWith('/0')
+                  ? Image.network(
+                      senderAvatar.startsWith('http') 
+                          ? senderAvatar 
+                          : 'https://stageapi.edusocial.pl/storage/$senderAvatar',
+                      fit: BoxFit.cover,
+                      width: 35,
+                      height: 35,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade300,
+                          child: const Icon(Icons.person, color: Colors.grey, size: 16),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: Colors.grey.shade300,
+                      child: const Icon(Icons.person, color: Colors.grey, size: 16),
+                    ),
+            ),
+          ),
+        ),
+        snackbarStatus: (status) {
+          print('💬 Bildirim durumu: $status');
+        },
+        // Kapatma butonu
+        mainButton: TextButton(
+          onPressed: () {
+            // Bildirimi kapat
+            Get.closeCurrentSnackbar();
+          },
+          child: const Icon(Icons.close, color: Colors.grey, size: 20),
+        ),
+      );
+      
+      print('✅ Özel mesaj bildirimi gösterildi: $senderName - $message');
+    } catch (e) {
+      print('❌ Özel mesaj bildirimi gösterilemedi: $e');
+    }
+  }
+
+  // Özel mesaj bildirimi gönder (profil resmi ve kullanıcı adı ile) - İKİNCİ METOD
+  Future<void> sendCustomMessageNotification({
+    required String senderName,
+    required String message,
+    required String senderAvatar,
+    required dynamic conversationId,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      print('💬 Özel mesaj bildirimi gösteriliyor...');
+      
+      // Bildirim ID'si oluştur (çoklu bildirim önlemek için)
+      final notificationId = 'message_$conversationId';
+      
+      // Çoklu bildirim kontrolü
+      if (_activeNotifications.containsKey(notificationId)) {
+        final lastNotificationTime = _activeNotifications[notificationId]!;
+        final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
+        
+        if (timeSinceLastNotification < _notificationCooldown) {
+          print('⚠️ Çoklu bildirim önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
+          return;
+        }
+      }
+      
+      // Aktif bildirimleri temizle (eski olanları)
+      _activeNotifications.removeWhere((key, value) {
+        return DateTime.now().difference(value) > _notificationCooldown;
+      });
+      
+      // Yeni bildirimi kaydet
+      _activeNotifications[notificationId] = DateTime.now();
+      
+      // Özel bildirim widget'ı oluştur
+      Get.snackbar(
+        senderName, // Başlık olarak kullanıcı adı
+        message, // Mesaj içeriği
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black87,
+        duration: const Duration(seconds: 4),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        snackStyle: SnackStyle.FLOATING,
+        titleText: Text(
+          senderName,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        messageText: Text(
+          message,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w400,
+            color: Colors.black54,
+          ),
+        ),
+        icon: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Container(
+            width: 35,
+            height: 35,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade200, width: 1.5),
+              color: Colors.grey.shade100,
+            ),
+            child: ClipOval(
+              child: senderAvatar.isNotEmpty && !senderAvatar.endsWith('/0')
+                  ? Image.network(
+                      senderAvatar.startsWith('http') 
+                          ? senderAvatar 
+                          : 'https://stageapi.edusocial.pl/storage/$senderAvatar',
+                      fit: BoxFit.cover,
+                      width: 35,
+                      height: 35,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade300,
+                          child: const Icon(Icons.person, color: Colors.grey, size: 16),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: Colors.grey.shade300,
+                      child: const Icon(Icons.person, color: Colors.grey, size: 16),
+                    ),
+            ),
+          ),
+        ),
+        snackbarStatus: (status) {
+          print('💬 Bildirim durumu: $status');
+        },
+        // Kapatma butonu
+        mainButton: TextButton(
+          onPressed: () {
+            // Bildirimi kapat
+            Get.closeCurrentSnackbar();
+          },
+          child: const Icon(Icons.close, color: Colors.grey, size: 20),
+        ),
+      );
+      
+      print('✅ Özel mesaj bildirimi gösterildi: $senderName - $message');
+    } catch (e) {
+      print('❌ Özel mesaj bildirimi gösterilemedi: $e');
     }
   }
 

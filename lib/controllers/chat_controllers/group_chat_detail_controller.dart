@@ -469,8 +469,8 @@ class GroupChatDetailController extends GetxController {
       }
       
       // FIXED: API'den gelen mesajlar zaten doğru sıralı (en yeni en altta)
-      // Sadece timestamp'e göre sırala (en eski en üstte, en yeni en altta)
-      processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      // API sırasını koru, ekstra sıralama yapma
+      // processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       
       // PAGINATION: Update state based on first load or not
       if (isFirstLoad.value) {

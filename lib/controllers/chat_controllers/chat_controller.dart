@@ -278,9 +278,44 @@ class ChatController extends GetxController {
 
   /// 🔴 Okunmamış mesaj sayısını güncelle
   void updateUnreadCount(int count) {
-    debugPrint("📬 Okunmamış mesaj sayısı: $count");
-    // Burada genel okunmamış mesaj sayısını güncelleyebilirsin
-    // Örneğin AppBar'da badge göstermek için
+    debugPrint("📬 Socket'ten gelen okunmamış mesaj sayısı: $count");
+    
+    // Socket'ten gelen count'u kullanarak chat listesini yenile
+    // Bu count backend'den gelen gerçek unread count
+    // Chat listesini API'den yeniden çek
+    _refreshChatListWithSocketCount(count);
+  }
+
+  /// Socket count ile chat listesini yenile
+  Future<void> _refreshChatListWithSocketCount(int socketCount) async {
+    try {
+      debugPrint("🔄 Socket count ile chat listesi yenileniyor...");
+      
+      // API'den chat listesini çek
+      final fetchedChats = await ChatServices.fetchChatList();
+      
+      // last_message alanı null olanları filtrele
+      final filteredChats = fetchedChats.where((chat) => chat.lastMessage != null).toList();
+      
+      // Socket'ten gelen count ile API count'u karşılaştır
+      final apiTotalUnread = filteredChats.fold(0, (sum, chat) => sum + chat.unreadCount);
+      debugPrint("📊 API Toplam Unread: $apiTotalUnread, Socket Count: $socketCount");
+      
+      // Eğer socket count daha yüksekse, chat listesini güncelle
+      if (socketCount > apiTotalUnread) {
+        debugPrint("📬 Socket count daha yüksek, chat listesi güncelleniyor...");
+        
+        // Chat listesini güncelle
+        chatList.assignAll(filteredChats);
+        filteredChatList.assignAll(filteredChats);
+        
+        debugPrint("✅ Chat listesi socket count ile güncellendi. Yeni toplam: ${chatList.fold(0, (sum, chat) => sum + chat.unreadCount)}");
+      } else {
+        debugPrint("📊 Socket count API count'tan düşük veya eşit, güncelleme yapılmadı");
+      }
+    } catch (e) {
+      debugPrint("❌ Socket count ile chat listesi yenileme hatası: $e");
+    }
   }
 
   /// 📃 Chat detay sayfasına git

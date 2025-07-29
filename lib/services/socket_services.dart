@@ -138,10 +138,15 @@ class SocketService extends GetxService {
     // 1. Yeni private mesaj
     _socket!.on('conversation:new_message', (data) {
       debugPrint('💬 Yeni private mesaj geldi (SocketService): $data');
+      debugPrint('💬 Data type: ${data.runtimeType}');
+      debugPrint('💬 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
       _privateMessageController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
+      // Mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('💬 Bildirim gönderiliyor...');
+      debugPrint('💬 Data içeriği: message=${data['message']}, sender=${data['sender']}, conversation_id=${data['conversation_id']}');
       _sendOneSignalNotification('message', data);
+      debugPrint('💬 Bildirim gönderme tamamlandı');
     });
 
     // 3. Okunmamış mesaj sayısı
@@ -404,7 +409,7 @@ class SocketService extends GetxService {
     });
 
     _socket!.on('user:group_message_new', (data) {
-      debugPrint('👥 User group message new geldi (SocketService): $data');
+      debugPrint('�� User group message new geldi (SocketService): $data');
       _groupMessageController.add(data);
       _sendOneSignalNotification('group', data);
     });
@@ -870,6 +875,8 @@ class SocketService extends GetxService {
   void _sendOneSignalNotification(String type, dynamic data) {
     try {
       debugPrint('📱 OneSignal bildirimi gönderiliyor: $type');
+      debugPrint('📱 Data: $data');
+      debugPrint('📱 Data type: ${data.runtimeType}');
       
       // Bildirim içeriğini hazırla
       String title = '';
@@ -879,6 +886,7 @@ class SocketService extends GetxService {
         case 'message':
           title = 'Yeni Mesaj';
           message = data['message'] ?? 'Yeni bir mesajınız var';
+          debugPrint('📱 Mesaj bildirimi hazırlandı: title=$title, message=$message');
           break;
         case 'group':
           title = 'Grup Mesajı';
@@ -939,6 +947,34 @@ class SocketService extends GetxService {
       debugPrint('✅ OneSignal bildirimi gönderildi: $title - $message');
     } catch (e) {
       debugPrint('❌ OneSignal bildirimi gönderilemedi: $e');
+    }
+  }
+
+  // Özel mesaj bildirimi gönder (profil resmi ve kullanıcı adı ile)
+  void _sendCustomMessageNotification(dynamic data) {
+    try {
+      debugPrint('💬 Özel mesaj bildirimi hazırlanıyor...');
+      
+      // Mesaj verilerini al
+      final message = data['message'] ?? '';
+      final senderName = data['sender_name'] ?? data['sender'] ?? 'Bilinmeyen';
+      final senderAvatar = data['sender_avatar'] ?? data['profile_image'] ?? '';
+      final conversationId = data['conversation_id'];
+      
+      debugPrint('💬 Mesaj detayları: sender=$senderName, message=$message');
+      
+      // Özel bildirim gönder
+      _oneSignalService.sendCustomMessageNotification(
+        senderName: senderName,
+        message: message,
+        senderAvatar: senderAvatar,
+        conversationId: conversationId,
+        data: data,
+      );
+      
+      debugPrint('✅ Özel mesaj bildirimi gönderildi');
+    } catch (e) {
+      debugPrint('❌ Özel mesaj bildirimi gönderilemedi: $e');
     }
   }
 
