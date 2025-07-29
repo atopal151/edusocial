@@ -222,7 +222,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   child: GeneralLoadingIndicator(
                     size: 32,
                     color: Color(0xFFFF7743),
-                    icon: Icons.notifications,
                     showText: true,
                   ),
                 ),
@@ -248,7 +247,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           child: Column(
             children: [
               // Socket bağlantı durumu göstergesi
-              Obx(() => Container(
+            /*  Obx(() => Container(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: _socketService.isConnected.value ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
@@ -272,7 +271,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                   ],
                 ),
-              )),
+              )),*/
               // Bildirim listesi
               Expanded(
                 child: ListView.builder(

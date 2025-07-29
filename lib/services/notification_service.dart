@@ -37,6 +37,14 @@ class NotificationService {
           ...followerNotifs
         ];
 
+        debugPrint("📥 === NOTIFICATION SERVICE DEBUG ===");
+        debugPrint("📥 Raw API Response: ${response.body}");
+        debugPrint("📥 Post Notifications Count: ${postNotifs.length}");
+        debugPrint("📥 Invitation Notifications Count: ${invitationNotifs.length}");
+        debugPrint("📥 Follower Notifications Count: ${followerNotifs.length}");
+        debugPrint("📥 Total Notifications Count: ${allNotifs.length}");
+        debugPrint("📥 =================================");
+
         return allNotifs.map((e) => NotificationModel.fromJson(e)).toList();
       } else {
         throw Exception('Bildirimler alınamadı. Status Code: ${response.statusCode}');

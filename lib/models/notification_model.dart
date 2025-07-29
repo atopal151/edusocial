@@ -46,15 +46,15 @@ class NotificationModel {
     final answer = fullData['answer'] ?? {};
 
     // Debug için API yanıtını logla
-    //debugPrint("🔍 === NOTIFICATION DEBUG ===");
-    //debugPrint("🔍 Notification type: ${json['type']}");
-    //debugPrint("🔍 Full notification: ${json.toString()}");
-    //debugPrint("🔍 User data: ${user.toString()}");
-    //debugPrint("🔍 Answer data: ${answer.toString()}");
-    //debugPrint("🔍 is_following: ${user['is_following']} (type: ${user['is_following'].runtimeType})");
-    //debugPrint("🔍 is_following_pending: ${user['is_following_pending']} (type: ${user['is_following_pending'].runtimeType})");
-    //debugPrint("🔍 is_self: ${user['is_self']}");
-    //debugPrint("🔍 answer.status: ${answer['status']}");
+    debugPrint("🔍 === NOTIFICATION DEBUG ===");
+    debugPrint("🔍 Notification type: ${json['type']}");
+    debugPrint("🔍 Full notification: ${json.toString()}");
+    debugPrint("🔍 User data: ${user.toString()}");
+    debugPrint("🔍 Answer data: ${answer.toString()}");
+    debugPrint("🔍 is_following: ${user['is_following']} (type: ${user['is_following'].runtimeType})");
+    debugPrint("🔍 is_following_pending: ${user['is_following_pending']} (type: ${user['is_following_pending'].runtimeType})");
+    debugPrint("🔍 is_self: ${user['is_self']}");
+    debugPrint("🔍 answer.status: ${answer['status']}");
 
     // Kullanıcı adını belirle
     String userName = 'Kullanıcı';
