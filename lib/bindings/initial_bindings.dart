@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:edusocial/controllers/login_controller.dart';
 import 'package:edusocial/controllers/match_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
@@ -38,6 +39,14 @@ class InitialBindings extends Bindings {
     Get.put(NotificationController(), permanent: true);
     Get.put(TranslationService(), permanent: true);
     Get.put(LanguageService(), permanent: true);
+    
+    // Socket durumunu kontrol et (binding'ler yüklendikten sonra)
+    try {
+      final socketService = Get.find<SocketService>();
+      socketService.checkInitialSocketStatus();
+    } catch (e) {
+      debugPrint('⚠️ SocketService kontrol edilemedi: $e');
+    }
 
     // İhtiyaç anında yüklenecek olanlar (lazy yükleme)
     Get.lazyPut(() => EventController());

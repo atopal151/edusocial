@@ -101,6 +101,48 @@ class ChatController extends GetxController {
     }
   }
 
+  /// Group message listener'ını duraklat
+  void pauseGroupMessageListener() {
+    try {
+      debugPrint('⏸️ PAUSE REQUEST: ChatController group message listener pause requested');
+      debugPrint('⏸️ Current state: isPaused=${_groupMessageSubscription.isPaused}');
+      
+      if (!_groupMessageSubscription.isPaused) {
+        _groupMessageSubscription.pause();
+        debugPrint('⏸️ SUCCESS: ChatController group message listener paused');
+      } else {
+        debugPrint('⏸️ ALREADY PAUSED: ChatController group message listener was already paused');
+      }
+      
+      // Verification
+      debugPrint('⏸️ VERIFICATION: isPaused=${_groupMessageSubscription.isPaused}');
+      
+    } catch (e) {
+      debugPrint('❌ PAUSE ERROR: Group message listener pause failed: $e');
+    }
+  }
+
+  /// Group message listener'ını devam ettir
+  void resumeGroupMessageListener() {
+    try {
+      debugPrint('▶️ RESUME REQUEST: ChatController group message listener resume requested');
+      debugPrint('▶️ Current state: isPaused=${_groupMessageSubscription.isPaused}');
+      
+      if (_groupMessageSubscription.isPaused) {
+        _groupMessageSubscription.resume();
+        debugPrint('▶️ SUCCESS: ChatController group message listener resumed');
+      } else {
+        debugPrint('▶️ ALREADY ACTIVE: ChatController group message listener was already active');
+      }
+      
+      // Verification  
+      debugPrint('▶️ VERIFICATION: isPaused=${_groupMessageSubscription.isPaused}');
+      
+    } catch (e) {
+      debugPrint('❌ RESUME ERROR: Group message listener resume failed: $e');
+    }
+  }
+
   /// 🔥 Online arkadaşları getir
   Future<void> fetchOnlineFriends() async {
     try {

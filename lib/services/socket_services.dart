@@ -135,22 +135,13 @@ class SocketService extends GetxService {
 
     // Event dinleyiciler
     debugPrint('🔌 Event dinleyicileri ayarlanıyor...');
-    // 1. Yeni özel mesaj
+    // 1. Yeni private mesaj
     _socket!.on('conversation:new_message', (data) {
-      debugPrint('💬 Yeni özel mesaj (SocketService): $data');
+      debugPrint('💬 Yeni private mesaj geldi (SocketService): $data');
       _privateMessageController.add(data);
       
       // OneSignal bildirimi gönder (uygulama açıkken)
       _sendOneSignalNotification('message', data);
-    });
-
-    // 2. Yeni grup mesajı
-    _socket!.on('group_conversation:new_message', (data) {
-      debugPrint('👥 Yeni grup mesajı (SocketService): $data');
-      _groupMessageController.add(data);
-      
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group', data);
     });
 
     // 3. Okunmamış mesaj sayısı
@@ -304,6 +295,144 @@ class SocketService extends GetxService {
       // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
+    // 21.5. Group message notification (user:{user_id} kanalından)
+    _socket!.on('user:group_message', (data) {
+      debugPrint('👥 Group message notification geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('group', data);
+    });
+
+    // 21.6. Group message (alternatif event isimleri)
+    _socket!.on('group:message', (data) {
+      debugPrint('👥 Group message event geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('group_conversation:new_message', (data) {
+      debugPrint('👥 Group conversation new message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('conversation:group_message', (data) {
+      debugPrint('👥 Conversation group message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('group', data);
+    });
+
+    // 21.7. Ek grup mesaj event'leri (backend'de farklı isimler kullanılıyor olabilir)
+    _socket!.on('group:new_message', (data) {
+      debugPrint('👥 Group new message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('group_chat:message', (data) {
+      debugPrint('👥 Group chat message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('group_chat:new_message', (data) {
+      debugPrint('👥 Group chat new message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('chat:group_message', (data) {
+      debugPrint('👥 Chat group message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('message:group', (data) {
+      debugPrint('👥 Message group geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('new:group_message', (data) {
+      debugPrint('👥 New group message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('group:chat_message', (data) {
+      debugPrint('👥 Group chat message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:group_chat', (data) {
+      debugPrint('👥 User group chat geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:group_chat_message', (data) {
+      debugPrint('👥 User group chat message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    // 21.8. User kanalında grup mesajları için ek olası event'ler
+    _socket!.on('user:new_group_message', (data) {
+      debugPrint('👥 User new group message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:chat_message', (data) {
+      debugPrint('👥 User chat message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:message_group', (data) {
+      debugPrint('👥 User message group geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:group_message_new', (data) {
+      debugPrint('👥 User group message new geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:new_message', (data) {
+      debugPrint('👥 User new message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:message_new', (data) {
+      debugPrint('👥 User message new geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:chat', (data) {
+      debugPrint('👥 User chat geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:group', (data) {
+      debugPrint('👥 User group geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
     // 22. User specific notification (user:{user_id} formatı)
     _socket!.on('user:*', (data) {
       debugPrint('👤 User specific notification geldi (SocketService): $data');
@@ -451,6 +580,12 @@ class SocketService extends GetxService {
         if (data.containsKey('user_id')) {
           debugPrint('🎯 User ID: ${data['user_id']}');
         }
+        if (data.containsKey('group_id')) {
+          debugPrint('🎯 Group ID: ${data['group_id']}');
+        }
+        if (data.containsKey('conversation_id')) {
+          debugPrint('🎯 Conversation ID: ${data['conversation_id']}');
+        }
       }
       
       debugPrint('🎯 ================================');
@@ -468,6 +603,67 @@ class SocketService extends GetxService {
         
         // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
       }
+    });
+
+    // 39. User kanalından gelen tüm verileri detaylı logla
+    _socket!.on('user:*', (data) {
+      debugPrint('👤 === USER KANALI DETAYLI LOG ===');
+      debugPrint('👤 Event: user:*');
+      debugPrint('👤 Raw Data: $data');
+      debugPrint('👤 Data Type: ${data.runtimeType}');
+      
+      if (data is Map<String, dynamic>) {
+        debugPrint('👤 === DATA ANALİZİ ===');
+        debugPrint('👤 Tüm Keys: ${data.keys.toList()}');
+        
+        // Her key'i detaylı incele
+        data.forEach((key, value) {
+          debugPrint('👤 $key: $value (${value.runtimeType})');
+        });
+        
+        // Özel alanları kontrol et
+        if (data.containsKey('type')) {
+          debugPrint('👤 📝 Event Type: ${data['type']}');
+        }
+        if (data.containsKey('message')) {
+          debugPrint('👤 💬 Message: ${data['message']}');
+        }
+        if (data.containsKey('user_id')) {
+          debugPrint('👤 👤 User ID: ${data['user_id']}');
+        }
+        if (data.containsKey('group_id')) {
+          debugPrint('👤 👥 Group ID: ${data['group_id']}');
+        }
+        if (data.containsKey('conversation_id')) {
+          debugPrint('👤 💭 Conversation ID: ${data['conversation_id']}');
+        }
+        if (data.containsKey('sender')) {
+          debugPrint('👤 👤 Sender: ${data['sender']}');
+        }
+        if (data.containsKey('receiver')) {
+          debugPrint('👤 👤 Receiver: ${data['receiver']}');
+        }
+        if (data.containsKey('created_at')) {
+          debugPrint('👤 ⏰ Created At: ${data['created_at']}');
+        }
+        if (data.containsKey('updated_at')) {
+          debugPrint('👤 ⏰ Updated At: ${data['updated_at']}');
+        }
+        if (data.containsKey('is_read')) {
+          debugPrint('👤 ✅ Is Read: ${data['is_read']}');
+        }
+        if (data.containsKey('media')) {
+          debugPrint('👤 📁 Media: ${data['media']}');
+        }
+        if (data.containsKey('links')) {
+          debugPrint('👤 🔗 Links: ${data['links']}');
+        }
+        if (data.containsKey('poll_options')) {
+          debugPrint('👤 📊 Poll Options: ${data['poll_options']}');
+        }
+      }
+      
+      debugPrint('👤 ================================');
     });
 
     debugPrint('🔌 Socket bağlantısı başlatılıyor... ($urlName)');
@@ -515,8 +711,28 @@ class SocketService extends GetxService {
     debugPrint('🔍 Socket ID: ${_socket?.id ?? "Yok"}');
     debugPrint('🔍 isConnected observable: ${isConnected.value}');
     debugPrint('🔍 Dinlenen event\'ler:');
-    debugPrint('  - conversation:new_message');
-    debugPrint('  - group_conversation:new_message');
+    debugPrint('  - conversation:new_message (private mesajlar için)');
+    debugPrint('  - user:group_message (group mesajlar için)');
+    debugPrint('  - group:message (group mesajlar için)');
+    debugPrint('  - group_conversation:new_message (group mesajlar için)');
+    debugPrint('  - conversation:group_message (group mesajlar için)');
+    debugPrint('  - group:new_message (group mesajlar için)');
+    debugPrint('  - group_chat:message (group mesajlar için)');
+    debugPrint('  - group_chat:new_message (group mesajlar için)');
+    debugPrint('  - chat:group_message (group mesajlar için)');
+    debugPrint('  - message:group (group mesajlar için)');
+    debugPrint('  - new:group_message (group mesajlar için)');
+    debugPrint('  - group:chat_message (group mesajlar için)');
+    debugPrint('  - user:group_chat (group mesajlar için)');
+    debugPrint('  - user:group_chat_message (group mesajlar için)');
+    debugPrint('  - user:new_group_message (group mesajlar için)');
+    debugPrint('  - user:chat_message (group mesajlar için)');
+    debugPrint('  - user:message_group (group mesajlar için)');
+    debugPrint('  - user:group_message_new (group mesajlar için)');
+    debugPrint('  - user:new_message (group mesajlar için)');
+    debugPrint('  - user:message_new (group mesajlar için)');
+    debugPrint('  - user:chat (group mesajlar için)');
+    debugPrint('  - user:group (group mesajlar için)');
     debugPrint('  - conversation:un_read_message_count');
     debugPrint('  - notification:new');
     debugPrint('  - notification:event');
@@ -756,4 +972,24 @@ class SocketService extends GetxService {
 
   /// Socket nesnesi
   io.Socket? get socket => _socket;
+
+  /// Uygulama başlatıldığında socket durumunu kontrol et
+  void checkInitialSocketStatus() {
+    debugPrint('🚀 === UYGULAMA BAŞLATILDI - SOCKET DURUMU ===');
+    debugPrint('🚀 Socket Bağlantı Durumu: ${isConnected.value}');
+    debugPrint('🚀 Socket ID: ${_socket?.id}');
+    debugPrint('🚀 Socket Connected: ${_socket?.connected}');
+    debugPrint('🚀 Socket URL: $_socketUrl');
+    debugPrint('🚀 ===========================================');
+    
+    // User kanalından gelen tüm event'leri dinlemeye başla
+    debugPrint('👤 User kanalından gelen tüm event\'ler dinleniyor...');
+    debugPrint('👤 Beklenen event\'ler:');
+    debugPrint('👤  - user:notification');
+    debugPrint('👤  - user:group_message');
+    debugPrint('👤  - user:message');
+    debugPrint('👤  - user:* (wildcard)');
+    debugPrint('👤  - Tüm diğer event\'ler');
+    debugPrint('👤 ===========================================');
+  }
 }

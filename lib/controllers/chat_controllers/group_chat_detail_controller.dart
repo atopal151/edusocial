@@ -13,6 +13,7 @@ import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../profile_controller.dart';
+import 'chat_controller.dart'; // Added import for ChatController
 
 class GroupChatDetailController extends GetxController {
   final LanguageService languageService = Get.find<LanguageService>();
@@ -28,6 +29,7 @@ class GroupChatDetailController extends GetxController {
   // Socket service ile ilgili değişkenler
   late SocketService _socketService;
   late StreamSubscription _groupMessageSubscription;
+  bool _isSocketListenerSetup = false; // Multiple subscription guard
   final ScrollController scrollController = ScrollController();
 
   // PAGINATION: New state variables for lazy loading group messages
@@ -110,6 +112,12 @@ class GroupChatDetailController extends GetxController {
       
       // Optimize: Sadece burada yükle, initState'te tekrar çağırma
       _loadGroupDataProgressive();
+      
+      // Group chat'e girdiğinde socket durumunu kontrol et
+      onGroupChatEntered();
+      
+      // Cache'i temizle (Android'de güncel olmayan veri sorunu için)
+      GroupServices.clearGroupCache();
     } else {
       debugPrint('❌ No group ID provided in arguments');
       Get.snackbar('Error', 'No group selected', snackPosition: SnackPosition.BOTTOM);
@@ -209,9 +217,70 @@ class GroupChatDetailController extends GetxController {
 
   /// Socket event dinleyicilerini ayarla
   void _setupSocketListeners() {
+    // Multiple subscription guard
+    if (_isSocketListenerSetup) {
+      debugPrint('⚠️ Group chat socket listeners already setup, skipping...');
+      return;
+    }
+    
+    // Chat liste controller'ın group message listener'ını durdur
+    try {
+      final chatController = Get.find<ChatController>();
+      chatController.pauseGroupMessageListener();
+      debugPrint('📴 ChatController group message listener duraklatıldı');
+    } catch (e) {
+      debugPrint('⚠️ ChatController bulunamadı: $e');
+    }
+    
+    // Group mesaj dinleyicisi - user:{user_id} kanalından
     _groupMessageSubscription = _socketService.onGroupMessage.listen((data) {
       _onNewGroupMessage(data);
     });
+    
+    _isSocketListenerSetup = true;
+    debugPrint('✅ GroupChatDetailController socket listeners setup completed');
+  }
+
+  /// Group message listener'ını duraklat
+  void pauseGroupMessageListener() {
+    try {
+      debugPrint('⏸️ PAUSE REQUEST: GroupChatDetailController group message listener pause requested');
+      debugPrint('⏸️ Current state: isPaused=${_groupMessageSubscription.isPaused}');
+      
+      if (!_groupMessageSubscription.isPaused) {
+        _groupMessageSubscription.pause();
+        debugPrint('⏸️ SUCCESS: GroupChatDetailController group message listener paused');
+      } else {
+        debugPrint('⏸️ ALREADY PAUSED: GroupChatDetailController group message listener was already paused');
+      }
+      
+      // Verification
+      debugPrint('⏸️ VERIFICATION: isPaused=${_groupMessageSubscription.isPaused}');
+      
+    } catch (e) {
+      debugPrint('❌ PAUSE ERROR: Group message listener pause failed: $e');
+    }
+  }
+
+  /// Group message listener'ını devam ettir
+  void resumeGroupMessageListener() {
+    try {
+      debugPrint('▶️ RESUME REQUEST: GroupChatDetailController group message listener resume requested');
+      debugPrint('▶️ Current state: isPaused=${_groupMessageSubscription.isPaused}');
+      
+      if (_groupMessageSubscription.isPaused) {
+        _groupMessageSubscription.resume();
+        debugPrint('▶️ SUCCESS: GroupChatDetailController group message listener resumed');
+      } else {
+        debugPrint('▶️ ALREADY ACTIVE: GroupChatDetailController group message listener was already active');
+      }
+      
+      // Verification  
+      debugPrint('▶️ VERIFICATION: isPaused=${_groupMessageSubscription.isPaused}');
+      
+    } catch (e) {
+      debugPrint('❌ RESUME ERROR: Group message listener resume failed: $e');
+    }
   }
 
   /// Yeni grup mesajı geldiğinde işle - OPTIMIZE
@@ -230,6 +299,8 @@ class GroupChatDetailController extends GetxController {
           _addNewMessageFromSocket(data);
           
           debugPrint('✅ Yeni grup mesajı işlendi');
+        } else {
+          debugPrint('📡 Gelen grup mesajı bu gruba ait değil. Gelen: $incomingGroupId, Mevcut: ${currentGroupId.value}');
         }
       }
     } catch (e) {
@@ -240,13 +311,24 @@ class GroupChatDetailController extends GetxController {
   /// Socket'ten gelen yeni mesajı direkt ekle (API çağrısı yapma)
   void _addNewMessageFromSocket(Map<String, dynamic> data) {
     try {
+      debugPrint('📡 [GroupChatDetailController] Yeni grup mesajı payload alındı');
+      debugPrint('📡 [GroupChatDetailController] Current Group ID: ${currentGroupId.value}');
+      debugPrint('📡 [GroupChatDetailController] Processing: $data');
+      
       // Yeni mesajı parse et ve listeye ekle
-      // Bu implementation'ı socket data formatına göre ayarla
       final currentUserId = Get.find<ProfileController>().userId.value;
+      
+      // DUPLICATE CHECK: Aynı ID'li mesaj var mı kontrol et
+      final messageId = data['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final isDuplicate = messages.any((existingMessage) => existingMessage.id == messageId);
+      if (isDuplicate) {
+        debugPrint('🚫 [GroupChatDetailController] DUPLICATE MESSAGE BLOCKED: ID $messageId already exists');
+        return;
+      }
       
       // Basit implementasyon - gerçek socket data'ya göre ayarlanmalı
       final newMessage = GroupMessageModel(
-        id: data['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        id: messageId,
         senderId: data['user_id']?.toString() ?? '',
         receiverId: currentGroupId.value,
         name: data['user']?['name'] ?? '',
@@ -260,6 +342,8 @@ class GroupChatDetailController extends GetxController {
       );
       
       messages.add(newMessage);
+      debugPrint('✅ [GroupChatDetailController] Yeni grup mesajı eklendi: ID ${newMessage.id}, Content: "${newMessage.content}"');
+      debugPrint('✅ [GroupChatDetailController] Toplam grup mesaj sayısı: ${messages.length}');
       
       // Yeni mesaj eklendiğinde en alta git
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -267,10 +351,55 @@ class GroupChatDetailController extends GetxController {
       });
       
     } catch (e) {
-      debugPrint('❌ Error adding new message from socket: $e');
+      debugPrint('❌ [GroupChatDetailController] _addNewMessageFromSocket error: $e');
       // Fallback: Tüm mesajları yeniden yükle
       refreshMessagesOnly();
     }
+  }
+
+  /// Group chat socket durumunu kontrol et
+  void checkGroupChatSocketConnection() {
+    debugPrint('📡 === GROUP CHAT SOCKET DURUM RAPORU ===');
+    debugPrint('📡 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
+    debugPrint('📡 Aktif Group ID: ${currentGroupId.value}');
+    debugPrint('📡 Group Message Subscription Aktif: ${!_groupMessageSubscription.isPaused}');
+    debugPrint('📡 Socket ID: ${_socketService.socket?.id}');
+    debugPrint('📡 Socket Connected: ${_socketService.socket?.connected}');
+    
+    // Socket service'den detaylı durum raporu al
+    _socketService.checkSocketStatus();
+    
+    debugPrint('📡 =======================================');
+  }
+
+  /// Group chat'e girdiğinde socket durumunu kontrol et
+  void onGroupChatEntered() {
+    debugPrint('🚪 Group chat\'e girildi, socket durumu kontrol ediliyor...');
+    checkGroupChatSocketConnection();
+    
+    // Group chat'e girdiğinde socket'e join ol
+    if (_socketService.isConnected.value) {
+      debugPrint('🔌 Group chat için socket kanalına join olunuyor...');
+      _socketService.sendMessage('join', {
+        'channel': 'group:${currentGroupId.value}',
+        'group_id': currentGroupId.value,
+        'user_id': Get.find<ProfileController>().userId.value,
+      });
+      
+      // Test için manuel socket event gönder
+      _testSocketEvent();
+    }
+  }
+
+  /// Test için manuel socket event gönder
+  void _testSocketEvent() {
+    debugPrint('🧪 Test socket event gönderiliyor...');
+    _socketService.sendTestEvent('user:group_message', {
+      'group_id': currentGroupId.value,
+      'user_id': Get.find<ProfileController>().userId.value,
+      'message': 'Test mesajı - ${DateTime.now()}',
+      'created_at': DateTime.now().toIso8601String(),
+    });
   }
 
   /// OPTIMIZE: Background message conversion with pagination support
@@ -339,22 +468,23 @@ class GroupChatDetailController extends GetxController {
         }
       }
       
-      // FIXED: Since API returns messages in DESC order (newest first), 
-      // we need to reverse them for proper display (oldest first, newest at bottom)
-      processedMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp)); // First sort DESC to match API
-      final reversedMessages = processedMessages.reversed.toList(); // Then reverse for display
+      // FIXED: API'den gelen mesajlar zaten doğru sıralı (en yeni en altta)
+      // Sadece timestamp'e göre sırala (en eski en üstte, en yeni en altta)
+      processedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       
       // PAGINATION: Update state based on first load or not
       if (isFirstLoad.value) {
-        messages.assignAll(reversedMessages);
+        messages.assignAll(processedMessages);
         
         // Since we're loading all messages, no more messages to load
         hasMoreMessages.value = false;
         
         isFirstLoad.value = false;
-        debugPrint('✅ Initial ${processedMessages.length} group messages loaded (reversed for proper display)');
+        debugPrint('✅ Initial ${processedMessages.length} group messages loaded (proper chronological order)');
+      debugPrint('📊 Mesaj sayısı kontrolü: ${messages.length} mesaj yüklendi');
       } else {
-        messages.assignAll(reversedMessages);
+        messages.assignAll(processedMessages);
+        debugPrint('📊 Mesaj sayısı güncellendi: ${messages.length} mesaj');
       }
       
       // Extract media in background
@@ -806,6 +936,12 @@ class GroupChatDetailController extends GetxController {
       return;
     }
     
+    // Socket durumunu kontrol et
+    debugPrint('🔌 Socket durumu kontrol ediliyor...');
+    debugPrint('🔌 Socket bağlı: ${_socketService.isConnected.value}');
+    debugPrint('🔌 Socket ID: ${_socketService.socket?.id}');
+    debugPrint('🔌 Group Message Subscription aktif: ${!_groupMessageSubscription.isPaused}');
+    
     isSendingMessage.value = true;
     
     try {
@@ -835,6 +971,27 @@ class GroupChatDetailController extends GetxController {
       
       if (success) {
         selectedFiles.clear();
+        
+        // Socket üzerinden mesaj gelip gelmediğini kontrol et
+        debugPrint('✅ Mesaj başarıyla gönderildi, socket üzerinden gelmesi bekleniyor...');
+        
+        // Socket üzerinden mesaj gelmesi için kısa bir süre bekle
+        bool socketMessageReceived = false;
+        final originalMessageCount = messages.length;
+        
+        // 2 saniye boyunca socket mesajını bekle
+        for (int i = 0; i < 20; i++) {
+          await Future.delayed(Duration(milliseconds: 100));
+          if (messages.length > originalMessageCount) {
+            debugPrint('✅ Socket üzerinden yeni mesaj geldi!');
+            socketMessageReceived = true;
+            break;
+          }
+        }
+        
+        if (!socketMessageReceived) {
+          debugPrint('⚠️ Socket üzerinden mesaj gelmedi, API\'den yeniden yüklenecek...');
+        }
         
         // FIXED: Immediate scroll for better UX, then refresh
         scrollToBottomForNewMessage();
@@ -956,6 +1113,18 @@ class GroupChatDetailController extends GetxController {
 
   @override
   void onClose() {
+    // Chat liste controller'ın group message listener'ını tekrar başlat
+    try {
+      final chatController = Get.find<ChatController>();
+      chatController.resumeGroupMessageListener();
+      debugPrint('▶️ ChatController group message listener tekrar başlatıldı');
+    } catch (e) {
+      debugPrint('⚠️ ChatController resume edilemedi: $e');
+    }
+    
+    // Socket listener guard'ı reset et
+    _isSocketListenerSetup = false;
+    
     messageController.dispose();
     pollTitleController.dispose();
     scrollController.dispose();
