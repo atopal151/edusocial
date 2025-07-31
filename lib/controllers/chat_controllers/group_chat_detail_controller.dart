@@ -391,12 +391,24 @@ class GroupChatDetailController extends GetxController {
     debugPrint('🚪 Group chat\'e girildi, socket durumu kontrol ediliyor...');
     checkGroupChatSocketConnection();
     
-    // Artık uygulama açıldığında otomatik join yapılıyor
-    // Burada sadece socket bağlantısını kontrol et
+    // Group chat'e girdiğinde gruba join ol
     if (_socketService.isConnected.value) {
-      debugPrint('✅ Socket bağlantısı mevcut, grup mesajları dinleniyor...');
+      debugPrint('🔌 Group chat için gruba join olunuyor...');
+      debugPrint('📊 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
+      debugPrint('🆔 Gönderilecek Group ID: ${currentGroupId.value}');
+      
+      final joinData = {
+        'group_id': currentGroupId.value,
+      };
+      
+      debugPrint('📤 group:join event\'i gönderiliyor...');
+      debugPrint('📋 Gönderilen Data: $joinData');
+      
+      _socketService.sendMessage('group:join', joinData);
+      
+      debugPrint('✅ group:join event\'i başarıyla gönderildi!');
     } else {
-      debugPrint('❌ Socket bağlantısı yok!');
+      debugPrint('❌ Socket bağlantısı yok! group:join gönderilemedi.');
       debugPrint('🔍 Socket durumu: ${_socketService.isConnected.value}');
     }
   }
