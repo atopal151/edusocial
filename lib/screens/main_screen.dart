@@ -98,6 +98,17 @@ class MainScreen extends StatelessWidget {
     } catch (e) {
       debugPrint("❌ PostController hatası: $e");
     }
+    
+    // ChatController kontrolü
+    try {
+      final chatController = Get.find<ChatController>();
+      if (chatController.chatList.isEmpty) {
+        debugPrint("🔄 Chat listesi yüklenmemiş, yükleniyor...");
+        chatController.fetchChatList();
+      }
+    } catch (e) {
+      debugPrint("❌ ChatController hatası: $e");
+    }
   }
 
   /// Socket bağlantısını başlat

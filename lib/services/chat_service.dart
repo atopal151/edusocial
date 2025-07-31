@@ -259,12 +259,28 @@ class ChatServices {
     );
 
     debugPrint("📥 Paginated Mesajlar Yanıt Kodu: ${response.statusCode}");
-    // debugPrint("📥 Paginated Mesajlar Yanıt Body: ${response.body}");
+    debugPrint("📥 Paginated Mesajlar Yanıt Body: ${response.body}");
 
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
     
     debugPrint("✅ ${messagesJson.length} mesaj yüklendi (pagination)");
+    
+    // İlk 5 mesajın detayını göster
+    debugPrint("📖 === İLK 5 MESAJ DETAYI ===");
+    for (int i = 0; i < messagesJson.length && i < 5; i++) {
+      final message = messagesJson[i];
+      debugPrint("📖 Mesaj ${i + 1}:");
+      debugPrint("  - ID: ${message['id']}");
+      debugPrint("  - Message: ${message['message']}");
+      debugPrint("  - Sender ID: ${message['sender_id']}");
+      debugPrint("  - Is Read: ${message['is_read']}");
+      debugPrint("  - Is Me: ${message['is_me']}");
+      debugPrint("  - Created At: ${message['created_at']}");
+      debugPrint("  - Raw JSON: ${jsonEncode(message)}");
+      debugPrint("  - ---");
+    }
+    debugPrint("📖 =========================");
 
     return messagesJson
         .map((json) => MessageModel.fromJson(json as Map<String, dynamic>,
@@ -295,15 +311,55 @@ class ChatServices {
       );
 
       final body = jsonDecode(response.body);
-      //  debugPrint("✅ Gelen JSON Body:");
-      //  debugPrint(jsonEncode(body));
+      debugPrint("✅ Chat List API Response:");
+      debugPrint("📊 Response Status: ${response.statusCode}");
+      debugPrint("📊 Response Body: ${jsonEncode(body)}");
+      debugPrint("📊 Response Data Type: ${body.runtimeType}");
+      if (body is Map<String, dynamic>) {
+        debugPrint("📊 Response Keys: ${body.keys.toList()}");
+        if (body.containsKey('data')) {
+          final data = body['data'];
+          debugPrint("📊 Data Type: ${data.runtimeType}");
+          if (data is List && data.isNotEmpty) {
+            debugPrint("📊 First Item Keys: ${(data.first as Map<String, dynamic>).keys.toList()}");
+          }
+        }
+      }
 
       if (body is Map<String, dynamic> && body.containsKey('data')) {
         final data = body['data'];
         if (data is List) {
-          return data.map((json) {
+          final chatList = data.map((json) {
+            debugPrint("📖 === CHAT ITEM FULL DEBUG ===");
+            debugPrint("📖 Raw JSON: ${jsonEncode(json)}");
+            debugPrint("📖 User ID: ${json['id']}");
+            debugPrint("📖 Name: ${json['name']}");
+            debugPrint("📖 Raw JSON Keys: ${json.keys.toList()}");
+            debugPrint("📖 Unread Count (unread_count): ${json['unread_count']} (type: ${json['unread_count']?.runtimeType})");
+            debugPrint("📖 Unread Count (unreadCount): ${json['unreadCount']} (type: ${json['unreadCount']?.runtimeType})");
+            debugPrint("📖 Unread Count (unread_message_count): ${json['unread_message_count']} (type: ${json['unread_message_count']?.runtimeType})");
+            debugPrint("📖 Unread Count (message_count): ${json['message_count']} (type: ${json['message_count']?.runtimeType})");
+            debugPrint("📖 Unread Count (count): ${json['count']} (type: ${json['count']?.runtimeType})");
+            debugPrint("📖 Last Message: ${json['last_message']?['message'] ?? 'No message'}");
+            debugPrint("📖 Last Message Created: ${json['last_message']?['created_at'] ?? 'No date'}");
+            debugPrint("📖 ==============================");
             return ChatModel.fromJson(json);
           }).toList();
+          
+          // Toplam okunmamış mesaj sayısını hesapla
+          final totalUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
+          debugPrint("📊 === CHAT LIST SUMMARY ===");
+          debugPrint("📊 Toplam Chat Sayısı: ${chatList.length}");
+          debugPrint("📊 Toplam Okunmamış Mesaj: $totalUnread");
+          debugPrint("📊 Okunmamış Mesajı Olan Chat'ler:");
+          for (var chat in chatList) {
+            if (chat.unreadCount > 0) {
+              debugPrint("  - ${chat.name} (${chat.username}): ${chat.unreadCount} okunmamış mesaj");
+            }
+          }
+          debugPrint("📊 =========================");
+          
+          return chatList;
         } else {
           debugPrint(
               "⚠️ 'data' alanı liste değilmiş. Tip: ${data.runtimeType}");

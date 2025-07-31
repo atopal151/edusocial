@@ -6,7 +6,7 @@ class NetworkHelper {
   static Future<bool> hasInternetConnection() async {
     try {
       final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 10)); // 5'ten 10'a çıkarıldı
       
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         return true;
@@ -22,7 +22,7 @@ class NetworkHelper {
   static Future<bool> canReachServer(String host) async {
     try {
       final result = await InternetAddress.lookup(host)
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 5)); // 3'ten 5'e çıkarıldı
       
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         return true;

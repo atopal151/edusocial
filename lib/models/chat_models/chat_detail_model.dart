@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'sender_model.dart';
 import 'conversation_model.dart';
 import 'message_media_model.dart';
@@ -48,6 +49,10 @@ class MessageModel {
       isMeFlag = senderId == currentUserId;
     }
 
+    // DEBUG: Okundu alanını kontrol et
+    final rawIsRead = json['is_read'];
+    final isReadValue = rawIsRead == true || (rawIsRead is int && rawIsRead == 1);
+
     return MessageModel(
       id: json['id'] is int
           ? json['id']
@@ -57,8 +62,7 @@ class MessageModel {
           : int.tryParse(json['conversation_id'].toString()) ?? 0,
       senderId: senderId,
       message: json['message'] ?? '',
-      isRead: json['is_read'] == true ||
-          (json['is_read'] is int && json['is_read'] == 1),
+      isRead: isReadValue,
       isMe: isMeFlag,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',

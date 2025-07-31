@@ -17,8 +17,8 @@ class GroupServices {
   
   // RETRY: Configuration for retry mechanism
   static const int _maxRetries = 3;
-  static const Duration _baseDelay = Duration(seconds: 2);
-  static const Duration _requestTimeout = Duration(seconds: 15);
+  static const Duration _baseDelay = Duration(seconds: 3); // 2'den 3'e çıkarıldı
+  static const Duration _requestTimeout = Duration(seconds: 30); // 15'ten 30'a çıkarıldı
 
   /// RETRY: Generic retry mechanism for HTTP requests
   static Future<http.Response> _makeRequestWithRetry(
@@ -341,7 +341,7 @@ class GroupServices {
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
           final groupData = jsonBody['data']['group'];
 
-          debugPrint('📋 GRUP DETAY VERİLERİ (OPTIMIZED):');
+          debugPrint('�� GRUP DETAY VERİLERİ (OPTIMIZED):');
           debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           debugPrint('ID: ${groupData['id']}');
           

@@ -9,8 +9,8 @@ class ApiService extends GetxService {
     super.onInit();
     _dio = dio.Dio(dio.BaseOptions(
       baseUrl: 'https://stageapi.edusocial.pl/mobile',
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
+      connectTimeout: const Duration(seconds: 60), // 30'dan 60'a çıkarıldı
+      receiveTimeout: const Duration(seconds: 60), // 30'dan 60'a çıkarıldı
     ));
   }
 

@@ -182,12 +182,12 @@ class GroupChatDetailController extends GetxController {
       try {
         // Try cached version first
         group = await _groupServices.fetchGroupDetailCached(currentGroupId.value)
-            .timeout(const Duration(seconds: 3)); // Even shorter timeout for cache
+            .timeout(const Duration(seconds: 10)); // 3'ten 10'a çıkarıldı
       } catch (e) {
         debugPrint('⚠️ Cache failed, trying direct API: $e');
         // Fallback to direct API call
         group = await _groupServices.fetchGroupDetail(currentGroupId.value)
-            .timeout(const Duration(seconds: 5));
+            .timeout(const Duration(seconds: 15)); // 5'ten 15'e çıkarıldı
       }
       
       if (group != null) {
@@ -289,11 +289,14 @@ class GroupChatDetailController extends GetxController {
       debugPrint('📡 GroupChatDetailController - Yeni grup mesajı geldi: $data');
       
       if (data is Map<String, dynamic>) {
-        final incomingGroupId = data['group_id']?.toString();
+        // Socket'ten gelen data yapısı: {message: {group_id: 2, ...}}
+        final messageData = data['message'] as Map<String, dynamic>?;
+        final incomingGroupId = messageData?['group_id']?.toString();
         
         // Sadece bu grup için gelen mesajları işle
         if (incomingGroupId != null && incomingGroupId == currentGroupId.value) {
           debugPrint('✅ Yeni grup mesajı bu gruba ait, mesaj listesine ekleniyor');
+          debugPrint('✅ Gelen Group ID: $incomingGroupId, Mevcut: ${currentGroupId.value}');
           
           // OPTIMIZE: Tüm grup detayını tekrar çekme, sadece yeni mesajı ekle
           _addNewMessageFromSocket(data);
@@ -301,6 +304,7 @@ class GroupChatDetailController extends GetxController {
           debugPrint('✅ Yeni grup mesajı işlendi');
         } else {
           debugPrint('📡 Gelen grup mesajı bu gruba ait değil. Gelen: $incomingGroupId, Mevcut: ${currentGroupId.value}');
+          debugPrint('📡 Data yapısı: $data');
         }
       }
     } catch (e) {
@@ -315,30 +319,40 @@ class GroupChatDetailController extends GetxController {
       debugPrint('📡 [GroupChatDetailController] Current Group ID: ${currentGroupId.value}');
       debugPrint('📡 [GroupChatDetailController] Processing: $data');
       
+      // Socket'ten gelen data yapısı: {message: {user_id: 6, group_id: 2, message: "text", ...}}
+      final messageData = data['message'] as Map<String, dynamic>?;
+      if (messageData == null) {
+        debugPrint('❌ [GroupChatDetailController] Message data is null');
+        return;
+      }
+      
       // Yeni mesajı parse et ve listeye ekle
       final currentUserId = Get.find<ProfileController>().userId.value;
       
       // DUPLICATE CHECK: Aynı ID'li mesaj var mı kontrol et
-      final messageId = data['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final messageId = messageData['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
       final isDuplicate = messages.any((existingMessage) => existingMessage.id == messageId);
       if (isDuplicate) {
         debugPrint('🚫 [GroupChatDetailController] DUPLICATE MESSAGE BLOCKED: ID $messageId already exists');
         return;
       }
       
+      // User data'yı al
+      final userData = messageData['user'] as Map<String, dynamic>?;
+      
       // Basit implementasyon - gerçek socket data'ya göre ayarlanmalı
       final newMessage = GroupMessageModel(
         id: messageId,
-        senderId: data['user_id']?.toString() ?? '',
+        senderId: messageData['user_id']?.toString() ?? '',
         receiverId: currentGroupId.value,
-        name: data['user']?['name'] ?? '',
-        surname: data['user']?['surname'] ?? '',
-        username: data['user']?['username'] ?? '',
-        profileImage: data['user']?['avatar_url'] ?? '',
-        content: data['message'] ?? '',
+        name: userData?['name'] ?? '',
+        surname: userData?['surname'] ?? '',
+        username: userData?['username'] ?? '',
+        profileImage: userData?['avatar_url'] ?? '',
+        content: messageData['message'] ?? '',
         messageType: GroupMessageType.text, // Socket data'ya göre ayarla
-        timestamp: DateTime.now(),
-        isSentByMe: data['user_id']?.toString() == currentUserId,
+        timestamp: DateTime.parse(messageData['created_at'] ?? DateTime.now().toIso8601String()),
+        isSentByMe: messageData['user_id']?.toString() == currentUserId,
       );
       
       messages.add(newMessage);
@@ -377,17 +391,28 @@ class GroupChatDetailController extends GetxController {
     debugPrint('🚪 Group chat\'e girildi, socket durumu kontrol ediliyor...');
     checkGroupChatSocketConnection();
     
-    // Group chat'e girdiğinde socket'e join ol
+    // Group chat'e girdiğinde gruba join ol
     if (_socketService.isConnected.value) {
-      debugPrint('🔌 Group chat için socket kanalına join olunuyor...');
-      _socketService.sendMessage('join', {
-        'channel': 'group:${currentGroupId.value}',
+      debugPrint('🔌 Group chat için gruba join olunuyor...');
+      debugPrint('📊 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
+      debugPrint('🆔 Gönderilecek Group ID: ${currentGroupId.value}');
+      
+      final joinData = {
         'group_id': currentGroupId.value,
-        'user_id': Get.find<ProfileController>().userId.value,
-      });
+      };
+      
+      debugPrint('📤 group:join event\'i gönderiliyor...');
+      debugPrint('📋 Gönderilen Data: $joinData');
+      
+      _socketService.sendMessage('group:join', joinData);
+      
+      debugPrint('✅ group:join event\'i başarıyla gönderildi!');
       
       // Test için manuel socket event gönder
       _testSocketEvent();
+    } else {
+      debugPrint('❌ Socket bağlantısı yok! group:join gönderilemedi.');
+      debugPrint('🔍 Socket durumu: ${_socketService.isConnected.value}');
     }
   }
 
@@ -1095,7 +1120,7 @@ class GroupChatDetailController extends GetxController {
       
       // Reduced timeout for faster response
       final group = await _groupServices.fetchGroupDetail(currentGroupId.value)
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 15)); // 5'ten 15'e çıkarıldı
       
       groupData.value = group;
       convertGroupChatsToMessagesOptimized();

@@ -160,6 +160,8 @@ class ChatController extends GetxController {
   Future<void> fetchChatList() async {
     try {
       isLoading(true);
+      debugPrint("📱 Chat listesi çekiliyor...");
+      
       final fetchedChats = await ChatServices.fetchChatList();
 
       // last_message alanı null olanları filtrelemiyoruz
@@ -168,8 +170,30 @@ class ChatController extends GetxController {
 
       chatList.assignAll(filteredChats);
       filteredChatList.assignAll(filteredChats);
+
+      // Okunmamış mesaj özeti
+      final totalUnread = filteredChats.fold(0, (sum, chat) => sum + chat.unreadCount);
+      final unreadChats = filteredChats.where((chat) => chat.unreadCount > 0).toList();
+      
+      debugPrint("📊 === CHAT CONTROLLER SUMMARY ===");
+      debugPrint("📊 Toplam Chat: ${filteredChats.length}");
+      debugPrint("📊 Toplam Okunmamış: $totalUnread");
+      debugPrint("📊 Okunmamış Mesajı Olan Chat: ${unreadChats.length}");
+      
+      if (unreadChats.isNotEmpty) {
+        debugPrint("📊 Okunmamış Mesaj Detayları:");
+        for (var chat in unreadChats) {
+          debugPrint("  - ${chat.name} (@${chat.username}): ${chat.unreadCount} mesaj");
+          debugPrint("    Son mesaj: ${chat.lastMessage?.message ?? 'No message'}");
+        }
+      } else {
+        debugPrint("📊 Tüm mesajlar okunmuş");
+      }
+      debugPrint("📊 ==============================");
+
+      debugPrint("✅ Chat listesi güncellendi. Toplam: ${chatList.length} sohbet");
     } catch (e) {
-      debugPrint('Chat listesi çekilirken hata: $e');
+      debugPrint('❌ Chat listesi çekilirken hata: $e');
     } finally {
       isLoading(false);
     }
