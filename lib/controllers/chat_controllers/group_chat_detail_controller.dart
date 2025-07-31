@@ -391,40 +391,14 @@ class GroupChatDetailController extends GetxController {
     debugPrint('🚪 Group chat\'e girildi, socket durumu kontrol ediliyor...');
     checkGroupChatSocketConnection();
     
-    // Group chat'e girdiğinde gruba join ol
+    // Artık uygulama açıldığında otomatik join yapılıyor
+    // Burada sadece socket bağlantısını kontrol et
     if (_socketService.isConnected.value) {
-      debugPrint('🔌 Group chat için gruba join olunuyor...');
-      debugPrint('📊 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
-      debugPrint('🆔 Gönderilecek Group ID: ${currentGroupId.value}');
-      
-      final joinData = {
-        'group_id': currentGroupId.value,
-      };
-      
-      debugPrint('📤 group:join event\'i gönderiliyor...');
-      debugPrint('📋 Gönderilen Data: $joinData');
-      
-      _socketService.sendMessage('group:join', joinData);
-      
-      debugPrint('✅ group:join event\'i başarıyla gönderildi!');
-      
-      // Test için manuel socket event gönder
-      _testSocketEvent();
+      debugPrint('✅ Socket bağlantısı mevcut, grup mesajları dinleniyor...');
     } else {
-      debugPrint('❌ Socket bağlantısı yok! group:join gönderilemedi.');
+      debugPrint('❌ Socket bağlantısı yok!');
       debugPrint('🔍 Socket durumu: ${_socketService.isConnected.value}');
     }
-  }
-
-  /// Test için manuel socket event gönder
-  void _testSocketEvent() {
-    debugPrint('🧪 Test socket event gönderiliyor...');
-    _socketService.sendTestEvent('user:group_message', {
-      'group_id': currentGroupId.value,
-      'user_id': Get.find<ProfileController>().userId.value,
-      'message': 'Test mesajı - ${DateTime.now()}',
-      'created_at': DateTime.now().toIso8601String(),
-    });
   }
 
   /// OPTIMIZE: Background message conversion with pagination support

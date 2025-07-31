@@ -481,4 +481,42 @@ class GroupServices {
       return false;
     }
   }
+
+  // Kullanıcının katıldığı grupları al
+  Future<List<GroupModel>?> getUserGroups() async {
+    final box = GetStorage();
+    final token = box.read('token');
+
+    try {
+      debugPrint('👥 Kullanıcının katıldığı gruplar alınıyor...');
+      
+      final response = await _makeRequestWithRetry(
+        () => http.get(
+          Uri.parse('${AppConstants.baseUrl}/user/groups'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+        operation: 'Get User Groups',
+      );
+
+      debugPrint('👥 Get User Groups Response: ${response.statusCode}');
+      debugPrint('👥 Get User Groups Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        final List<GroupModel> groups = data.map((json) => GroupModel.fromJson(json)).toList();
+        
+        debugPrint('✅ Kullanıcının ${groups.length} adet grubu bulundu');
+        return groups;
+      } else {
+        debugPrint('❌ Get user groups failed: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      debugPrint('💥 Get user groups error: $e');
+      return null;
+    }
+  }
 }

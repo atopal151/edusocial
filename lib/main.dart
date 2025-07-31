@@ -8,6 +8,7 @@ import 'services/language_service.dart';
 import 'services/auth_service.dart';
 import 'services/api_service.dart';
 import 'services/onesignal_service.dart';
+import 'services/socket_services.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -35,6 +36,16 @@ void main() async {
   
   // OneSignalService'i başlat
   Get.put(OneSignalService());
+  
+  // SocketService'i başlat
+  Get.put(SocketService());
+  
+  // SocketService'i al ve bağlantı kur
+  final socketService = Get.find<SocketService>();
+  final token = GetStorage().read('token');
+  if (token != null) {
+    socketService.connect(token);
+  }
   
   // Debug: Dil servisinin yüklenip yüklenmediğini kontrol et
   final languageService = Get.find<LanguageService>();

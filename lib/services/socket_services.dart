@@ -1,10 +1,13 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'onesignal_service.dart';
 import 'package:get_storage/get_storage.dart';
+import 'group_services/group_service.dart';
 
 class SocketService extends GetxService {
   io.Socket? _socket;
@@ -12,6 +15,13 @@ class SocketService extends GetxService {
   
   // OneSignal service
   final OneSignalService _oneSignalService = Get.find<OneSignalService>();
+  
+  // Group service
+  final GroupServices _groupServices = GroupServices();
+  
+  // DEBOUNCE: Çoklu bildirimleri engellemek için
+  final Map<String, DateTime> _lastNotificationTime = {};
+  static const Duration _notificationDebounce = Duration(seconds: 2);
 
   // Stream Controllers for broadcasting events
   final _privateMessageController = StreamController<dynamic>.broadcast();
@@ -83,8 +93,8 @@ class SocketService extends GetxService {
       debugPrint('✅ Socket ID: ${_socket!.id}');
       
       // Bağlantı kurulduktan sonra tüm kanallara join ol
-      Future.delayed(Duration(seconds: 1), () {
-        _joinAllChannelsAfterConnection();
+      Future.delayed(Duration(seconds: 1), () async {
+        await _joinAllChannelsAfterConnection();
       });
     });
     
@@ -305,8 +315,10 @@ class SocketService extends GetxService {
       debugPrint('👥 Group message notification geldi (SocketService): $data');
       _groupMessageController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group', data);
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     // 21.6. Group message (alternatif event isimleri)
@@ -314,104 +326,162 @@ class SocketService extends GetxService {
       debugPrint('👥 Group message event geldi (SocketService): $data');
       _groupMessageController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group', data);
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('group_conversation:new_message', (data) {
       debugPrint('👥 Group conversation new message geldi (SocketService): $data');
       _groupMessageController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group', data);
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('conversation:group_message', (data) {
       debugPrint('👥 Conversation group message geldi (SocketService): $data');
       _groupMessageController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group', data);
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     // 21.7. Ek grup mesaj event'leri (backend'de farklı isimler kullanılıyor olabilir)
     _socket!.on('group:new_message', (data) {
       debugPrint('👥 Group new message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('group_chat:message', (data) {
       debugPrint('👥 Group chat message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('group_chat:new_message', (data) {
       debugPrint('👥 Group chat new message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('chat:group_message', (data) {
       debugPrint('👥 Chat group message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('message:group', (data) {
       debugPrint('👥 Message group geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('new:group_message', (data) {
       debugPrint('👥 New group message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('group:chat_message', (data) {
       debugPrint('👥 Group chat message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('user:group_chat', (data) {
       debugPrint('👥 User group chat geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('user:group_chat_message', (data) {
       debugPrint('👥 User group chat message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     // 21.8. User kanalında grup mesajları için ek olası event'ler
     _socket!.on('user:new_group_message', (data) {
       debugPrint('👥 User new group message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('user:chat_message', (data) {
       debugPrint('👥 User chat message geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('user:message_group', (data) {
       debugPrint('👥 User message group geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('user:group_message_new', (data) {
-      debugPrint('�� User group message new geldi (SocketService): $data');
+      debugPrint('👥 User group message new geldi (SocketService): $data');
       _groupMessageController.add(data);
-      _sendOneSignalNotification('group', data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('user:new_message', (data) {
@@ -852,8 +922,8 @@ class SocketService extends GetxService {
     }
   }
 
-  /// Bağlantı kurulduktan sonra tüm kanallara join ol
-  void _joinAllChannelsAfterConnection() {
+  // Bağlantı kurulduktan sonra tüm kanallara join ol
+  Future<void> _joinAllChannelsAfterConnection() async {
     try {
       // Token'dan user ID'yi çıkar
       final token = GetStorage().read('token');
@@ -865,9 +935,44 @@ class SocketService extends GetxService {
         _socket!.emit('subscribe', {'channel': 'user'});
         
         debugPrint('✅ Bağlantı sonrası user kanalına join istekleri gönderildi');
+        
+        // Katıldığımız gruplara join ol
+        await _joinUserGroups();
       }
     } catch (e) {
       debugPrint('❌ Bağlantı sonrası user kanalına join olma hatası: $e');
+    }
+  }
+
+  // Kullanıcının katıldığı gruplara join ol
+  Future<void> _joinUserGroups() async {
+    try {
+      debugPrint('👥 Kullanıcının katıldığı gruplar alınıyor...');
+      
+      // Kullanıcının katıldığı grupları al
+      final userGroups = await _groupServices.getUserGroups();
+      
+      if (userGroups != null && userGroups.isNotEmpty) {
+        debugPrint('👥 ${userGroups.length} adet gruba join olunuyor...');
+        
+        for (final group in userGroups) {
+          final groupId = group.id?.toString();
+          if (groupId != null) {
+            debugPrint('👥 Gruba join olunuyor: ${group.name} (ID: $groupId)');
+            
+            // Gruba join ol
+            _socket!.emit('group:join', {'group_id': groupId});
+            
+            debugPrint('✅ Gruba join isteği gönderildi: ${group.name}');
+          }
+        }
+        
+        debugPrint('✅ Tüm gruplara join istekleri gönderildi');
+      } else {
+        debugPrint('ℹ️ Kullanıcının katıldığı grup bulunamadı');
+      }
+    } catch (e) {
+      debugPrint('❌ Gruplara join olma hatası: $e');
     }
   }
 
@@ -890,7 +995,17 @@ class SocketService extends GetxService {
           break;
         case 'group':
           title = 'Grup Mesajı';
-          message = data['message'] ?? 'Grup sohbetinde yeni mesaj';
+          // Group mesaj data yapısı: {message: {message: "text", user: {name: "..."}}}
+          if (data is Map<String, dynamic> && data.containsKey('message')) {
+            final messageData = data['message'] as Map<String, dynamic>?;
+            final userData = messageData?['user'] as Map<String, dynamic>?;
+            final senderName = userData?['name'] ?? 'Bilinmeyen';
+            final messageText = messageData?['message'] ?? 'Grup sohbetinde yeni mesaj';
+            message = '$senderName: $messageText';
+          } else {
+            message = data['message'] ?? 'Grup sohbetinde yeni mesaj';
+          }
+          debugPrint('📱 Group mesaj bildirimi hazırlandı: title=$title, message=$message');
           break;
         case 'notification':
           title = 'Yeni Bildirim';
@@ -918,7 +1033,17 @@ class SocketService extends GetxService {
           break;
         case 'group':
           title = 'Grup Bildirimi';
-          message = data['message'] ?? 'Grup aktivitesi';
+          // Group mesaj data yapısı: {message: {message: "text", user: {name: "..."}}}
+          if (data is Map<String, dynamic> && data.containsKey('message')) {
+            final messageData = data['message'] as Map<String, dynamic>?;
+            final userData = messageData?['user'] as Map<String, dynamic>?;
+            final senderName = userData?['name'] ?? 'Bilinmeyen';
+            final messageText = messageData?['message'] ?? 'Grup aktivitesi';
+            message = '$senderName: $messageText';
+          } else {
+            message = data['message'] ?? 'Grup aktivitesi';
+          }
+          debugPrint('📱 Group bildirim hazırlandı: title=$title, message=$message');
           break;
         case 'event':
           title = 'Etkinlik Bildirimi';
@@ -975,6 +1100,80 @@ class SocketService extends GetxService {
       debugPrint('✅ Özel mesaj bildirimi gönderildi');
     } catch (e) {
       debugPrint('❌ Özel mesaj bildirimi gönderilemedi: $e');
+    }
+  }
+
+  // Özel grup mesaj bildirimi gönder (grup profil resmi, grup adı ve gönderen bilgisi ile)
+  void _sendCustomGroupMessageNotification(dynamic data) async {
+    try {
+      debugPrint('👥 Özel grup mesaj bildirimi hazırlanıyor...');
+      
+      // Group mesaj data yapısı: {message: {message: "text", user: {name: "...", avatar_url: "..."}}}
+      final messageData = data['message'] as Map<String, dynamic>?;
+      if (messageData == null) {
+        debugPrint('❌ Group message data is null');
+        return;
+      }
+      
+      final userData = messageData['user'] as Map<String, dynamic>?;
+      final messageText = messageData['message'] ?? '';
+      final senderName = userData?['name'] ?? 'Bilinmeyen';
+      final senderUserId = messageData['user_id']?.toString() ?? '';
+      final groupId = messageData['group_id']?.toString() ?? '';
+      
+      // Kendi mesajımız için bildirim gönderme
+      final currentUserId = GetStorage().read('user_id')?.toString() ?? '';
+      if (senderUserId == currentUserId) {
+        debugPrint('🚫 Kendi mesajımız için bildirim gönderilmiyor. Sender: $senderUserId, Current: $currentUserId');
+        return;
+      }
+      
+      debugPrint('👥 Group mesaj detayları: sender=$senderName, message=$messageText, groupId=$groupId, senderUserId=$senderUserId');
+      
+      // DEBOUNCE: Aynı mesaj için çoklu bildirim engelle
+      final notificationKey = 'group_${groupId}_${messageData['id']}';
+      final now = DateTime.now();
+      final lastNotification = _lastNotificationTime[notificationKey];
+      
+      if (lastNotification != null && 
+          now.difference(lastNotification) < _notificationDebounce) {
+        debugPrint('🚫 Group mesaj bildirimi debounced: $notificationKey');
+        return;
+      }
+      
+      _lastNotificationTime[notificationKey] = now;
+      
+      // Grup bilgilerini al
+      String groupName = 'Grup';
+      String groupAvatar = '';
+      
+      try {
+        final groupDetail = await _groupServices.fetchGroupDetail(groupId);
+        if (groupDetail != null) {
+          groupName = groupDetail.name ?? 'Grup';
+          groupAvatar = groupDetail.avatarUrl ?? '';
+          debugPrint('👥 Grup bilgileri alındı: name=$groupName, avatar=$groupAvatar');
+        }
+      } catch (e) {
+        debugPrint('⚠️ Grup bilgileri alınamadı: $e');
+      }
+      
+      // Bildirim içeriğini hazırla: "Gönderen Adı: Mesaj"
+      final notificationMessage = '$senderName: $messageText';
+      
+      // Özel grup bildirimi gönder
+      _oneSignalService.sendCustomMessageNotification(
+        senderName: groupName, // Grup adı
+        message: notificationMessage, // "Gönderen: Mesaj" formatı
+        senderAvatar: groupAvatar, // Grup profil resmi
+        conversationId: groupId, // Group ID'yi conversation ID olarak kullan
+        data: data,
+      );
+      
+      debugPrint('✅ Özel grup mesaj bildirimi gönderildi');
+      debugPrint('📱 Bildirim detayları: title=$groupName, message=$notificationMessage, avatar=$groupAvatar');
+    } catch (e) {
+      debugPrint('❌ Özel grup mesaj bildirimi gönderilemedi: $e');
     }
   }
 

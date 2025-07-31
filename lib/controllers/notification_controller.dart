@@ -24,10 +24,10 @@ class NotificationController extends GetxController {
     
     unreadCount.value = unreadNotifications.length;
     
-    debugPrint('📊 === BADGE SAYISI HESAPLAMA ===');
-    debugPrint('📊 Toplam bildirim sayısı: ${notifications.length}');
-    debugPrint('📊 Okunmuş bildirim sayısı: ${readNotifications.length}');
-    debugPrint('📊 Okunmamış bildirim sayısı: ${unreadCount.value}');
+    //debugPrint('📊 === BADGE SAYISI HESAPLAMA ===');
+    //debugPrint('📊 Toplam bildirim sayısı: ${notifications.length}');
+    //debugPrint('📊 Okunmuş bildirim sayısı: ${readNotifications.length}');
+    //debugPrint('📊 Okunmamış bildirim sayısı: ${unreadCount.value}');
     
     if (unreadNotifications.isNotEmpty) {
       debugPrint('📊 Okunmamış bildirimler:');
