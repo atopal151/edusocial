@@ -110,11 +110,7 @@ class GetTranslations extends Translations {
           }
           result[languageCode]![fullKey] = value.toString();
         } catch (e) {
-          // LanguageService bulunamadıysa varsayılan olarak 'en' kullan
-          if (!result.containsKey('en')) {
-            result['en'] = {};
-          }
-          result['en']![fullKey] = value.toString();
+          print('Çeviri hatası: $e');
         }
       }
     });

@@ -46,15 +46,15 @@ class NotificationModel {
     final answer = fullData['answer'] ?? {};
 
     // Debug için API yanıtını logla
-    debugPrint("🔍 === NOTIFICATION DEBUG ===");
-    debugPrint("🔍 Notification type: ${json['type']}");
-    debugPrint("🔍 Full notification: ${json.toString()}");
-    debugPrint("🔍 User data: ${user.toString()}");
-    debugPrint("🔍 Answer data: ${answer.toString()}");
-    debugPrint("🔍 is_following: ${user['is_following']} (type: ${user['is_following'].runtimeType})");
-    debugPrint("🔍 is_following_pending: ${user['is_following_pending']} (type: ${user['is_following_pending'].runtimeType})");
-    debugPrint("🔍 is_self: ${user['is_self']}");
-    debugPrint("🔍 answer.status: ${answer['status']}");
+    //debugPrint("🔍 === NOTIFICATION DEBUG ===");
+    //debugPrint("🔍 Notification type: ${json['type']}");
+    //debugPrint("🔍 Full notification: ${json.toString()}");
+    //debugPrint("🔍 User data: ${user.toString()}");
+    //debugPrint("🔍 Answer data: ${answer.toString()}");
+    //debugPrint("🔍 is_following: ${user['is_following']} (type: ${user['is_following'].runtimeType})");
+    //debugPrint("🔍 is_following_pending: ${user['is_following_pending']} (type: ${user['is_following_pending'].runtimeType})");
+    //debugPrint("🔍 is_self: ${user['is_self']}");
+    //debugPrint("🔍 answer.status: ${answer['status']}");
 
     // Kullanıcı adını belirle
     String userName = 'Kullanıcı';
@@ -121,10 +121,10 @@ class NotificationModel {
       bool userIsFollowing = user['is_following'] ?? false;
       bool userIsFollowingPending = user['is_following_pending'] ?? false;
       
-      debugPrint("🔍 [FOLLOW NOTIFICATION] API Data:");
-      debugPrint("🔍   - Type: ${json['type']}");
-      debugPrint("🔍   - User is_following: $userIsFollowing");
-      debugPrint("🔍   - User is_following_pending: $userIsFollowingPending");
+      //debugPrint("🔍 [FOLLOW NOTIFICATION] API Data:");
+      //debugPrint("🔍   - Type: ${json['type']}");
+      //debugPrint("🔍   - User is_following: $userIsFollowing");
+      //debugPrint("🔍   - User is_following_pending: $userIsFollowingPending");
       
       // Bildirim tipine göre durumu belirle
       if (json['type'] == 'user.folow.request.accepted' || 
@@ -134,7 +134,7 @@ class NotificationModel {
         isFollowingPending = false;
         isAccepted = true;
         isRejected = false;
-        debugPrint("🔍   → RESULT: Takip isteği onaylandı");
+        //debugPrint("🔍   → RESULT: Takip isteği onaylandı");
       } else if (json['type'] == 'user.folow.start' || 
                  json['type'] == 'follow-start') {
         // Direkt takip başladı bildirimi (açık profil)
@@ -142,7 +142,7 @@ class NotificationModel {
         isFollowingPending = false;
         isAccepted = true;
         isRejected = false;
-        debugPrint("🔍   → RESULT: Direkt takip başladı");
+        //debugPrint("🔍   → RESULT: Direkt takip başladı");
       } else {
         // Takip isteği bildirimi (pending)
         if (userIsFollowing) {
@@ -151,33 +151,33 @@ class NotificationModel {
           isFollowingPending = false;
           isAccepted = true;
           isRejected = false;
-          debugPrint("🔍   → RESULT: Zaten takip ediyor");
+          //debugPrint("🔍   → RESULT: Zaten takip ediyor");
         } else if (userIsFollowingPending) {
           // Takip isteği beklemede
           isFollowing = false;
           isFollowingPending = true;
           isAccepted = false;
           isRejected = false;
-          debugPrint("🔍   → RESULT: Takip isteği beklemede");
+          //debugPrint("🔍   → RESULT: Takip isteği beklemede");
         } else {
           // Yeni takip isteği
           isFollowing = false;
           isFollowingPending = true;
           isAccepted = false;
           isRejected = false;
-          debugPrint("🔍   → RESULT: Yeni takip isteği");
+          //debugPrint("🔍   → RESULT: Yeni takip isteği");
         }
       }
     
-      debugPrint("🔍 [FOLLOW NOTIFICATION] Final State:");
-      debugPrint("🔍   - isFollowing: $isFollowing");
-      debugPrint("🔍   - isFollowingPending: $isFollowingPending");
-      debugPrint("🔍   - isAccepted: $isAccepted");
-      debugPrint("🔍   - isRejected: $isRejected");
+      //debugPrint("🔍 [FOLLOW NOTIFICATION] Final State:");
+      //debugPrint("🔍   - isFollowing: $isFollowing");
+      //debugPrint("🔍   - isFollowingPending: $isFollowingPending");
+      //debugPrint("🔍   - isAccepted: $isAccepted");
+      //debugPrint("🔍   - isRejected: $isRejected");
     } else if (json['type'] == 'group-join-request' || json['type'] == 'group-join') {
       // Grup katılma istekleri için answer.status'a göre belirle
       String answerStatus = answer['status']?.toString().toLowerCase() ?? '';
-      debugPrint("🔍 Group join request answer status: $answerStatus");
+      //debugPrint("🔍 Group join request answer status: $answerStatus");
       
       if (answerStatus == 'approved') {
         isAccepted = true;
@@ -198,7 +198,7 @@ class NotificationModel {
         // group-join tipinde answer.status yoksa, grup durumuna göre belirle
         if (json['type'] == 'group-join') {
           String groupStatus = group['status']?.toString().toLowerCase() ?? '';
-          debugPrint("🔍 Group status: $groupStatus");
+          //debugPrint("🔍 Group status: $groupStatus");
           
           if (groupStatus == 'approved') {
             isAccepted = true;
@@ -235,12 +235,12 @@ class NotificationModel {
     final rawIsRead = json['is_read'];
     final isReadValue = rawIsRead == true || rawIsRead == 1;
     
-    debugPrint('🔍 === ISREAD DEBUG ===');
-    debugPrint('🔍 Raw is_read value: $rawIsRead (type: ${rawIsRead.runtimeType})');
-    debugPrint('🔍 Parsed isRead: $isReadValue');
-    debugPrint('🔍 Notification ID: ${json['id']}');
-    debugPrint('🔍 Notification Type: ${json['type']}');
-    debugPrint('🔍 ====================');
+    //  debugPrint('🔍 === ISREAD DEBUG ===');
+    //debugPrint('🔍 Raw is_read value: $rawIsRead (type: ${rawIsRead.runtimeType})');
+    //debugPrint('🔍 Parsed isRead: $isReadValue');
+    //debugPrint('🔍 Notification ID: ${json['id']}');
+    //debugPrint('🔍 Notification Type: ${json['type']}');
+    //debugPrint('🔍 ====================');
 
     return NotificationModel(
       id: json['id'].toString(),

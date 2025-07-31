@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
 import '../services/socket_services.dart';
+import '../services/onesignal_service.dart';
 import 'dart:async';
 
 class NotificationController extends GetxController {
@@ -13,6 +14,7 @@ class NotificationController extends GetxController {
 
   // Socket servisi için
   late SocketService _socketService;
+  late OneSignalService _oneSignalService;
   late StreamSubscription _notificationSubscription;
   late StreamSubscription _commentNotificationSubscription;
   late StreamSubscription _userNotificationSubscription;
@@ -45,6 +47,7 @@ class NotificationController extends GetxController {
   void onInit() {
     super.onInit();
     _socketService = Get.find<SocketService>();
+    _oneSignalService = Get.find<OneSignalService>();
     _setupSocketListener();
   }
 
@@ -77,6 +80,9 @@ class NotificationController extends GetxController {
       // API'den verileri yeniden çek
       isLoading.value = true;
       fetchNotifications();
+      
+      // OneSignal bildirimi gönder
+      _sendOneSignalNotificationFromData(data);
     });
   }
 
@@ -186,20 +192,20 @@ class NotificationController extends GetxController {
       final fetched = await NotificationService.fetchMobileNotifications();
       
       // API'den gelen isRead değerlerini kontrol et
-      debugPrint('📊 === API\'DEN GELEN BİLDİRİMLER ===');
+      //debugPrint('📊 === API\'DEN GELEN BİLDİRİMLER ===');
       for (var notif in fetched) {
-        debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
+        //debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
       }
-      debugPrint('📊 ================================');
+      //debugPrint('📊 ================================');
       
       // Okunmamış bildirimleri ayrıca listele
       final unreadNotifications = fetched.where((n) => !n.isRead).toList();
       if (unreadNotifications.isNotEmpty) {
-        debugPrint('📊 === OKUNMAMIŞ BİLDİRİMLER (API) ===');
+        //debugPrint('📊 === OKUNMAMIŞ BİLDİRİMLER (API) ===');
         for (var notif in unreadNotifications) {
-          debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
+          //debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
         }
-        debugPrint('📊 ====================================');
+        //debugPrint('📊 ====================================');
       }
       
       // Yeni verileri set et ve UI'ı güncelle
@@ -208,7 +214,7 @@ class NotificationController extends GetxController {
       // Okunmamış sayısını güncelle
       _updateUnreadCount();
       
-      debugPrint('✅ Notification listesi güncellendi: ${fetched.length} bildirim');
+      //  debugPrint('✅ Notification listesi güncellendi: ${fetched.length} bildirim');
     } catch (e) {
       debugPrint("❗ Bildirimleri çekerken hata: $e");
     }
@@ -429,6 +435,65 @@ class NotificationController extends GetxController {
       fetchNotifications();
     } catch (e) {
       debugPrint("❗ Etkinlik oluşturma isteği onaylanamadı: $e");
+    }
+  }
+
+  /// OneSignal bildirimi gönder
+  void _sendOneSignalNotificationFromData(dynamic data) async {
+    try {
+      debugPrint('📱 NotificationController: OneSignal bildirimi gönderiliyor...');
+      debugPrint('📱 Data: $data');
+      
+      if (data is Map<String, dynamic> && data.containsKey('notification_data')) {
+        final notificationData = data['notification_data'] as Map<String, dynamic>?;
+        final notificationFullData = notificationData?['notification_full_data'] as Map<String, dynamic>?;
+        final notificationType = notificationData?['type']?.toString() ?? '';
+        
+        if (notificationFullData != null) {
+          final userData = notificationFullData['user'] as Map<String, dynamic>?;
+          final postData = notificationFullData['post'] as Map<String, dynamic>?;
+          
+          final userName = userData?['name'] ?? 'Bilinmeyen';
+          final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
+          
+          String title = '';
+          String message = '';
+          
+          // Bildirim tipine göre mesaj oluştur
+          switch (notificationType) {
+            case 'post-like':
+              final postContent = postData?['content'] ?? 'Post\'unuzu beğendi';
+              message = '$userName: $postContent';
+              title = 'Yeni Beğeni';
+              break;
+            case 'post-comment':
+              final postContent = postData?['content'] ?? 'Post\'unuza yorum geldi';
+              message = '$userName: $postContent';
+              title = 'Yeni Yorum';
+              break;
+            case 'follow-request':
+              message = '$userName sizi takip etmek istiyor';
+              title = 'Takip İsteği';
+              break;
+            default:
+              message = '$userName size bildirim gönderdi';
+              title = 'Yeni Bildirim';
+          }
+          
+          // OneSignal bildirimi gönder
+          _oneSignalService.sendCustomMessageNotification(
+            senderName: title,
+            message: message,
+            senderAvatar: userAvatar,
+            conversationId: 'notification',
+            data: data,
+          );
+          
+          debugPrint('✅ NotificationController: OneSignal bildirimi gönderildi');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ NotificationController: OneSignal bildirimi gönderilemedi: $e');
     }
   }
 }

@@ -486,13 +486,11 @@ class GroupServices {
   Future<List<GroupModel>?> getUserGroups() async {
     final box = GetStorage();
     final token = box.read('token');
-
     try {
       debugPrint('👥 Kullanıcının katıldığı gruplar alınıyor...');
-      
       final response = await _makeRequestWithRetry(
         () => http.get(
-          Uri.parse('${AppConstants.baseUrl}/user/groups'),
+          Uri.parse('${AppConstants.baseUrl}/timeline/groups'),
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
@@ -500,14 +498,12 @@ class GroupServices {
         ),
         operation: 'Get User Groups',
       );
-
       debugPrint('👥 Get User Groups Response: ${response.statusCode}');
       debugPrint('👥 Get User Groups Body: ${response.body}');
-
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'] as List<dynamic>;
         final List<GroupModel> groups = data.map((json) => GroupModel.fromJson(json)).toList();
-        
         debugPrint('✅ Kullanıcının ${groups.length} adet grubu bulundu');
         return groups;
       } else {

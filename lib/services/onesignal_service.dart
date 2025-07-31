@@ -549,10 +549,10 @@ class OneSignalService extends GetxService {
       // Yeni bildirimi kaydet
       _activeNotifications[notificationId] = DateTime.now();
       
-      // Özel bildirim widget'ı oluştur
+      // Local notification gönder (snackbar ile)
       Get.snackbar(
-        senderName, // Başlık olarak kullanıcı adı
-        message, // Mesaj içeriği
+        senderName,
+        message,
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.white,
         colorText: Colors.black87,
@@ -560,71 +560,25 @@ class OneSignalService extends GetxService {
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
         snackStyle: SnackStyle.FLOATING,
-        titleText: Text(
-          senderName,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        messageText: Text(
-          message,
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w400,
-            color: Colors.black54,
-          ),
-        ),
-        icon: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Container(
-            width: 35,
-            height: 35,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade200, width: 1.5),
-              color: Colors.grey.shade100,
-            ),
-            child: ClipOval(
-              child: senderAvatar.isNotEmpty && !senderAvatar.endsWith('/0')
-                  ? Image.network(
-                      senderAvatar.startsWith('http') 
-                          ? senderAvatar 
-                          : 'https://stageapi.edusocial.pl/storage/$senderAvatar',
-                      fit: BoxFit.cover,
-                      width: 35,
-                      height: 35,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: const Icon(Icons.person, color: Colors.grey, size: 16),
-                        );
-                      },
-                    )
-                  : Container(
-                      color: Colors.grey.shade300,
-                      child: const Icon(Icons.person, color: Colors.grey, size: 16),
-                    ),
-            ),
-          ),
-        ),
-        snackbarStatus: (status) {
-          print('💬 Bildirim durumu: $status');
-        },
-        // Kapatma butonu
-        mainButton: TextButton(
-          onPressed: () {
-            // Bildirimi kapat
-            Get.closeCurrentSnackbar();
-          },
-          child: const Icon(Icons.close, color: Colors.grey, size: 20),
-        ),
+        icon: senderAvatar.isNotEmpty
+            ? CircleAvatar(
+                backgroundImage: NetworkImage(
+                  senderAvatar.startsWith('http') 
+                      ? senderAvatar 
+                      : 'https://stageapi.edusocial.pl/storage/$senderAvatar',
+                ),
+                radius: 16,
+              )
+            : const CircleAvatar(
+                child: Icon(Icons.person, size: 16),
+                radius: 16,
+              ),
       );
       
-      print('✅ Özel mesaj bildirimi gösterildi: $senderName - $message');
+      print('✅ Local notification gönderildi');
+      print('📱 Bildirim detayları: title=$senderName, message=$message, avatar=$senderAvatar');
     } catch (e) {
-      print('❌ Özel mesaj bildirimi gösterilemedi: $e');
+      print('❌ OneSignal local notification gönderilemedi: $e');
     }
   }
 
@@ -640,6 +594,9 @@ class OneSignalService extends GetxService {
         backgroundColor: const Color(0xFF4CAF50),
         colorText: Colors.white,
         duration: const Duration(seconds: 5),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        snackStyle: SnackStyle.FLOATING,
         icon: const Icon(Icons.notifications, color: Colors.white),
       );
       

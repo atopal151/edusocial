@@ -58,17 +58,40 @@ class _NotificationScreenState extends State<NotificationScreen> {
       debugPrint('👤 NotificationScreen: User notification geldi: $data');
       debugPrint('👤 NotificationScreen: Data type: ${data.runtimeType}');
       
+      // Yeni bildirim geldiğinde kayan bildirim göster
+      _handleNewNotification(data);
+      
       // Yeni bildirim geldiğinde API'den verileri yeniden çek
       // Loading state'i göstermek için önce loading'i true yap
       controller.isLoading.value = true;
       controller.fetchNotifications();
       
       // Badge sayısı otomatik güncellenir
-      // Snackbar kaldırıldı - sadece badge güncellenir
     });
     
     debugPrint('✅ NotificationScreen: Socket dinleyicileri aktif');
     debugPrint('✅ NotificationScreen: User notification stream aktif: ${!_userNotificationSubscription.isPaused}');
+  }
+
+  /// Yeni bildirimi işle ve kayan bildirim göster
+  void _handleNewNotification(dynamic data) {
+    try {
+      debugPrint('📱 =======================================');
+      debugPrint('📱 YENİ BİLDİRİM İŞLENİYOR!');
+      debugPrint('📱 Data: $data');
+      debugPrint('📱 Data Type: ${data.runtimeType}');
+      debugPrint('📱 Data Keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      // Yeni bildirim geldiğinde API'den verileri yeniden çek
+      // Loading state'i göstermek için önce loading'i true yap
+      controller.isLoading.value = true;
+      controller.fetchNotifications();
+      
+      // Badge sayısı otomatik güncellenir
+      debugPrint('📱 =======================================');
+    } catch (e) {
+      debugPrint('❌ Bildirim işleme hatası: $e');
+    }
   }
 
 
@@ -246,32 +269,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           displacement: 40.0,
           child: Column(
             children: [
-              // Socket bağlantı durumu göstergesi
-            /*  Obx(() => Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: _socketService.isConnected.value ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _socketService.isConnected.value ? Icons.wifi : Icons.wifi_off,
-                      color: _socketService.isConnected.value ? Colors.green : Colors.red,
-                      size: 16,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      _socketService.isConnected.value ? 'Socket Bağlı - Gerçek Zamanlı Güncelleme Aktif' : 'Socket Bağlı Değil - Gerçek Zamanlı Güncelleme Devre Dışı',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _socketService.isConnected.value ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              )),*/
               // Bildirim listesi
               Expanded(
                 child: ListView.builder(
@@ -371,14 +368,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget? _buildTrailingButton(NotificationModel notif) {
     final LanguageService languageService = Get.find<LanguageService>();
     
-    debugPrint("🔍 ===============================");
-    debugPrint("🔍 Building button for notification:");
-    debugPrint("🔍   - type: ${notif.type}");
-    debugPrint("🔍   - message: '${notif.message}'");
-    debugPrint("🔍   - isFollowing: ${notif.isFollowing.toString()}");
-    debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending.toString()}");
-    debugPrint("🔍   - isAccepted: ${notif.isAccepted.toString()}");
-    debugPrint("🔍   - isRejected: ${notif.isRejected.toString()}");
+    //debugPrint("🔍 ===============================");
+    //debugPrint("🔍 Building button for notification:");
+    //debugPrint("🔍   - type: ${notif.type}");
+    //debugPrint("🔍   - message: '${notif.message}'");
+    //debugPrint("🔍   - isFollowing: ${notif.isFollowing.toString()}");
+    //debugPrint("🔍   - isFollowingPending: ${notif.isFollowingPending.toString()}");
+    //debugPrint("🔍   - isAccepted: ${notif.isAccepted.toString()}");
+    //debugPrint("🔍   - isRejected: ${notif.isRejected.toString()}");
 
     // System bildirimleri (buton gösterilmez)
     List<String> systemMessages = [
@@ -394,43 +391,43 @@ class _NotificationScreenState extends State<NotificationScreen> {
     ];
     
     if (systemMessages.contains(notif.message)) {
-      debugPrint("🔍   - SONUÇ: System bildirimi '${notif.message}' - buton gösterilmiyor");
-      debugPrint("🔍 ===============================");
+      //debugPrint("🔍   - SONUÇ: System bildirimi '${notif.message}' - buton gösterilmiyor");
+      //debugPrint("🔍 ===============================");
       return null;
     }
     
         // Takip başladı bildirimi (sadece bilgi amaçlı)
     if (notif.type == 'follow-request') {
-      debugPrint("🔍 Takip başladı bildirimi (bilgi amaçlı):");
-      debugPrint("🔍   - type: ${notif.type}");
-      debugPrint("🔍   - message: ${notif.message}");
-      debugPrint("🔍   - SONUÇ: Takip başlamış - buton gösterilmiyor");
-      debugPrint("🔍 ===============================");
+      //debugPrint("🔍 Takip başladı bildirimi (bilgi amaçlı):");
+      //debugPrint("🔍   - type: ${notif.type}");
+      //debugPrint("🔍   - message: ${notif.message}");
+      //debugPrint("🔍   - SONUÇ: Takip başlamış - buton gösterilmiyor");
+      //debugPrint("🔍 ===============================");
       return null; // Takip başlamış, buton gösterme
     }
 
     // Takip istekleri için butonlar (sadece follow-join-request)
     if (notif.type == 'follow-join-request') {
-      debugPrint("🔍   - Takip isteği kontrolü yapılıyor...");
+      //debugPrint("🔍   - Takip isteği kontrolü yapılıyor...");
 
       // Onaylanmış takip istekleri - buton gösterme
       if (notif.isAccepted && notif.isFollowing) {
-        debugPrint("🔍   - SONUÇ: Zaten onaylanmış ve takip ediyor - buton gösterilmiyor");
-        debugPrint("🔍 ===============================");
+        //debugPrint("🔍   - SONUÇ: Zaten onaylanmış ve takip ediyor - buton gösterilmiyor");
+        //debugPrint("🔍 ===============================");
         return null;
       }
 
       // Reddedilmiş takip istekleri - buton gösterme
       if (notif.isRejected) {
-        debugPrint("🔍   - SONUÇ: Zaten reddedilmiş - buton gösterilmiyor");
-        debugPrint("🔍 ===============================");
+        //debugPrint("🔍   - SONUÇ: Zaten reddedilmiş - buton gösterilmiyor");
+        //debugPrint("🔍 ===============================");
         return null;
       }
 
       // Sadece bekleyen takip istekleri için buton göster (gizli profil)
       if (!notif.isAccepted && !notif.isRejected) {
-        debugPrint("🔍   - SONUÇ: Takip İsteği Beklemede (Onayla/Reddet butonları gösteriliyor)");
-        debugPrint("🔍 ===============================");
+        //debugPrint("🔍   - SONUÇ: Takip İsteği Beklemede (Onayla/Reddet butonları gösteriliyor)");
+        //debugPrint("🔍 ===============================");
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -464,54 +461,54 @@ class _NotificationScreenState extends State<NotificationScreen> {
       }
 
       // Varsayılan durum
-      debugPrint("🔍   - SONUÇ: Beklenmeyen takip isteği durumu - buton gösterilmiyor");
-      debugPrint("🔍 ===============================");
+      //    debugPrint("🔍   - SONUÇ: Beklenmeyen takip isteği durumu - buton gösterilmiyor");
+      //debugPrint("🔍 ===============================");
       return null;
     }
 
         // Grup katılım bildirimi (sadece bilgi amaçlı)
     if (notif.type == 'group-join') {
-      debugPrint("🔍 Grup katılım bildirimi (bilgi amaçlı):");
-      debugPrint("🔍   - type: ${notif.type}");
-      debugPrint("🔍   - message: ${notif.message}");
-      debugPrint("🔍   - SONUÇ: Grup katılımı gerçekleşmiş - buton gösterilmiyor");
-      debugPrint("🔍 ===============================");
+      //debugPrint("🔍 Grup katılım bildirimi (bilgi amaçlı):");
+      //debugPrint("🔍   - type: ${notif.type}");
+      //debugPrint("🔍   - message: ${notif.message}");
+      //debugPrint("🔍   - SONUÇ: Grup katılımı gerçekleşmiş - buton gösterilmiyor");
+      //debugPrint("🔍 ===============================");
       return null; // Katılım gerçekleşmiş, buton gösterme
     }
 
     // Grup katılma istekleri için butonlar (sadece group-join-request)
     if (notif.type == 'group-join-request') {
-      debugPrint("🔍 Building group join request button for notification:");
-      debugPrint("🔍   - type: ${notif.type}");
-      debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
-      debugPrint("🔍   - isRejected: ${notif.isRejected}");
-      debugPrint("🔍   - groupId: ${notif.groupId}");
-      debugPrint("🔍   - senderUserId: ${notif.senderUserId}");
-      debugPrint("🔍   - message: ${notif.message}");
+      //debugPrint("🔍 Building group join request button for notification:");
+      //debugPrint("🔍   - type: ${notif.type}");
+      //debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
+      //debugPrint("🔍   - isRejected: ${notif.isRejected}");
+      //debugPrint("🔍   - groupId: ${notif.groupId}");
+      //debugPrint("🔍   - senderUserId: ${notif.senderUserId}");
+      //debugPrint("🔍   - message: ${notif.message}");
 
       // groupId null ise buton gösterme
       if (notif.groupId == null) {
-        debugPrint("🔍   - SONUÇ: groupId null - buton gösterilmiyor");
-        debugPrint("🔍 ===============================");
+        //debugPrint("🔍   - SONUÇ: groupId null - buton gösterilmiyor");
+        //debugPrint("🔍 ===============================");
         return null;
       }
 
       // Eğer istek zaten onaylanmışsa veya reddedilmişse - buton gösterme
       if (notif.isAccepted) {
-        debugPrint("🔍   - SONUÇ: Grup isteği zaten onaylandı - buton gösterilmiyor");
-        debugPrint("🔍 ===============================");
+        //debugPrint("🔍   - SONUÇ: Grup isteği zaten onaylandı - buton gösterilmiyor");
+        //debugPrint("🔍 ===============================");
         return null;
       }
 
       if (notif.isRejected) {
-        debugPrint("🔍   - SONUÇ: Grup isteği zaten reddedildi - buton gösterilmiyor");
-        debugPrint("🔍 ===============================");
+        //debugPrint("🔍   - SONUÇ: Grup isteği zaten reddedildi - buton gösterilmiyor");
+        //debugPrint("🔍 ===============================");
         return null;
       }
 
       // Sadece bekleyen istekler için buton göster
-      debugPrint("🔍   - SONUÇ: Grup isteği beklemede - Onayla/Reddet butonları gösteriliyor");
-      debugPrint("🔍 ===============================");
+      //debugPrint("🔍   - SONUÇ: Grup isteği beklemede - Onayla/Reddet butonları gösteriliyor");
+      //debugPrint("🔍 ===============================");
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -552,8 +549,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
       );
     }
 
-    debugPrint("🔍   - SONUÇ: Bilinmeyen bildirim tipi '${notif.type}' - buton gösterilmiyor");
-    debugPrint("🔍 ===============================");
+    //debugPrint("🔍   - SONUÇ: Bilinmeyen bildirim tipi '${notif.type}' - buton gösterilmiyor");
+    //debugPrint("🔍 ===============================");
     return null;
   }
 

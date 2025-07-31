@@ -45,6 +45,26 @@ class NotificationService {
         // debugPrint("📥 Total Notifications Count: ${allNotifs.length}");
         //debugPrint("📥 =================================");
 
+        // Bildirimleri created_at tarihine göre sırala (en yeni en üstte)
+        allNotifs.sort((a, b) {
+          final aCreatedAt = a['created_at'] ?? '';
+          final bCreatedAt = b['created_at'] ?? '';
+          
+          if (aCreatedAt.isEmpty && bCreatedAt.isEmpty) return 0;
+          if (aCreatedAt.isEmpty) return 1; // Boş tarih en alta
+          if (bCreatedAt.isEmpty) return -1; // Boş tarih en alta
+          
+          final aDate = DateTime.tryParse(aCreatedAt);
+          final bDate = DateTime.tryParse(bCreatedAt);
+          
+          if (aDate == null && bDate == null) return 0;
+          if (aDate == null) return 1; // Geçersiz tarih en alta
+          if (bDate == null) return -1; // Geçersiz tarih en alta
+          
+          // En yeni tarih en üstte olacak şekilde sırala
+          return bDate.compareTo(aDate);
+        });
+
         return allNotifs.map((e) => NotificationModel.fromJson(e)).toList();
       } else {
         throw Exception('Bildirimler alınamadı. Status Code: ${response.statusCode}');

@@ -160,7 +160,7 @@ class ChatController extends GetxController {
   Future<void> fetchChatList() async {
     try {
       isLoading(true);
-      debugPrint("📱 Chat listesi çekiliyor...");
+      //debugPrint("📱 Chat listesi çekiliyor...");
       
       final fetchedChats = await ChatServices.fetchChatList();
 
@@ -175,23 +175,23 @@ class ChatController extends GetxController {
       final totalUnread = filteredChats.fold(0, (sum, chat) => sum + chat.unreadCount);
       final unreadChats = filteredChats.where((chat) => chat.unreadCount > 0).toList();
       
-      debugPrint("📊 === CHAT CONTROLLER SUMMARY ===");
-      debugPrint("📊 Toplam Chat: ${filteredChats.length}");
-      debugPrint("📊 Toplam Okunmamış: $totalUnread");
-      debugPrint("📊 Okunmamış Mesajı Olan Chat: ${unreadChats.length}");
+      //debugPrint("📊 === CHAT CONTROLLER SUMMARY ===");
+      //debugPrint("📊 Toplam Chat: ${filteredChats.length}");
+      //debugPrint("📊 Toplam Okunmamış: $totalUnread");
+      //debugPrint("📊 Okunmamış Mesajı Olan Chat: ${unreadChats.length}");
       
       if (unreadChats.isNotEmpty) {
-        debugPrint("📊 Okunmamış Mesaj Detayları:");
+        //debugPrint("📊 Okunmamış Mesaj Detayları:");
         for (var chat in unreadChats) {
-          debugPrint("  - ${chat.name} (@${chat.username}): ${chat.unreadCount} mesaj");
-          debugPrint("    Son mesaj: ${chat.lastMessage?.message ?? 'No message'}");
+          //debugPrint("  - ${chat.name} (@${chat.username}): ${chat.unreadCount} mesaj");
+          //debugPrint("    Son mesaj: ${chat.lastMessage?.message ?? 'No message'}");
         }
       } else {
-        debugPrint("📊 Tüm mesajlar okunmuş");
+        //debugPrint("📊 Tüm mesajlar okunmuş");
       }
-      debugPrint("📊 ==============================");
+      //debugPrint("📊 ==============================");
 
-      debugPrint("✅ Chat listesi güncellendi. Toplam: ${chatList.length} sohbet");
+      //debugPrint("✅ Chat listesi güncellendi. Toplam: ${chatList.length} sohbet");
     } catch (e) {
       debugPrint('❌ Chat listesi çekilirken hata: $e');
     } finally {
@@ -201,9 +201,9 @@ class ChatController extends GetxController {
 
   /// 📥 Yeni birebir mesaj geldiğinde listeyi güncelle
   void handleNewPrivateMessage(dynamic data) {
-    debugPrint("📡 [ChatController] Yeni birebir mesaj payload alındı");
-    debugPrint("📡 [ChatController] Listener State: isPaused=${_privateMessageSubscription.isPaused}");
-    debugPrint("📡 [ChatController] Processing: $data");
+    //debugPrint("📡 [ChatController] Yeni birebir mesaj payload alındı");
+    //debugPrint("📡 [ChatController] Listener State: isPaused=${_privateMessageSubscription.isPaused}");
+    //debugPrint("📡 [ChatController] Processing: $data");
 
     try {
       final conversationId = data['conversation_id'] ?? 0;
@@ -213,7 +213,7 @@ class ChatController extends GetxController {
       // Socket'ten gelen is_me field'ını kontrol et (kendi mesajını unread count'a dahil etme)
       final isMyMessage = data['is_me'] == true;
       
-      debugPrint("📡 [ChatController] Mesaj detayları: conversationId=$conversationId, isMyMessage=$isMyMessage");
+      //debugPrint("📡 [ChatController] Mesaj detayları: conversationId=$conversationId, isMyMessage=$isMyMessage");
 
       final index =
           chatList.indexWhere((chat) => chat.conversationId == conversationId);
@@ -229,10 +229,10 @@ class ChatController extends GetxController {
         
         // Sadece başkasının mesajıysa unread count artır (API'den gelen değeri koru)
         if (!isMyMessage) {
-          chat.unreadCount += 1;
-          debugPrint("📬 [ChatController] Unread count artırıldı: ${chat.name} (${chat.unreadCount})");
+          chat.unreadCount += 1;    
+          //debugPrint("📬 [ChatController] Unread count artırıldı: ${chat.name} (${chat.unreadCount})");
         } else {
-          debugPrint("📤 [ChatController] Kendi mesajım, unread count artırılmadı");
+          //debugPrint("📤 [ChatController] Kendi mesajım, unread count artırılmadı");
         }
 
         // Güncellenen sohbeti listenin en başına taşı
@@ -257,7 +257,7 @@ class ChatController extends GetxController {
           ),
         );
         chatList.insert(0, newChat);
-        debugPrint("📝 [ChatController] Yeni chat oluşturuldu: ${newChat.name} (unread: ${newChat.unreadCount})");
+        //debugPrint("📝 [ChatController] Yeni chat oluşturuldu: ${newChat.name} (unread: ${newChat.unreadCount})");
       }
 
       // Filtrelenmiş listeyi de güncelle
@@ -272,7 +272,7 @@ class ChatController extends GetxController {
 
   /// 📥 Yeni grup mesajı geldiğinde listeyi güncelle
   void handleNewGroupMessage(dynamic data) {
-    debugPrint("📡 Yeni grup mesajı payload: $data");
+    //debugPrint("📡 Yeni grup mesajı payload: $data");
     
     final groupId = data['group_id'];
     final message = data['message'];
