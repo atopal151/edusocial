@@ -5,6 +5,7 @@ import '../models/notification_model.dart';
 import '../services/notification_service.dart';
 import '../services/socket_services.dart';
 import '../services/onesignal_service.dart';
+import '../services/language_service.dart';
 import 'dart:async';
 
 class NotificationController extends GetxController {
@@ -15,6 +16,7 @@ class NotificationController extends GetxController {
   // Socket servisi için
   late SocketService _socketService;
   late OneSignalService _oneSignalService;
+  late LanguageService _languageService;
   late StreamSubscription _notificationSubscription;
   late StreamSubscription _commentNotificationSubscription;
   late StreamSubscription _userNotificationSubscription;
@@ -48,6 +50,7 @@ class NotificationController extends GetxController {
     super.onInit();
     _socketService = Get.find<SocketService>();
     _oneSignalService = Get.find<OneSignalService>();
+    _languageService = Get.find<LanguageService>();
     _setupSocketListener();
   }
 
@@ -462,22 +465,22 @@ class NotificationController extends GetxController {
           // Bildirim tipine göre mesaj oluştur
           switch (notificationType) {
             case 'post-like':
-              final postContent = postData?['content'] ?? 'Post\'unuzu beğendi';
+              final postContent = postData?['content'] ?? _languageService.tr('notifications.messages.likedPost');
               message = '$userName: $postContent';
-              title = 'Yeni Beğeni';
+              title = _languageService.tr('slidingNotifications.newLike');
               break;
             case 'post-comment':
-              final postContent = postData?['content'] ?? 'Post\'unuza yorum geldi';
+              final postContent = postData?['content'] ?? _languageService.tr('notifications.messages.commentedPost');
               message = '$userName: $postContent';
-              title = 'Yeni Yorum';
+              title = _languageService.tr('slidingNotifications.newComment');
               break;
             case 'follow-request':
-              message = '$userName sizi takip etmek istiyor';
-              title = 'Takip İsteği';
+              message = '$userName ${_languageService.tr('notifications.messages.wantsToFollow')}';
+              title = _languageService.tr('slidingNotifications.followRequest');
               break;
             default:
-              message = '$userName size bildirim gönderdi';
-              title = 'Yeni Bildirim';
+              message = '$userName ${_languageService.tr('notifications.messages.sentMessage')}';
+              title = _languageService.tr('slidingNotifications.newMessage');
           }
           
           // OneSignal bildirimi gönder

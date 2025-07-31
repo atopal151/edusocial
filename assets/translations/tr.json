@@ -879,102 +879,128 @@
   },
   "notifications": {
     "title": "Bildirimler",
-    "loading": {
-      "notifications": "Bildirimler yükleniyor...",
-      "refreshing": "Bildirimler yenileniyor...",
-      "refreshed": "Bildirimler başarıyla yenilendi",
-      "accepting": "Onaylanıyor...",
-      "declining": "Reddediliyor...",
-      "following": "Takip ediliyor...",
-      "unfollowing": "Takipten çıkarılıyor..."
-    },
-    "grouping": {
-      "today": "Bugün",
-      "yesterday": "Dün",
-      "lastWeek": "Son 7 Gün",
-      "older": "Daha Önce"
-    },
+    "today": "Bugün",
+    "yesterday": "Dün",
+    "lastWeek": "Son 7 Gün",
+    "earlier": "Daha Önce",
     "timeAgo": {
       "justNow": "az önce",
-      "minutesAgo": "dk",
-      "hoursAgo": "s",
-      "daysAgo": "g",
-      "weeksAgo": "h",
-      "monthsAgo": "a",
-      "yearsAgo": "y"
+      "minutesAgo": "dakika önce",
+      "hoursAgo": "saat önce",
+      "daysAgo": "gün önce",
+      "weeksAgo": "hafta önce",
+      "monthsAgo": "ay önce",
+      "yearsAgo": "yıl önce"
     },
-    "actions": {
-      "accept": "Onayla",
-      "decline": "Reddet",
-      "accepted": "Onaylandı",
-      "rejected": "Reddedildi",
-      "follow": "Takip Et",
-      "unfollow": "Takipten Çıkar",
-      "close": "Kapat"
-    },
-    "notificationTypes": {
+    "types": {
+      "newMessage": "Yeni Mesaj",
+      "groupMessage": "Grup Mesajı",
+      "newComment": "Yeni Yorum",
+      "newLike": "Yeni Beğeni",
+      "newFollow": "Yeni Takipçi",
       "followRequest": "Takip İsteği",
-      "followJoinRequest": "Takip ve Katılma İsteği",
-      "postLike": "Gönderi Beğenisi",
-      "postComment": "Gönderi Yorumu",
       "groupJoinRequest": "Grup Katılma İsteği",
-      "groupJoin": "Grup Katılımı",
-      "createGroupEvent": "Grup Etkinliği Oluşturma",
-      "groupAccept": "Grup Onayı"
+      "eventInvitation": "Etkinlik Daveti",
+      "systemNotification": "Sistem Bildirimi"
     },
     "messages": {
-      "followRequest": "sizi takip etmek istiyor",
-      "postLiked": "gönderinizi beğendi",
-      "postCommented": "gönderinize yorum yaptı",
-      "groupJoinRequest": "grubunuza katılmak istiyor",
-      "groupJoined": "grubunuza katıldı",
-      "eventCreated": "grup etkinliği oluşturdu",
-      "groupAccepted": "grup isteğiniz onaylandı"
-    },
+      "likedPost": "postunuzu beğendi",
+      "commentedPost": "postunuza yorum yaptı",
+      "startedFollowing": "sizi takip etmeye başladı",
+      "wantsToFollow": "sizi takip etmek istiyor",
+      "wantsToJoinGroup": "grubuna katılmak istiyor",
+      "group": "grup",
+      "sentMessage": "size mesaj gönderdi",
+      "sentGroupMessage": "grubunda mesaj gönderdi",
+      "invitedToEvent": "sizi bir etkinliğe davet etti"
+    }
+  },
+  "slidingNotifications": {
+    "newMessage": "Yeni Mesaj",
+    "groupMessage": "Grup Mesajı",
+    "newComment": "Yeni Yorum",
+    "newLike": "Yeni Beğeni",
+    "newFollow": "Yeni Takipçi",
+    "followRequest": "Takip İsteği",
+    "groupJoinRequest": "Grup Katılma İsteği",
+    "eventInvitation": "Etkinlik Daveti",
+    "systemNotification": "Sistem Bildirimi",
+    "unknown": "Bilinmeyen"
+  },
+  "groupChat": {
     "errors": {
-      "notificationsLoadFailed": "Bildirimler yüklenemedi",
-      "followRequestFailed": "Takip isteği onaylanamadı",
-      "groupJoinRequestFailed": "Grup katılma isteği işlenemedi",
-      "followFailed": "Takip işlemi başarısız",
-      "unfollowFailed": "Takipten çıkarma işlemi başarısız",
-      "eventCreateRequestFailed": "Etkinlik oluşturma isteği onaylanamadı",
+      "loadFailed": "Grup sohbeti yüklenemedi",
+      "messageSendFailed": "Mesaj gönderilemedi",
+      "joinFailed": "Gruba katılma başarısız",
+      "leaveFailed": "Gruptan ayrılma başarısız",
       "networkError": "Ağ bağlantısı hatası",
       "serverError": "Sunucu hatası oluştu",
-      "generalError": "Bir hata oluştu"
+      "tryAgain": "Tekrar Dene",
+      "retry": "Yeniden Dene",
+      "connectionLost": "Bağlantı kesildi",
+      "reconnecting": "Yeniden bağlanıyor...",
+      "connectionRestored": "Bağlantı yeniden kuruldu"
     },
-    "success": {
-      "notificationsRefreshed": "Bildirimler başarıyla yenilendi",
-      "followRequestAccepted": "Takip isteği onaylandı",
-      "followRequestDeclined": "Takip isteği reddedildi",
-      "groupJoinRequestAccepted": "Grup katılma isteği onaylandı",
-      "groupJoinRequestDeclined": "Grup katılma isteği reddedildi",
-      "userFollowed": "Kullanıcı takip edildi",
-      "userUnfollowed": "Kullanıcı takipten çıkarıldı",
-      "eventCreateRequestAccepted": "Etkinlik oluşturma isteği onaylandı",
-      "eventCreateRequestDeclined": "Etkinlik oluşturma isteği reddedildi"
+    "messages": {
+      "loading": "Mesajlar yükleniyor...",
+      "noMessages": "Henüz mesaj yok",
+      "sendMessage": "Mesaj gönder",
+      "typeMessage": "Mesaj yazın...",
+      "sending": "Gönderiliyor...",
+      "sent": "Gönderildi",
+      "failed": "Gönderilemedi"
     },
-    "validation": {
-      "userIdRequired": "Kullanıcı ID gerekli",
-      "groupIdRequired": "Grup ID gerekli",
-      "eventIdRequired": "Etkinlik ID gerekli",
-      "decisionRequired": "Karar gerekli"
+    "actions": {
+      "joinGroup": "Gruba Katıl",
+      "leaveGroup": "Gruptan Ayrıl",
+      "viewMembers": "Üyeleri Görüntüle",
+      "groupInfo": "Grup Bilgisi",
+      "shareGroup": "Grubu Paylaş"
+    }
+  },
+  "notificationSettings": {
+    "title": "Bildirim Ayarları",
+    "status": {
+      "title": "Bildirim Durumu",
+      "deviceId": "Cihaz ID",
+      "serviceActive": "Bildirim Servisi Aktif",
+      "serviceInactive": "Bildirim Servisi Bağlantısı Yok",
+      "connectionError": "Bağlantı Hatası"
     },
-    "debug": {
-      "buildingButton": "Bildirim için buton oluşturuluyor:",
-      "notificationType": "Tip:",
-      "isFollowing": "Takip ediliyor:",
-      "isFollowingPending": "Takip beklemede:",
-      "isAccepted": "Onaylandı:",
-      "isRejected": "Reddedildi:",
-      "status": "Durum:",
-      "groupId": "Grup ID:",
-      "senderUserId": "Gönderen Kullanıcı ID:",
-      "message": "Mesaj:",
-      "groupJoinRequestButton": "Grup katılma isteği butonu oluşturuluyor:",
-      "groupIdNull": "Grup ID null, buton gösterilmiyor",
-      "requestAccepted": "İstek zaten onaylanmış, 'Onaylandı' butonu gösteriliyor",
-      "requestRejected": "İstek reddedilmiş, 'Reddedildi' butonu gösteriliyor",
-      "requestPending": "İstek beklemede, onaylama/reddetme butonları gösteriliyor"
+    "permissions": {
+      "title": "Bildirim İzinleri",
+      "notificationPermission": "Bildirim İzni"
+    },
+    "types": {
+      "title": "Bildirim Türleri",
+      "postNotifications": "Post Bildirimleri",
+      "messageNotifications": "Mesaj Bildirimleri",
+      "groupNotifications": "Grup Bildirimleri",
+      "eventNotifications": "Etkinlik Bildirimleri",
+      "followNotifications": "Takip Bildirimleri",
+      "userNotifications": "Kullanıcı Bildirimleri",
+      "commentNotifications": "Yorum Bildirimleri",
+      "likeNotifications": "Beğeni Bildirimleri",
+      "postMentionNotifications": "Post Etiketleme Bildirimleri",
+      "commentMentionNotifications": "Yorum Etiketleme Bildirimleri",
+      "systemNotifications": "Sistem Bildirimleri"
+    },
+    "test": {
+      "title": "Test İşlemleri",
+      "platformTest": "Platform Test Bildirimi",
+      "onesignalTest": "OneSignal Test Bildirimi",
+      "localTest": "Local Test Bildirimi",
+      "simpleTest": "Basit Test Bildirimi",
+      "checkConfig": "Konfigürasyon Kontrol Et",
+      "showPlayerId": "Player ID Göster"
+    },
+    "messages": {
+      "playerId": "Player ID",
+      "playerIdError": "Player ID alınamadı",
+      "settingsSaved": "Ayarlar başarıyla kaydedildi",
+      "settingsError": "Ayarlar kaydedilemedi",
+      "permissionGranted": "Bildirim izni verildi",
+      "permissionDenied": "Bildirim izni reddedildi"
     }
   },
   "profile": {

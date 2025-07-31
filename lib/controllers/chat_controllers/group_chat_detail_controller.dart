@@ -14,10 +14,12 @@ import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../profile_controller.dart';
 import 'chat_controller.dart'; // Added import for ChatController
+import 'package:get_storage/get_storage.dart';
 
 class GroupChatDetailController extends GetxController {
-  final LanguageService languageService = Get.find<LanguageService>();
+  // Services
   final GroupServices _groupServices = GroupServices();
+  final LanguageService _languageService = Get.find<LanguageService>();
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isGroupDataLoading = false.obs; // Grup verisi için ayrı loading
@@ -205,8 +207,8 @@ class GroupChatDetailController extends GetxController {
       debugPrint('❌ Error fetching group details: $e');
       
       Get.snackbar(
-        'Bağlantı Hatası',
-        'Grup verileri yüklenemedi. Lütfen tekrar deneyin.',
+        _languageService.tr('groupChat.errors.loadFailed'),
+        _languageService.tr('groupChat.errors.tryAgain'),
         snackPosition: SnackPosition.BOTTOM,
         duration: Duration(seconds: 3),
         backgroundColor: Colors.orange.shade100,
@@ -736,7 +738,11 @@ class GroupChatDetailController extends GetxController {
       
     } catch (e) {
       debugPrint('Error fetching messages: $e');
-      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.messageSendFailed"), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        _languageService.tr('groupChat.errors.loadFailed'),
+        _languageService.tr('groupChat.errors.messageSendFailed'),
+        snackPosition: SnackPosition.BOTTOM
+      );
     }
   }
 
@@ -760,7 +766,7 @@ class GroupChatDetailController extends GetxController {
                 style: TextStyle(fontSize: 12),
                 controller: pollTitleController,
                 decoration: InputDecoration(
-                  hintText: languageService.tr("chat.poll.title"),
+                  hintText: _languageService.tr("chat.poll.title"),
                   filled: true,
                   fillColor: const Color(0xfff5f5f5),
                   hintStyle:
@@ -785,7 +791,7 @@ class GroupChatDetailController extends GetxController {
                               child: TextField(
                                 style: TextStyle(fontSize: 12),
                                 decoration: InputDecoration(
-                                  hintText: languageService.tr("chat.poll.addOption"),
+                                  hintText: _languageService.tr("chat.poll.addOption"),
                                   filled: true,
                                   fillColor: const Color(0xfff5f5f5),
                                   hintStyle: const TextStyle(
@@ -819,7 +825,7 @@ class GroupChatDetailController extends GetxController {
                   size: 15,
                 ),
                 label: Text(
-                  languageService.tr("chat.poll.addOption"),
+                  _languageService.tr("chat.poll.addOption"),
                   style: TextStyle(color: Color(0xffED7474), fontSize: 12),
                 ),
               ),
@@ -830,7 +836,7 @@ class GroupChatDetailController extends GetxController {
                     foregroundColor: const Color(0xffED7474),
                */
               CustomButton(
-                  text: languageService.tr("chat.poll.send"),
+                  text: _languageService.tr("chat.poll.send"),
                   height: 45,
                   borderRadius: 15,
                   onPressed: () {
@@ -1014,12 +1020,20 @@ class GroupChatDetailController extends GetxController {
           scrollToBottomForNewMessage();
         });
       } else {
-        Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.messageSendFailed"), snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          _languageService.tr('groupChat.errors.messageSendFailed'),
+          _languageService.tr('groupChat.errors.tryAgain'),
+          snackPosition: SnackPosition.BOTTOM
+        );
       }
       
     } catch (e) {
       debugPrint('💥 Message sending error: $e');
-      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.messageSendFailed"), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        _languageService.tr('groupChat.errors.messageSendFailed'),
+        _languageService.tr('groupChat.errors.tryAgain'),
+        snackPosition: SnackPosition.BOTTOM
+      );
     } finally {
       isSendingMessage.value = false;
     }
@@ -1051,12 +1065,20 @@ class GroupChatDetailController extends GetxController {
           scrollToBottomForNewMessage();
         });
       } else {
-        Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.mediaSendFailed"), snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          _languageService.tr('groupChat.errors.messageSendFailed'),
+          _languageService.tr('groupChat.errors.tryAgain'),
+          snackPosition: SnackPosition.BOTTOM
+        );
       }
       
     } catch (e) {
       debugPrint('💥 Media sending error: $e');
-      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.mediaSendFailed"), snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        _languageService.tr('groupChat.errors.messageSendFailed'),
+        _languageService.tr('groupChat.errors.tryAgain'),
+        snackPosition: SnackPosition.BOTTOM
+      );
     } finally {
       isSendingMessage.value = false;
     }

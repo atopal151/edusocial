@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/onesignal_service.dart';
+import '../../services/language_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class NotificationSettingsScreen extends StatefulWidget {
 
 class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
   final OneSignalService _oneSignalService = Get.find<OneSignalService>();
+  final LanguageService _languageService = Get.find<LanguageService>();
   
   // Bildirim türleri için state'ler
   bool _notificationPermission = false;
@@ -79,7 +81,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: BackAppBar(
-        title: 'Bildirim Ayarları',
+        title: _languageService.tr('notificationSettings.title'),
         iconBackgroundColor: Color(0xffffffff),
       ),
       backgroundColor: const Color(0xffFAFAFA),
@@ -89,13 +91,13 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+             /* const SizedBox(height: 20),
+              _buildNotificationStatusCard(),*/
               const SizedBox(height: 20),
-              _buildNotificationStatusCard(),
-              const SizedBox(height: 20),
-              _sectionTitle('Bildirim İzinleri'),
+              _sectionTitle(_languageService.tr('notificationSettings.permissions.title')),
               const SizedBox(height: 10),
               _buildSwitchTile(
-                'Bildirim İzni',
+                _languageService.tr('notificationSettings.permissions.notificationPermission'),
                 _notificationPermission,
                 (value) async {
                   setState(() {
@@ -108,10 +110,10 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 },
               ),
               const SizedBox(height: 30),
-              _sectionTitle('Bildirim Türleri'),
+              _sectionTitle(_languageService.tr('notificationSettings.types.title')),
               const SizedBox(height: 10),
               _buildSwitchTile(
-                'Post Bildirimleri',
+                _languageService.tr('notificationSettings.types.postNotifications'),
                 _postNotifications,
                 (value) {
                   setState(() {
@@ -122,7 +124,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Mesaj Bildirimleri',
+                _languageService.tr('notificationSettings.types.messageNotifications'),
                 _messageNotifications,
                 (value) {
                   setState(() {
@@ -133,7 +135,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Grup Bildirimleri',
+                _languageService.tr('notificationSettings.types.groupNotifications'),
                 _groupNotifications,
                 (value) {
                   setState(() {
@@ -144,7 +146,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Etkinlik Bildirimleri',
+                _languageService.tr('notificationSettings.types.eventNotifications'),
                 _eventNotifications,
                 (value) {
                   setState(() {
@@ -155,7 +157,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Takip Bildirimleri',
+                _languageService.tr('notificationSettings.types.followNotifications'),
                 _followNotifications,
                 (value) {
                   setState(() {
@@ -166,7 +168,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Kullanıcı Bildirimleri',
+                _languageService.tr('notificationSettings.types.userNotifications'),
                 _userNotifications,
                 (value) {
                   setState(() {
@@ -177,7 +179,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Yorum Bildirimleri',
+                _languageService.tr('notificationSettings.types.commentNotifications'),
                 _commentNotifications,
                 (value) {
                   setState(() {
@@ -188,7 +190,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Beğeni Bildirimleri',
+                _languageService.tr('notificationSettings.types.likeNotifications'),
                 _likeNotifications,
                 (value) {
                   setState(() {
@@ -199,7 +201,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Post Etiketleme Bildirimleri',
+                _languageService.tr('notificationSettings.types.postMentionNotifications'),
                 _postMentionNotifications,
                 (value) {
                   setState(() {
@@ -210,7 +212,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Yorum Etiketleme Bildirimleri',
+                _languageService.tr('notificationSettings.types.commentMentionNotifications'),
                 _commentMentionNotifications,
                 (value) {
                   setState(() {
@@ -221,7 +223,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
               const SizedBox(height: 20),
               _buildSwitchTile(
-                'Sistem Bildirimleri',
+                _languageService.tr('notificationSettings.types.systemNotifications'),
                 _systemNotifications,
                 (value) {
                   setState(() {
@@ -230,51 +232,51 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   _saveNotificationSettings();
                 },
               ),
-              const SizedBox(height: 30),
-              _sectionTitle('Test İşlemleri'),
+              /*const SizedBox(height: 30),
+              _sectionTitle(_languageService.tr('notificationSettings.test.title')),
               const SizedBox(height: 10),
               _buildTestButton(
-                'Platform Test Bildirimi',
+                _languageService.tr('notificationSettings.test.platformTest'),
                 () {
                   _oneSignalService.sendPlatformAwareTestNotification();
                 },
               ),
               const SizedBox(height: 8),
               _buildTestButton(
-                'OneSignal Test Bildirimi',
+                _languageService.tr('notificationSettings.test.onesignalTest'),
                 () {
                   _oneSignalService.sendOneSignalTestNotification();
                 },
               ),
               const SizedBox(height: 8),
               _buildTestButton(
-                'Local Test Bildirimi',
+                _languageService.tr('notificationSettings.test.localTest'),
                 () {
                   _oneSignalService.sendLocalTestNotification();
                 },
               ),
               const SizedBox(height: 8),
               _buildTestButton(
-                'Basit Test Bildirimi',
+                _languageService.tr('notificationSettings.test.simpleTest'),
                 () {
                   _oneSignalService.sendSimpleTestNotification();
                 },
               ),
               const SizedBox(height: 8),
               _buildTestButton(
-                'Konfigürasyon Kontrol Et',
+                _languageService.tr('notificationSettings.test.checkConfig'),
                 () {
                   _oneSignalService.checkOneSignalConfiguration();
                 },
               ),
               const SizedBox(height: 8),
               _buildTestButton(
-                'Player ID Göster',
+                _languageService.tr('notificationSettings.test.showPlayerId'),
                 () async {
                   final playerId = await _oneSignalService.getPlayerId();
                   if (playerId != null) {
                     Get.snackbar(
-                      'Player ID',
+                      _languageService.tr('notificationSettings.messages.playerId'),
                       playerId,
                       snackPosition: SnackPosition.BOTTOM,
                       duration: const Duration(seconds: 5),
@@ -284,7 +286,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   } else {
                     Get.snackbar(
                       'Hata',
-                      'Player ID alınamadı',
+                      _languageService.tr('notificationSettings.messages.playerIdError'),
                       snackPosition: SnackPosition.BOTTOM,
                       backgroundColor: Colors.red,
                       colorText: Colors.white,
@@ -292,7 +294,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   }
                 },
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 40),*/
             ],
           ),
         ),
@@ -313,7 +315,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Bildirim Durumu',
+            _languageService.tr('notificationSettings.status.title'),
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -338,7 +340,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'Cihaz ID: ${snapshot.data!.substring(0, 8)}...',
+                        '${_languageService.tr('notificationSettings.status.deviceId')}: ${snapshot.data!.substring(0, 8)}...',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -359,7 +361,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Bildirim Servisi Aktif',
+                          _languageService.tr('notificationSettings.status.serviceActive'),
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -383,7 +385,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Bildirim Servisi Bağlantısı Yok',
+                      _languageService.tr('notificationSettings.status.serviceInactive'),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

@@ -15,7 +15,6 @@ import 'story/my_story_list.dart';
 import 'post_home_list.dart';
 import '../../services/language_service.dart';
 import '../../services/onesignal_service.dart';
-import '../../services/socket_services.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
@@ -71,46 +70,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.only(bottom: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Test bildirimi butonu
-            ElevatedButton(
-              onPressed: () async {
-                debugPrint('🧪 Test bildirimi gönderiliyor...');
-                final oneSignalService = Get.find<OneSignalService>();
-                await oneSignalService.sendLocalTestNotification();
-              },
-              child: Text('Test Bildirim'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-              ),
-            ),
-            // Test socket bildirimi butonu
-            ElevatedButton(
-              onPressed: () {
-                debugPrint('🧪 Socket test bildirimi gönderiliyor...');
-                final oneSignalService = Get.find<OneSignalService>();
-                oneSignalService.sendCustomMessageNotification(
-                  senderName: 'Test User',
-                  message: 'Bu bir test bildirimidir',
-                  senderAvatar: '',
-                  conversationId: 'test',
-                  data: {'test': true},
-                );
-              },
-              child: Text('Socket Test'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
+  
       body: RefreshIndicator(
         onRefresh: _refreshHomeData,
         color: Color(0xFFef5050),

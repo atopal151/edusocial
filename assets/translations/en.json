@@ -1515,6 +1515,94 @@
     "rejected": "Rejected",
     "accept": "Accept",
     "decline": "Decline"
+  },
+  "slidingNotifications": {
+    "newMessage": "New Message",
+    "groupMessage": "Group Message",
+    "newComment": "New Comment",
+    "newLike": "New Like",
+    "newFollow": "New Follower",
+    "followRequest": "Follow Request",
+    "groupJoinRequest": "Group Join Request",
+    "eventInvitation": "Event Invitation",
+    "systemNotification": "System Notification",
+    "unknown": "Unknown"
+  },
+  "groupChat": {
+    "errors": {
+      "loadFailed": "Failed to load group chat",
+      "messageSendFailed": "Failed to send message",
+      "joinFailed": "Failed to join group",
+      "leaveFailed": "Failed to leave group",
+      "networkError": "Network connection error",
+      "serverError": "Server error occurred",
+      "tryAgain": "Try Again",
+      "retry": "Retry",
+      "connectionLost": "Connection lost",
+      "reconnecting": "Reconnecting...",
+      "connectionRestored": "Connection restored"
+    },
+    "messages": {
+      "loading": "Loading messages...",
+      "noMessages": "No messages yet",
+      "sendMessage": "Send a message",
+      "typeMessage": "Type a message...",
+      "sending": "Sending...",
+      "sent": "Sent",
+      "failed": "Failed to send"
+    },
+    "actions": {
+      "joinGroup": "Join Group",
+      "leaveGroup": "Leave Group",
+      "viewMembers": "View Members",
+      "groupInfo": "Group Info",
+      "shareGroup": "Share Group"
+    }
+  },
+  "notificationSettings": {
+    "title": "Notification Settings",
+    "status": {
+      "title": "Notification Status",
+      "deviceId": "Device ID",
+      "serviceActive": "Notification Service Active",
+      "serviceInactive": "Notification Service Inactive",
+      "connectionError": "Connection Error"
+    },
+    "permissions": {
+      "title": "Notification Permissions",
+      "notificationPermission": "Notification Permission"
+    },
+    "types": {
+      "title": "Notification Types",
+      "postNotifications": "Post Notifications",
+      "messageNotifications": "Message Notifications",
+      "groupNotifications": "Group Notifications",
+      "eventNotifications": "Event Notifications",
+      "followNotifications": "Follow Notifications",
+      "userNotifications": "User Notifications",
+      "commentNotifications": "Comment Notifications",
+      "likeNotifications": "Like Notifications",
+      "postMentionNotifications": "Post Mention Notifications",
+      "commentMentionNotifications": "Comment Mention Notifications",
+      "systemNotifications": "System Notifications"
+    },
+    "test": {
+      "title": "Test Operations",
+      "platformTest": "Platform Test Notification",
+      "onesignalTest": "OneSignal Test Notification",
+      "localTest": "Local Test Notification",
+      "simpleTest": "Simple Test Notification",
+      "checkConfig": "Check Configuration",
+      "showPlayerId": "Show Player ID"
+    },
+    "messages": {
+      "playerId": "Player ID",
+      "playerIdError": "Could not get Player ID",
+      "settingsSaved": "Settings saved successfully",
+      "settingsError": "Failed to save settings",
+      "permissionGranted": "Notification permission granted",
+      "permissionDenied": "Notification permission denied"
+    }
   }
 
 }
