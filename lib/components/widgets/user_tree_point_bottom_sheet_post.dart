@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:edusocial/controllers/post_controller.dart';
-import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import '../../services/language_service.dart';
 
 class UserTreePointBottomSheet extends StatelessWidget {

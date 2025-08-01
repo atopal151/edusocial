@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+
 import 'sender_model.dart';
 import 'conversation_model.dart';
 import 'message_media_model.dart';

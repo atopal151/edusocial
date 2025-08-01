@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io' as io;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -993,8 +991,8 @@ class SocketService extends GetxService {
         debugPrint('👥 ${userGroups.length} adet gruba join olunuyor...');
         
         for (final group in userGroups) {
-          final groupId = group.id?.toString();
-          if (groupId != null) {
+          final groupId = group.id.toString();
+          if (groupId.isNotEmpty) {
             debugPrint('👥 Gruba join olunuyor: ${group.name} (ID: $groupId)');
             
             // Gruba join ol
@@ -1254,7 +1252,7 @@ class SocketService extends GetxService {
       debugPrint('❌ OneSignal bildirimi gönderilemedi: $e');
     }
   }
-
+/*
   // Özel mesaj bildirimi gönder (profil resmi ve kullanıcı adı ile)
   void _sendCustomMessageNotification(dynamic data) {
     try {
@@ -1281,7 +1279,7 @@ class SocketService extends GetxService {
     } catch (e) {
       debugPrint('❌ Özel mesaj bildirimi gönderilemedi: $e');
     }
-  }
+  }*/
 
   // Özel grup mesaj bildirimi gönder (grup profil resmi, grup adı ve gönderen bilgisi ile)
   void _sendCustomGroupMessageNotification(dynamic data) async {
@@ -1329,11 +1327,9 @@ class SocketService extends GetxService {
       
       try {
         final groupDetail = await _groupServices.fetchGroupDetail(groupId);
-        if (groupDetail != null) {
-          groupName = groupDetail.name ?? 'Grup';
-          groupAvatar = groupDetail.avatarUrl ?? '';
-          debugPrint('👥 Grup bilgileri alındı: name=$groupName, avatar=$groupAvatar');
-        }
+        groupName = groupDetail.name;
+        groupAvatar = groupDetail.avatarUrl ?? '';
+        debugPrint('👥 Grup bilgileri alındı: name=$groupName, avatar=$groupAvatar');
       } catch (e) {
         debugPrint('⚠️ Grup bilgileri alınamadı: $e');
       }

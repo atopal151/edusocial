@@ -302,6 +302,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
 
+
+/*
   Widget _buildNotificationStatusCard() {
     return Container(
       width: double.infinity,
@@ -401,7 +403,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       ),
     );
   }
-
+*/
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
@@ -459,7 +461,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       ),
     );
   }
-
+/*
   Widget _buildTestButton(String title, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,
@@ -483,4 +485,5 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       ),
     );
   }
+  */
 } 

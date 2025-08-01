@@ -106,7 +106,7 @@ class StoryService {
 
         if (response.statusCode == 200) {
           successCount++;
-          debugPrint("✅ Story ${successCount}/${mediaFiles.length} başarıyla yüklendi.");
+          debugPrint("✅ Story $successCount/${mediaFiles.length} başarıyla yüklendi.");
         } else {
           debugPrint("❌ Story yükleme başarısız. Status: ${response.statusCode}");
         }
@@ -116,7 +116,7 @@ class StoryService {
       final isSuccess = successCount > 0;
       
       if (isSuccess) {
-        debugPrint("✅ Toplam ${successCount}/${mediaFiles.length} story başarıyla yüklendi.");
+        debugPrint("✅ Toplam $successCount/${mediaFiles.length} story başarıyla yüklendi.");
       } else {
         debugPrint("❌ Hiçbir story yüklenemedi.");
       }

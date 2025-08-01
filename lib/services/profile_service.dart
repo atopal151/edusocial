@@ -50,7 +50,7 @@ class ProfileService {
           
           // Post verilerini debug et
           if (jsonBody['data']['posts'] != null) {
-            final posts = jsonBody['data']['posts'] as List;
+            //final posts = jsonBody['data']['posts'] as List;
             //debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
           }
         }

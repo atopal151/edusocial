@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:get/get.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
-import '../../../services/language_service.dart';
 
 class PollMessageWidget extends StatelessWidget {
   final MessageModel message;
@@ -12,7 +10,6 @@ class PollMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LanguageService languageService = Get.find<LanguageService>();
     // Mesajın içinde "[POLL] Anket başlığı - Seçenek1, Seçenek2" gibi bir yapı varsa parçalayabilirsin
     final content = message.message.replaceFirst('[POLL]', '').trim();
     final parts = content.split('-');
@@ -45,7 +42,7 @@ class PollMessageWidget extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withAlpha(5),
                   offset: const Offset(0, 1),
                   blurRadius: 3,
                 ),
@@ -92,7 +89,7 @@ class PollMessageWidget extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: message.isMe 
-                        ? Colors.white.withOpacity(0.2)
+                        ? Colors.white.withAlpha(20) 
                         : const Color(0xFFF0F0F0),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -132,7 +129,7 @@ class PollMessageWidget extends StatelessWidget {
                        style: GoogleFonts.inter(
                          fontSize: 11,
                          color: message.isMe 
-                             ? Colors.white.withOpacity(0.8)
+                             ? Colors.white.withAlpha(80)
                              : const Color(0xff8E8E93),
                          fontWeight: FontWeight.w400,
                        ),

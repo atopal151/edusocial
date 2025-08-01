@@ -266,7 +266,7 @@ class MediaMessageWidget extends StatelessWidget {
                  ),
                  boxShadow: [
                    BoxShadow(
-                     color: Colors.black.withOpacity(0.1),
+                     color: Colors.black.withAlpha(10),
                      blurRadius: 4,
                      offset: const Offset(0, 2),
                    ),
@@ -289,7 +289,7 @@ class MediaMessageWidget extends StatelessWidget {
                            style: TextStyle(
                              fontSize: 10,
                              color: message.isMe
-                                 ? Colors.white.withValues(alpha: 0.7)
+                                 ? Colors.white.withAlpha(70)
                                  : const Color(0xff9ca3ae),
                            ),
                          ),

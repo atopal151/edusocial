@@ -22,7 +22,7 @@ class OneSignalService extends GetxService {
 
   Future<void> _initializeOneSignal() async {
     try {
-      print('🚀 OneSignal başlatılıyor...');
+      debugPrint('🚀 OneSignal başlatılıyor...');
       
       // OneSignal'i başlat
       OneSignal.initialize(_appId);
@@ -46,15 +46,15 @@ class OneSignalService extends GetxService {
       // Player ID'yi al ve kaydet
       await _getAndSavePlayerId();
       
-      print('✅ OneSignal başarıyla başlatıldı');
+      debugPrint('✅ OneSignal başarıyla başlatıldı');
     } catch (e) {
-      print('❌ OneSignal başlatılırken hata: $e');
+      debugPrint('❌ OneSignal başlatılırken hata: $e');
     }
   }
 
   Future<void> _getAndSavePlayerId() async {
     try {
-      print('🔍 OneSignal Player ID alınıyor...');
+      debugPrint('🔍 OneSignal Player ID alınıyor...');
       
       // Birkaç kez deneme yap
       String? playerId;
@@ -63,53 +63,53 @@ class OneSignalService extends GetxService {
       
       while (playerId == null && attempts < maxAttempts) {
         attempts++;
-        print('📱 Player ID deneme $attempts/$maxAttempts...');
+        debugPrint('📱 Player ID deneme $attempts/$maxAttempts...');
         
         // Player ID'yi al
-        playerId = await OneSignal.User.pushSubscription.id;
+        playerId =  OneSignal.User.pushSubscription.id;
         
         if (playerId == null) {
-          print('⏳ Player ID henüz hazır değil, bekleniyor...');
+          debugPrint('⏳ Player ID henüz hazır değil, bekleniyor...');
           await Future.delayed(Duration(seconds: 1));
         }
       }
       
-      print('📱 Player ID: $playerId');
+      debugPrint('📱 Player ID: $playerId');
       
       if (playerId != null && playerId.isNotEmpty) {
         // SharedPreferences'a kaydet
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('player_id', playerId);
-        print('💾 Player ID kaydedildi');
+        debugPrint('💾 Player ID kaydedildi');
         
         // API'ye gönder
         await _sendDeviceInfoToServer(playerId);
       } else {
-        print('❌ Player ID alınamadı veya boş');
+        debugPrint('❌ Player ID alınamadı veya boş');
         // Alternatif olarak SharedPreferences'tan almayı dene
         final prefs = await SharedPreferences.getInstance();
         final savedPlayerId = prefs.getString('player_id');
         if (savedPlayerId != null) {
-          print('💾 Kaydedilmiş Player ID kullanılıyor: $savedPlayerId');
+          debugPrint('💾 Kaydedilmiş Player ID kullanılıyor: $savedPlayerId');
           await _sendDeviceInfoToServer(savedPlayerId);
         }
       }
     } catch (e) {
-      print('❌ OneSignal Player ID alınamadı: $e');
+      debugPrint('❌ OneSignal Player ID alınamadı: $e');
     }
   }
 
   Future<void> _sendDeviceInfoToServer(String playerId) async {
     try {
-      print('🌐 Cihaz bilgisi sunucuya gönderiliyor...');
+                debugPrint('🌐 Cihaz bilgisi sunucuya gönderiliyor...');
       
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       
-      print('🔑 Token: ${token?.substring(0, 20)}...');
+      debugPrint('🔑 Token: ${token?.substring(0, 20)}...');
       
       if (token == null) {
-        print('❌ Token bulunamadı, cihaz bilgisi gönderilemedi');
+        debugPrint('❌ Token bulunamadı, cihaz bilgisi gönderilemedi');
         return;
       }
 
@@ -119,20 +119,20 @@ class OneSignalService extends GetxService {
         platform = 'ios';
       }
       
-      print('📱 Platform: $platform');
+      debugPrint('📱 Platform: $platform');
 
       // Cihaz adını al
       String deviceName = 'Unknown Device';
       try {
-        deviceName = await OneSignal.User.pushSubscription.id ?? 'Unknown Device';
+        deviceName =  OneSignal.User.pushSubscription.id ?? 'Unknown Device';
       } catch (e) {
-        print('❌ Cihaz adı alınamadı: $e');
+        debugPrint('❌ Cihaz adı alınamadı: $e');
       }
 
-      print('📋 Gönderilecek veri:');
-      print('   - player_id: $playerId');
-      print('   - device_name: $deviceName');
-      print('   - platform: $platform');
+      debugPrint('📋 Gönderilecek veri:');
+      debugPrint('   - player_id: $playerId');
+      debugPrint('   - device_name: $deviceName');
+      debugPrint('   - platform: $platform');
 
       // API'ye gönder
       final response = await _apiService.post(
@@ -145,23 +145,23 @@ class OneSignalService extends GetxService {
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      print('📡 API Response Status: ${response.statusCode}');
-      print('📡 API Response Body: ${response.data}');
+      debugPrint('📡 API Response Status: ${response.statusCode}');
+      debugPrint('📡 API Response Body: ${response.data}');
 
       if (response.statusCode == 200) {
-        print('✅ Cihaz bilgisi başarıyla gönderildi');
+        debugPrint('✅ Cihaz bilgisi başarıyla gönderildi');
       } else {
-        print('❌ Cihaz bilgisi gönderilemedi: ${response.statusCode}');
-        print('❌ Hata detayı: ${response.data}');
+        debugPrint('❌ Cihaz bilgisi gönderilemedi: ${response.statusCode}');
+        debugPrint('❌ Hata detayı: ${response.data}');
       }
     } catch (e) {
-      print('❌ Cihaz bilgisi gönderilirken hata: $e');
+      debugPrint('❌ Cihaz bilgisi gönderilirken hata: $e');
     }
   }
 
   void _handleNotificationClick(OSNotificationClickEvent event) {
     // Bildirim tıklandığında yapılacak işlemler
-    print('Bildirim tıklandı: ${event.notification.jsonRepresentation()}');
+    debugPrint('Bildirim tıklandı: ${event.notification.jsonRepresentation()}');
     
     // Bildirim verilerini kontrol et ve uygun sayfaya yönlendir
     final data = event.notification.additionalData;
@@ -172,7 +172,7 @@ class OneSignalService extends GetxService {
 
   void _handleNotificationReceived(OSNotificationWillDisplayEvent event) {
     // Uygulama açıkken bildirim alındığında yapılacak işlemler
-    print('Bildirim alındı: ${event.notification.jsonRepresentation()}');
+    debugPrint('Bildirim alındı: ${event.notification.jsonRepresentation()}');
     
     // Bildirim türüne göre filtreleme yap
     _shouldShowNotification(event.notification).then((shouldShow) {
@@ -181,7 +181,7 @@ class OneSignalService extends GetxService {
         event.notification.display();
       } else {
         // Bildirimi gizle - OneSignal'da preventDefault yok, sadece göstermiyoruz
-        print('Bildirim filtrelendi: ${event.notification.notificationId}');
+        debugPrint('Bildirim filtrelendi: ${event.notification.notificationId}');
       }
     });
   }
@@ -213,8 +213,6 @@ class OneSignalService extends GetxService {
           return prefs.getBool('user_notifications') ?? true;
         case 'comment':
           return prefs.getBool('comment_notifications') ?? true;
-        case 'follow':
-          return prefs.getBool('follow_notifications') ?? true;
         case 'like':
           return prefs.getBool('like_notifications') ?? true;
         case 'post_mention':
@@ -227,7 +225,7 @@ class OneSignalService extends GetxService {
           return true; // Bilinmeyen tip için göster
       }
     } catch (e) {
-      print('Bildirim filtreleme hatası: $e');
+      debugPrint('Bildirim filtreleme hatası: $e');
       return true; // Hata durumunda göster
     }
   }
@@ -282,9 +280,9 @@ class OneSignalService extends GetxService {
   // Player ID'yi manuel olarak almak için
   Future<String?> getPlayerId() async {
     try {
-      return await OneSignal.User.pushSubscription.id;
+      return OneSignal.User.pushSubscription.id;
     } catch (e) {
-      print('Player ID alınamadı: $e');
+      debugPrint('Player ID alınamadı: $e');
       return null;
     }
   }
@@ -292,9 +290,9 @@ class OneSignalService extends GetxService {
   // Bildirim izinlerini kontrol et
   Future<bool> hasNotificationPermission() async {
     try {
-      return await OneSignal.Notifications.permission;
+        return  OneSignal.Notifications.permission;
     } catch (e) {
-      print('Bildirim izni kontrol edilemedi: $e');
+      debugPrint('Bildirim izni kontrol edilemedi: $e');
       return false;
     }
   }
@@ -304,18 +302,18 @@ class OneSignalService extends GetxService {
     try {
       await OneSignal.Notifications.requestPermission(true);
     } catch (e) {
-      print('Bildirim izni istenemedi: $e');
+      debugPrint('Bildirim izni istenemedi: $e');
     }
   }
 
   // Test bildirimi gönder
   Future<void> sendTestNotification() async {
     try {
-      print('🧪 Test bildirimi gönderiliyor...');
+      debugPrint('🧪 Test bildirimi gönderiliyor...');
       
       final playerId = await getPlayerId();
       if (playerId != null) {
-        print('📱 Player ID: $playerId');
+            debugPrint('📱 Player ID: $playerId');
         
         // OneSignal REST API ile test bildirimi gönder
         final response = await _apiService.post(
@@ -340,44 +338,44 @@ class OneSignalService extends GetxService {
           },
         );
         
-        print('📡 OneSignal API Response: ${response.statusCode}');
-        print('📡 Response Data: ${response.data}');
+        debugPrint('📡 OneSignal API Response: ${response.statusCode}');
+        debugPrint('📡 Response Data: ${response.data}');
         
         if (response.statusCode == 200) {
-          print('✅ Test bildirimi başarıyla gönderildi');
+          debugPrint('✅ Test bildirimi başarıyla gönderildi');
           
           // Eğer invalid_player_ids hatası varsa
           if (response.data['errors'] != null && 
               response.data['errors']['invalid_player_ids'] != null) {
-            print('⚠️ OneSignal Dashboard konfigürasyonu eksik!');
-            print('🔧 Lütfen OneSignal Dashboard\'da şunları kontrol edin:');
-            print('   1. App Settings → Android Configuration');
-            print('   2. Package Name: com.social.edusocial');
-            print('   3. App ID: $_appId');
-            print('   4. REST API Key: $_apiKey');
-            print('   5. Google Project Number (opsiyonel)');
+            debugPrint('⚠️ OneSignal Dashboard konfigürasyonu eksik!');
+            debugPrint('🔧 Lütfen OneSignal Dashboard\'da şunları kontrol edin:');
+            debugPrint('   1. App Settings → Android Configuration');
+            debugPrint('   2. Package Name: com.social.edusocial');
+            debugPrint('   3. App ID: $_appId');
+            debugPrint('   4. REST API Key: $_apiKey');
+            debugPrint('   5. Google Project Number (opsiyonel)');
           }
         } else {
-          print('❌ Test bildirimi gönderilemedi: ${response.statusCode}');
+          debugPrint('❌ Test bildirimi gönderilemedi: ${response.statusCode}');
         }
       } else {
-        print('❌ Player ID alınamadı');
+        debugPrint('❌ Player ID alınamadı');
       }
     } catch (e) {
-      print('❌ Test bildirimi gönderilirken hata: $e');
+      debugPrint('❌ Test bildirimi gönderilirken hata: $e');
     }
   }
 
   // Yerel bildirim gönder (uygulama açıkken)
   Future<void> sendLocalNotification(String title, String message, Map<String, dynamic>? data) async {
     try {
-      print('📱 sendLocalNotification çağrıldı: title=$title, message=$message');
-      print('📱 Data: $data');
-      print('📱 Data type: ${data.runtimeType}');
+      debugPrint('📱 sendLocalNotification çağrıldı: title=$title, message=$message');
+      debugPrint('📱 Data: $data');
+      debugPrint('📱 Data type: ${data.runtimeType}');
       
       // Eğer mesaj bildirimi ise özel tasarım kullan
       if ((title == 'Yeni Mesaj' || title == 'message') && data != null) {
-        print('📱 Özel mesaj bildirimi kullanılacak');
+        debugPrint('📱 Özel mesaj bildirimi kullanılacak');
         await _sendCustomMessageNotificationFromData(data);
         return;
       }
@@ -392,9 +390,9 @@ class OneSignalService extends GetxService {
         duration: const Duration(seconds: 3),
       );
       
-      print('✅ Yerel bildirim gösterildi: $title - $message');
+      debugPrint('✅ Yerel bildirim gösterildi: $title - $message');
     } catch (e) {
-      print('❌ Yerel bildirim gösterilemedi: $e');
+      debugPrint('❌ Yerel bildirim gösterilemedi: $e');
     }
   }
 
@@ -421,12 +419,12 @@ class OneSignalService extends GetxService {
       
       final conversationId = data['conversation_id'];
       
-      print('💬 Mesaj detayları: sender=$senderName, message=$message');
+      debugPrint('💬 Mesaj detayları: sender=$senderName, message=$message');
       
       // Kendi mesajım ise bildirim gösterme (TEST için geçici olarak kapatıldı)
       final isMyMessage = data['is_me'] == true;
       if (isMyMessage) {
-        print('📤 Kendi mesajım, bildirim gösterilmeyecek (TEST için geçici olarak kapatıldı)');
+          debugPrint('📤 Kendi mesajım, bildirim gösterilmeyecek (TEST için geçici olarak kapatıldı)');
         // return; // TEST için geçici olarak kapatıldı
       }
       
@@ -439,7 +437,7 @@ class OneSignalService extends GetxService {
         final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
         
         if (timeSinceLastNotification < _notificationCooldown) {
-          print('⚠️ Çoklu bildirim önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
+          debugPrint('⚠️ Çoklu bildirim önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
           return;
         }
       }
@@ -498,7 +496,7 @@ class OneSignalService extends GetxService {
           ),
         ),
         snackbarStatus: (status) {
-          print('💬 Bildirim durumu: $status');
+          debugPrint('💬 Bildirim durumu: $status');
         },
         // Kapatma butonu
         mainButton: TextButton(
@@ -510,9 +508,9 @@ class OneSignalService extends GetxService {
         ),
       );
       
-      print('✅ Özel mesaj bildirimi gösterildi: $senderName - $message');
+      debugPrint('✅ Özel mesaj bildirimi gösterildi: $senderName - $message');
     } catch (e) {
-      print('❌ Özel mesaj bildirimi gösterilemedi: $e');
+      debugPrint('❌ Özel mesaj bildirimi gösterilemedi: $e');
     }
   }
 
@@ -525,7 +523,7 @@ class OneSignalService extends GetxService {
     required Map<String, dynamic> data,
   }) async {
     try {
-      print('💬 Özel mesaj bildirimi gösteriliyor...');
+      debugPrint('💬 Özel mesaj bildirimi gösteriliyor...');
       
       // Bildirim ID'si oluştur (çoklu bildirim önlemek için)
       final notificationId = 'message_$conversationId';
@@ -536,7 +534,7 @@ class OneSignalService extends GetxService {
         final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
         
         if (timeSinceLastNotification < _notificationCooldown) {
-          print('⚠️ Çoklu bildirim önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
+          debugPrint('⚠️ Çoklu bildirim önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
           return;
         }
       }
@@ -570,22 +568,22 @@ class OneSignalService extends GetxService {
                 radius: 16,
               )
             : const CircleAvatar(
-                child: Icon(Icons.person, size: 16),
                 radius: 16,
+                child: Icon(Icons.person, size: 16),
               ),
       );
       
-      print('✅ Local notification gönderildi');
-      print('📱 Bildirim detayları: title=$senderName, message=$message, avatar=$senderAvatar');
+      debugPrint('✅ Local notification gönderildi');
+      debugPrint('📱 Bildirim detayları: title=$senderName, message=$message, avatar=$senderAvatar');
     } catch (e) {
-      print('❌ OneSignal local notification gönderilemedi: $e');
+      debugPrint('❌ OneSignal local notification gönderilemedi: $e');
     }
   }
 
   // Local test notification (OneSignal Dashboard konfigürasyonu olmadan da çalışır)
   Future<void> sendLocalTestNotification() async {
     try {
-      print('🧪 Local test bildirimi gönderiliyor...');
+      debugPrint('🧪 Local test bildirimi gönderiliyor...');
       
       Get.snackbar(
         'Test Bildirimi',
@@ -600,20 +598,20 @@ class OneSignalService extends GetxService {
         icon: const Icon(Icons.notifications, color: Colors.white),
       );
       
-      print('✅ Local test bildirimi gösterildi');
+      debugPrint('✅ Local test bildirimi gösterildi');
     } catch (e) {
-      print('❌ Local test bildirimi gösterilemedi: $e');
+      debugPrint('❌ Local test bildirimi gösterilemedi: $e');
     }
   }
 
   // OneSignal Dashboard konfigürasyonu kontrol et
   Future<void> checkOneSignalConfiguration() async {
     try {
-      print('🔧 OneSignal konfigürasyonu kontrol ediliyor...');
+      debugPrint('🔧 OneSignal konfigürasyonu kontrol ediliyor...');
       
       final playerId = await getPlayerId();
       if (playerId != null) {
-        print('✅ Player ID mevcut: $playerId');
+        debugPrint('✅ Player ID mevcut: $playerId');
         
         // Test bildirimi gönder ve sonucu kontrol et
         final response = await _apiService.post(
@@ -633,22 +631,22 @@ class OneSignalService extends GetxService {
         if (response.statusCode == 200) {
           if (response.data['errors'] != null && 
               response.data['errors']['invalid_player_ids'] != null) {
-            print('❌ OneSignal Dashboard konfigürasyonu eksik!');
-            print('📋 Gerekli adımlar:');
-            print('   1. OneSignal Dashboard → App Settings → Android Configuration');
-            print('   2. Package Name: com.social.edusocial');
-            print('   3. App ID: $_appId');
-            print('   4. REST API Key: $_apiKey');
-            print('   5. Google Project Number (opsiyonel)');
+                debugPrint('❌ OneSignal Dashboard konfigürasyonu eksik!');
+            debugPrint('📋 Gerekli adımlar:');
+            debugPrint('   1. OneSignal Dashboard → App Settings → Android Configuration');
+            debugPrint('   2. Package Name: com.social.edusocial');
+            debugPrint('   3. App ID: $_appId');
+            debugPrint('   4. REST API Key: $_apiKey');
+            debugPrint('   5. Google Project Number (opsiyonel)');
           } else {
-            print('✅ OneSignal konfigürasyonu doğru');
+            debugPrint('✅ OneSignal konfigürasyonu doğru');
           }
         }
       } else {
-        print('❌ Player ID bulunamadı');
+        debugPrint('❌ Player ID bulunamadı');
       }
     } catch (e) {
-      print('❌ Konfigürasyon kontrolü hatası: $e');
+      debugPrint('❌ Konfigürasyon kontrolü hatası: $e');
     }
   }
 
@@ -703,11 +701,11 @@ class OneSignalService extends GetxService {
     String? playerId;
     
     try {
-      print('🧪 OneSignal test bildirimi gönderiliyor...');
+      debugPrint('🧪 OneSignal test bildirimi gönderiliyor...');
       
       playerId = await getPlayerId();
       if (playerId != null) {
-        print('📱 Player ID: $playerId');
+        debugPrint('📱 Player ID: $playerId');
         
         // OneSignal REST API ile test - basit format
         final response = await _apiService.post(
@@ -732,31 +730,31 @@ class OneSignalService extends GetxService {
           },
         );
         
-        print('📡 OneSignal API Response: ${response.statusCode}');
-        print('📡 Response Data: ${response.data}');
+        debugPrint('📡 OneSignal API Response: ${response.statusCode}');
+        debugPrint('📡 Response Data: ${response.data}');
         
         if (response.statusCode == 200) {
-          print('✅ OneSignal test bildirimi başarıyla gönderildi');
+          debugPrint('✅ OneSignal test bildirimi başarıyla gönderildi');
           if (response.data['id'] != null) {
-            print('📋 Notification ID: ${response.data['id']}');
+            debugPrint('📋 Notification ID: ${response.data['id']}');
           }
         } else {
-          print('❌ Test bildirimi gönderilemedi: ${response.statusCode}');
-          print('❌ Hata detayı: ${response.data}');
+          debugPrint('❌ Test bildirimi gönderilemedi: ${response.statusCode}');
+          debugPrint('❌ Hata detayı: ${response.data}');
         }
       } else {
-        print('❌ Player ID alınamadı');
+        debugPrint('❌ Player ID alınamadı');
       }
     } catch (e) {
-      print('❌ OneSignal test bildirimi gönderilirken hata: $e');
+      debugPrint('❌ OneSignal test bildirimi gönderilirken hata: $e');
       
       // Hata detaylarını göster
       if (e.toString().contains('400')) {
-        print('🔧 400 hatası - Request formatı kontrol ediliyor...');
-        print('📋 Kullanılan parametreler:');
-        print('   - App ID: $_appId');
-        print('   - Player ID: $playerId');
-        print('   - API Key: ${_apiKey.substring(0, 20)}...');
+          debugPrint('🔧 400 hatası - Request formatı kontrol ediliyor...');
+        debugPrint('📋 Kullanılan parametreler:');
+        debugPrint('   - App ID: $_appId');
+        debugPrint('   - Player ID: $playerId');
+        debugPrint('   - API Key: ${_apiKey.substring(0, 20)}...');
       }
     }
   }
@@ -764,15 +762,15 @@ class OneSignalService extends GetxService {
   // Basit test notification (sadece console'da bilgi gösterir)
   Future<void> sendSimpleTestNotification() async {
     try {
-      print('🧪 Basit test bildirimi gönderiliyor...');
+      debugPrint('🧪 Basit test bildirimi gönderiliyor...');
       
       final playerId = await getPlayerId();
       if (playerId != null) {
-        print('📱 Player ID: $playerId');
-        print('🔧 OneSignal Konfigürasyonu:');
-        print('   - App ID: $_appId');
-        print('   - API Key: ${_apiKey.substring(0, 20)}...');
-        print('   - Package Name: com.social.edusocial');
+        debugPrint('📱 Player ID: $playerId');
+        debugPrint('🔧 OneSignal Konfigürasyonu:');
+        debugPrint('   - App ID: $_appId');
+        debugPrint('   - API Key: ${_apiKey.substring(0, 20)}...');
+        debugPrint('   - Package Name: com.social.edusocial');
         
         // Test için snackbar göster
         Get.snackbar(
@@ -785,28 +783,28 @@ class OneSignalService extends GetxService {
           icon: const Icon(Icons.info, color: Colors.white),
         );
         
-        print('✅ Test bilgileri gösterildi');
-        print('📋 OneSignal Dashboard\'da şunları kontrol edin:');
-        print('   1. App Settings → Android Configuration');
-        print('   2. Package Name: com.social.edusocial');
-        print('   3. App ID: $_appId');
-        print('   4. REST API Key: $_apiKey');
+        debugPrint('✅ Test bilgileri gösterildi');
+        debugPrint('📋 OneSignal Dashboard\'da şunları kontrol edin:');
+        debugPrint('   1. App Settings → Android Configuration');
+        debugPrint('   2. Package Name: com.social.edusocial');
+        debugPrint('   3. App ID: $_appId');
+        debugPrint('   4. REST API Key: $_apiKey');
       } else {
-        print('❌ Player ID alınamadı');
+        debugPrint('❌ Player ID alınamadı');
       }
     } catch (e) {
-      print('❌ Basit test bildirimi hatası: $e');
+      debugPrint('❌ Basit test bildirimi hatası: $e');
     }
   }
 
   // Platform tespiti ile test notification
   Future<void> sendPlatformAwareTestNotification() async {
     try {
-      print('🧪 Platform-aware test bildirimi gönderiliyor...');
+      debugPrint('🧪 Platform-aware test bildirimi gönderiliyor...');
       
       final playerId = await getPlayerId();
       if (playerId != null) {
-        print('📱 Player ID: $playerId');
+        debugPrint('📱 Player ID: $playerId');
         
         // Platform tespiti
         String platform = 'android';
@@ -816,12 +814,12 @@ class OneSignalService extends GetxService {
           platformName = 'iOS';
         }
         
-        print('🔧 Platform: $platformName');
-        print('🔧 OneSignal Konfigürasyonu:');
-        print('   - App ID: $_appId');
-        print('   - API Key: ${_apiKey.substring(0, 20)}...');
-        print('   - Package/Bundle ID: com.social.edusocial');
-        print('   - Platform: $platformName');
+        debugPrint('🔧 Platform: $platformName');
+        debugPrint('🔧 OneSignal Konfigürasyonu:');
+        debugPrint('   - App ID: $_appId');
+        debugPrint('   - API Key: ${_apiKey.substring(0, 20)}...');
+          debugPrint('   - Package/Bundle ID: com.social.edusocial');
+        debugPrint('   - Platform: $platformName');
         
         // OneSignal REST API ile test
         final response = await _apiService.post(
@@ -846,37 +844,36 @@ class OneSignalService extends GetxService {
           },
         );
         
-        print('📡 OneSignal API Response: ${response.statusCode}');
-        print('📡 Response Data: ${response.data}');
+        debugPrint('📡 OneSignal API Response: ${response.statusCode}');
+        debugPrint('📡 Response Data: ${response.data}');
         
         if (response.statusCode == 200) {
           if (response.data['errors'] != null && 
               response.data['errors']['invalid_player_ids'] != null) {
-            print('❌ OneSignal Dashboard konfigürasyonu eksik!');
-            print('📋 $platformName için gerekli adımlar:');
-            print('   1. OneSignal Dashboard → App Settings → ${platformName} Configuration');
-            print('   2. Package/Bundle ID: com.social.edusocial');
-            print('   3. App ID: $_appId');
-            print('   4. REST API Key: $_apiKey');
+            debugPrint('❌ OneSignal Dashboard konfigürasyonu eksik!');
+            debugPrint('📋 $platformName için gerekli adımlar:');
+            debugPrint('   2. Package/Bundle ID: com.social.edusocial');
+            debugPrint('   3. App ID: $_appId');
+            debugPrint('   4. REST API Key: $_apiKey');
             if (platform == 'ios') {
-              print('   5. APNs Certificate (opsiyonel)');
+              debugPrint('   5. APNs Certificate (opsiyonel)');
             } else {
-              print('   5. Google Project Number (opsiyonel)');
+              debugPrint('   5. Google Project Number (opsiyonel)');
             }
           } else {
-            print('✅ OneSignal test bildirimi başarıyla gönderildi');
+            debugPrint('✅ OneSignal test bildirimi başarıyla gönderildi');
             if (response.data['id'] != null) {
-              print('📋 Notification ID: ${response.data['id']}');
+              debugPrint('📋 Notification ID: ${response.data['id']}');
             }
           }
         } else {
-          print('❌ Test bildirimi gönderilemedi: ${response.statusCode}');
+          debugPrint('❌ Test bildirimi gönderilemedi: ${response.statusCode}');
         }
       } else {
-        print('❌ Player ID alınamadı');
+          debugPrint('❌ Player ID alınamadı');
       }
     } catch (e) {
-      print('❌ Platform-aware test bildirimi hatası: $e');
+      debugPrint('❌ Platform-aware test bildirimi hatası: $e');
     }
   }
 } 

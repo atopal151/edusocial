@@ -122,7 +122,7 @@ class TranslationService extends GetxService {
             
             // Error response'u parse etmeye çalış
             try {
-              final errorData = jsonDecode(response.body);
+              //inal errorData = jsonDecode(response.body);
               // debugPrint('❌ [TranslationService] Error Message: ${errorData['message']}');
               // debugPrint('❌ [TranslationService] Error Exception: ${errorData['exception']}');
             } catch (e) {

@@ -10,12 +10,12 @@ class ImagePreviewDialog extends StatefulWidget {
   final DateTime? timestamp;
 
   const ImagePreviewDialog({
-    Key? key,
+    super.key,
     required this.imageUrl,
     this.heroTag,
     this.userName,
     this.timestamp,
-  }) : super(key: key);
+  });
 
   @override
   State<ImagePreviewDialog> createState() => _ImagePreviewDialogState();
@@ -164,7 +164,7 @@ class _ImagePreviewDialogState extends State<ImagePreviewDialog>
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           _handleClose();
         }

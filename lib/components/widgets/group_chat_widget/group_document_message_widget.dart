@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../services/language_service.dart';

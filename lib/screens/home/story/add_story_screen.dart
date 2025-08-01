@@ -256,7 +256,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                         const SizedBox(height: 16),
                         // Küçük thumbnail'ler (eğer birden fazla seçili varsa)
                         if (_selectedImages.length > 1)
-                          Container(
+                          SizedBox(
                             height: 80,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,

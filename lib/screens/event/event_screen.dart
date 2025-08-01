@@ -47,7 +47,7 @@ class _EventScreenState extends State<EventScreen> {
           child: controller.eventList.isEmpty
               ? SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
-                  child: Container(
+                  child: SizedBox(
                     height: Get.height * 0.6,
                     child: Center(
                       child: Column(

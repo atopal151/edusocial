@@ -68,7 +68,7 @@ class GroupServices {
         
         // Don't retry for 4xx errors (client errors)
         if (e.toString().contains('4')) {
-          throw e;
+          rethrow;
         }
         
         if (attempt < _maxRetries) {

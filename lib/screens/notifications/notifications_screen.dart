@@ -1,5 +1,4 @@
 import 'package:edusocial/components/user_appbar/back_appbar.dart';
-import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/components/buttons/notification_action_button.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/notification_controller.dart';
@@ -130,7 +129,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       debugPrint('❌ NotificationScreen: User kanalından ayrılma hatası: $e');
     }
   }
-
+/*
   /// Socket durumunu kontrol et
   void _checkSocketConnection() {
     debugPrint('🔍 === NOTIFICATION SCREEN SOCKET DURUMU ===');
@@ -173,7 +172,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
     debugPrint('🔍 ===========================');
     debugPrint('🔍 ===========================================');
   }
-
+*/
+/*
   /// Test event gönder
   void _sendTestEvent() {
     debugPrint('🧪 Test event gönderiliyor...');
@@ -222,7 +222,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       duration: Duration(seconds: 2),
     );
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     final LanguageService languageService = Get.find<LanguageService>();
@@ -305,7 +305,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget buildNotificationTile(NotificationModel n) {
-    final LanguageService languageService = Get.find<LanguageService>();
+    //final LanguageService languageService = Get.find<LanguageService>();
     
     return ListTile(
       tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),

@@ -75,7 +75,7 @@ Widget buildProfileDetails() {
                               ),
                             ),
                             Text(
-                              "${profileData.schoolDepartment?.title ?? languageService.tr("profile.fallbackTexts.noDepartmentInfo")}" ,
+                              profileData.schoolDepartment?.title ?? languageService.tr("profile.fallbackTexts.noDepartmentInfo") ,
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w400,

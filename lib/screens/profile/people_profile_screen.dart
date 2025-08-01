@@ -132,19 +132,17 @@
                               text: languageService.tr("profile.peopleProfile.actions.sendMessage"),
                               onPressed: () {
                                 // Mesaj gönderme ekranına yönlendirme
-                                if (profile != null) {
-                                  Get.toNamed(Routes.chatDetail, arguments: {
-                                    'userId': profile.id,
-                                    'conversationId':
-                                        null, // Yeni konuşma başlatılacak
-                                    'name': '${profile.name} ${profile.surname}',
-                                    'username': profile.username,
-                                    'avatarUrl': profile.avatarUrl.isNotEmpty
-                                        ? profile.avatarUrl
-                                        : profile.avatar,
-                                    'isOnline': profile.isOnline,
-                                  });
-                                }
+                                Get.toNamed(Routes.chatDetail, arguments: {
+                                  'userId': profile.id,
+                                  'conversationId':
+                                      null, // Yeni konuşma başlatılacak
+                                  'name': '${profile.name} ${profile.surname}',
+                                  'username': profile.username,
+                                  'avatarUrl': profile.avatarUrl.isNotEmpty
+                                      ? profile.avatarUrl
+                                      : profile.avatar,
+                                  'isOnline': profile.isOnline,
+                                });
                               },
                               backgroundColor: const Color(0xff1f1f1f),
                               textColor: const Color(0xffffffff),
@@ -297,7 +295,7 @@
 
         // Entries loading durumu
         if (controller.isEntriesLoading.value) {
-          return Container(
+          return SizedBox(
             height: 200,
             child: Center(
               child: GeneralLoadingIndicator(
@@ -309,7 +307,7 @@
         }
 
         if (controller.peopleEntries.isEmpty) {
-          return Container(
+          return SizedBox(
             height: 200,
             child: Center(
               child: Text(languageService.tr("profile.peopleProfile.noEntriesFound")),
@@ -326,10 +324,7 @@
 
             // Entry'nin kullanıcı bilgilerini al
             final user = entry.user;
-            if (user == null) {
-              //debugPrint("⚠️ Entry için kullanıcı bilgileri bulunamadı: ${entry.id}");
-              return const SizedBox.shrink();
-            }
+          
 
             //debugPrint("🔍 PersonEntryCard - Kullanıcı bilgileri: ${user.avatarUrl}");
             return Container(
@@ -415,7 +410,7 @@
     Widget _buildLockedContent() {
       final LanguageService languageService = Get.find<LanguageService>();
 
-      return Container(
+      return SizedBox(
         height: 300,
         child: Center(
         child: Column(

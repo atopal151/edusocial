@@ -121,7 +121,7 @@ class PeopleProfileController extends GetxController {
       peopleEntries.assignAll(entries);
     }
   }
-
+/*
   /// Eski yöntem - geriye uyumluluk için tutuldu
   Future<void> _processEntriesWithUserData(List<EntryModel> entries) async {
     try {
@@ -196,7 +196,7 @@ class PeopleProfileController extends GetxController {
       peopleEntries.assignAll(entries);
     }
   }
-
+*/
   /// PeopleProfileModel'den UserModel oluştur
   UserModel _createUserModelFromProfile(PeopleProfileModel profile) {
     return UserModel(

@@ -176,7 +176,7 @@ class PeopleProfileService {
     if (userIds.isEmpty) return {};
     
     final Map<int, PeopleProfileModel> users = {};
-    final token = box.read('token');
+    //final token = box.read('token');
 
     try {
       // Eğer backend batch endpoint'i varsa kullan, yoksa paralel çek

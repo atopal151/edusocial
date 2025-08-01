@@ -84,7 +84,7 @@ class ErrorHandler {
       'Başarılı',
       message,
       snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.green.withOpacity(0.8),
+      backgroundColor: Colors.green.withAlpha(80),
       colorText: Colors.white,
       duration: const Duration(seconds: 3),
       margin: const EdgeInsets.all(16),
@@ -101,7 +101,7 @@ class ErrorHandler {
       'Uyarı',
       message,
       snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.orange.withOpacity(0.8),
+      backgroundColor: Colors.orange.withAlpha(80),
       colorText: Colors.white,
       duration: const Duration(seconds: 3),
       margin: const EdgeInsets.all(16),
@@ -114,8 +114,8 @@ class ErrorHandler {
   /// 🔄 Loading dialog göster
   static void showLoading({String message = 'Yükleniyor...'}) {
     Get.dialog(
-      WillPopScope(
-        onWillPop: () async => false, // Geri tuşu ile kapatılmasın
+      PopScope(
+        canPop: false, // Geri tuşu ile kapatılmasın
         child: Center(
           child: Container(
             padding: const EdgeInsets.all(20),
@@ -157,7 +157,7 @@ class ErrorHandler {
       'Hata',
       message,
       snackPosition: SnackPosition.TOP,
-      backgroundColor: backgroundColor ?? Colors.red.withOpacity(0.8),
+      backgroundColor: backgroundColor ?? Colors.red.withAlpha(80),
       colorText: Colors.white,
       duration: const Duration(seconds: 4),
       margin: const EdgeInsets.all(16),

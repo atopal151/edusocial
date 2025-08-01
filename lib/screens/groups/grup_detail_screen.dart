@@ -1,22 +1,12 @@
 import 'package:edusocial/components/cards/event_card.dart';
-import 'package:edusocial/components/cards/group_suggestion_card.dart';
-import 'package:edusocial/components/buttons/custom_button.dart';
-import 'package:edusocial/components/buttons/icon_button.dart';
-import 'package:edusocial/components/cards/profile_cards.dart';
-import 'package:edusocial/components/user_appbar/group_appbar.dart';
 import 'package:edusocial/components/widgets/custom_loading_indicator.dart';
 import 'package:edusocial/controllers/group_controller/group_controller.dart';
-import 'package:edusocial/models/group_models/group_detail_model.dart';
-import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
-import 'package:edusocial/routes/app_routes.dart';
-import 'package:edusocial/services/group_services/group_service.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/language_service.dart';
 

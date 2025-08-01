@@ -172,7 +172,7 @@ class ChatController extends GetxController {
       filteredChatList.assignAll(filteredChats);
 
       // Okunmamış mesaj özeti
-      final totalUnread = filteredChats.fold(0, (sum, chat) => sum + chat.unreadCount);
+      //final totalUnread = filteredChats.fold(0, (sum, chat) => sum + chat.unreadCount);
       final unreadChats = filteredChats.where((chat) => chat.unreadCount > 0).toList();
       
       //debugPrint("📊 === CHAT CONTROLLER SUMMARY ===");
@@ -183,8 +183,8 @@ class ChatController extends GetxController {
       if (unreadChats.isNotEmpty) {
         //debugPrint("📊 Okunmamış Mesaj Detayları:");
         for (var chat in unreadChats) {
-          //debugPrint("  - ${chat.name} (@${chat.username}): ${chat.unreadCount} mesaj");
-          //debugPrint("    Son mesaj: ${chat.lastMessage?.message ?? 'No message'}");
+          debugPrint("  - ${chat.name} (@${chat.username}): ${chat.unreadCount} mesaj");
+          debugPrint("    Son mesaj: ${chat.lastMessage?.message ?? 'No message'}");
         }
       } else {
         //debugPrint("📊 Tüm mesajlar okunmuş");

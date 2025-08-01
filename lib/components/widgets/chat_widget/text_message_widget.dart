@@ -57,7 +57,7 @@ class TextMessageWidget extends StatelessWidget {
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         color: message.isMe 
-                            ? Colors.white.withOpacity(0.8)
+                            ? Colors.white.withAlpha(80)
                             : const Color(0xff8E8E93),
                         fontWeight: FontWeight.w400,
                       ),

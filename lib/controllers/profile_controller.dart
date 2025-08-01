@@ -12,7 +12,6 @@ import '../models/profile_model.dart';
 import '../models/entry_model.dart';
 import '../models/user_model.dart';
 import '../services/profile_service.dart';
-import '../services/people_profile_services.dart';
 import 'package:get_storage/get_storage.dart';
 
 class ProfileController extends GetxController {
@@ -297,7 +296,7 @@ String formatSimpleDate(String dateStr) {
       personEntries.clear();
     }
   }
-
+/*
   /// Entries'ları topic user_id'lerine göre kullanıcı bilgileriyle işle
   Future<void> _processEntriesWithUserData(List<EntryModel> entries) async {
     try {
@@ -342,7 +341,8 @@ String formatSimpleDate(String dateStr) {
       personEntries.assignAll(entries);
     }
   }
-
+*/
+/*
   /// ProfileModel'den UserModel oluştur
   UserModel _createUserModelFromProfile(dynamic profile) {
     return UserModel(
@@ -375,4 +375,5 @@ String formatSimpleDate(String dateStr) {
       isSelf: profile.isSelf,
     );
   }
-}
+  */
+  }

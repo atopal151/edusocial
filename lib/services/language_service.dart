@@ -30,7 +30,7 @@ class LanguageService extends GetxService {
       final savedLanguage = prefs.getString(_languageKey) ?? _defaultLanguage;
       await changeLanguage(savedLanguage);
     } catch (e) {
-      print('Dil yükleme hatası: $e');
+      debugPrint('Dil yükleme hatası: $e');
       await changeLanguage(_defaultLanguage);
     }
   }
@@ -54,9 +54,9 @@ class LanguageService extends GetxService {
       currentLanguage.value = languageCode;
       await _saveLanguage(languageCode);
       
-      print('Dil değiştirildi: $languageCode');
+      debugPrint('Dil değiştirildi: $languageCode');
     } catch (e) {
-      print('Dil değiştirme hatası: $e');
+      debugPrint('Dil değiştirme hatası: $e');
     }
   }
 
@@ -67,7 +67,7 @@ class LanguageService extends GetxService {
       final Map<String, dynamic> loadedTranslations = json.decode(jsonString);
       translations.value = loadedTranslations;
     } catch (e) {
-      print('Çeviri dosyası yükleme hatası: $e');
+      debugPrint('Çeviri dosyası yükleme hatası: $e');
       // Hata durumunda varsayılan dili yükle
       if (languageCode != _defaultLanguage) {
         await _loadTranslations(_defaultLanguage);
@@ -92,7 +92,7 @@ class LanguageService extends GetxService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_languageKey, languageCode);
     } catch (e) {
-      print('Dil kaydetme hatası: $e');
+      debugPrint('Dil kaydetme hatası: $e');
     }
   }
 
@@ -100,7 +100,7 @@ class LanguageService extends GetxService {
   String tr(String key) {
     try {
       final keys = key.split('.');
-      dynamic value = translations.value;
+      dynamic value = translations;
       
       for (final k in keys) {
         if (value is Map && value.containsKey(k)) {
@@ -112,7 +112,7 @@ class LanguageService extends GetxService {
       
       return value?.toString() ?? key;
     } catch (e) {
-      print('Çeviri hatası ($key): $e');
+      debugPrint('Çeviri hatası ($key): $e');
       return key;
     }
   }

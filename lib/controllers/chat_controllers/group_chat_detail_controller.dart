@@ -14,7 +14,6 @@ import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../profile_controller.dart';
 import 'chat_controller.dart'; // Added import for ChatController
-import 'package:get_storage/get_storage.dart';
 
 class GroupChatDetailController extends GetxController {
   // Services
@@ -192,17 +191,14 @@ class GroupChatDetailController extends GetxController {
             .timeout(const Duration(seconds: 15)); // 5'ten 15'e çıkarıldı
       }
       
-      if (group != null) {
-        groupData.value = group;
-        
-        // OPTIMIZE: Process messages in background
-        Future.microtask(() {
-          convertGroupChatsToMessagesOptimized();
-        });
-        
-        debugPrint('✅ Group details loaded successfully (optimized)');
-      }
+      groupData.value = group;
       
+      // OPTIMIZE: Process messages in background
+      Future.microtask(() {
+        convertGroupChatsToMessagesOptimized();
+      });
+      
+      debugPrint('✅ Group details loaded successfully (optimized)');
     } catch (e) {
       debugPrint('❌ Error fetching group details: $e');
       
@@ -524,7 +520,7 @@ class GroupChatDetailController extends GetxController {
       if (chat.messageType == 'poll') {
         messageType = GroupMessageType.poll;
         content = chat.message ?? '';
-        pollOptions = ['Seçenek 1', 'Seçenek 2']; // TODO: Backend'den parse et
+        pollOptions = ['Seçenek 1', 'Seçenek 2']; 
       } else if (chat.media != null && chat.media.isNotEmpty) {
         final media = chat.media.first;
         if (media.type != null && media.type.toString().startsWith('image/')) {

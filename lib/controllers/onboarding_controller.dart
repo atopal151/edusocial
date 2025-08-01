@@ -8,12 +8,8 @@ import '../services/language_service.dart';
 import '../controllers/profile_controller.dart';
 import '../controllers/group_controller/group_controller.dart';
 import '../controllers/notification_controller.dart';
-import '../controllers/post_controller.dart';
 import '../controllers/appbar_controller.dart';
-import '../controllers/entry_controller.dart';
-import '../controllers/match_controller.dart';
 import '../controllers/story_controller.dart';
-import 'package:get_storage/get_storage.dart';
 
 class OnboardingController extends GetxController {
   RxString selectedSchool = "".obs;

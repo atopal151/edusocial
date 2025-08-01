@@ -79,7 +79,7 @@ class GetTranslations extends Translations {
   Map<String, Map<String, String>> get keys {
     try {
       final languageService = Get.find<LanguageService>();
-      final translations = languageService.translations.value;
+      final translations = languageService.translations;
       
       // GetX formatına dönüştür
       Map<String, Map<String, String>> result = {};
@@ -87,7 +87,7 @@ class GetTranslations extends Translations {
       
       return result;
     } catch (e) {
-      print('LanguageService bulunamadı, varsayılan çeviriler kullanılıyor: $e');
+      debugPrint('LanguageService bulunamadı, varsayılan çeviriler kullanılıyor: $e');
       // Varsayılan boş çeviriler döndür
       return {
         'en': {},
@@ -110,7 +110,7 @@ class GetTranslations extends Translations {
           }
           result[languageCode]![fullKey] = value.toString();
         } catch (e) {
-          print('Çeviri hatası: $e');
+          debugPrint('Çeviri hatası: $e');
         }
       }
     });

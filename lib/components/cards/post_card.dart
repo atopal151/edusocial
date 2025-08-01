@@ -13,7 +13,6 @@ import '../widgets/share_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 import '../snackbars/custom_snackbar.dart';
 import '../../services/language_service.dart';
-import 'package:edusocial/controllers/notification_controller.dart';
 
 class PostCard extends StatefulWidget {
   final int postId;

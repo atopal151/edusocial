@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/models/chat_models/detail_document_model.dart';
 import 'package:edusocial/services/chat_service.dart';
 import 'package:edusocial/services/socket_services.dart';
 import 'package:edusocial/utils/network_helper.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';

@@ -38,7 +38,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
       languageService = Get.find<LanguageService>();
     } catch (e) {
       // Eğer LanguageService bulunamazsa, null olarak bırak
-      print('LanguageService bulunamadı: $e');
+      debugPrint('LanguageService bulunamadı: $e');
       languageService = null;
     }
   }
@@ -49,7 +49,7 @@ class _EntryShareScreenState extends State<EntryShareScreen> {
         return languageService!.tr(key);
       }
     } catch (e) {
-      print('Çeviri hatası ($key): $e');
+      debugPrint('Çeviri hatası ($key): $e');
     }
     return fallback;
   }

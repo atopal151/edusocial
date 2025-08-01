@@ -1,7 +1,6 @@
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:edusocial/utils/constants.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -134,7 +134,7 @@ class ProfileUpdateController extends GetxController {
       // Dil servisini güncelle
       _languageService.changeLanguage(selectedLanguage.code);
       
-      print('Dil değiştirildi: ${selectedLanguage.code}');
+      debugPrint('Dil değiştirildi: ${selectedLanguage.code}');
     }
   }
 

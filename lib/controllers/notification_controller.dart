@@ -24,7 +24,7 @@ class NotificationController extends GetxController {
   /// Okunmamış bildirim sayısını hesapla ve güncelle
   void _updateUnreadCount() {
     final unreadNotifications = notifications.where((n) => !n.isRead).toList();
-    final readNotifications = notifications.where((n) => n.isRead).toList();
+    //final readNotifications = notifications.where((n) => n.isRead).toList();
     
     unreadCount.value = unreadNotifications.length;
     
@@ -88,7 +88,7 @@ class NotificationController extends GetxController {
       _sendOneSignalNotificationFromData(data);
     });
   }
-
+/*
   /// Yeni bildirim geldiğinde listeye ekle
   void _handleNewNotification(dynamic data) {
     try {
@@ -117,7 +117,7 @@ class NotificationController extends GetxController {
       debugPrint('❌ Socket bildirim işleme hatası: $e');
     }
   }
-
+*/
   /// Bildirimi okundu olarak işaretle
   void markAsRead(String notificationId) {
     final index = notifications.indexWhere((n) => n.id == notificationId);
@@ -196,18 +196,18 @@ class NotificationController extends GetxController {
       
       // API'den gelen isRead değerlerini kontrol et
       //debugPrint('📊 === API\'DEN GELEN BİLDİRİMLER ===');
-      for (var notif in fetched) {
+      //for (var notif in fetched) {
         //debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
-      }
+      //}
       //debugPrint('📊 ================================');
       
       // Okunmamış bildirimleri ayrıca listele
       final unreadNotifications = fetched.where((n) => !n.isRead).toList();
       if (unreadNotifications.isNotEmpty) {
         //debugPrint('📊 === OKUNMAMIŞ BİLDİRİMLER (API) ===');
-        for (var notif in unreadNotifications) {
+        //for (var notif in unreadNotifications) {
           //debugPrint('📊 ID: ${notif.id} | Type: ${notif.type} | isRead: ${notif.isRead} | Message: ${notif.message}');
-        }
+        //}
         //debugPrint('📊 ====================================');
       }
       
