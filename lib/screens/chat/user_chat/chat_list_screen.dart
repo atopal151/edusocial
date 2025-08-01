@@ -461,6 +461,10 @@ class _ChatListScreenState extends State<ChatListScreen>
             itemCount: groupController.userGroups.length,
             itemBuilder: (context, index) {
               final group = groupController.userGroups[index];
+              
+              // DEBUG: Print individual group data when building
+              debugPrint('🏗️ Building group item ${index + 1}: ${group.name} (ID: ${group.id})');
+              
               return GestureDetector(
                 onTap: () {
                   chatController.getGroupChatPage(group.id);

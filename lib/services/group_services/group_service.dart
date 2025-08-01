@@ -123,12 +123,12 @@ class GroupServices {
     final box = GetStorage();
     final token = box.read('token');
 
-    /*debugPrint("🚀 fetchUserGroups() çağrıldı");
-    debugPrint("🔑 Token: $token");*/
+    debugPrint("🚀 fetchUserGroups() çağrıldı");
+    debugPrint("🔑 Token: $token");
 
     try {
       final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
-      /*debugPrint("🌐 İstek Atılıyor: $uri");*/
+      debugPrint("🌐 İstek Atılıyor: $uri");
 
       final response = await http.get(
         uri,
@@ -138,28 +138,81 @@ class GroupServices {
         },
       );
 
-      /*debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}",
-       wrapWidth: 1024);
-      debugPrint("📥 Kullanıcı Grupları Body:\n${response.body}",
-      wrapWidth: 1024);*/
+      debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}");
+      debugPrint("📥 Kullanıcı Grupları Raw Response Body:");
+      debugPrint("${response.body}");
+      debugPrint("📥 Kullanıcı Grupları Response Headers:");
+      debugPrint("${response.headers}");
+      debugPrint("📥 Response Body Length: ${response.body.length} characters");
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
+        debugPrint("📦 Parsed JSON Response:");
+        debugPrint("${json.encode(jsonBody)}");
+        
         final List<dynamic> data = jsonBody['data'] ?? [];
-
-        /*debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}",
-          wrapWidth: 1024);*/
+        debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}");
+        
+        // Show all available fields in the first group (if exists)
+        if (data.isNotEmpty) {
+          final firstGroup = data[0];
+          debugPrint('📊 Available Fields in API Response:');
+          debugPrint('${firstGroup.keys.toList()}');
+          debugPrint('');
+        }
+        
+        // Print each group data individually with detailed analysis
+        for (int i = 0; i < data.length; i++) {
+          final groupData = data[i];
+          debugPrint("📋 Group ${i + 1} Raw Data:");
+          debugPrint("${json.encode(groupData)}");
+          
+          // Detailed analysis of each group
+          debugPrint('🔍 Group ${i + 1} Detailed Analysis:');
+          debugPrint('   ID: ${groupData['id']}');
+          debugPrint('   Name: ${groupData['name']}');
+          debugPrint('   Description: ${groupData['description']}');
+          debugPrint('   Status: ${groupData['status']}');
+          debugPrint('   Is Private: ${groupData['is_private']}');
+          debugPrint('   Message Count: ${groupData['message_count']}');
+          debugPrint('   User Count With Admin: ${groupData['user_count_with_admin']}');
+          debugPrint('   User Count Without Admin: ${groupData['user_count_without_admin']}');
+          debugPrint('   Is Founder: ${groupData['is_founder']}');
+          debugPrint('   Is Member: ${groupData['is_member']}');
+          debugPrint('   Is Pending: ${groupData['is_pending']}');
+          debugPrint('   Avatar URL: ${groupData['avatar_url']}');
+          debugPrint('   Banner URL: ${groupData['banner_url']}');
+          debugPrint('   Created At: ${groupData['created_at']}');
+          debugPrint('   Updated At: ${groupData['updated_at']}');
+          debugPrint('   Human Created At: ${groupData['human_created_at']}');
+          debugPrint('   Deleted At: ${groupData['deleted_at']}');
+          debugPrint('   User ID: ${groupData['user_id']}');
+          debugPrint('   Group Area ID: ${groupData['group_area_id']}');
+          
+          // Pivot data analysis
+          if (groupData['pivot'] != null) {
+            final pivot = groupData['pivot'];
+            debugPrint('   📌 Pivot Data:');
+            debugPrint('      User ID: ${pivot['user_id']}');
+            debugPrint('      Group ID: ${pivot['group_id']}');
+            debugPrint('      Pivot Created At: ${pivot['created_at']}');
+            debugPrint('      Pivot Updated At: ${pivot['updated_at']}');
+          }
+          
+          debugPrint(''); // Empty line for separation
+        }
 
         final userGroupList = data.map((item) => GroupModel.fromJson(item)).toList();
+        debugPrint("✅ Başarıyla ${userGroupList.length} grup parse edildi");
 
         return userGroupList;
       } else {
-        debugPrint("❌ Sunucudan beklenmeyen yanıt.");
+        debugPrint("❌ Sunucudan beklenmeyen yanıt: ${response.statusCode}");
+        debugPrint("❌ Error Body: ${response.body}");
         return [];
       }
     } catch (e) {
-      debugPrint("💥 Kullanıcı grupları alınırken hata oluştu: $e",
-          wrapWidth: 1024);
+      debugPrint("💥 Kullanıcı grupları alınırken hata oluştu: $e");
       return [];
     }
   }
@@ -488,6 +541,9 @@ class GroupServices {
     final token = box.read('token');
     try {
       debugPrint('👥 Kullanıcının katıldığı gruplar alınıyor...');
+      debugPrint('🔑 Token: $token');
+      debugPrint('🌐 Request URL: ${AppConstants.baseUrl}/timeline/groups');
+      
       final response = await _makeRequestWithRetry(
         () => http.get(
           Uri.parse('${AppConstants.baseUrl}/timeline/groups'),
@@ -498,16 +554,77 @@ class GroupServices {
         ),
         operation: 'Get User Groups',
       );
-      debugPrint('👥 Get User Groups Response: ${response.statusCode}');
-      debugPrint('👥 Get User Groups Body: ${response.body}');
+      
+      debugPrint('👥 Get User Groups Response Status: ${response.statusCode}');
+      debugPrint('👥 Get User Groups Response Headers:');
+      debugPrint('${response.headers}');
+      debugPrint('👥 Get User Groups Raw Response Body:');
+      debugPrint(response.body);
+      
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
+        debugPrint('📦 Parsed JSON Response:');
+        debugPrint(json.encode(responseData));
+        
         final List<dynamic> data = responseData['data'] as List<dynamic>;
+        debugPrint('📦 Data array length: ${data.length}');
+        
+        // Show all available fields in the first group (if exists)
+        if (data.isNotEmpty) {
+          final firstGroup = data[0];
+          debugPrint('📊 Available Fields in API Response:');
+          debugPrint('${firstGroup.keys.toList()}');
+          debugPrint('');
+        }
+        
+        // Print each group data individually with detailed analysis
+        for (int i = 0; i < data.length; i++) {
+          final groupData = data[i];
+          debugPrint('📋 Group ${i + 1} Raw Data:');
+          debugPrint(json.encode(groupData));
+          
+        /*  // Detailed analysis of each group
+          debugPrint('🔍 Group ${i + 1} Detailed Analysis:');
+          debugPrint('   ID: ${groupData['id']}');
+          debugPrint('   Name: ${groupData['name']}');
+          debugPrint('   Description: ${groupData['description']}');
+          debugPrint('   Status: ${groupData['status']}');
+          debugPrint('   Is Private: ${groupData['is_private']}');
+          debugPrint('   Message Count: ${groupData['message_count']}');
+          debugPrint('   User Count With Admin: ${groupData['user_count_with_admin']}');
+          debugPrint('   User Count Without Admin: ${groupData['user_count_without_admin']}');
+          debugPrint('   Is Founder: ${groupData['is_founder']}');
+          debugPrint('   Is Member: ${groupData['is_member']}');
+          debugPrint('   Is Pending: ${groupData['is_pending']}');
+          debugPrint('   Avatar URL: ${groupData['avatar_url']}');
+          debugPrint('   Banner URL: ${groupData['banner_url']}');
+          debugPrint('   Created At: ${groupData['created_at']}');
+          debugPrint('   Updated At: ${groupData['updated_at']}');
+          debugPrint('   Human Created At: ${groupData['human_created_at']}');
+          debugPrint('   Deleted At: ${groupData['deleted_at']}');
+          debugPrint('   User ID: ${groupData['user_id']}');
+          debugPrint('   Group Area ID: ${groupData['group_area_id']}');
+          
+          // Pivot data analysis
+          if (groupData['pivot'] != null) {
+            final pivot = groupData['pivot'];
+            debugPrint('   📌 Pivot Data:');
+            debugPrint('      User ID: ${pivot['user_id']}');
+            debugPrint('      Group ID: ${pivot['group_id']}');
+            debugPrint('      Pivot Created At: ${pivot['created_at']}');
+            debugPrint('      Pivot Updated At: ${pivot['updated_at']}');
+          }
+          
+          debugPrint(''); // Empty line for separation
+          */
+        }
+        
         final List<GroupModel> groups = data.map((json) => GroupModel.fromJson(json)).toList();
-        debugPrint('✅ Kullanıcının ${groups.length} adet grubu bulundu');
+        debugPrint('✅ Kullanıcının ${groups.length} adet grubu başarıyla parse edildi');
         return groups;
       } else {
-        debugPrint('❌ Get user groups failed: ${response.body}');
+        debugPrint('❌ Get user groups failed with status: ${response.statusCode}');
+        debugPrint('❌ Error Response Body: ${response.body}');
         return null;
       }
     } catch (e) {
