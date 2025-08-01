@@ -19,7 +19,7 @@ class SocketService extends GetxService {
   
   // DEBOUNCE: Çoklu bildirimleri engellemek için
   final Map<String, DateTime> _lastNotificationTime = {};
-  static const Duration _notificationDebounce = Duration(seconds: 2);
+  static const Duration _notificationDebounce = Duration(seconds: 10);
 
   // Stream Controllers for broadcasting events
   final _privateMessageController = StreamController<dynamic>.broadcast();
@@ -336,11 +336,53 @@ class SocketService extends GetxService {
       debugPrint('👤 User notification geldi (SocketService): $data');
       debugPrint('👤 User notification data type: ${data.runtimeType}');
       debugPrint('👤 User notification data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      // Çoklu bildirim kontrolü
+      final notificationId = data['notification_data']?['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final notificationKey = 'user_notification_$notificationId';
+      final now = DateTime.now();
+      final lastNotification = _lastNotificationTime[notificationKey];
+      
+      if (lastNotification != null && 
+          now.difference(lastNotification) < _notificationDebounce) {
+        debugPrint('🚫 User notification debounced: $notificationKey');
+        return;
+      }
+      
+      _lastNotificationTime[notificationKey] = now;
+      
       _userNotificationController.add(data);
       
+      // Bildirim tipini belirle
+      String notificationType = 'notification';
+      if (data is Map<String, dynamic> && data.containsKey('notification_data')) {
+        final notificationData = data['notification_data'] as Map<String, dynamic>?;
+        final type = notificationData?['type']?.toString() ?? '';
+        
+        // Alt türe göre bildirim tipini belirle
+        switch (type) {
+          case 'post-like':
+          case 'post-comment':
+            notificationType = 'post';
+            break;
+          case 'follow-request':
+          case 'follow-accepted':
+          case 'follow-declined':
+            notificationType = 'follow';
+            break;
+          case 'group-join-request':
+          case 'group-join-accepted':
+          case 'group-join-declined':
+            notificationType = 'group';
+            break;
+          default:
+            notificationType = 'notification';
+        }
+      }
+      
       // OneSignal bildirimi gönder (uygulama açıkken)
-      debugPrint('👤 OneSignal bildirimi gönderiliyor...');
-      _sendOneSignalNotification('notification', data);
+      debugPrint('👤 OneSignal bildirimi gönderiliyor... Tip: $notificationType');
+      _sendOneSignalNotification(notificationType, data);
       debugPrint('👤 OneSignal bildirimi gönderme tamamlandı');
       debugPrint('👤 =======================================');
     });
@@ -1338,12 +1380,16 @@ class SocketService extends GetxService {
       final notificationMessage = '$senderName: $messageText';
       
       // Özel grup bildirimi gönder
-      _oneSignalService.sendCustomMessageNotification(
-        senderName: groupName, // Grup adı
-        message: notificationMessage, // "Gönderen: Mesaj" formatı
-        senderAvatar: groupAvatar, // Grup profil resmi
-        conversationId: groupId, // Group ID'yi conversation ID olarak kullan
-        data: data,
+      _oneSignalService.sendLocalNotification(
+        groupName, // Grup adı
+        notificationMessage, // "Gönderen: Mesaj" formatı
+        {
+          'type': 'group', // Group tipi olarak işaretle
+          'group_id': groupId,
+          'sender_name': senderName,
+          'message': messageText,
+          'group_avatar': groupAvatar,
+        },
       );
       
       debugPrint('✅ Özel grup mesaj bildirimi gönderildi');

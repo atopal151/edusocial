@@ -1291,6 +1291,7 @@
       "declining": "Declining...",
       "retry": "Retry"
     },
+    "cancel": "Cancel",
     "messages": {
       "success": "Success",
       "error": "Error",
@@ -1574,16 +1575,11 @@
     },
     "types": {
       "title": "Notification Types",
-      "postNotifications": "Post Notifications",
-      "messageNotifications": "Message Notifications",
-      "groupNotifications": "Group Notifications",
-      "eventNotifications": "Event Notifications",
-      "followNotifications": "Follow Notifications",
-      "userNotifications": "User Notifications",
-      "commentNotifications": "Comment Notifications",
-      "likeNotifications": "Like Notifications",
-      "postMentionNotifications": "Post Mention Notifications",
-      "commentMentionNotifications": "Comment Mention Notifications",
+      "postNotifications": "Post Notifications (Likes, Comments)",
+      "messageNotifications": "Message Notifications (Private & Group Chat)",
+      "groupNotifications": "Group Notifications (Join Requests)",
+      "eventNotifications": "Event Notifications (Invitations)",
+      "followNotifications": "Follow Notifications (Requests)",
       "systemNotifications": "System Notifications"
     },
     "test": {
@@ -1601,7 +1597,25 @@
       "settingsSaved": "Settings saved successfully",
       "settingsError": "Failed to save settings",
       "permissionGranted": "Notification permission granted",
-      "permissionDenied": "Notification permission denied"
+      "permissionGrantedDesc": "You can now receive notifications",
+      "permissionDenied": "Notification permission denied",
+      "permissionDeniedDesc": "You need to grant permission from settings to receive notifications",
+      "permissionRequired": "Notification permission required",
+      "permissionRequiredDesc": "You need to grant notification permission first to use this feature",
+      "settingsRedirect": "Redirecting to Settings",
+      "settingsRedirectDesc": "You can disable notification permissions from device settings"
+    },
+    "dialogs": {
+      "permissionRequired": {
+        "title": "Notification Permission Required",
+        "message": "To enable this notification type, you need to grant notification permission from your device first. Would you like to grant permission?",
+        "grant": "Grant Permission"
+      },
+      "disablePermission": {
+        "title": "Disable Notification Permission",
+        "message": "To disable notification permission, you need to go to device settings. Would you like to open settings?",
+        "openSettings": "Open Settings"
+      }
     }
   }
 

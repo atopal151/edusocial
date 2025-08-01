@@ -32,7 +32,7 @@ class NotificationController extends GetxController {
     //debugPrint('📊 Toplam bildirim sayısı: ${notifications.length}');
     //debugPrint('📊 Okunmuş bildirim sayısı: ${readNotifications.length}');
     //debugPrint('📊 Okunmamış bildirim sayısı: ${unreadCount.value}');
-    
+    /*
     if (unreadNotifications.isNotEmpty) {
       debugPrint('📊 Okunmamış bildirimler:');
       for (var notif in unreadNotifications) {
@@ -41,8 +41,8 @@ class NotificationController extends GetxController {
     } else {
       debugPrint('📊 Okunmamış bildirim yok');
     }
-    
-    debugPrint('📊 ================================');
+    */
+    //  debugPrint('📊 ================================');
   }
 
   @override
@@ -483,13 +483,27 @@ class NotificationController extends GetxController {
               title = _languageService.tr('slidingNotifications.newMessage');
           }
           
-          // OneSignal bildirimi gönder
-          _oneSignalService.sendCustomMessageNotification(
-            senderName: title,
-            message: message,
-            senderAvatar: userAvatar,
-            conversationId: 'notification',
-            data: data,
+          // OneSignal bildirimi gönder - doğru tip ile
+          // Bildirim tipini belirle
+          String type = 'notification';
+          if (notificationType.startsWith('post-')) {
+            type = 'post';
+          } else if (notificationType.startsWith('follow-')) {
+            type = 'follow';
+          } else if (notificationType.startsWith('group-')) {
+            type = 'group';
+          }
+          
+          debugPrint('📱 Bildirim tipi belirlendi: $type (notificationType: $notificationType)');
+          
+          _oneSignalService.sendLocalNotification(
+            title,
+            message,
+            {
+              'type': type,
+              'notification_data': notificationData,
+              ...data,
+            },
           );
           
           debugPrint('✅ NotificationController: OneSignal bildirimi gönderildi');

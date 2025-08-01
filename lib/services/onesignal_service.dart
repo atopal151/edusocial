@@ -12,7 +12,10 @@ class OneSignalService extends GetxService {
   
   // Bildirim yöneticisi - çoklu bildirim önlemek için
   final Map<String, DateTime> _activeNotifications = {};
-  final Duration _notificationCooldown = const Duration(seconds: 2);
+  final Duration _notificationCooldown = const Duration(seconds: 10);
+  
+  // Global bildirim kontrolü - aynı anda sadece bir bildirim göster
+  bool _isShowingNotification = false;
   
   @override
   void onInit() {
@@ -192,40 +195,107 @@ class OneSignalService extends GetxService {
       final prefs = await SharedPreferences.getInstance();
       final data = notification.additionalData;
       
+      // Önce genel bildirim iznini kontrol et
+      final hasPermission = await hasNotificationPermission();
+      if (!hasPermission) {
+        debugPrint('❌ Bildirim izni yok, bildirim gösterilmeyecek');
+        return false;
+      }
+      
       if (data == null || data['type'] == null) {
+        debugPrint('⚠️ Bildirim tipi belirtilmemiş, varsayılan olarak gösteriliyor');
         return true; // Tip belirtilmemişse göster
       }
 
       final type = data['type'] as String;
+      debugPrint('🔍 Bildirim tipi kontrol ediliyor: $type');
+      debugPrint('🔍 Bildirim data: $data');
+      debugPrint('🔍 Bildirim ayarları kontrol ediliyor...');
+      
+      bool shouldShow = true;
       
       switch (type) {
         case 'post':
-          return prefs.getBool('post_notifications') ?? true;
-        case 'message':
-          return prefs.getBool('message_notifications') ?? true;
-        case 'group':
-          return prefs.getBool('group_notifications') ?? true;
-        case 'event':
-          return prefs.getBool('event_notifications') ?? true;
-        case 'follow':
-          return prefs.getBool('follow_notifications') ?? true;
-        case 'user_notification':
-          return prefs.getBool('user_notifications') ?? true;
-        case 'comment':
-          return prefs.getBool('comment_notifications') ?? true;
         case 'like':
-          return prefs.getBool('like_notifications') ?? true;
-        case 'post_mention':
-          return prefs.getBool('post_mention_notifications') ?? true;
-        case 'comment_mention':
-          return prefs.getBool('comment_mention_notifications') ?? true;
-        case 'system_notification':
-          return prefs.getBool('system_notifications') ?? true;
+        case 'comment':
+          shouldShow = prefs.getBool('post_notifications') ?? true;
+          debugPrint('🔍 Post bildirimleri kontrol edildi: $shouldShow');
+          break;
+        case 'message':
+          shouldShow = prefs.getBool('message_notifications') ?? true;
+          debugPrint('🔍 Mesaj bildirimleri kontrol edildi: $shouldShow');
+          break;
+        case 'group':
+          shouldShow = prefs.getBool('message_notifications') ?? true; // Group chat mesajları
+          debugPrint('🔍 Grup bildirimleri kontrol edildi: $shouldShow');
+          break;
+        case 'group_join_request':
+        case 'group_join_accepted':
+        case 'group_join_declined':
+          shouldShow = prefs.getBool('group_notifications') ?? true;
+          break;
+        case 'event_invitation':
+          shouldShow = prefs.getBool('event_notifications') ?? true;
+          break;
+        case 'follow':
+        case 'follow_request':
+        case 'follow_accepted':
+        case 'follow_declined':
+          shouldShow = prefs.getBool('follow_notifications') ?? true;
+          break;
+        case 'notification':
+          // Notification tipindeki alt türleri kontrol et
+          final notificationData = data['notification_data'] as Map<String, dynamic>?;
+          final notificationType = notificationData?['type']?.toString() ?? '';
+          debugPrint('🔍 Notification alt tipi: $notificationType');
+          
+          switch (notificationType) {
+            case 'post-like':
+            case 'post-comment':
+              shouldShow = prefs.getBool('post_notifications') ?? true;
+              debugPrint('🔍 Post bildirimleri (notification) kontrol edildi: $shouldShow');
+              break;
+            case 'follow-request':
+            case 'follow-accepted':
+            case 'follow-declined':
+              shouldShow = prefs.getBool('follow_notifications') ?? true;
+              debugPrint('🔍 Follow bildirimleri (notification) kontrol edildi: $shouldShow');
+              break;
+            case 'group-join-request':
+            case 'group-join-accepted':
+            case 'group-join-declined':
+              shouldShow = prefs.getBool('group_notifications') ?? true;
+              debugPrint('🔍 Group bildirimleri (notification) kontrol edildi: $shouldShow');
+              break;
+            default:
+              shouldShow = prefs.getBool('system_notifications') ?? true;
+              debugPrint('🔍 System bildirimleri (notification) kontrol edildi: $shouldShow');
+          }
+          break;
         default:
-          return true; // Bilinmeyen tip için göster
+          debugPrint('⚠️ Bilinmeyen bildirim tipi: $type, varsayılan olarak gösteriliyor');
+          shouldShow = true; // Bilinmeyen tip için göster
       }
+      
+      if (!shouldShow) {
+        debugPrint('🚫 Bildirim filtrelendi: $type');
+        if (type == 'notification') {
+          final notificationData = data['notification_data'] as Map<String, dynamic>?;
+          final notificationType = notificationData?['type']?.toString() ?? '';
+          debugPrint('🚫 Alt bildirim tipi: $notificationType');
+        }
+      } else {
+        debugPrint('✅ Bildirim gösterilecek: $type');
+        if (type == 'notification') {
+          final notificationData = data['notification_data'] as Map<String, dynamic>?;
+          final notificationType = notificationData?['type']?.toString() ?? '';
+          debugPrint('✅ Alt bildirim tipi: $notificationType');
+        }
+      }
+      
+      return shouldShow;
     } catch (e) {
-      debugPrint('Bildirim filtreleme hatası: $e');
+      debugPrint('❌ Bildirim filtreleme hatası: $e');
       return true; // Hata durumunda göster
     }
   }
@@ -372,6 +442,132 @@ class OneSignalService extends GetxService {
       debugPrint('📱 sendLocalNotification çağrıldı: title=$title, message=$message');
       debugPrint('📱 Data: $data');
       debugPrint('📱 Data type: ${data.runtimeType}');
+      debugPrint('📱 Data type field: ${data?['type']}');
+      
+      // Bildirim iznini kontrol et
+      final hasPermission = await hasNotificationPermission();
+      if (!hasPermission) {
+        debugPrint('❌ Bildirim izni yok, yerel bildirim gösterilmeyecek');
+        return;
+      }
+      
+      // Bildirim tipini belirle
+      String notificationType = 'general';
+      if (data != null && data['type'] != null) {
+        notificationType = data['type'] as String;
+      }
+      
+      // Bildirim ayarlarını kontrol et
+      final prefs = await SharedPreferences.getInstance();
+      bool shouldShow = true;
+      
+      switch (notificationType) {
+        case 'post':
+        case 'like':
+        case 'comment':
+          shouldShow = prefs.getBool('post_notifications') ?? true;
+          debugPrint('🔍 sendLocalNotification - Post bildirimleri kontrol edildi: $shouldShow');
+          break;
+        case 'message':
+          shouldShow = prefs.getBool('message_notifications') ?? true;
+          debugPrint('🔍 sendLocalNotification - Mesaj bildirimleri kontrol edildi: $shouldShow');
+          break;
+        case 'group':
+          shouldShow = prefs.getBool('message_notifications') ?? true; // Group chat mesajları
+          debugPrint('🔍 sendLocalNotification - Grup bildirimleri kontrol edildi: $shouldShow');
+          break;
+        case 'group_join_request':
+        case 'group_join_accepted':
+        case 'group_join_declined':
+          shouldShow = prefs.getBool('group_notifications') ?? true;
+          break;
+        case 'event_invitation':
+          shouldShow = prefs.getBool('event_notifications') ?? true;
+          break;
+        case 'follow':
+        case 'follow_request':
+        case 'follow_accepted':
+        case 'follow_declined':
+          shouldShow = prefs.getBool('follow_notifications') ?? true;
+          break;
+        case 'notification':
+          // Notification tipindeki alt türleri kontrol et
+          final notificationData = data?['notification_data'] as Map<String, dynamic>?;
+          final notificationType = notificationData?['type']?.toString() ?? '';
+          debugPrint('🔍 sendLocalNotification - Notification alt tipi: $notificationType');
+          
+          switch (notificationType) {
+            case 'post-like':
+            case 'post-comment':
+              shouldShow = prefs.getBool('post_notifications') ?? true;
+              debugPrint('🔍 sendLocalNotification - Post bildirimleri (notification) kontrol edildi: $shouldShow');
+              break;
+            case 'follow-request':
+            case 'follow-accepted':
+            case 'follow-declined':
+              shouldShow = prefs.getBool('follow_notifications') ?? true;
+              debugPrint('🔍 sendLocalNotification - Follow bildirimleri (notification) kontrol edildi: $shouldShow');
+              break;
+            case 'group-join-request':
+            case 'group-join-accepted':
+            case 'group-join-declined':
+              shouldShow = prefs.getBool('group_notifications') ?? true;
+              debugPrint('🔍 sendLocalNotification - Group bildirimleri (notification) kontrol edildi: $shouldShow');
+              break;
+            default:
+              shouldShow = prefs.getBool('system_notifications') ?? true;
+              debugPrint('🔍 sendLocalNotification - System bildirimleri (notification) kontrol edildi: $shouldShow');
+          }
+          break;
+        default:
+          shouldShow = true; // Genel bildirimler için varsayılan olarak göster
+      }
+      
+      if (!shouldShow) {
+        debugPrint('🚫 Yerel bildirim filtrelendi: $notificationType');
+        return;
+      }
+      
+      // Çoklu bildirim kontrolü için benzersiz ID oluştur
+      final notificationId = _generateNotificationId(title, message, data);
+      
+      // Çoklu bildirim kontrolü - çok daha sıkı kontrol
+      if (_activeNotifications.containsKey(notificationId)) {
+        final lastNotificationTime = _activeNotifications[notificationId]!;
+        final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
+        
+        if (timeSinceLastNotification < _notificationCooldown) {
+          debugPrint('⚠️ Çoklu bildirim önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
+          return;
+        }
+      }
+      
+      // Aktif bildirimleri temizle (eski olanları)
+      _activeNotifications.removeWhere((key, value) {
+        return DateTime.now().difference(value) > _notificationCooldown;
+      });
+      
+      // Yeni bildirimi kaydet
+      _activeNotifications[notificationId] = DateTime.now();
+      
+      debugPrint('📱 Bildirim gönderiliyor: $notificationId');
+      debugPrint('📱 Aktif bildirim sayısı: ${_activeNotifications.length}');
+      
+      // Global bildirim kontrolü - aynı anda sadece bir bildirim göster
+      if (_isShowingNotification) {
+        debugPrint('⚠️ Başka bir bildirim gösteriliyor, bu bildirim atlanıyor');
+        return;
+      }
+      
+      _isShowingNotification = true;
+      
+      // Eğer notification tipi ise özel tasarım kullan
+      if (notificationType == 'notification' && data != null) {
+        debugPrint('📱 Özel notification tasarımı kullanılacak');
+        await _sendCustomNotificationFromData(data);
+        _isShowingNotification = false;
+        return;
+      }
       
       // Eğer mesaj bildirimi ise özel tasarım kullan
       if ((title == 'Yeni Mesaj' || title == 'message') && data != null) {
@@ -385,9 +581,13 @@ class OneSignalService extends GetxService {
         title,
         message,
         snackPosition: SnackPosition.TOP,
-        backgroundColor: const Color(0xFFEF5050),
-        colorText: Colors.white,
-        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.white,
+        colorText: Colors.black87,
+        duration: const Duration(seconds: 4),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        snackStyle: SnackStyle.FLOATING,
+        icon: const Icon(Icons.notifications, color: Color(0xFFEF5050)),
       );
       
       debugPrint('✅ Yerel bildirim gösterildi: $title - $message');
@@ -396,9 +596,145 @@ class OneSignalService extends GetxService {
     }
   }
 
+  // Data'dan özel notification bildirimi gönder (profil resmi ve isim ile)
+  Future<void> _sendCustomNotificationFromData(Map<String, dynamic> data) async {
+    try {
+      debugPrint('📱 Özel notification bildirimi gösteriliyor...');
+      
+      // Bildirim iznini kontrol et
+      final hasPermission = await hasNotificationPermission();
+      if (!hasPermission) {
+        debugPrint('❌ Bildirim izni yok, notification bildirimi gösterilmeyecek');
+        return;
+      }
+      
+      // Notification data'sını al
+      final notificationData = data['notification_data'] as Map<String, dynamic>?;
+      final notificationFullData = notificationData?['notification_full_data'] as Map<String, dynamic>?;
+      final notificationType = notificationData?['type']?.toString() ?? '';
+      
+      if (notificationFullData == null) {
+        debugPrint('❌ Notification full data bulunamadı');
+        return;
+      }
+      
+      // Kullanıcı bilgilerini al
+      final userData = notificationFullData['user'] as Map<String, dynamic>?;
+      final userName = userData?['name'] ?? 'Bilinmeyen';
+      final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
+      
+      // Bildirim tipine göre mesaj oluştur
+      String title = '';
+      String message = '';
+      
+      switch (notificationType) {
+        case 'post-like':
+          title = 'Yeni Beğeni';
+          message = '$userName gönderinizi beğendi';
+          break;
+        case 'post-comment':
+          title = 'Yeni Yorum';
+          message = '$userName gönderinize yorum yaptı';
+          break;
+        case 'follow-request':
+          title = 'Takip İsteği';
+          message = '$userName sizi takip etmek istiyor';
+          break;
+        case 'group-join-request':
+          title = 'Grup Katılma İsteği';
+          message = '$userName grubunuza katılmak istiyor';
+          break;
+        default:
+          title = 'Yeni Bildirim';
+          message = '$userName size bildirim gönderdi';
+      }
+      
+      // Çoklu bildirim kontrolü - daha sıkı kontrol
+      final notificationId = 'notification_${notificationData?['id'] ?? DateTime.now().millisecondsSinceEpoch}';
+      
+      if (_activeNotifications.containsKey(notificationId)) {
+        final lastNotificationTime = _activeNotifications[notificationId]!;
+        final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
+        
+        if (timeSinceLastNotification < _notificationCooldown) {
+          debugPrint('⚠️ Çoklu notification önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
+          return;
+        }
+      }
+      
+      // Aktif bildirimleri temizle
+      _activeNotifications.removeWhere((key, value) {
+        return DateTime.now().difference(value) > _notificationCooldown;
+      });
+      
+      // Yeni bildirimi kaydet
+      _activeNotifications[notificationId] = DateTime.now();
+      
+      debugPrint('📱 Özel notification gönderiliyor: $notificationId');
+      debugPrint('📱 Aktif bildirim sayısı: ${_activeNotifications.length}');
+      
+      // Global bildirim kontrolü
+      if (_isShowingNotification) {
+        debugPrint('⚠️ Başka bir bildirim gösteriliyor, bu notification atlanıyor');
+        return;
+      }
+      
+      _isShowingNotification = true;
+      
+      // Beyaz arka planlı, profil resmi ile bildirim
+      Get.snackbar(
+        title,
+        message,
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black87,
+        duration: const Duration(seconds: 4),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 12,
+        snackStyle: SnackStyle.FLOATING,
+        icon: userAvatar.isNotEmpty
+            ? CircleAvatar(
+                backgroundImage: NetworkImage(
+                  userAvatar.startsWith('http') 
+                      ? userAvatar 
+                      : 'https://stageapi.edusocial.pl/storage/$userAvatar',
+                ),
+                radius: 16,
+              )
+            : const CircleAvatar(
+                radius: 16,
+                child: Icon(Icons.person, size: 16),
+              ),
+      );
+      
+      debugPrint('✅ Özel notification bildirimi gösterildi');
+      debugPrint('📱 Bildirim detayları: title=$title, message=$message, user=$userName, avatar=$userAvatar');
+      _isShowingNotification = false;
+    } catch (e) {
+      debugPrint('❌ Özel notification bildirimi gösterilemedi: $e');
+      _isShowingNotification = false;
+    }
+  }
+
   // Data'dan özel mesaj bildirimi gönder
   Future<void> _sendCustomMessageNotificationFromData(Map<String, dynamic> data) async {
     try {
+      // Bildirim iznini kontrol et
+      final hasPermission = await hasNotificationPermission();
+      if (!hasPermission) {
+        debugPrint('❌ Bildirim izni yok, mesaj bildirimi gösterilmeyecek');
+        return;
+      }
+      
+      // Mesaj bildirimleri ayarını kontrol et
+      final prefs = await SharedPreferences.getInstance();
+      final messageNotificationsEnabled = prefs.getBool('message_notifications') ?? true;
+      
+      if (!messageNotificationsEnabled) {
+        debugPrint('🚫 Mesaj bildirimleri kapalı, bildirim gösterilmeyecek');
+        return;
+      }
+      
       // Mesaj verilerini al
       final message = data['message'] ?? '';
       
@@ -431,7 +767,7 @@ class OneSignalService extends GetxService {
       // Bildirim ID'si oluştur (çoklu bildirim önlemek için)
       final notificationId = 'message_$conversationId';
       
-      // Çoklu bildirim kontrolü
+      // Çoklu bildirim kontrolü - daha sıkı kontrol
       if (_activeNotifications.containsKey(notificationId)) {
         final lastNotificationTime = _activeNotifications[notificationId]!;
         final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
@@ -449,6 +785,9 @@ class OneSignalService extends GetxService {
       
       // Yeni bildirimi kaydet
       _activeNotifications[notificationId] = DateTime.now();
+      
+      debugPrint('📱 Özel mesaj notification gönderiliyor: $notificationId');
+      debugPrint('📱 Aktif bildirim sayısı: ${_activeNotifications.length}');
       
       // Özel bildirim widget'ı oluştur
       Get.snackbar(
@@ -509,8 +848,10 @@ class OneSignalService extends GetxService {
       );
       
       debugPrint('✅ Özel mesaj bildirimi gösterildi: $senderName - $message');
+      _isShowingNotification = false;
     } catch (e) {
       debugPrint('❌ Özel mesaj bildirimi gösterilemedi: $e');
+      _isShowingNotification = false;
     }
   }
 
@@ -525,10 +866,26 @@ class OneSignalService extends GetxService {
     try {
       debugPrint('💬 Özel mesaj bildirimi gösteriliyor...');
       
+      // Bildirim iznini kontrol et
+      final hasPermission = await hasNotificationPermission();
+      if (!hasPermission) {
+        debugPrint('❌ Bildirim izni yok, mesaj bildirimi gösterilmeyecek');
+        return;
+      }
+      
+      // Mesaj bildirimleri ayarını kontrol et
+      final prefs = await SharedPreferences.getInstance();
+      final messageNotificationsEnabled = prefs.getBool('message_notifications') ?? true;
+      
+      if (!messageNotificationsEnabled) {
+        debugPrint('🚫 Mesaj bildirimleri kapalı, bildirim gösterilmeyecek');
+        return;
+      }
+      
       // Bildirim ID'si oluştur (çoklu bildirim önlemek için)
       final notificationId = 'message_$conversationId';
       
-      // Çoklu bildirim kontrolü
+      // Çoklu bildirim kontrolü - daha sıkı kontrol
       if (_activeNotifications.containsKey(notificationId)) {
         final lastNotificationTime = _activeNotifications[notificationId]!;
         final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
@@ -547,18 +904,21 @@ class OneSignalService extends GetxService {
       // Yeni bildirimi kaydet
       _activeNotifications[notificationId] = DateTime.now();
       
-      // Local notification gönder (snackbar ile)
+      debugPrint('📱 Özel mesaj notification gönderiliyor: $notificationId');
+      debugPrint('📱 Aktif bildirim sayısı: ${_activeNotifications.length}');
+      
+      // Eski tasarımı kullan (kırmızı arka plan)
       Get.snackbar(
         senderName,
         message,
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
+            backgroundColor: Colors.white,
         colorText: Colors.black87,
         duration: const Duration(seconds: 4),
         margin: const EdgeInsets.all(16),
         borderRadius: 12,
         snackStyle: SnackStyle.FLOATING,
-        icon: senderAvatar.isNotEmpty
+         icon: senderAvatar.isNotEmpty
             ? CircleAvatar(
                 backgroundImage: NetworkImage(
                   senderAvatar.startsWith('http') 
@@ -575,9 +935,25 @@ class OneSignalService extends GetxService {
       
       debugPrint('✅ Local notification gönderildi');
       debugPrint('📱 Bildirim detayları: title=$senderName, message=$message, avatar=$senderAvatar');
+      _isShowingNotification = false;
     } catch (e) {
       debugPrint('❌ OneSignal local notification gönderilemedi: $e');
+      _isShowingNotification = false;
     }
+  }
+
+  // Benzersiz bildirim ID'si oluştur
+  String _generateNotificationId(String title, String message, Map<String, dynamic>? data) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final type = data?['type']?.toString() ?? 'general';
+    final notificationData = data?['notification_data'] as Map<String, dynamic>?;
+    final notificationType = notificationData?['type']?.toString() ?? '';
+    final notificationId = notificationData?['id']?.toString() ?? '';
+    
+    // Daha benzersiz ID oluştur
+    final id = '${type}_${notificationType}_${notificationId}_${title.hashCode}_${message.hashCode}_$timestamp';
+    debugPrint('🔑 Bildirim ID oluşturuldu: $id');
+    return id;
   }
 
   // Local test notification (OneSignal Dashboard konfigürasyonu olmadan da çalışır)
@@ -657,11 +1033,6 @@ class OneSignalService extends GetxService {
     required bool groupNotifications,
     required bool eventNotifications,
     required bool followNotifications,
-    required bool userNotifications,
-    required bool commentNotifications,
-    required bool likeNotifications,
-    required bool postMentionNotifications,
-    required bool commentMentionNotifications,
     required bool systemNotifications,
   }) async {
     final prefs = await SharedPreferences.getInstance();
@@ -670,11 +1041,6 @@ class OneSignalService extends GetxService {
     await prefs.setBool('group_notifications', groupNotifications);
     await prefs.setBool('event_notifications', eventNotifications);
     await prefs.setBool('follow_notifications', followNotifications);
-    await prefs.setBool('user_notifications', userNotifications);
-    await prefs.setBool('comment_notifications', commentNotifications);
-    await prefs.setBool('like_notifications', likeNotifications);
-    await prefs.setBool('post_mention_notifications', postMentionNotifications);
-    await prefs.setBool('comment_mention_notifications', commentMentionNotifications);
     await prefs.setBool('system_notifications', systemNotifications);
   }
 
@@ -687,11 +1053,6 @@ class OneSignalService extends GetxService {
       'group_notifications': prefs.getBool('group_notifications') ?? true,
       'event_notifications': prefs.getBool('event_notifications') ?? true,
       'follow_notifications': prefs.getBool('follow_notifications') ?? true,
-      'user_notifications': prefs.getBool('user_notifications') ?? true,
-      'comment_notifications': prefs.getBool('comment_notifications') ?? true,
-      'like_notifications': prefs.getBool('like_notifications') ?? true,
-      'post_mention_notifications': prefs.getBool('post_mention_notifications') ?? true,
-      'comment_mention_notifications': prefs.getBool('comment_mention_notifications') ?? true,
       'system_notifications': prefs.getBool('system_notifications') ?? true,
     };
   }

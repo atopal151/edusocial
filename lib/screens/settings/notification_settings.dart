@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../services/onesignal_service.dart';
 import '../../services/language_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_settings/app_settings.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -24,11 +25,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   bool _groupNotifications = true;
   bool _eventNotifications = true;
   bool _followNotifications = true;
-  bool _userNotifications = true;
-  bool _commentNotifications = true;
-  bool _likeNotifications = true;
-  bool _postMentionNotifications = true;
-  bool _commentMentionNotifications = true;
   bool _systemNotifications = true;
 
   @override
@@ -38,26 +34,44 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   }
 
   Future<void> _loadNotificationSettings() async {
+    debugPrint('📱 Bildirim ayarları yükleniyor...');
     final prefs = await SharedPreferences.getInstance();
     final settings = await _oneSignalService.getNotificationSettings();
+    final hasPermission = await _oneSignalService.hasNotificationPermission();
+    
+    debugPrint('📱 Mevcut ayarlar:');
+    debugPrint('   - Bildirim İzni: $hasPermission');
+    debugPrint('   - Post Bildirimleri: ${settings['post_notifications'] ?? true}');
+    debugPrint('   - Mesaj Bildirimleri: ${settings['message_notifications'] ?? true}');
+    debugPrint('   - Grup Bildirimleri: ${settings['group_notifications'] ?? true}');
+    debugPrint('   - Etkinlik Bildirimleri: ${settings['event_notifications'] ?? true}');
+    debugPrint('   - Takip Bildirimleri: ${settings['follow_notifications'] ?? true}');
+    debugPrint('   - Sistem Bildirimleri: ${settings['system_notifications'] ?? true}');
     
     setState(() {
-      _notificationPermission = prefs.getBool('notification_permission') ?? false;
+      _notificationPermission = hasPermission;
       _postNotifications = settings['post_notifications'] ?? true;
       _messageNotifications = settings['message_notifications'] ?? true;
       _groupNotifications = settings['group_notifications'] ?? true;
       _eventNotifications = settings['event_notifications'] ?? true;
       _followNotifications = settings['follow_notifications'] ?? true;
-      _userNotifications = settings['user_notifications'] ?? true;
-      _commentNotifications = settings['comment_notifications'] ?? true;
-      _likeNotifications = settings['like_notifications'] ?? true;
-      _postMentionNotifications = settings['post_mention_notifications'] ?? true;
-      _commentMentionNotifications = settings['comment_mention_notifications'] ?? true;
       _systemNotifications = settings['system_notifications'] ?? true;
     });
+    
+    debugPrint('✅ Bildirim ayarları yüklendi');
   }
 
   Future<void> _saveNotificationSettings() async {
+    debugPrint('💾 Bildirim ayarları kaydediliyor...');
+    debugPrint('💾 Yeni ayarlar:');
+    debugPrint('   - Bildirim İzni: $_notificationPermission');
+    debugPrint('   - Post Bildirimleri: $_postNotifications');
+    debugPrint('   - Mesaj Bildirimleri: $_messageNotifications');
+    debugPrint('   - Grup Bildirimleri: $_groupNotifications');
+    debugPrint('   - Etkinlik Bildirimleri: $_eventNotifications');
+    debugPrint('   - Takip Bildirimleri: $_followNotifications');
+    debugPrint('   - Sistem Bildirimleri: $_systemNotifications');
+    
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notification_permission', _notificationPermission);
     
@@ -68,13 +82,58 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       groupNotifications: _groupNotifications,
       eventNotifications: _eventNotifications,
       followNotifications: _followNotifications,
-      userNotifications: _userNotifications,
-      commentNotifications: _commentNotifications,
-      likeNotifications: _likeNotifications,
-      postMentionNotifications: _postMentionNotifications,
-      commentMentionNotifications: _commentMentionNotifications,
       systemNotifications: _systemNotifications,
     );
+    
+    debugPrint('✅ Bildirim ayarları kaydedildi');
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    debugPrint('🔐 Bildirim izni isteniyor...');
+    try {
+      debugPrint('🔐 OneSignal\'dan izin isteniyor...');
+      await _oneSignalService.requestNotificationPermission();
+      debugPrint('🔐 İzin durumu kontrol ediliyor...');
+      final hasPermission = await _oneSignalService.hasNotificationPermission();
+      debugPrint('🔐 İzin durumu: $hasPermission');
+      
+      setState(() {
+        _notificationPermission = hasPermission;
+      });
+      debugPrint('🔐 State güncellendi: $_notificationPermission');
+      
+      if (hasPermission) {
+        debugPrint('✅ Bildirim izni verildi, başarı mesajı gösteriliyor');
+        Get.snackbar(
+          _languageService.tr('notificationSettings.messages.permissionGranted'),
+          _languageService.tr('notificationSettings.messages.permissionGrantedDesc'),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFF4CAF50),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+      } else {
+        debugPrint('❌ Bildirim izni reddedildi, hata mesajı gösteriliyor');
+        Get.snackbar(
+          _languageService.tr('notificationSettings.messages.permissionDenied'),
+          _languageService.tr('notificationSettings.messages.permissionDeniedDesc'),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFFEF5050),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+      }
+      debugPrint('✅ Bildirim izni işlemi tamamlandı');
+    } catch (e) {
+      debugPrint('❌ Bildirim izni istenirken hata: $e');
+      Get.snackbar(
+        'Hata',
+        'Bildirim izni istenirken bir hata oluştu',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFEF5050),
+        colorText: Colors.white,
+      );
+    }
   }
 
   @override
@@ -91,8 +150,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             /* const SizedBox(height: 20),
-              _buildNotificationStatusCard(),*/
               const SizedBox(height: 20),
               _sectionTitle(_languageService.tr('notificationSettings.permissions.title')),
               const SizedBox(height: 10),
@@ -100,13 +157,17 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 _languageService.tr('notificationSettings.permissions.notificationPermission'),
                 _notificationPermission,
                 (value) async {
-                  setState(() {
-                    _notificationPermission = value;
-                  });
+                  debugPrint('🔄 Ana Bildirim İzni Switch: $value');
                   if (value) {
-                    await _oneSignalService.requestNotificationPermission();
+                    debugPrint('🔐 Bildirim izni isteniyor...');
+                    await _requestNotificationPermission();
+                    debugPrint('✅ Bildirim izni işlemi tamamlandı');
+                  } else {
+                    debugPrint('🔐 Bildirim izni kapatma dialog\'u gösteriliyor...');
+                    // Bildirim iznini kapatmak için dialog göster
+                    _showDisablePermissionDialog();
+                    debugPrint('✅ Bildirim izni kapatma dialog\'u gösterildi');
                   }
-                  await _saveNotificationSettings();
                 },
               ),
               const SizedBox(height: 30),
@@ -116,10 +177,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 _languageService.tr('notificationSettings.types.postNotifications'),
                 _postNotifications,
                 (value) {
+                  debugPrint('🔄 Post Bildirimleri Switch: $value');
+                  if (!_notificationPermission) {
+                    debugPrint('❌ Bildirim izni yok, dialog gösteriliyor');
+                    _showPermissionRequiredDialog();
+                    return;
+                  }
+                  debugPrint('✅ Post bildirimleri ${value ? 'açılıyor' : 'kapatılıyor'}');
                   setState(() {
                     _postNotifications = value;
                   });
+                  debugPrint('💾 Post bildirimleri ayarları kaydediliyor...');
                   _saveNotificationSettings();
+                  debugPrint('✅ Post bildirimleri ayarları kaydedildi');
                 },
               ),
               const SizedBox(height: 20),
@@ -127,10 +197,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 _languageService.tr('notificationSettings.types.messageNotifications'),
                 _messageNotifications,
                 (value) {
+                  debugPrint('🔄 Mesaj Bildirimleri Switch: $value');
+                  if (!_notificationPermission) {
+                    debugPrint('❌ Bildirim izni yok, dialog gösteriliyor');
+                    _showPermissionRequiredDialog();
+                    return;
+                  }
+                  debugPrint('✅ Mesaj bildirimleri ${value ? 'açılıyor' : 'kapatılıyor'}');
                   setState(() {
                     _messageNotifications = value;
                   });
+                  debugPrint('💾 Mesaj bildirimleri ayarları kaydediliyor...');
                   _saveNotificationSettings();
+                  debugPrint('✅ Mesaj bildirimleri ayarları kaydedildi');
                 },
               ),
               const SizedBox(height: 20),
@@ -138,10 +217,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 _languageService.tr('notificationSettings.types.groupNotifications'),
                 _groupNotifications,
                 (value) {
+                  debugPrint('🔄 Grup Bildirimleri Switch: $value');
+                  if (!_notificationPermission) {
+                    debugPrint('❌ Bildirim izni yok, dialog gösteriliyor');
+                    _showPermissionRequiredDialog();
+                    return;
+                  }
+                  debugPrint('✅ Grup bildirimleri ${value ? 'açılıyor' : 'kapatılıyor'}');
                   setState(() {
                     _groupNotifications = value;
                   });
+                  debugPrint('💾 Grup bildirimleri ayarları kaydediliyor...');
                   _saveNotificationSettings();
+                  debugPrint('✅ Grup bildirimleri ayarları kaydedildi');
                 },
               ),
               const SizedBox(height: 20),
@@ -149,10 +237,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 _languageService.tr('notificationSettings.types.eventNotifications'),
                 _eventNotifications,
                 (value) {
+                  debugPrint('🔄 Etkinlik Bildirimleri Switch: $value');
+                  if (!_notificationPermission) {
+                    debugPrint('❌ Bildirim izni yok, dialog gösteriliyor');
+                    _showPermissionRequiredDialog();
+                    return;
+                  }
+                  debugPrint('✅ Etkinlik bildirimleri ${value ? 'açılıyor' : 'kapatılıyor'}');
                   setState(() {
                     _eventNotifications = value;
                   });
+                  debugPrint('💾 Etkinlik bildirimleri ayarları kaydediliyor...');
                   _saveNotificationSettings();
+                  debugPrint('✅ Etkinlik bildirimleri ayarları kaydedildi');
                 },
               ),
               const SizedBox(height: 20),
@@ -160,65 +257,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 _languageService.tr('notificationSettings.types.followNotifications'),
                 _followNotifications,
                 (value) {
+                  debugPrint('🔄 Takip Bildirimleri Switch: $value');
+                  if (!_notificationPermission) {
+                    debugPrint('❌ Bildirim izni yok, dialog gösteriliyor');
+                    _showPermissionRequiredDialog();
+                    return;
+                  }
+                  debugPrint('✅ Takip bildirimleri ${value ? 'açılıyor' : 'kapatılıyor'}');
                   setState(() {
                     _followNotifications = value;
                   });
+                  debugPrint('💾 Takip bildirimleri ayarları kaydediliyor...');
                   _saveNotificationSettings();
-                },
-              ),
-              const SizedBox(height: 20),
-              _buildSwitchTile(
-                _languageService.tr('notificationSettings.types.userNotifications'),
-                _userNotifications,
-                (value) {
-                  setState(() {
-                    _userNotifications = value;
-                  });
-                  _saveNotificationSettings();
-                },
-              ),
-              const SizedBox(height: 20),
-              _buildSwitchTile(
-                _languageService.tr('notificationSettings.types.commentNotifications'),
-                _commentNotifications,
-                (value) {
-                  setState(() {
-                    _commentNotifications = value;
-                  });
-                  _saveNotificationSettings();
-                },
-              ),
-              const SizedBox(height: 20),
-              _buildSwitchTile(
-                _languageService.tr('notificationSettings.types.likeNotifications'),
-                _likeNotifications,
-                (value) {
-                  setState(() {
-                    _likeNotifications = value;
-                  });
-                  _saveNotificationSettings();
-                },
-              ),
-              const SizedBox(height: 20),
-              _buildSwitchTile(
-                _languageService.tr('notificationSettings.types.postMentionNotifications'),
-                _postMentionNotifications,
-                (value) {
-                  setState(() {
-                    _postMentionNotifications = value;
-                  });
-                  _saveNotificationSettings();
-                },
-              ),
-              const SizedBox(height: 20),
-              _buildSwitchTile(
-                _languageService.tr('notificationSettings.types.commentMentionNotifications'),
-                _commentMentionNotifications,
-                (value) {
-                  setState(() {
-                    _commentMentionNotifications = value;
-                  });
-                  _saveNotificationSettings();
+                  debugPrint('✅ Takip bildirimleri ayarları kaydedildi');
                 },
               ),
               const SizedBox(height: 20),
@@ -226,75 +277,22 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 _languageService.tr('notificationSettings.types.systemNotifications'),
                 _systemNotifications,
                 (value) {
+                  debugPrint('🔄 Sistem Bildirimleri Switch: $value');
+                  if (!_notificationPermission) {
+                    debugPrint('❌ Bildirim izni yok, dialog gösteriliyor');
+                    _showPermissionRequiredDialog();
+                    return;
+                  }
+                  debugPrint('✅ Sistem bildirimleri ${value ? 'açılıyor' : 'kapatılıyor'}');
                   setState(() {
                     _systemNotifications = value;
                   });
+                  debugPrint('💾 Sistem bildirimleri ayarları kaydediliyor...');
                   _saveNotificationSettings();
+                  debugPrint('✅ Sistem bildirimleri ayarları kaydedildi');
                 },
               ),
-              /*const SizedBox(height: 30),
-              _sectionTitle(_languageService.tr('notificationSettings.test.title')),
-              const SizedBox(height: 10),
-              _buildTestButton(
-                _languageService.tr('notificationSettings.test.platformTest'),
-                () {
-                  _oneSignalService.sendPlatformAwareTestNotification();
-                },
-              ),
-              const SizedBox(height: 8),
-              _buildTestButton(
-                _languageService.tr('notificationSettings.test.onesignalTest'),
-                () {
-                  _oneSignalService.sendOneSignalTestNotification();
-                },
-              ),
-              const SizedBox(height: 8),
-              _buildTestButton(
-                _languageService.tr('notificationSettings.test.localTest'),
-                () {
-                  _oneSignalService.sendLocalTestNotification();
-                },
-              ),
-              const SizedBox(height: 8),
-              _buildTestButton(
-                _languageService.tr('notificationSettings.test.simpleTest'),
-                () {
-                  _oneSignalService.sendSimpleTestNotification();
-                },
-              ),
-              const SizedBox(height: 8),
-              _buildTestButton(
-                _languageService.tr('notificationSettings.test.checkConfig'),
-                () {
-                  _oneSignalService.checkOneSignalConfiguration();
-                },
-              ),
-              const SizedBox(height: 8),
-              _buildTestButton(
-                _languageService.tr('notificationSettings.test.showPlayerId'),
-                () async {
-                  final playerId = await _oneSignalService.getPlayerId();
-                  if (playerId != null) {
-                    Get.snackbar(
-                      _languageService.tr('notificationSettings.messages.playerId'),
-                      playerId,
-                      snackPosition: SnackPosition.BOTTOM,
-                      duration: const Duration(seconds: 5),
-                      backgroundColor: const Color(0xFFEF5050),
-                      colorText: Colors.white,
-                    );
-                  } else {
-                    Get.snackbar(
-                      'Hata',
-                      _languageService.tr('notificationSettings.messages.playerIdError'),
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 40),*/
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -302,108 +300,156 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
 
-
-/*
-  Widget _buildNotificationStatusCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-       
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            _languageService.tr('notificationSettings.status.title'),
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xff414751),
+  void _showPermissionRequiredDialog() {
+    debugPrint('📱 İzin gerekli dialog\'u gösteriliyor...');
+    Get.dialog(
+      AlertDialog(
+        title: Text(
+          _languageService.tr('notificationSettings.dialogs.permissionRequired.title'),
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            color: const Color(0xff414751),
+          ),
+        ),
+        content: Text(
+          _languageService.tr('notificationSettings.dialogs.permissionRequired.message'),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: const Color(0xff6B7280),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              debugPrint('❌ İzin dialog\'u iptal edildi');
+              Get.back();
+            },
+            child: Text(
+              _languageService.tr('common.cancel'),
+              style: GoogleFonts.inter(
+                color: const Color(0xff6B7280),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          FutureBuilder<String?>(
-            future: _oneSignalService.getPlayerId(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasData && snapshot.data != null) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEF5050).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${_languageService.tr('notificationSettings.status.deviceId')}: ${snapshot.data!.substring(0, 8)}...',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFFEF5050),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _languageService.tr('notificationSettings.status.serviceActive'),
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              } else {
-                return Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _languageService.tr('notificationSettings.status.serviceInactive'),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                );
-              }
+          ElevatedButton(
+            onPressed: () async {
+              debugPrint('✅ İzin dialog\'unda "İzin Ver" butonuna tıklandı');
+              Get.back();
+              await _requestNotificationPermission();
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF5050),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              _languageService.tr('notificationSettings.dialogs.permissionRequired.grant'),
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
     );
+    debugPrint('✅ İzin gerekli dialog\'u gösterildi');
   }
-*/
+
+  void _showDisablePermissionDialog() {
+    debugPrint('📱 İzin kapatma dialog\'u gösteriliyor...');
+    Get.dialog(
+      AlertDialog(
+        title: Text(
+          _languageService.tr('notificationSettings.dialogs.disablePermission.title'),
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            color: const Color(0xff414751),
+          ),
+        ),
+        content: Text(
+          _languageService.tr('notificationSettings.dialogs.disablePermission.message'),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: const Color(0xff6B7280),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              debugPrint('❌ İzin kapatma dialog\'u iptal edildi');
+              Get.back();
+            },
+            child: Text(
+              _languageService.tr('common.cancel'),
+              style: GoogleFonts.inter(
+                color: const Color(0xff6B7280),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              debugPrint('✅ İzin kapatma dialog\'unda "Ayarları Aç" butonuna tıklandı');
+              Get.back();
+              // Cihaz ayarlarına yönlendir
+              await _openDeviceSettings();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF9800),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              _languageService.tr('notificationSettings.dialogs.disablePermission.openSettings'),
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    debugPrint('✅ İzin kapatma dialog\'u gösterildi');
+  }
+
+  Future<void> _openDeviceSettings() async {
+    debugPrint('⚙️ Cihaz ayarları açılıyor...');
+    try {
+      // Cihaz ayarlarına yönlendir
+      debugPrint('⚙️ AppSettings.openAppSettings() çağrılıyor...');
+      await AppSettings.openAppSettings();
+      debugPrint('✅ Cihaz ayarları açıldı');
+      
+      // Kullanıcıya bilgi ver
+      debugPrint('📱 Kullanıcıya bilgi mesajı gösteriliyor...');
+      Get.snackbar(
+        _languageService.tr('notificationSettings.messages.settingsRedirect'),
+        _languageService.tr('notificationSettings.messages.settingsRedirectDesc'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFFF9800),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 4),
+      );
+      debugPrint('✅ Bilgi mesajı gösterildi');
+    } catch (e) {
+      debugPrint('❌ Cihaz ayarları açılırken hata: $e');
+      Get.snackbar(
+        'Hata',
+        'Ayarlar açılamadı',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFEF5050),
+        colorText: Colors.white,
+      );
+    }
+  }
+
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
@@ -414,12 +460,14 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w600,
-              fontSize: 13.28,
-              color: const Color(0xff9ca3ae),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600,
+                fontSize: 11.28,
+                color: const Color(0xff9ca3ae),
+              ),
             ),
           ),
           GestureDetector(
@@ -461,29 +509,4 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       ),
     );
   }
-/*
-  Widget _buildTestButton(String title, VoidCallback onPressed) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFEF5050),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: Text(
-          title,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-  */
 } 

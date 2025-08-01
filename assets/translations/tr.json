@@ -973,16 +973,11 @@
     },
     "types": {
       "title": "Bildirim Türleri",
-      "postNotifications": "Post Bildirimleri",
-      "messageNotifications": "Mesaj Bildirimleri",
-      "groupNotifications": "Grup Bildirimleri",
-      "eventNotifications": "Etkinlik Bildirimleri",
-      "followNotifications": "Takip Bildirimleri",
-      "userNotifications": "Kullanıcı Bildirimleri",
-      "commentNotifications": "Yorum Bildirimleri",
-      "likeNotifications": "Beğeni Bildirimleri",
-      "postMentionNotifications": "Post Etiketleme Bildirimleri",
-      "commentMentionNotifications": "Yorum Etiketleme Bildirimleri",
+      "postNotifications": "Post Bildirimleri (Beğeni, Yorum)",
+      "messageNotifications": "Mesaj Bildirimleri (Private & Group Chat)",
+      "groupNotifications": "Grup Bildirimleri (Katılım İstekleri)",
+      "eventNotifications": "Etkinlik Bildirimleri (Davetler)",
+      "followNotifications": "Takip Bildirimleri (İstekler)",
       "systemNotifications": "Sistem Bildirimleri"
     },
     "test": {
@@ -1000,7 +995,25 @@
       "settingsSaved": "Ayarlar başarıyla kaydedildi",
       "settingsError": "Ayarlar kaydedilemedi",
       "permissionGranted": "Bildirim izni verildi",
-      "permissionDenied": "Bildirim izni reddedildi"
+      "permissionGrantedDesc": "Artık bildirimler alabilirsiniz",
+      "permissionDenied": "Bildirim izni reddedildi",
+      "permissionDeniedDesc": "Bildirimleri almak için ayarlardan izin vermeniz gerekiyor",
+      "permissionRequired": "Bildirim izni gerekli",
+      "permissionRequiredDesc": "Bu özelliği kullanmak için önce bildirim izni vermeniz gerekiyor",
+      "settingsRedirect": "Ayarlara Yönlendiriliyor",
+      "settingsRedirectDesc": "Cihaz ayarlarından bildirim izinlerini kapatabilirsiniz"
+    },
+    "dialogs": {
+      "permissionRequired": {
+        "title": "Bildirim İzni Gerekli",
+        "message": "Bu bildirim türünü açmak için önce cihazdan bildirim izni almanız gerekiyor. İzin vermek ister misiniz?",
+        "grant": "İzin Ver"
+      },
+      "disablePermission": {
+        "title": "Bildirim İzni Kapatma",
+        "message": "Bildirim iznini kapatmak için cihaz ayarlarına gitmeniz gerekiyor. Ayarları açmak ister misiniz?",
+        "openSettings": "Ayarları Aç"
+      }
     }
   },
   "profile": {
@@ -1301,6 +1314,7 @@
       "unfollowing": "Takipten çıkarılıyor...",
       "retry": "Tekrar Dene"
     },
+    "cancel": "İptal",
     "messages": {
       "success": "Başarılı",
       "error": "Hata",
