@@ -90,27 +90,39 @@ class PostController extends GetxController {
 
 //post create
   Future<void> createPost(String content, List<File> mediaFiles, {List<String>? links}) async {
+    // Boş içerik kontrolü
+    if (content.trim().isEmpty) {
+      CustomSnackbar.show(
+        title: languageService.tr("common.warning"),
+        message: languageService.tr("home.createPost.contentRequired"),
+        type: SnackbarType.warning,
+      );
+      return;
+    }
     try {
       final success = await PostServices.createPost(content, mediaFiles, links: links);
       if (success) {
+        final LanguageService languageService = Get.find<LanguageService>();
         CustomSnackbar.show(
-          title: "Başarılı",
-          message: "Gönderi paylaşıldı",
+          title: languageService.tr("common.success"),
+          message: languageService.tr("home.success.postCreated"),
           type: SnackbarType.success,
         );
         
         fetchHomePosts(); // Yeni postu listeye eklemek için
       } else {
+        final LanguageService languageService = Get.find<LanguageService>();
         CustomSnackbar.show(
-          title: "Hata",
-          message: "Gönderi paylaşılamadı",
+          title: languageService.tr("common.error"),
+          message: languageService.tr("home.errors.postCreateFailed"),
           type: SnackbarType.error,
         );
       }
     } catch (e) {
+      final LanguageService languageService = Get.find<LanguageService>();
       CustomSnackbar.show(
-        title: "Hata",
-        message: "Bir hata oluştu: $e",
+        title: languageService.tr("common.error"),
+        message: languageService.tr("home.createPost.postError"),
         type: SnackbarType.error,
       );
     }

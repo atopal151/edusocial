@@ -1001,7 +1001,10 @@
       "permissionRequired": "Bildirim izni gerekli",
       "permissionRequiredDesc": "Bu özelliği kullanmak için önce bildirim izni vermeniz gerekiyor",
       "settingsRedirect": "Ayarlara Yönlendiriliyor",
-      "settingsRedirectDesc": "Cihaz ayarlarından bildirim izinlerini kapatabilirsiniz"
+      "settingsRedirectDesc": "Cihaz ayarlarından bildirim izinlerini kapatabilirsiniz",
+      "settingsOpenError": "Ayarlar Açılamadı",
+      "settingsOpenErrorDesc": "Cihaz ayarlarını manuel olarak açmanız gerekiyor",
+      "manualSettingsInstruction": "Lütfen cihaz ayarlarından uygulama bildirimlerini kontrol edin"
     },
     "dialogs": {
       "permissionRequired": {

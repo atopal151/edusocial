@@ -6,6 +6,8 @@ import '../../services/onesignal_service.dart';
 import '../../services/language_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../components/snackbars/custom_snackbar.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -35,7 +37,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   Future<void> _loadNotificationSettings() async {
     debugPrint('📱 Bildirim ayarları yükleniyor...');
-    final prefs = await SharedPreferences.getInstance();
+   // final prefs = await SharedPreferences.getInstance();
     final settings = await _oneSignalService.getNotificationSettings();
     final hasPermission = await _oneSignalService.hasNotificationPermission();
     
@@ -362,59 +364,111 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   void _showDisablePermissionDialog() {
     debugPrint('📱 İzin kapatma dialog\'u gösteriliyor...');
     Get.dialog(
-      AlertDialog(
-        title: Text(
-          _languageService.tr('notificationSettings.dialogs.disablePermission.title'),
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-            color: const Color(0xff414751),
+      Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            width: Get.width * 0.8,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.settings,
+                    color: Color(0xffef5050),
+                    size: 50,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  _languageService.tr('notificationSettings.dialogs.disablePermission.title'),
+                  style: GoogleFonts.inter(
+                    fontSize: 17.28,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF414751),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  _languageService.tr('notificationSettings.dialogs.disablePermission.message'),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff9ca3ae),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          debugPrint('❌ İzin kapatma dialog\'u iptal edildi');
+                          Get.back();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          margin: EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            color: Color(0xfffff6f6),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Text(
+                            _languageService.tr('common.cancel'),
+                            style: GoogleFonts.inter(
+                              fontSize: 13.28,
+                              color: Color(0xffed7474),
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          debugPrint('✅ İzin kapatma dialog\'unda "Ayarları Aç" butonuna tıklandı');
+                          Get.back();
+                          // Cihaz ayarlarına yönlendir
+                          await _openDeviceSettings();
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          margin: EdgeInsets.only(left: 8),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFEF5050),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Text(
+                            _languageService.tr('notificationSettings.dialogs.disablePermission.openSettings'),
+                            style: TextStyle(
+                              fontSize: 13.28,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        content: Text(
-          _languageService.tr('notificationSettings.dialogs.disablePermission.message'),
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: const Color(0xff6B7280),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              debugPrint('❌ İzin kapatma dialog\'u iptal edildi');
-              Get.back();
-            },
-            child: Text(
-              _languageService.tr('common.cancel'),
-              style: GoogleFonts.inter(
-                color: const Color(0xff6B7280),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              debugPrint('✅ İzin kapatma dialog\'unda "Ayarları Aç" butonuna tıklandı');
-              Get.back();
-              // Cihaz ayarlarına yönlendir
-              await _openDeviceSettings();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF9800),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(
-              _languageService.tr('notificationSettings.dialogs.disablePermission.openSettings'),
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
+      barrierDismissible: false,
     );
     debugPrint('✅ İzin kapatma dialog\'u gösterildi');
   }
@@ -422,31 +476,66 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   Future<void> _openDeviceSettings() async {
     debugPrint('⚙️ Cihaz ayarları açılıyor...');
     try {
-      // Cihaz ayarlarına yönlendir
+      // Önce app_settings paketini dene
       debugPrint('⚙️ AppSettings.openAppSettings() çağrılıyor...');
       await AppSettings.openAppSettings();
-      debugPrint('✅ Cihaz ayarları açıldı');
+      debugPrint('✅ Cihaz ayarları açıldı (app_settings)');
       
       // Kullanıcıya bilgi ver
       debugPrint('📱 Kullanıcıya bilgi mesajı gösteriliyor...');
-      Get.snackbar(
-        _languageService.tr('notificationSettings.messages.settingsRedirect'),
-        _languageService.tr('notificationSettings.messages.settingsRedirectDesc'),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFFF9800),
-        colorText: Colors.white,
+      CustomSnackbar.show(
+        title: _languageService.tr('notificationSettings.messages.settingsRedirect'),
+        message: _languageService.tr('notificationSettings.messages.settingsRedirectDesc'),
+        type: SnackbarType.success,
         duration: const Duration(seconds: 4),
       );
       debugPrint('✅ Bilgi mesajı gösterildi');
     } catch (e) {
-      debugPrint('❌ Cihaz ayarları açılırken hata: $e');
-      Get.snackbar(
-        'Hata',
-        'Ayarlar açılamadı',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFEF5050),
-        colorText: Colors.white,
-      );
+      debugPrint('❌ app_settings paketi çalışmadı: $e');
+      
+      // Alternatif olarak url_launcher kullan
+      try {
+        debugPrint('⚙️ url_launcher ile ayarlar açılmaya çalışılıyor...');
+        
+        // Platform'a göre farklı URL'ler
+        String settingsUrl;
+        if (GetPlatform.isIOS) {
+          settingsUrl = 'App-Prefs:root=General&path=NOTIFICATION/edusocial';
+        } else if (GetPlatform.isAndroid) {
+          settingsUrl = 'package:edusocial';
+        } else {
+          settingsUrl = 'settings://';
+        }
+        
+        debugPrint('📱 Platform: ${GetPlatform.isIOS ? "iOS" : "Android"}');
+        debugPrint('📱 Settings URL: $settingsUrl');
+        
+        final Uri uri = Uri.parse(settingsUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+          debugPrint('✅ Cihaz ayarları açıldı (url_launcher)');
+          
+          // Kullanıcıya bilgi ver
+          CustomSnackbar.show(
+            title: _languageService.tr('notificationSettings.messages.settingsRedirect'),
+            message: _languageService.tr('notificationSettings.messages.settingsRedirectDesc'),
+            type: SnackbarType.success,
+            duration: const Duration(seconds: 4),
+          );
+        } else {
+          throw Exception('URL açılamadı');
+        }
+      } catch (urlError) {
+        debugPrint('❌ url_launcher da çalışmadı: $urlError');
+        
+        // Son çare olarak kullanıcıya manuel talimat ver
+        CustomSnackbar.show(
+          title: _languageService.tr('notificationSettings.messages.settingsOpenError'),
+          message: _languageService.tr('notificationSettings.messages.manualSettingsInstruction'),
+          type: SnackbarType.error,
+          duration: const Duration(seconds: 6),
+        );
+      }
     }
   }
 

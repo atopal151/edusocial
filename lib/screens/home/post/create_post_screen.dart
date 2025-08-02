@@ -74,45 +74,36 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
   void sharePost() async {
-    if (textController.text.isNotEmpty) {
-      try {
-        isPosting.value = true;
+    try {
+      isPosting.value = true;
 
-        // Linkleri text'ten çıkar
-        String cleanContent = textController.text;
-        List<String> extractedLinks = extractLinksFromText(cleanContent);
+      // Linkleri text'ten çıkar
+      String cleanContent = textController.text;
+      List<String> extractedLinks = extractLinksFromText(cleanContent);
 
-        // Linkleri text'ten temizle
-        for (String link in extractedLinks) {
-          cleanContent = cleanContent.replaceAll(link, '').trim();
-        }
-
-        // Fazla boşlukları temizle
-        cleanContent = cleanContent.replaceAll(RegExp(r'\s+'), ' ').trim();
-
-        final mediaFiles =
-            _selectedImages.map((xfile) => File(xfile.path)).toList();
-        await postController.createPost(cleanContent, mediaFiles,
-            links: extractedLinks);
-        isPosting.value = false;
-        Get.offAllNamed('/main'); // Main screen'e git (navbar 0. index)
-      } catch (e) {
-        isPosting.value = false;
-        final LanguageService languageService = Get.find<LanguageService>();
-        CustomSnackbar.show(
-          title: languageService.tr("common.errors.error"),
-          message: languageService.tr("post.createPost.error"),
-          type: SnackbarType.error,
-        );
+      // Linkleri text'ten temizle
+      for (String link in extractedLinks) {
+        cleanContent = cleanContent.replaceAll(link, '').trim();
       }
-    } else {
-      final LanguageService languageService = Get.find<LanguageService>();
-      CustomSnackbar.show(
-        title: languageService.tr("common.warnings.warning"),
-        message: languageService.tr("post.createPost.emptyContent"),
-        type: SnackbarType.warning,
-      );
+
+      // Fazla boşlukları temizle
+      cleanContent = cleanContent.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+      final mediaFiles =
+          _selectedImages.map((xfile) => File(xfile.path)).toList();
+      await postController.createPost(cleanContent, mediaFiles,
+          links: extractedLinks);
+      isPosting.value = false;
+      Get.offAllNamed('/main'); // Main screen'e git (navbar 0. index)
+    } catch (e) {
+      isPosting.value = false;
     }
   }
 

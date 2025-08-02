@@ -1603,7 +1603,10 @@
       "permissionRequired": "Notification permission required",
       "permissionRequiredDesc": "You need to grant notification permission first to use this feature",
       "settingsRedirect": "Redirecting to Settings",
-      "settingsRedirectDesc": "You can disable notification permissions from device settings"
+      "settingsRedirectDesc": "You can disable notification permissions from device settings",
+      "settingsOpenError": "Settings Could Not Be Opened",
+      "settingsOpenErrorDesc": "You need to open device settings manually",
+      "manualSettingsInstruction": "Please check app notifications from device settings"
     },
     "dialogs": {
       "permissionRequired": {
