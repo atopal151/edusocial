@@ -50,6 +50,19 @@ class CalendarController extends GetxController {
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Color(0xffef5050), // Seçili tarih rengi
+              onPrimary: Colors.white, // Seçili tarih üzerindeki yazı rengi
+              onSurface: Colors.black, // Diğer yazılar
+            ),
+            dialogBackgroundColor: Colors.white, // Modal arka planı
+          ),
+          child: child!,
+        );
+      },
     );
     if (pickedDate != null) {
       selectedDate.value = DateFormat('dd MMM yyyy').format(pickedDate);
@@ -73,11 +86,11 @@ class CalendarController extends GetxController {
 
   void addOrUpdateReminder({Reminder? existing}) {
     final titleController = TextEditingController(text: existing?.title ?? "");
-    DateTime selectedDateTime =
-        existing != null ? DateTime.parse(existing.dateTime) : DateTime.now();
+    Rx<DateTime> selectedDateTime =
+        (existing != null ? DateTime.parse(existing.dateTime) : DateTime.now()).obs;
     RxBool sendNotification = (existing?.sendNotification ?? true).obs;
     Rx<Color> selectedColor =
-        (existing != null ? HexColor.fromHex(existing.color) : Colors.blue).obs;
+        (existing != null ? HexColor.fromHex(existing.color) : Color(0xff2196F3)).obs; // Varsayılan olarak Normal (mavi)
 
     Get.bottomSheet(
       Container(
@@ -100,121 +113,243 @@ class CalendarController extends GetxController {
                 backgroundColor: Color(0xfff5f5f5),
               ),
               SizedBox(height: 30),
-              Row(
+              Obx(() => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      "${languageService.tr("calendar.reminderForm.dateLabel")} ${DateFormat('dd MMM yyyy').format(selectedDateTime)}"),
+                      "${languageService.tr("calendar.reminderForm.dateLabel")} ${DateFormat('dd MMM yyyy').format(selectedDateTime.value)}"),
                   SizedBox(
                     width: 120,
                     child: CustomButton(
-                      height: 50,
+                      height: 40,
                       borderRadius: 15,
                       text: languageService.tr("calendar.reminderForm.selectDate"),
                       onPressed: () async {
                         DateTime? pickedDate = await showDatePicker(
                           context: Get.context!,
-                          initialDate: selectedDateTime,
+                          initialDate: selectedDateTime.value,
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2100),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Color(0xffef5050), // Seçili tarih rengi
+                                  onPrimary: Colors.white, // Seçili tarih üzerindeki yazı rengi
+                                  onSurface: Colors.black, // Diğer yazılar
+                                ),
+                                dialogBackgroundColor: Colors.white, // Modal arka planı
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
                         if (pickedDate != null) {
-                          selectedDateTime = DateTime(
+                          selectedDateTime.value = DateTime(
                             pickedDate.year,
                             pickedDate.month,
                             pickedDate.day,
-                            selectedDateTime.hour,
-                            selectedDateTime.minute,
+                            selectedDateTime.value.hour,
+                            selectedDateTime.value.minute,
                           );
                         }
                       },
                       isLoading: false.obs,
-                      backgroundColor: Color(0xff414751),
+                      backgroundColor: Color(0xffef5050),
                       textColor: Colors.white,
                     ),
                   ),
                 ],
-              ),
+              )),
               SizedBox(height: 10),
-              Row(
+              Obx(() => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("${languageService.tr("calendar.reminderForm.timeLabel")} ${DateFormat('HH:mm').format(selectedDateTime)}"),
+                  Text("${languageService.tr("calendar.reminderForm.timeLabel")} ${DateFormat('HH:mm').format(selectedDateTime.value)}"),
                   SizedBox(
                     width: 120,
                     child: CustomButton(
-                      height: 50,
+                      height: 40,
                       borderRadius: 15,
                       text: languageService.tr("calendar.reminderForm.selectTime"),
                       onPressed: () async {
                         TimeOfDay? pickedTime = await showTimePicker(
                           context: Get.context!,
-                          initialTime: TimeOfDay.fromDateTime(selectedDateTime),
+                          initialTime: TimeOfDay.fromDateTime(selectedDateTime.value),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Color(0xffef5050), // Seçili saat rengi
+                                  onPrimary: Colors.white, // Seçili saat üzerindeki yazı rengi
+                                  onSurface: Colors.black, // Diğer yazılar
+                                ),
+                                dialogBackgroundColor: Colors.white, // Modal arka planı
+                              ),
+                              child: child!,
+                            );
+                          },
                         );
                         if (pickedTime != null) {
-                          selectedDateTime = DateTime(
-                            selectedDateTime.year,
-                            selectedDateTime.month,
-                            selectedDateTime.day,
+                          selectedDateTime.value = DateTime(
+                            selectedDateTime.value.year,
+                            selectedDateTime.value.month,
+                            selectedDateTime.value.day,
                             pickedTime.hour,
                             pickedTime.minute,
                           );
                         }
                       },
                       isLoading: false.obs,
-                      backgroundColor: Color(0xff414751),
+                      backgroundColor: Color(0xffef5050),
                       textColor: Colors.white,
                     ),
                   ),
                 ],
-              ),
+              )),
               SizedBox(height: 20),
-              Obx(() => SwitchListTile(
-                    title: Text(languageService.tr("calendar.reminderForm.sendNotification")),
-                    value: sendNotification.value,
-                    onChanged: (val) => sendNotification.value = val,
-                  )),
-              SizedBox(height: 10),
-              Obx(() => Row(
-                    children: [
-                      Text("${languageService.tr("calendar.reminderForm.colorLabel")} "),
-                      SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () {
-                          Get.dialog(
-                            AlertDialog(
-                              title: Text(languageService.tr("calendar.reminderForm.selectColor")),
-                              content: SingleChildScrollView(
-                                child: ColorPicker(
-                                  pickerColor: selectedColor.value,
-                                  onColorChanged: (color) {
-                                    selectedColor.value = color;
-                                  },
-                                  labelTypes: [],
-                                  pickerAreaHeightPercent: 0.8,
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text(languageService.tr("calendar.reminderForm.ok")),
-                                  onPressed: () {
-                                    Get.back(); // renk seçimi tamamlandı
-                                  },
-                                ),
-                              ],
+              Obx(() => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            languageService.tr("calendar.reminderForm.sendNotification"),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13.28,
+                              color: const Color(0xff414751),
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: selectedColor.value,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey),
                           ),
                         ),
+                        GestureDetector(
+                          onTap: () => sendNotification.value = !sendNotification.value,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 36,
+                            height: 20,
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            alignment: sendNotification.value ? Alignment.centerRight : Alignment.centerLeft,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: sendNotification.value
+                                    ? const Color(0xFFEF5050)
+                                    : const Color(0xFFD3D3D3),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+              SizedBox(height: 10),
+              Obx(() => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("${languageService.tr("calendar.reminderForm.colorLabel")} "),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // Düşük Önem - Yeşil
+                          GestureDetector(
+                            onTap: () => selectedColor.value = Color(0xff4CAF50),
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Color(0xff4CAF50),
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  color: selectedColor.value == Color(0xff4CAF50) 
+                                    ? Color(0xffef5050) 
+                                    : Colors.grey,
+                                  width: selectedColor.value == Color(0xff4CAF50) ? 3 : 1,
+                                ),
+                              ),
+                              child: selectedColor.value == Color(0xff4CAF50)
+                                ? Icon(Icons.check, color: Colors.white, size: 20)
+                                : null,
+                            ),
+                          ),
+                          // Normal Önem - Mavi
+                          GestureDetector(
+                            onTap: () => selectedColor.value = Color(0xff2196F3),
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Color(0xff2196F3),
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  color: selectedColor.value == Color(0xff2196F3) 
+                                    ? Color(0xffef5050) 
+                                    : Colors.grey,
+                                  width: selectedColor.value == Color(0xff2196F3) ? 3 : 1,
+                                ),
+                              ),
+                              child: selectedColor.value == Color(0xff2196F3)
+                                ? Icon(Icons.check, color: Colors.white, size: 20)
+                                : null,
+                            ),
+                          ),
+                          // Yüksek Önem - Turuncu
+                          GestureDetector(
+                            onTap: () => selectedColor.value = Color(0xffFF9800),
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Color(0xffFF9800),
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  color: selectedColor.value == Color(0xffFF9800) 
+                                    ? Color(0xffef5050) 
+                                    : Colors.grey,
+                                  width: selectedColor.value == Color(0xffFF9800) ? 3 : 1,
+                                ),
+                              ),
+                              child: selectedColor.value == Color(0xffFF9800)
+                                ? Icon(Icons.check, color: Colors.white, size: 20)
+                                : null,
+                            ),
+                          ),
+                          // Acil Önem - Kırmızı
+                          GestureDetector(
+                            onTap: () => selectedColor.value = Color(0xffef5050),
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Color(0xffef5050),
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  color: selectedColor.value == Color(0xffef5050) 
+                                    ? Colors.black 
+                                    : Colors.grey,
+                                  width: selectedColor.value == Color(0xffef5050) ? 3 : 1,
+                                ),
+                              ),
+                              child: selectedColor.value == Color(0xffef5050)
+                                ? Icon(Icons.check, color: Colors.white, size: 20)
+                                : null,
+                            ),
+                          ),
+                        ],
                       ),
+
                     ],
                   )),
               SizedBox(height: 20),
@@ -226,14 +361,17 @@ class CalendarController extends GetxController {
                   text: existing != null ? languageService.tr("calendar.reminderForm.update") : languageService.tr("calendar.reminderForm.save"),
                   onPressed: () async {
                     final formatted = DateFormat('yyyy-MM-dd HH:mm:ss')
-                        .format(selectedDateTime);
+                        .format(selectedDateTime.value);
+                    final colorHex = selectedColor.value.toHex();
+                    print("🎨 Seçilen renk: $colorHex"); // Debug için
+                    print("🎨 Seçilen renk RGB: ${selectedColor.value.red}, ${selectedColor.value.green}, ${selectedColor.value.blue}"); // Debug için
+                    
                     final reminder = Reminder(
                       id: existing?.id ?? 0,
                       title: titleController.text,
                       dateTime: formatted,
                       sendNotification: sendNotification.value,
-                      color: selectedColor.value
-                          .toHex(), // renk hex olarak gönderilecek
+                      color: colorHex, // renk hex olarak gönderilecek
                     );
                     try {
                       if (existing != null) {

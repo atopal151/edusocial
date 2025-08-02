@@ -24,12 +24,14 @@ class CalendarService {
       /*debugPrint("📥 Calendar Response: ${response.statusCode}",wrapWidth: 1024);
       debugPrint("📥 Calendar Body: ${response.body}",wrapWidth: 1024);*/
 
-      if (response.statusCode == 200) {
-        final jsonBody = jsonDecode(response.body);
-        final List data = jsonBody['data'] ?? [];
+          if (response.statusCode == 200) {
+      final jsonBody = jsonDecode(response.body);
+      final List data = jsonBody['data'] ?? [];
+      
+      print("📥 API'den gelen response: ${response.body}"); // Debug için
 
-        return data.map((e) => Reminder.fromJson(e)).toList();
-      } else {
+      return data.map((e) => Reminder.fromJson(e)).toList();
+    } else {
         throw Exception(
             "Takvim verileri alınamadı. Status code: ${response.statusCode}");
       }
@@ -50,6 +52,8 @@ class CalendarService {
       "send_notification": true,
       "notification_time": reminder.dateTime,
     });
+    
+    print("📤 API'ye gönderilen body: $body"); // Debug için
 
     final response = await http.post(
       uri,
@@ -77,6 +81,8 @@ class CalendarService {
       "send_notification": true,
       "notification_time": reminder.dateTime,
     });
+    
+    print("📤 API'ye gönderilen body (update): $body"); // Debug için
 
     final response = await http.put(
       uri,
