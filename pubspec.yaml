@@ -130,6 +130,8 @@ flutter:
     - images/icons/document_icon.svg
     - images/icons/logout.svg
     - images/icons/lock.svg
+    - images/icons/subjects.svg
+    - images/icons/logo.svg
     - images/icons/profile_icon_settings.svg
     - images/mask_group.png
     - images/ch_group.png

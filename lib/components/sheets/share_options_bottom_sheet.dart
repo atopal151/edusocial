@@ -3,13 +3,23 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:get/get.dart';
 import '../../services/language_service.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ShareOptionsBottomSheet extends StatelessWidget {
   final String postText;
+  final List<String>? mediaUrls;
+  final int? postId;
+  final String? postSlug;
 
   const ShareOptionsBottomSheet({
     super.key,
     required this.postText,
+    this.mediaUrls,
+    this.postId,
+    this.postSlug,
   });
 
   @override
@@ -113,27 +123,63 @@ class ShareOptionsBottomSheet extends StatelessWidget {
 
   void _shareToWhatsApp(String text) {
     final LanguageService languageService = Get.find<LanguageService>();
-    Share.share(text, subject: languageService.tr("share.subjects.whatsapp"));
+    _shareWithMedia(text, languageService.tr("share.subjects.whatsapp"));
   }
 
   void _shareToTelegram(String text) {
     final LanguageService languageService = Get.find<LanguageService>();
-    Share.share(text, subject: languageService.tr("share.subjects.telegram"));
+    _shareWithMedia(text, languageService.tr("share.subjects.telegram"));
   }
 
   void _shareToTwitter(String text) {
     final LanguageService languageService = Get.find<LanguageService>();
-    Share.share(text, subject: languageService.tr("share.subjects.twitter"));
+    _shareWithMedia(text, languageService.tr("share.subjects.twitter"));
   }
 
   void _shareToFacebook(String text) {
     final LanguageService languageService = Get.find<LanguageService>();
-    Share.share(text, subject: languageService.tr("share.subjects.facebook"));
+    _shareWithMedia(text, languageService.tr("share.subjects.facebook"));
   }
 
   void _shareToLinkedIn(String text) {
     final LanguageService languageService = Get.find<LanguageService>();
-    Share.share(text, subject: languageService.tr("share.subjects.linkedin"));
+    _shareWithMedia(text, languageService.tr("share.subjects.linkedin"));
+  }
+
+  void _shareWithMedia(String text, String subject) async {
+    try {
+      if (mediaUrls != null && mediaUrls!.isNotEmpty) {
+        // Görseller varsa, ilk görseli paylaş
+        final firstImageUrl = mediaUrls!.first;
+        
+        // URL'den dosya indir
+        final response = await http.get(Uri.parse(firstImageUrl));
+        
+        if (response.statusCode == 200) {
+          // Geçici dosya oluştur
+          final tempPath = await getTemporaryDirectory();
+          final tempFile = File('${tempPath.path}/shared_image.jpg');
+          await tempFile.writeAsBytes(response.bodyBytes);
+          
+          // Görsel ile paylaş
+          await Share.shareXFiles(
+            [XFile(tempFile.path)],
+            text: text,
+            subject: subject,
+          );
+        } else {
+          // Görsel indirilemezse sadece text paylaş
+          Share.share(text, subject: subject);
+        }
+      } else {
+        // Görsel yoksa sadece text paylaş
+        Share.share(text, subject: subject);
+      }
+    } catch (e) {
+      debugPrint("❌ Paylaşım hatası: $e");
+      // Hata durumunda sadece text paylaş
+      Share.share(text, subject: subject);
+    }
   }
 
   void _copyToClipboard(BuildContext context, String text) {

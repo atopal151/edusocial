@@ -97,9 +97,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 10),
                     _buildDepartmentDropdown(),
                     const SizedBox(height: 20),
-                    _sectionTitle(languageService.tr("profile.editProfile.courses")),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _sectionTitle(languageService.tr("profile.editProfile.courses")),
+                        InkWell(
+                          onTap: () {
+                            Get.toNamed('/match');
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFEF5050),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              languageService.tr("match.resultScreen.addCourseButton"),
+                              style: GoogleFonts.inter(
+                                color: Color(0xffffffff),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 10),
-                    CustomTextFieldStep2(
+                   /* CustomTextFieldStep2(
                       controller: controller.lessonController,
                       onAdd: () {
                         if (controller.lessonController.text.isNotEmpty) {
@@ -109,7 +134,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         }
                       },
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 10),*/
                     _buildLessonChips(),
                     const SizedBox(height: 20),
                     _sectionTitle(languageService.tr("profile.editProfile.notificationSettings")),

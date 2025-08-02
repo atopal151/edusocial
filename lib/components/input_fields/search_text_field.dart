@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SearchTextField extends StatefulWidget {
+class SearchTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final Function(String)? onChanged;
@@ -15,18 +15,6 @@ class SearchTextField extends StatefulWidget {
   });
 
   @override
-  State<SearchTextField> createState() => _SearchTextFieldState();
-}
-
-class _SearchTextFieldState extends State<SearchTextField> {
-  @override
-  void dispose() {
-    // Controller'ın listener'larını temizle
-    widget.controller.removeListener(() {});
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12),
@@ -35,8 +23,8 @@ class _SearchTextFieldState extends State<SearchTextField> {
         borderRadius: BorderRadius.circular(30),
       ),
       child: TextField(
-        controller: widget.controller,
-        onChanged: widget.onChanged,
+        controller: controller,
+        onChanged: onChanged,
         textInputAction: TextInputAction.search,
         enableSuggestions: true,
         autocorrect: false, // Search için autocorrect kapalı
@@ -53,7 +41,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
               BlendMode.srcIn,
             ),
           ),
-          hintText: widget.label,
+          hintText: label,
           hintStyle: GoogleFonts.inter(
             color: Color(0xff9CA3AE),
             fontSize: 12,

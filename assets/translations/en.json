@@ -834,6 +834,7 @@
     "card": {
       "follow": "Follow",
       "skip": "Skip",
+      "next": "Next",
       "online": "Online",
       "education": "Education",
       "noSchoolInfo": "No school info",
@@ -843,7 +844,7 @@
       "noInfoYet": "No info yet",
       "matchedTopics": "Topics matched with you",
       "following": "Following",
-      "message": "message"
+      "message": "Message"
     }
   },
   "notifications": {

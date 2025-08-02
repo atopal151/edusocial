@@ -34,8 +34,8 @@ class MatchController extends GetxController {
       Get.snackbar(languageService.tr("common.success"), languageService.tr("common.messages.courseSavedToProfile"),
           snackPosition: SnackPosition.BOTTOM);
       
-      Get.back();
-      findMatches();
+      // Kurslar kaydedildikten sonra ana sayfaya dön
+      Get.offAllNamed('/main');
     } catch (e) {
       debugPrint("❗ Ders kaydedilirken hata: $e");
       Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.generalError"),
@@ -99,7 +99,8 @@ class MatchController extends GetxController {
     if (currentIndex.value < matches.length - 1) {
       currentIndex.value++;
     } else {
-      currentIndex.value = 0; // Baştan başla
+      // Eşleşmeler bittiyse yeni eşleşmeler getir
+      findMatches();
     }
   }
 

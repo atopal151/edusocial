@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
 import '../widgets/comment_bottom_sheet.dart';
-import '../widgets/share_bottom_sheet.dart';
+import '../sheets/share_options_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 import '../snackbars/custom_snackbar.dart';
 import '../../services/language_service.dart';
@@ -512,6 +512,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                           ),
                           builder: (_) => ShareOptionsBottomSheet(
                             postText: shareText,
+                            mediaUrls: widget.mediaUrls,
                             postId: widget.postId,
                             postSlug: widget.slug,
                           ),

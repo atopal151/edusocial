@@ -36,8 +36,10 @@ class _MatchCardState extends State<MatchCard> {
         },
         onPanEnd: (details) {
           if (_dragOffset.dx > 100) {
+            // Sağa swipe - Follow
             controller.followUser();
           } else if (_dragOffset.dx < -100) {
+            // Sola swipe - Skip ve yeni eşleşme
             controller.nextMatch();
           }
           setState(() {
@@ -75,7 +77,7 @@ class _MatchCardState extends State<MatchCard> {
                             child: Text(
                               _dragOffset.dx > 0 
                                 ? languageService.tr("match.card.follow") 
-                                : languageService.tr("match.card.skip"),
+                                : languageService.tr("match.card.next"),
                               style: GoogleFonts.inter(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w600,
@@ -266,7 +268,7 @@ class _MatchCardState extends State<MatchCard> {
                 ),
                 _buildActionButton(
                   iconPath: 'images/icons/match_next_icon.svg',
-                  label: languageService.tr("match.card.skip"),
+                  label: languageService.tr("match.card.next"),
                   color: const Color(0xffEF5050),
                   onTap: controller.nextMatch,
                 ),

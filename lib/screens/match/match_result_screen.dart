@@ -46,34 +46,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFFF7743),
-                          Color(0xFFEF5050)
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        Get.toNamed('/match');
-                      },
-                      child: Text(
-                        languageService.tr("match.resultScreen.addCourseButton"),
-                        style: GoogleFonts.inter(
-                          color: Color(0xffffffff),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
+
                 ],
               ),
             );
@@ -83,34 +56,6 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 MatchCard(),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFFF7743),
-                        Color(0xFFEF5050)
-                      ],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      Get.toNamed('/match');
-                    },
-                    child: Text(
-                      languageService.tr("match.resultScreen.addCourseButton"),
-                      style: GoogleFonts.inter(
-                        color: Color(0xffffffff),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             );
           }
