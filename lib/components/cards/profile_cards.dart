@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/profile_controller.dart';
 import 'group_suggestion_card.dart';
 import '../../services/language_service.dart';
+import '../../components/snackbars/custom_snackbar.dart';
 
 final ProfileController controller = Get.find();
 
@@ -182,15 +183,31 @@ Widget buildProfileDetails() {
                             Axis.horizontal, // **Yana kaydırılabilir yapı**
                         itemCount: profileData.approvedGroups.length,
                         itemBuilder: (context, index) {
+                          final group = profileData.approvedGroups[index];
                           return InkWell(
                             onTap: () {
-                              Get.toNamed("/group_chat_detail");
+                              // Group ID'yi al ve group chat'e yönlendir
+                              final groupId = group['id']?.toString();
+                              if (groupId != null && groupId.isNotEmpty) {
+                                debugPrint('🚀 Navigating to group chat with ID: $groupId');
+                                Get.toNamed('/group_chat_detail', arguments: {
+                                  'groupId': groupId,
+                                });
+                              } else {
+                                debugPrint('❌ Group ID not found in group data');
+                                // Custom snackbar ile hata mesajı
+                                CustomSnackbar.show(
+                                  title: languageService.tr("common.error"),
+                                  message: languageService.tr("groups.errors.noGroupSelected"),
+                                  type: SnackbarType.error,
+                                  duration: const Duration(seconds: 3),
+                                );
+                              }
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(right: 10),
                               child: buildGroupSuggestionCard(
-                                GroupSuggestionModel.fromJson(
-                                    profileData.approvedGroups[index]),
+                                GroupSuggestionModel.fromJson(group),
                               ),
                             ),
                           );

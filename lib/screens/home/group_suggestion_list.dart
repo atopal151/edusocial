@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/group_controller/group_controller.dart';
 import '../../components/cards/group_suggestion_card.dart';
 import '../../services/language_service.dart';
+import '../../components/snackbars/custom_snackbar.dart';
 
 class GroupSuggestionListView extends StatelessWidget {
   GroupSuggestionListView({super.key});
@@ -50,15 +51,14 @@ class GroupSuggestionListView extends StatelessWidget {
                       ),
                       child: InkWell(
                         onTap: () {
-                          groupController.joinGroup(group.id);
+                          // Sadece katılmamış ve beklemede olmayan gruplar için tıklanabilir
+                          if (!group.isMember && !group.isPending) {
+                            groupController.handleGroupJoin(group.id);
+                          }
                         },
                         child: Center(
                             child: Text(
-                          group.isMember 
-                            ? languageService.tr("groups.suggestion.joined") 
-                            : group.isPrivate 
-                              ? languageService.tr("groups.suggestion.sendRequest") 
-                              : languageService.tr("groups.suggestion.joinGroup"),
+                          _getButtonText(group, languageService),
                           style: GoogleFonts.inter(
                               color: Color(0xffffffff),
                               fontSize: 10,
@@ -72,5 +72,30 @@ class GroupSuggestionListView extends StatelessWidget {
         ),
       );
     });
+  }
+
+  String _getButtonText(dynamic group, LanguageService languageService) {
+    // Eğer kullanıcı zaten üyeyse
+    if (group.isMember) {
+      return languageService.tr("groups.suggestion.joined");
+    }
+    
+    // Eğer grup gizli değilse (public) ve kullanıcı üye değilse
+    if (!group.isPrivate && !group.isMember) {
+      return languageService.tr("groups.suggestion.joinGroup");
+    }
+    
+    // Eğer grup gizli ise (private) ve kullanıcı başvuru yaptıysa
+    if (group.isPrivate && group.isPending) {
+      return languageService.tr("groups.suggestion.requestSent");
+    }
+    
+    // Eğer grup gizli ise (private) ve kullanıcı daha başvuru yapmadıysa
+    if (group.isPrivate && !group.isPending) {
+      return languageService.tr("groups.suggestion.sendRequest");
+    }
+    
+    // Varsayılan durum
+    return languageService.tr("groups.suggestion.joinGroup");
   }
 }

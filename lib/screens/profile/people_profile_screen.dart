@@ -2,6 +2,7 @@
   import 'package:edusocial/components/user_appbar/back_appbar.dart';
   import 'package:edusocial/components/widgets/build_people_profile_details.dart';
   import 'package:edusocial/components/widgets/general_loading_indicator.dart';
+  import 'package:edusocial/components/widgets/empty_state_widget.dart';
   import 'package:edusocial/controllers/people_profile_controller.dart';
   import 'package:edusocial/utils/date_format.dart';
   import 'package:flutter/material.dart';
@@ -240,11 +241,9 @@
       }
 
       if (posts.isEmpty) {
-        return SizedBox(
-          height: 200,
-          child: Center(
-            child: Text(languageService.tr("profile.peopleProfile.noPostsFound")),
-          ),
+        return Container(
+          constraints: const BoxConstraints(minHeight: 200),
+          child: EmptyStateWidgets.postsEmptyState(languageService),
         );
       }
 
@@ -307,11 +306,9 @@
         }
 
         if (controller.peopleEntries.isEmpty) {
-          return SizedBox(
-            height: 200,
-            child: Center(
-              child: Text(languageService.tr("profile.peopleProfile.noEntriesFound")),
-            ),
+          return Container(
+            constraints: const BoxConstraints(minHeight: 200),
+            child: EmptyStateWidgets.entriesEmptyState(languageService),
           );
         }
 

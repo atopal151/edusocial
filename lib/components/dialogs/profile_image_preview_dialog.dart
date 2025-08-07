@@ -228,7 +228,6 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                                                 color: Colors.white,
                                                 size: 16,
                                               ),
-                                             update
                                             ],
                                           ),
                                         ),

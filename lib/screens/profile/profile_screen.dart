@@ -9,12 +9,16 @@ import '../../components/cards/profile_cards.dart';
 import '../../components/cards/profile_header.dart';
 import '../../components/profile_tabbar/profile_tabbar.dart';
 import '../../components/profile_tabbar/toggle_tab_bar.dart';
+import '../../components/widgets/empty_state_widget.dart';
 import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../routes/app_routes.dart';
 import '../profile/people_profile_screen.dart';
 import '../../services/language_service.dart';
+import '../../utils/date_format.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -200,11 +204,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     
     return Obx(() {
       if (controller.profilePosts.isEmpty) {
-        return SizedBox(
-          height: 200,
-          child: Center(
-            child: Text(languageService.tr("profile.mainProfile.noPostsFound")),
-          ),
+        return Container(
+          constraints: const BoxConstraints(minHeight: 200),
+          child: EmptyStateWidgets.postsEmptyState(languageService),
         );
       }
 
@@ -243,11 +245,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     
     return Obx(() {
       if (controller.personEntries.isEmpty) {
-        return SizedBox(
-          height: 200,
-          child: Center(
-            child: Text(languageService.tr("profile.mainProfile.noEntriesFound")),
-          ),
+        return Container(
+          constraints: const BoxConstraints(minHeight: 200),
+          child: EmptyStateWidgets.entriesEmptyState(languageService),
         );
       }
 

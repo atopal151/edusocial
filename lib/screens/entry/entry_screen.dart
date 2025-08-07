@@ -2,25 +2,17 @@ import 'package:edusocial/components/buttons/custom_button.dart';
 import 'package:edusocial/components/cards/entry_card.dart';
 import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
+import 'package:edusocial/components/widgets/empty_state_widget.dart';
+import 'package:edusocial/controllers/entry_controller.dart';
 import 'package:edusocial/models/entry_model.dart';
+import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../components/user_appbar/user_appbar.dart';
-import '../../controllers/entry_controller.dart';
-import '../../services/language_service.dart';
 import '../profile/people_profile_screen.dart';
 import 'package:edusocial/routes/app_routes.dart';
-
-// Yeni sınıf: Entry ve ilişkili görüntüleme verilerini tutar
-class DisplayEntryItem {
-  final EntryModel entry;
-  final String? topicName;
-  final String? categoryTitle;
-
-  DisplayEntryItem({required this.entry, this.topicName, this.categoryTitle});
-}
 
 class EntryScreen extends StatefulWidget {
   const EntryScreen({super.key});
@@ -249,13 +241,7 @@ class EntryScreenState extends State<EntryScreen> {
                       // 📄 Entry Listesi
                       Expanded(
                         child: entryController.displayEntries.isEmpty
-                            ? Center(
-                                child: Text(
-                                  languageService.tr("entry.entryScreen.noEntriesFound"),
-                                  style:
-                                      GoogleFonts.inter(color: Color(0xff9ca3ae)),
-                                ),
-                              )
+                            ? EmptyStateWidgets.entriesEmptyState(languageService)
                             : ListView.builder(
                                 physics: AlwaysScrollableScrollPhysics(),
                                 itemCount: entryController.displayEntries.length,

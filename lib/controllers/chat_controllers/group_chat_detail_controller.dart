@@ -14,6 +14,7 @@ import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../profile_controller.dart';
 import 'chat_controller.dart'; // Added import for ChatController
+import '../../components/snackbars/custom_snackbar.dart';
 
 class GroupChatDetailController extends GetxController {
   // Services
@@ -107,8 +108,10 @@ class GroupChatDetailController extends GetxController {
     // PAGINATION: Initialize scroll listener for lazy loading
     _setupPaginationScrollListener();
     
-    if (Get.arguments != null && Get.arguments['groupId'] != null) {
-      currentGroupId.value = Get.arguments['groupId'];
+    // Arguments'ı güvenli bir şekilde kontrol et
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    if (arguments != null && arguments['groupId'] != null) {
+      currentGroupId.value = arguments['groupId'].toString();
       debugPrint('✅ Current group ID set to: ${currentGroupId.value}');
       
       // Optimize: Sadece burada yükle, initState'te tekrar çağırma
@@ -121,8 +124,21 @@ class GroupChatDetailController extends GetxController {
       GroupServices.clearGroupCache();
     } else {
       debugPrint('❌ No group ID provided in arguments');
-      Get.snackbar('Error', 'No group selected', snackPosition: SnackPosition.BOTTOM);
-      Get.back();
+      // Custom snackbar kullan ve güvenli navigation
+      final languageService = Get.find<LanguageService>();
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("groups.errors.noGroupSelected"),
+        type: SnackbarType.error,
+        duration: const Duration(seconds: 3),
+      );
+      
+      // Güvenli navigation
+      Future.delayed(const Duration(seconds: 1), () {
+        if (Get.isRegistered<GroupChatDetailController>()) {
+          Get.back();
+        }
+      });
     }
   }
 

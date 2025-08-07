@@ -615,7 +615,9 @@
       "groupCreated": "Group created successfully",
       "joinedGroup": "Successfully joined the group",
       "leftGroup": "Successfully left the group",
-      "groupShared": "Group shared successfully"
+      "groupShared": "Group shared successfully",
+      "requestSent": "Request sent",
+      "joinRequestSent": "Your join request has been sent"
     },
     "validation": {
       "nameRequired": "Group name is required",
@@ -644,7 +646,8 @@
     "suggestion": {
       "joined": "Joined",
       "sendRequest": "Send Request",
-      "joinGroup": "Join Group"
+      "joinGroup": "Join Group",
+      "requestSent": "Request Sent"
     },
     "list": {
       "groupSelected": "Group Selected",
@@ -1105,6 +1108,12 @@
       "posts": "Posts",
       "followers": "Followers",
       "following": "Following"
+    },
+    "emptyStates": {
+      "noPostsTitle": "No posts yet",
+      "noPostsDescription": "Share your first post to let your friends get to know you!",
+      "noEntriesTitle": "No entries shared yet",
+      "noEntriesDescription": "Share entries to express your thoughts with the community."
     }
   },
   "search": {

@@ -153,13 +153,9 @@ class GroupListScreen extends StatelessWidget {
                             groupName: group.name,
                             groupDescription: group.description,
                             memberCount: group.userCountWithAdmin,
-                            action: group.isMember
-                                ? languageService.tr("groups.groupList.joined")
-                                : (group.isPending ? languageService.tr("groups.groupList.pending") : languageService.tr("groups.groupList.join")),
+                            action: controller.getButtonText(group, languageService),
                             onJoinPressed: () {
-                              if (!group.isMember && !group.isPending) {
-                                controller.joinGroup(group.id);
-                              }
+                              controller.handleGroupJoin(group.id);
                             },
                           ),
                         );

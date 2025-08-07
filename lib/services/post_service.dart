@@ -67,8 +67,8 @@ class PostServices {
   /// Anasayfa gönderilerini getir
   static Future<List<PostModel>> fetchHomePosts() async {
     final token = _box.read('token');
-    //debugPrint("🔄 PostServices.fetchHomePosts() çağrıldı");
-    //debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
+    debugPrint("🔄 PostServices.fetchHomePosts() çağrıldı");
+    debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
 
     try {
       final response = await http.get(
@@ -79,24 +79,41 @@ class PostServices {
         },
       );
 
-      //debugPrint("📥 Postlar Response: ${response.statusCode}", wrapWidth: 1024);
-      //debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
+      debugPrint("📥 Postlar Response: ${response.statusCode}", wrapWidth: 1024);
+      debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
         /// Debug için JSON'u ham olarak gör
-        //debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}", wrapWidth: 1024);
+        debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}", wrapWidth: 1024);
 
         final List posts = body['data']['data'];
-        //debugPrint("📊 API'den ${posts.length} post alındı");
+        debugPrint("📊 API'den ${posts.length} post alındı");
 
         final postList = posts.map((item) {
-          //debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024);
+          debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024);
           return PostModel.fromJson(item);
         }).toList();
         
-        //debugPrint("✅ ${postList.length} post başarıyla parse edildi");
+        debugPrint("✅ ${postList.length} post başarıyla parse edildi");
+        
+        // Her post için detaylı bilgi
+        for (int i = 0; i < postList.length; i++) {
+          final post = postList[i];
+          debugPrint("📋 Post ${i + 1} Detayları:");
+          debugPrint("  - ID: ${post.id}");
+          debugPrint("  - Username: ${post.username}");
+          debugPrint("  - Name: ${post.name}");
+          debugPrint("  - Content: ${post.postDescription}");
+          debugPrint("  - isOwner: ${post.isOwner}");
+          debugPrint("  - isLiked: ${post.isLiked}");
+          debugPrint("  - Like Count: ${post.likeCount}");
+          debugPrint("  - Comment Count: ${post.commentCount}");
+          debugPrint("  - Media URLs: ${post.mediaUrls.length}");
+          debugPrint("  - Links: ${post.links.length}");
+        }
+        
         return postList;
       } else {
         debugPrint("❌ API yanıtı başarısız: ${response.statusCode}");

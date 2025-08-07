@@ -12,6 +12,9 @@ class ProfileService {
   Future<ProfileModel> fetchProfileData() async {
     final token = box.read("token");
 
+    //debugPrint("🔄 ProfileService.fetchProfileData() başlatıldı");
+    //debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
+
     final response = await http.get(
       Uri.parse("${AppConstants.baseUrl}/me"),
       headers: {
@@ -21,19 +24,19 @@ class ProfileService {
     );
 
     //debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
-      //debugPrint("📦 ProfileService - Response Body: ${response.body}");
+    //debugPrint("📦 ProfileService - Response Body: ${response.body}");
     
     if (response.statusCode == 200) {
       // Gelen verinin tamamını JSON formatında yazdır
       try {
         final jsonBody = json.decode(response.body);
-        //final formattedJson = const JsonEncoder.withIndent('  ').convert(jsonBody);
+       // final formattedJson = const JsonEncoder.withIndent('  ').convert(jsonBody);
         //debugPrint("🔍 ProfileService - Tam JSON Response:");
-        // debugPrint(formattedJson);
+        //debugPrint(formattedJson);
         
         // Data alanını ayrıca yazdır
         if (jsonBody['data'] != null) {
-          //final dataJson = const JsonEncoder.withIndent('  ').convert(jsonBody['data']);
+         // final dataJson = const JsonEncoder.withIndent('  ').convert(jsonBody['data']);
           //debugPrint("📊 ProfileService - Data Alanı:");
           //debugPrint(dataJson);
           
@@ -45,14 +48,23 @@ class ProfileService {
               //debugPrint("📝 Entry $i: ${entries[i]}");
             }
           } else {
-            //debugPrint("⚠️ ProfileService - Entries alanı bulunamadı");
+            debugPrint("⚠️ ProfileService - Entries alanı bulunamadı");
           }
           
           // Post verilerini debug et
           if (jsonBody['data']['posts'] != null) {
-            //final posts = jsonBody['data']['posts'] as List;
+            final posts = jsonBody['data']['posts'] as List;
             //debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
+            for (int i = 0; i < posts.length; i++) {
+              //debugPrint("📝 Post $i: ${posts[i]}");
+            }
+          } else {
+            debugPrint("⚠️ ProfileService - Posts alanı bulunamadı");
           }
+          
+          // Account type kontrolü
+          //final accountType = jsonBody['data']['account_type'];
+          //adebugPrint("🔍 ProfileService - Account Type: $accountType");
         }
         
         return ProfileModel.fromJson(jsonBody['data']);
@@ -61,6 +73,7 @@ class ProfileService {
         throw Exception("❗ Profil verisi alınamadı: ${response.body}");
       }
     } else {
+      debugPrint("❌ ProfileService - HTTP hatası: ${response.statusCode}");
       throw Exception("❗ Profil verisi alınamadı: ${response.body}");
     }
   }
@@ -72,18 +85,22 @@ class ProfileService {
     final token = box.read('token');
 
     try {
-      debugPrint("🔄 ProfileService - fetchUserByUsername çağrıldı: $username");
+      //debugPrint("🔄 ProfileService - fetchUserByUsername çağrıldı: $username");
       
       final response = await http.get(
         url,
         headers: {"Authorization": "Bearer $token"},
       ).timeout(const Duration(seconds: 10));
       
+      //debugPrint("📥 ProfileService - Response status: ${response.statusCode}");
+      //debugPrint("📥 ProfileService - Response body: ${response.body}");
+      
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         
-        debugPrint("✅ ProfileService - fetchUserByUsername başarılı");
-        debugPrint("📊 ProfileService - Entries sayısı: ${body['data']['entries']?.length ?? 0}");
+        //debugPrint("✅ ProfileService - fetchUserByUsername başarılı");
+        //debugPrint("📊 ProfileService - Entries sayısı: ${body['data']['entries']?.length ?? 0}");
+        //debugPrint("🔍 ProfileService - Account type: ${body['data']['account_type'] ?? 'unknown'}");
 
         final model = PeopleProfileModel.fromJson(body['data']);
         return model;

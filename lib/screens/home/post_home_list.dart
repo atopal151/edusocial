@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/cards/post_card.dart';
 import '../../components/widgets/general_loading_indicator.dart';
+import '../../components/widgets/empty_state_widget.dart';
 import '../../controllers/post_controller.dart';
+import '../../services/language_service.dart';
 
 class PostHomeList extends StatelessWidget {
   PostHomeList({super.key});
@@ -11,6 +13,8 @@ class PostHomeList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
     return Obx(() {
       debugPrint(
           "🔄 PostHomeList build - Loading: ${postController.isHomeLoading.value}, Post count: ${postController.postHomeList.length}");
@@ -28,7 +32,10 @@ class PostHomeList extends StatelessWidget {
       }
 
       if (postController.postHomeList.isEmpty) {
-        return Center();
+        return Container(
+          constraints: const BoxConstraints(minHeight: 200),
+          child: EmptyStateWidgets.postsEmptyState(languageService),
+        );
       }
 
       return Column(

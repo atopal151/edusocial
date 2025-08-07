@@ -62,13 +62,42 @@ String formatSimpleDate(String dateStr) {
   /// Profil postlarını ayrı bir endpoint'ten çek
   Future<void> fetchProfilePosts() async {
     try {
-      final posts = await PostServices.fetchHomePosts();
-      final userPosts = posts.where((post) => post.isOwner).toList();
+      debugPrint("🔄 fetchProfilePosts() başlatıldı");
       
-      profilePosts.assignAll(userPosts);
-      postCount.value = userPosts.length;
-      
-      debugPrint("✅ Profile postları yüklendi: ${userPosts.length} post");
+      // /me endpoint'inden gelen profil verisindeki postları kullan
+      final profileData = profile.value;
+      if (profileData != null && profileData.posts != null) {
+        debugPrint("📦 /me endpoint'inden ${profileData.posts!.length} post alındı");
+        
+        // Her post için detaylı debug
+        for (int i = 0; i < profileData.posts!.length; i++) {
+          final post = profileData.posts![i];
+          debugPrint("📋 Post ${i + 1}: ID=${post.id}, Content=${post.postDescription}, isOwner=${post.isOwner}");
+        }
+        
+        // /me endpoint'inden gelen postlar zaten kullanıcının kendi postları
+        final userPosts = profileData.posts!;
+        debugPrint("👤 /me endpoint'inden gelen post sayısı: ${userPosts.length}");
+        
+        // Hesap tipi kontrolü - kendi profilimizde olduğumuz için her zaman göster
+        final currentAccountType = profile.value?.accountType ?? 'public';
+        debugPrint("🔍 Mevcut hesap tipi: $currentAccountType");
+        
+        if (currentAccountType == 'private') {
+          debugPrint("🔒 Private hesap tespit edildi, ancak kendi postlarımız her zaman görünür");
+        }
+        
+        profilePosts.assignAll(userPosts);
+        postCount.value = userPosts.length;
+        
+        debugPrint("✅ Profile postları yüklendi: ${userPosts.length} post");
+        debugPrint("🔍 Hesap tipi: ${profile.value?.accountType ?? 'unknown'}");
+        debugPrint("👤 Kullanıcının kendi postları her zaman görünür");
+      } else {
+        debugPrint("⚠️ /me endpoint'inden post verisi bulunamadı");
+        profilePosts.clear();
+        postCount.value = 0;
+      }
       
     } catch (e) {
       debugPrint("❌ Profile postları yükleme hatası: $e");
@@ -79,17 +108,34 @@ String formatSimpleDate(String dateStr) {
     isLoading.value = true;
     
     try {
+      debugPrint("🔄 ProfileController.loadProfile() başlatıldı");
+      
       // Token kontrolü
       final box = GetStorage();
       final token = box.read('token');
       if (token == null || token.isEmpty) {
         throw Exception("Token bulunamadı");
       }
+      debugPrint("🔑 Token kontrolü başarılı");
       
       // Ana profil verisi
+      debugPrint("📥 Ana profil verisi çekiliyor...");
       final profileData = await _profileService.fetchProfileData();
       profile.value = profileData;
       userId.value = profileData.id.toString();
+      
+      debugPrint("✅ Ana profil verisi yüklendi:");
+      debugPrint("  - ID: ${profileData.id}");
+      debugPrint("  - Name: ${profileData.name} ${profileData.surname}");
+      debugPrint("  - Username: ${profileData.username}");
+      debugPrint("  - Account Type: ${profileData.accountType}");
+      debugPrint("  - Avatar: ${profileData.avatarUrl}");
+      debugPrint("  - Banner: ${profileData.bannerUrl}");
+      debugPrint("  - Bio: ${profileData.description}");
+      debugPrint("  - Followers: ${profileData.followers.length}");
+      debugPrint("  - Following: ${profileData.followings.length}");
+      debugPrint("  - Posts: ${profileData.posts?.length ?? 0}");
+      debugPrint("  - Entries: ${profileData.entries?.length ?? 0}");
       
       // Temel veriler
       fullName.value = "${profileData.name} ${profileData.surname}";
@@ -110,10 +156,16 @@ String formatSimpleDate(String dateStr) {
       followerList.assignAll(profileData.followers);
       followingList.assignAll(profileData.followings);
       
+      debugPrint("📊 Takipçi ve takip edilen verileri:");
+      debugPrint("  - Followers: ${followers.value}");
+      debugPrint("  - Following: ${following.value}");
+      
       // 🚀 Ana profil verisi yüklendi, UI'ı hemen göster
       isLoading.value = false;
+      debugPrint("✅ Ana profil verisi UI'da gösteriliyor");
       
       // 🔄 Diğer veriler paralel olarak arka planda yüklenir
+      debugPrint("🔄 Arka plan verileri yükleniyor...");
       Future.wait([
         fetchProfilePosts(),
         _fetchEntriesFromUsername(profileData.username),
@@ -232,40 +284,57 @@ String formatSimpleDate(String dateStr) {
   /// Username'den entries'ları çek
   Future<void> _fetchEntriesFromUsername(String username) async {
     try {
-      final userData = await ProfileService.fetchUserByUsername(username);
+      debugPrint("🔄 _fetchEntriesFromUsername() başlatıldı: $username");
       
-      if (userData != null && userData.entries.isNotEmpty) {
+      // /me endpoint'inden gelen profil verisindeki entries'ları kullan
+      final profileData = profile.value;
+      if (profileData != null && profileData.entries != null) {
+        debugPrint("📦 /me endpoint'inden ${profileData.entries!.length} entry alındı");
+        
+        // Hesap tipi kontrolü - kendi profilimizde olduğumuz için her zaman göster
+        final currentAccountType = profile.value?.accountType ?? 'public';
+        debugPrint("🔍 Mevcut hesap tipi: $currentAccountType");
+        
+        if (currentAccountType == 'private') {
+          debugPrint("🔒 Private hesap tespit edildi, ancak kendi entries'larımız her zaman görünür");
+        }
+        
+        // /me endpoint'inden gelen entries'lar zaten kullanıcının kendi entries'ları
+        final userEntries = profileData.entries!;
+        debugPrint("👤 /me endpoint'inden gelen entry sayısı: ${userEntries.length}");
+        
+        // Entries'ları işle
         final processedEntries = <EntryModel>[];
         
-        for (final entry in userData.entries) {
+        for (final entry in userEntries) {
           final user = UserModel(
-            id: int.tryParse(userData.id.toString()) ?? 0,
-            accountType: userData.accountType,
-            languageId: int.tryParse(userData.languageId?.toString() ?? '1') ?? 1,
-            avatar: userData.avatar,
-            banner: userData.banner,
-            schoolId: int.tryParse(userData.schoolId?.toString() ?? '1') ?? 1,
-            schoolDepartmentId: int.tryParse(userData.schoolDepartmentId?.toString() ?? '1') ?? 1,
-            name: userData.name,
-            surname: userData.surname,
-            username: userData.username,
-            email: userData.email,
-            phone: userData.phone,
-            birthday: userData.birthDate.isNotEmpty ? DateTime.tryParse(userData.birthDate) : null,
-            instagram: userData.instagram,
-            tiktok: userData.tiktok,
-            twitter: userData.twitter,
-            facebook: userData.facebook,
-            linkedin: userData.linkedin,
-            notificationEmail: userData.notificationEmail,
-            notificationMobile: userData.notificationMobile,
-            isActive: userData.isActive,
-            isOnline: userData.isOnline,
-            avatarUrl: userData.avatarUrl.isNotEmpty ? userData.avatarUrl : userData.avatar,
-            bannerUrl: userData.bannerUrl,
-            isFollowing: userData.isFollowing,
-            isFollowingPending: userData.isFollowingPending,
-            isSelf: userData.isSelf,
+            id: int.tryParse(profileData.id.toString()) ?? 0,
+            accountType: profileData.accountType,
+            languageId: int.tryParse(profileData.languageId?.toString() ?? '1') ?? 1,
+            avatar: profileData.avatar,
+            banner: profileData.banner,
+            schoolId: int.tryParse(profileData.schoolId?.toString() ?? '1') ?? 1,
+            schoolDepartmentId: int.tryParse(profileData.schoolDepartmentId?.toString() ?? '1') ?? 1,
+            name: profileData.name,
+            surname: profileData.surname,
+            username: profileData.username,
+            email: profileData.email,
+            phone: profileData.phone,
+            birthday: profileData.birthDate.isNotEmpty ? DateTime.tryParse(profileData.birthDate) : null,
+            instagram: profileData.instagram,
+            tiktok: profileData.tiktok,
+            twitter: profileData.twitter,
+            facebook: profileData.facebook,
+            linkedin: profileData.linkedin,
+            notificationEmail: profileData.notificationEmail,
+            notificationMobile: profileData.notificationMobile,
+            isActive: profileData.isActive,
+            isOnline: profileData.isOnline,
+            avatarUrl: profileData.avatarUrl.isNotEmpty ? profileData.avatarUrl : profileData.avatar,
+            bannerUrl: profileData.bannerUrl,
+            isFollowing: profileData.isFollowing,
+            isFollowingPending: profileData.isFollowingPending,
+            isSelf: profileData.isSelf,
           );
           
           final processedEntry = EntryModel(
@@ -286,14 +355,14 @@ String formatSimpleDate(String dateStr) {
         
         personEntries.assignAll(processedEntries);
         debugPrint("✅ Profile entries yüklendi: ${processedEntries.length}");
-        
+        debugPrint("🔍 Hesap tipi: ${profileData.accountType}");
+        debugPrint("👤 Kullanıcının kendi entries'ları her zaman görünür");
       } else {
+        debugPrint("⚠️ /me endpoint'inden entry verisi bulunamadı");
         personEntries.clear();
       }
-      
     } catch (e) {
       debugPrint("❌ Profile entries yükleme hatası: $e");
-      personEntries.clear();
     }
   }
 /*

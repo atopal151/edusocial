@@ -636,7 +636,9 @@
       "groupCreated": "Grup başarıyla oluşturuldu",
       "joinedGroup": "Gruba başarıyla katıldınız",
       "leftGroup": "Gruptan başarıyla ayrıldınız",
-      "groupShared": "Grup başarıyla paylaşıldı"
+      "groupShared": "Grup başarıyla paylaşıldı",
+      "requestSent": "İstek gönderildi",
+      "joinRequestSent": "Gruba katılma isteğiniz gönderildi"
     },
     "validation": {
       "nameRequired": "Grup adı zorunludur",
@@ -671,7 +673,8 @@
     "suggestion": {
       "joined": "Katıldınız",
       "sendRequest": "İstek Gönder",
-      "joinGroup": "Gruba Katıl"
+      "joinGroup": "Gruba Katıl",
+      "requestSent": "İstek Gönderildi"
     }
   },
   "home": {
@@ -865,7 +868,7 @@
     },
     "card": {
       "follow": "Takip Et",
-      "skip": "Geç",
+      "next": "Geç",
       "online": "Çevrimiçi",
       "education": "Eğitim",
       "noSchoolInfo": "Okul bilgisi yok",
@@ -1177,6 +1180,12 @@
       "posts": "Gönderi",
       "followers": "Takipçi",
       "following": "Takip Edilen"
+    },
+    "emptyStates": {
+      "noPostsTitle": "Henüz bir gönderi yok",
+      "noPostsDescription": "İlk gönderini paylaşarak arkadaşlarının seni tanımasını sağla!",
+      "noEntriesTitle": "Henüz bir entry paylaşılmamış",
+      "noEntriesDescription": "Entry paylaşarak düşüncelerini toplulukla paylaşabilirsin."
     }
   },
   "search": {
