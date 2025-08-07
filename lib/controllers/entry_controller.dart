@@ -37,7 +37,7 @@ class EntryController extends GetxController {
 
   // CATEGORY MANAGEMENT: Kategori yönetimi için yeni state'ler
   final RxList<TopicCategoryModel> categories = <TopicCategoryModel>[].obs;
-  final RxString selectedCategory = 'Tümü'.obs; // Varsayılan olarak "Tümü" seçili
+  final RxString selectedCategory = 'all'.obs; // Varsayılan olarak "all" seçili (dil desteği için)
   final RxBool isCategoryLoading = false.obs;
 
   final EntryServices entryServices = EntryServices();
@@ -113,7 +113,7 @@ class EntryController extends GetxController {
 
   /// CATEGORY MANAGEMENT: Seçilen kategoriye göre entry'leri filtrele
   void applyCategoryFilter() {
-    if (selectedCategory.value == 'Tümü') {
+    if (selectedCategory.value == 'all') {
       // Tüm entry'leri göster
       displayEntries.assignAll(allDisplayEntries);
     } else {
@@ -350,7 +350,7 @@ class EntryController extends GetxController {
     
     // Önce kategori filtresini uygula
     List<DisplayEntryItem> categoryFiltered;
-    if (selectedCategory.value == 'Tümü') {
+    if (selectedCategory.value == 'all') {
       categoryFiltered = allDisplayEntries.toList();
     } else {
       categoryFiltered = allDisplayEntries.where((item) => 

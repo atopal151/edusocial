@@ -394,6 +394,7 @@
       "refreshSuccess": "Entry data refreshed successfully",
       "refreshLoading": "Refreshing entry data...",
       "allCategories": "All Categories",
+      "all": "All",
       "entries": "entries"
     },
     "entryDetail": {

@@ -397,6 +397,7 @@
       "refreshSuccess": "Entry verileri başarıyla yenilendi",
       "refreshLoading": "Entry verileri yenileniyor...",
       "allCategories": "Tüm Kategoriler",
+      "all": "Tümü",
       "entries": "entry"
     },
     "entryDetail": {

@@ -4,9 +4,12 @@ import 'package:edusocial/controllers/people_profile_controller.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:edusocial/services/language_service.dart';
+import 'package:edusocial/components/dialogs/profile_image_preview_dialog.dart';
 
 Widget buildPeopleProfileHeader(PeopleProfileController controller) {
   final LanguageService languageService = Get.find<LanguageService>();
+  final GlobalKey bannerKey = GlobalKey();
+  final GlobalKey avatarKey = GlobalKey();
   
   return Obx(() {
     if (controller.isLoading.value) {
@@ -30,10 +33,39 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         /// Banner Alanı
-        if (profile.banner.isNotEmpty)
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            if (profile.banner.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: GestureDetector(
+                  onTap: () {
+                    final RenderBox? renderBox = bannerKey.currentContext?.findRenderObject() as RenderBox?;
+                    if (renderBox != null) {
+                      showProfileImagePreviewDialog(
+                        imageUrl: profile.banner,
+                        title: '${profile.name} ${profile.surname} - Kapak Fotoğrafı',
+                        context: Get.context!,
+                        renderBox: renderBox,
+                      );
+                    }
+                  },
+                  child: Container(
+                    key: bannerKey,
+                    height: 120,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(profile.banner),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Container(
@@ -41,19 +73,38 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(profile.banner),
+                    color: const Color(0xfff4f4f5),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.image,
+                      size: 48,
+                      color: const Color(0xff9ca3ae),
                     ),
                   ),
                 ),
               ),
 
-              /// Profil Fotoğrafı
-              Positioned(
-                bottom: -35,
-                left: Get.width / 2 - 45,
+            /// Profil Fotoğrafı
+            Positioned(
+              bottom: -35,
+              left: Get.width / 2 - 45,
+              child: GestureDetector(
+                onTap: () {
+                  if (profile.avatar.isNotEmpty) {
+                    final RenderBox? renderBox = avatarKey.currentContext?.findRenderObject() as RenderBox?;
+                    if (renderBox != null) {
+                      showProfileImagePreviewDialog(
+                        imageUrl: profile.avatar,
+                        title: '${profile.name} ${profile.surname} - Profil Fotoğrafı',
+                        context: Get.context!,
+                        renderBox: renderBox,
+                      );
+                    }
+                  }
+                },
                 child: CircleAvatar(
+                  key: avatarKey,
                   radius: 42,
                   backgroundColor: const Color(0xfffafafa),
                   child: CircleAvatar(
@@ -65,8 +116,9 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
         const SizedBox(height: 50),
 
         /// İsim ve Kullanıcı Adı

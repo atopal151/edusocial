@@ -126,8 +126,8 @@ class EntryScreenState extends State<EntryScreen> {
                             );
                           }
                           
-                          // "Tümü" seçeneği + kategoriler
-                          final allCategories = ['Tümü'] + entryController.categories.map((cat) => cat.title).toList();
+                          // "All" seçeneği + kategoriler (dil desteği için)
+                          final allCategories = ['all'] + entryController.categories.map((cat) => cat.title).toList();
                           
                           return ListView.builder(
                             scrollDirection: Axis.horizontal,
@@ -138,7 +138,7 @@ class EntryScreenState extends State<EntryScreen> {
                               
                               // Kategori için entry sayısını hesapla
                               int entryCount;
-                              if (categoryName == 'Tümü') {
+                              if (categoryName == 'all') {
                                 entryCount = entryController.allDisplayEntries.length;
                               } else {
                                 entryCount = entryController.allDisplayEntries
@@ -162,7 +162,9 @@ class EntryScreenState extends State<EntryScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          categoryName,
+                                          categoryName == 'all' 
+                                            ? languageService.tr("entry.entryScreen.all")
+                                            : categoryName,
                                           style: GoogleFonts.inter(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
@@ -209,7 +211,7 @@ class EntryScreenState extends State<EntryScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                selectedCat == 'Tümü' 
+                                selectedCat == 'all' 
                                   ? languageService.tr("entry.entryScreen.allCategories")
                                   : selectedCat,
                                 style: GoogleFonts.inter(
