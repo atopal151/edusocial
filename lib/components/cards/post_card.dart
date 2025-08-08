@@ -7,9 +7,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../widgets/comment_bottom_sheet.dart';
-import '../sheets/share_options_bottom_sheet.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 import '../snackbars/custom_snackbar.dart';
 import '../../services/language_service.dart';
@@ -503,20 +503,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                           }
                         }
                         
-                        showModalBottomSheet(
-                          backgroundColor: Color(0xffffffff),
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(25)),
-                          ),
-                          builder: (_) => ShareOptionsBottomSheet(
-                            postText: shareText,
-                            mediaUrls: widget.mediaUrls,
-                            postId: widget.postId,
-                            postSlug: widget.slug,
-                          ),
-                        );
+                        // Sistem varsayılanı share sheet'ini kullan
+                        Share.share(shareText);
                       },
                       child: SvgPicture.asset(
                         "images/icons/share.svg",

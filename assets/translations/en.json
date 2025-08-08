@@ -1499,6 +1499,12 @@
     "noComments": "No comments yet",
     "input": {
       "placeholder": "Write a comment..."
+    },
+    "reply": {
+      "replyTo": "Reply to:",
+      "replyPlaceholder": "Type your reply...",
+      "replyButton": "Reply",
+      "cancelReply": "Cancel reply"
     }
   },
   "share": {

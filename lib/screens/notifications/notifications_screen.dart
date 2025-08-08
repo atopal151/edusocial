@@ -408,26 +408,26 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     // Takip istekleri için butonlar (sadece follow-join-request)
     if (notif.type == 'follow-join-request') {
-      //debugPrint("🔍   - Takip isteği kontrolü yapılıyor...");
+      debugPrint("🔍   - Takip isteği kontrolü yapılıyor...");
 
       // Onaylanmış takip istekleri - buton gösterme
       if (notif.isAccepted && notif.isFollowing) {
-        //debugPrint("🔍   - SONUÇ: Zaten onaylanmış ve takip ediyor - buton gösterilmiyor");
-        //debugPrint("🔍 ===============================");
+        debugPrint("🔍   - SONUÇ: Zaten onaylanmış ve takip ediyor - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
         return null;
       }
 
       // Reddedilmiş takip istekleri - buton gösterme
       if (notif.isRejected) {
-        //debugPrint("🔍   - SONUÇ: Zaten reddedilmiş - buton gösterilmiyor");
-        //debugPrint("🔍 ===============================");
+        debugPrint("🔍   - SONUÇ: Zaten reddedilmiş - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
         return null;
       }
 
       // Sadece bekleyen takip istekleri için buton göster (gizli profil)
       if (!notif.isAccepted && !notif.isRejected) {
-        //debugPrint("🔍   - SONUÇ: Takip İsteği Beklemede (Onayla/Reddet butonları gösteriliyor)");
-        //debugPrint("🔍 ===============================");
+        debugPrint("🔍   - SONUÇ: Takip İsteği Beklemede (Onayla/Reddet butonları gösteriliyor)");
+        debugPrint("🔍 ===============================");
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -478,37 +478,37 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     // Grup katılma istekleri için butonlar (sadece group-join-request)
     if (notif.type == 'group-join-request') {
-      //debugPrint("🔍 Building group join request button for notification:");
-      //debugPrint("🔍   - type: ${notif.type}");
-      //debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
-      //debugPrint("🔍   - isRejected: ${notif.isRejected}");
-      //debugPrint("🔍   - groupId: ${notif.groupId}");
-      //debugPrint("🔍   - senderUserId: ${notif.senderUserId}");
-      //debugPrint("🔍   - message: ${notif.message}");
+      debugPrint("🔍 Building group join request button for notification:");
+      debugPrint("🔍   - type: ${notif.type}");
+      debugPrint("🔍   - isAccepted: ${notif.isAccepted}");
+      debugPrint("🔍   - isRejected: ${notif.isRejected}");
+      debugPrint("🔍   - groupId: ${notif.groupId}");
+      debugPrint("🔍   - senderUserId: ${notif.senderUserId}");
+      debugPrint("🔍   - message: ${notif.message}");
 
       // groupId null ise buton gösterme
       if (notif.groupId == null) {
-        //debugPrint("🔍   - SONUÇ: groupId null - buton gösterilmiyor");
-        //debugPrint("🔍 ===============================");
+        debugPrint("🔍   - SONUÇ: groupId null - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
         return null;
       }
 
       // Eğer istek zaten onaylanmışsa veya reddedilmişse - buton gösterme
       if (notif.isAccepted) {
-        //debugPrint("🔍   - SONUÇ: Grup isteği zaten onaylandı - buton gösterilmiyor");
-        //debugPrint("🔍 ===============================");
+        debugPrint("🔍   - SONUÇ: Grup isteği zaten onaylandı - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
         return null;
       }
 
       if (notif.isRejected) {
-        //debugPrint("🔍   - SONUÇ: Grup isteği zaten reddedildi - buton gösterilmiyor");
-        //debugPrint("🔍 ===============================");
+        debugPrint("🔍   - SONUÇ: Grup isteği zaten reddedildi - buton gösterilmiyor");
+        debugPrint("🔍 ===============================");
         return null;
       }
 
       // Sadece bekleyen istekler için buton göster
-      //debugPrint("🔍   - SONUÇ: Grup isteği beklemede - Onayla/Reddet butonları gösteriliyor");
-      //debugPrint("🔍 ===============================");
+      debugPrint("🔍   - SONUÇ: Grup isteği beklemede - Onayla/Reddet butonları gösteriliyor");
+      debugPrint("🔍 ===============================");
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [

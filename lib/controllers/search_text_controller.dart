@@ -5,6 +5,8 @@ import '../models/group_models/group_search_model.dart';
 import '../models/user_search_model.dart';
 import '../services/search_services.dart'; // Yeni ekledik ✅
 import '../services/group_services/group_service.dart';
+import '../services/language_service.dart';
+import '../components/snackbars/custom_snackbar.dart';
 
 class SearchTextController extends GetxController {
   var searchTextController = TextEditingController();
@@ -137,27 +139,33 @@ class SearchTextController extends GetxController {
           }
         }
         
-        Get.snackbar(
-          "Başarılı", 
-          "Gruba katılma isteği gönderildi",
-          backgroundColor: const Color(0xFF4CAF50),
-          colorText: const Color(0xFFFFFFFF),
+        // Custom snackbar ile dil desteği
+        final languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("groups.success.requestSent"),
+          message: languageService.tr("groups.success.joinRequestSent"),
+          type: SnackbarType.success,
+          duration: const Duration(seconds: 3),
         );
       } else {
-        Get.snackbar(
-          "Hata", 
-          "Gruba katılma isteği gönderilemedi",
-          backgroundColor: const Color(0xFFEF5050),
-          colorText: const Color(0xFFFFFFFF),
+        // Hata durumu için custom snackbar
+        final languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("common.error"),
+          message: languageService.tr("groups.errors.joinFailed"),
+          type: SnackbarType.error,
+          duration: const Duration(seconds: 4),
         );
       }
     } catch (e) {
       debugPrint("❗ Grup katılma hatası: $e");
-      Get.snackbar(
-        "Hata", 
-        "Bir hata oluştu",
-        backgroundColor: const Color(0xFFEF5050),
-        colorText: const Color(0xFFFFFFFF),
+      // Hata durumu için custom snackbar
+      final languageService = Get.find<LanguageService>();
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("groups.errors.serverError"),
+        type: SnackbarType.error,
+        duration: const Duration(seconds: 4),
       );
     }
   }

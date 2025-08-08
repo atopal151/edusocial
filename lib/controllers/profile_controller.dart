@@ -72,7 +72,10 @@ String formatSimpleDate(String dateStr) {
         // Her post için detaylı debug
         for (int i = 0; i < profileData.posts!.length; i++) {
           final post = profileData.posts![i];
-          debugPrint("📋 Post ${i + 1}: ID=${post.id}, Content=${post.postDescription}, isOwner=${post.isOwner}");
+          debugPrint("📋 Post ${i + 1}: ID=${post.id}, Content=${post.postDescription}, isOwner=${post.isOwner}, MediaUrls=${post.mediaUrls.length}");
+          if (post.mediaUrls.isNotEmpty) {
+            debugPrint("🖼️ Post ${i + 1} Media URLs: ${post.mediaUrls}");
+          }
         }
         
         // /me endpoint'inden gelen postlar zaten kullanıcının kendi postları
