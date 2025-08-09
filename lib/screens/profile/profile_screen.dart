@@ -16,9 +16,6 @@ import '../../controllers/profile_controller.dart';
 import '../../routes/app_routes.dart';
 import '../profile/people_profile_screen.dart';
 import '../../services/language_service.dart';
-import '../../utils/date_format.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

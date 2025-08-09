@@ -24,7 +24,7 @@ class _UserChatDetailScreenState extends State<UserChatDetailScreen> {
     scrollController = ScrollController();
 
     final args = Get.arguments as Map<String, dynamic>?;
-    debugPrint('🔍 UserChatDetailScreen - Gelen Arguments: $args');
+    //debugPrint('🔍 UserChatDetailScreen - Gelen Arguments: $args');
 
     if (args == null || !args.containsKey('chatId') || !args.containsKey('userDetail')) {
       debugPrint('❌ UserChatDetailScreen - Eksik veya hatalı arguments');

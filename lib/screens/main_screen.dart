@@ -139,7 +139,7 @@ class MainScreen extends StatelessWidget {
       final socketService = Get.find<SocketService>();
       final notificationController = Get.find<NotificationController>();
       
-      debugPrint('🧪 === SOCKET TEST BAŞLADI ===');
+      //debugPrint('🧪 === SOCKET TEST BAŞLADI ===');
       
       // 1. Socket durumunu kontrol et
       socketService.checkSocketStatus();
@@ -164,7 +164,7 @@ class MainScreen extends StatelessWidget {
         debugPrint('❌ Socket bağlı değil, test yapılamıyor');
       }
       
-      debugPrint('🧪 === SOCKET TEST TAMAMLANDI ===');
+      //debugPrint('🧪 === SOCKET TEST TAMAMLANDI ===');
       
     } catch (e) {
       debugPrint('❌ Socket test hatası: $e');

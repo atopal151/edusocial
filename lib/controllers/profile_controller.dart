@@ -2,7 +2,6 @@ import 'package:edusocial/controllers/appbar_controller.dart';
 import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/screens/profile/people_profile_screen.dart';
-import 'package:edusocial/services/post_service.dart';
 import 'package:edusocial/services/entry_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -155,17 +154,17 @@ String formatSimpleDate(String dateStr) {
       userId.value = profileData.id.toString();
       
       debugPrint("✅ Ana profil verisi yüklendi:");
-      debugPrint("  - ID: ${profileData.id}");
-      debugPrint("  - Name: ${profileData.name} ${profileData.surname}");
-      debugPrint("  - Username: ${profileData.username}");
-      debugPrint("  - Account Type: ${profileData.accountType}");
-      debugPrint("  - Avatar: ${profileData.avatarUrl}");
-      debugPrint("  - Banner: ${profileData.bannerUrl}");
-      debugPrint("  - Bio: ${profileData.description}");
-      debugPrint("  - Followers: ${profileData.followers.length}");
-      debugPrint("  - Following: ${profileData.followings.length}");
-      debugPrint("  - Posts: ${profileData.posts?.length ?? 0}");
-      debugPrint("  - Entries: ${profileData.entries?.length ?? 0}");
+      //debugPrint("  - ID: ${profileData.id}");
+      //debugPrint("  - Name: ${profileData.name} ${profileData.surname}");
+      //debugPrint("  - Username: ${profileData.username}");
+      //debugPrint("  - Account Type: ${profileData.accountType}");
+      //debugPrint("  - Avatar: ${profileData.avatarUrl}");
+      //debugPrint("  - Banner: ${profileData.bannerUrl}");
+      //debugPrint("  - Bio: ${profileData.description}");
+      //debugPrint("  - Followers: ${profileData.followers.length}");
+      //debugPrint("  - Following: ${profileData.followings.length}");
+      //debugPrint("  - Posts: ${profileData.posts?.length ?? 0}");
+      //debugPrint("  - Entries: ${profileData.entries?.length ?? 0}");
       
       // Temel veriler
       fullName.value = "${profileData.name} ${profileData.surname}";
@@ -323,11 +322,11 @@ String formatSimpleDate(String dateStr) {
       // /me endpoint'inden gelen profil verisindeki entries'ları kullan
       final profileData = profile.value;
       if (profileData != null && profileData.entries != null) {
-        debugPrint("📦 /me endpoint'inden ${profileData.entries!.length} entry alındı");
+        //debugPrint("📦 /me endpoint'inden ${profileData.entries!.length} entry alındı");
         
         // Hesap tipi kontrolü - kendi profilimizde olduğumuz için her zaman göster
         final currentAccountType = profile.value?.accountType ?? 'public';
-        debugPrint("🔍 Mevcut hesap tipi: $currentAccountType");
+        //debugPrint("🔍 Mevcut hesap tipi: $currentAccountType");
         
         if (currentAccountType == 'private') {
           debugPrint("🔒 Private hesap tespit edildi, ancak kendi entries'larımız her zaman görünür");
@@ -335,7 +334,7 @@ String formatSimpleDate(String dateStr) {
         
         // /me endpoint'inden gelen entries'lar zaten kullanıcının kendi entries'ları
         final userEntries = profileData.entries!;
-        debugPrint("👤 /me endpoint'inden gelen entry sayısı: ${userEntries.length}");
+        //debugPrint("👤 /me endpoint'inden gelen entry sayısı: ${userEntries.length}");
         
         // Entries'ları işle
         final processedEntries = <EntryModel>[];
@@ -388,9 +387,9 @@ String formatSimpleDate(String dateStr) {
         }
         
         personEntries.assignAll(processedEntries);
-        debugPrint("✅ Profile entries yüklendi: ${processedEntries.length}");
-        debugPrint("🔍 Hesap tipi: ${profileData.accountType}");
-        debugPrint("👤 Kullanıcının kendi entries'ları her zaman görünür");
+        //debugPrint("✅ Profile entries yüklendi: ${processedEntries.length}");
+        //debugPrint("🔍 Hesap tipi: ${profileData.accountType}");
+        //debugPrint("👤 Kullanıcının kendi entries'ları her zaman görünür");
       } else {
         debugPrint("⚠️ /me endpoint'inden entry verisi bulunamadı");
         personEntries.clear();

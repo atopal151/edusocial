@@ -25,9 +25,9 @@ class EntryServices {
     final token = GetStorage().read("token");
 
     try {
-      debugPrint("🔍 Fetching entries for topic ID: $topicId");
-      debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
-      debugPrint("🌐 URL: ${AppConstants.baseUrl}/timeline/topics/$topicId?sort=latest");
+      //debugPrint("🔍 Fetching entries for topic ID: $topicId");
+      //debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
+      //debugPrint("🌐 URL: ${AppConstants.baseUrl}/timeline/topics/$topicId?sort=latest");
       
       final response = await http.get(
         Uri.parse("${AppConstants.baseUrl}/timeline/topics/$topicId?sort=latest"),
@@ -37,33 +37,33 @@ class EntryServices {
         },
       );
 
-      debugPrint("📥 Response Status: ${response.statusCode}");
-      debugPrint("📥 Response Body: ${response.body}");
+      //debugPrint("📥 Response Status: ${response.statusCode}");
+      //debugPrint("📥 Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonBody = jsonDecode(response.body);
-        debugPrint("📦 Decoded JSON: $jsonBody");
+        //debugPrint("📦 Decoded JSON: $jsonBody");
 
         if (jsonBody != null && jsonBody["data"] != null) {
           final data = jsonBody["data"];
-          debugPrint("📊 Data field: $data");
-          debugPrint("📊 Data type: ${data.runtimeType}");
+          //debugPrint("📊 Data field: $data");
+          //debugPrint("📊 Data type: ${data.runtimeType}");
 
           if (data is Map<String, dynamic>) {
             // Topic bilgilerini debug et
-            debugPrint("🏷️ Topic info:");
-            debugPrint("  - Topic ID: ${data['topic']?['id']}");
-            debugPrint("  - Topic Name: ${data['topic']?['name']}");
-            debugPrint("  - Entries Count: ${data['entrys']?.length ?? 0}");
+            //debugPrint("🏷️ Topic info:");
+            //debugPrint("  - Topic ID: ${data['topic']?['id']}");
+            //debugPrint("  - Topic Name: ${data['topic']?['name']}");
+            //debugPrint("  - Entries Count: ${data['entrys']?.length ?? 0}");
             
             if (data['entrys'] != null) {
-              debugPrint("📝 Entries details:");
+              //debugPrint("📝 Entries details:");
               final entries = data['entrys'] as List;
               for (int i = 0; i < entries.length; i++) {
-                debugPrint("  [$i] Entry ID: ${entries[i]['id']}, Content: ${entries[i]['content']?.substring(0, entries[i]['content']?.length > 50 ? 50 : entries[i]['content']?.length)}...");
+                //debugPrint("  [$i] Entry ID: ${entries[i]['id']}, Content: ${entries[i]['content']?.substring(0, entries[i]['content']?.length > 50 ? 50 : entries[i]['content']?.length)}...");
               }
             } else {
-              debugPrint("⚠️ No entries found in data");
+              //debugPrint("⚠️ No entries found in data");
             }
             
             final result = TopicEntryResponse.fromJson(data);
@@ -112,14 +112,14 @@ class EntryServices {
     required int topicCategoryId,
   }) async {
     final token = GetStorage().read("token");
-    debugPrint("🔑 Token alındı: ${token != null ? "Var" : "Yok"}");
+    //debugPrint("🔑 Token alındı: ${token != null ? "Var" : "Yok"}");
 
     try {
-      debugPrint("🌐 API isteği gönderiliyor...");
-      debugPrint("📤 Gönderilen veriler:");
-      debugPrint("   - Konu Adı: $name");
-      debugPrint("   - İçerik: $content");
-      debugPrint("   - Kategori ID: $topicCategoryId");
+      //debugPrint("🌐 API isteği gönderiliyor...");
+      //debugPrint("📤 Gönderilen veriler:");
+      //debugPrint("   - Konu Adı: $name");
+      //debugPrint("   - İçerik: $content");
+      //debugPrint("   - Kategori ID: $topicCategoryId");
 
       final response = await http.post(
         Uri.parse("${AppConstants.baseUrl}/timeline/topics"),
@@ -135,15 +135,15 @@ class EntryServices {
         }),
       );
 
-      debugPrint("📥 API yanıtı alındı:");
-      debugPrint("   - Status Code: ${response.statusCode}");
-      debugPrint("   - Response Body: ${response.body}");
+      //debugPrint("📥 API yanıtı alındı:");
+      //debugPrint("   - Status Code: ${response.statusCode}");
+      //debugPrint("   - Response Body: ${response.body}");
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e, stackTrace) {
-      debugPrint("❌ API çağrısı sırasında hata oluştu:");
-      debugPrint("   - Hata: $e");
-      debugPrint("   - Stack Trace: $stackTrace");
+      //debugPrint("❌ API çağrısı sırasında hata oluştu:");
+      //debugPrint("   - Hata: $e");
+      //debugPrint("   - Stack Trace: $stackTrace");
       return false;
     }
   }
@@ -272,9 +272,9 @@ class EntryServices {
 
   static Future<List<EntryModel>> fetchEntries() async {
     try {
-      debugPrint('🔍 Fetching all entries');
+      //debugPrint('🔍 Fetching all entries');
       final token = await GetStorage().read('token');
-      debugPrint('🔑 Token: ${token != null ? 'Var' : 'Yok'}');
+      //debugPrint('🔑 Token: ${token != null ? 'Var' : 'Yok'}');
 
       if (token == null) {
         debugPrint('❌ Token bulunamadı!');
@@ -295,30 +295,30 @@ class EntryServices {
         }),
       );
 
-      debugPrint('📥 All entries status code: ${response.statusCode}');
-      debugPrint('📥 All entries full response: ${response.body}');
+      //debugPrint('📥 All entries status code: ${response.statusCode}');
+      //debugPrint('📥 All entries full response: ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> entries = jsonBody['data'] ?? [];
-        debugPrint('📦 Alınan entry sayısı: ${entries.length}');
+        //debugPrint('📦 Alınan entry sayısı: ${entries.length}');
 
         if (entries.isEmpty) {
-          debugPrint('⚠️ Hiç entry bulunamadı!');
+          //debugPrint('⚠️ Hiç entry bulunamadı!');
           return [];
         }
 
-        debugPrint('📝 Entry\'ler parse ediliyor...');
+        //debugPrint('📝 Entry\'ler parse ediliyor...');
         final List<EntryModel> entryList = entries.map((entry) {
-          debugPrint('📌 Entry detayları:');
-          debugPrint('   ID: ${entry['id']}');
-          debugPrint('   İçerik: ${entry['content']}');
-          debugPrint('   Upvote: ${entry['upvote_count']}');
-          debugPrint('   Downvote: ${entry['downvote_count']}');
-          debugPrint('   Oluşturulma: ${entry['human_created_at']}');
-          debugPrint('   Topic: ${entry['topic']?['name']}');
-          debugPrint('   Kategori: ${entry['topic']?['topic_category']?['title']}');
-          debugPrint('   Kullanıcı: ${entry['user']?['name']}');
+          //debugPrint('📌 Entry detayları:');
+          //debugPrint('   ID: ${entry['id']}');
+          //debugPrint('   İçerik: ${entry['content']}');
+          //debugPrint('   Upvote: ${entry['upvote_count']}');
+          //debugPrint('   Downvote: ${entry['downvote_count']}');
+          //debugPrint('   Oluşturulma: ${entry['human_created_at']}');
+          //debugPrint('   Topic: ${entry['topic']?['name']}');
+          //debugPrint('   Kategori: ${entry['topic']?['topic_category']?['title']}');
+          //debugPrint('   Kullanıcı: ${entry['user']?['name']}');
           return EntryModel.fromJson(entry);
         }).toList();
 

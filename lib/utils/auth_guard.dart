@@ -20,7 +20,7 @@ class AuthGuard extends GetMiddleware {
   }
 
   Future<void> _checkUserOnboarding() async {
-    debugPrint("🔍 AuthGuard: Kullanıcı onboarding durumu kontrol ediliyor...");
+    //debugPrint("🔍 AuthGuard: Kullanıcı onboarding durumu kontrol ediliyor...");
     
     final authService = AuthService();
     final user = await authService.getCurrentUser();
@@ -34,7 +34,7 @@ class AuthGuard extends GetMiddleware {
     final schoolId = user['school_id'];
     final departmentId = user['school_department_id'];
     
-    debugPrint("🔍 AuthGuard: school_id=$schoolId, department_id=$departmentId");
+    //debugPrint("🔍 AuthGuard: school_id=$schoolId, department_id=$departmentId");
     
     if (schoolId == null || departmentId == null) {
       debugPrint("⚠️ AuthGuard: Onboarding tamamlanmamış, step1'e yönlendiriliyor");
@@ -51,7 +51,7 @@ class AuthGuard extends GetMiddleware {
       }
       Get.offAllNamed(Routes.step1);
     } else {
-      debugPrint("✅ AuthGuard: Onboarding tamamlanmış, normal akış devam ediyor");
+      //debugPrint("✅ AuthGuard: Onboarding tamamlanmış, normal akış devam ediyor");
     }
   }
 }

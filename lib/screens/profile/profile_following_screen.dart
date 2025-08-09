@@ -31,9 +31,9 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
     _filteredFollowings = List.from(widget.followings);
     
     // Debug: Following verilerini listele
-    debugPrint("🔍 === FOLLOWING SCREEN DEBUG ===");
-    debugPrint("📊 Toplam takip edilen sayısı: ${widget.followings.length}");
-    for (int i = 0; i < widget.followings.length; i++) {
+    //debugPrint("🔍 === FOLLOWING SCREEN DEBUG ===");
+    //debugPrint("📊 Toplam takip edilen sayısı: ${widget.followings.length}");
+   /* for (int i = 0; i < widget.followings.length; i++) {
       final following = widget.followings[i];
       debugPrint("👤 Takip Edilen ${i + 1}:");
       debugPrint("  - ID: ${following['id']}");
@@ -46,18 +46,18 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
       debugPrint("  - Created At: ${following['created_at']}");
       debugPrint("  - Raw Data: ${following.toString()}");
       debugPrint("  - ---");
-    }
-    debugPrint("🔍 === FOLLOWING DEBUG END ===");
+    }*/
+    //debugPrint("🔍 === FOLLOWING DEBUG END ===");
     
     // Sadece takip isteği kabul edilenleri göster (is_following = true && is_following_pending != true)
     final approvedFollowings = widget.followings.where((following) {
       final isFollowing = following['is_following'] == true;
       final isPending = following['is_following_pending'] == true;
-      debugPrint("🔍 Following ${following['username']}: isFollowing = $isFollowing, isPending = $isPending");
+      //debugPrint("🔍 Following ${following['username']}: isFollowing = $isFollowing, isPending = $isPending");
       return isFollowing && !isPending; // Takip ediliyor ve pending değil
     }).toList();
     
-    debugPrint("📊 Filtrelenmiş takip edilen sayısı: ${approvedFollowings.length} (Toplam: ${widget.followings.length})");
+    //debugPrint("📊 Filtrelenmiş takip edilen sayısı: ${approvedFollowings.length} (Toplam: ${widget.followings.length})");
     _filteredFollowings = List.from(approvedFollowings);
   }
 
@@ -88,7 +88,7 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
         }).toList();
       }
       
-      debugPrint("🔍 Arama sonucu: ${_filteredFollowings.length} takip edilen bulundu");
+      //debugPrint("🔍 Arama sonucu: ${_filteredFollowings.length} takip edilen bulundu");
     });
   }
 

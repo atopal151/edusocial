@@ -28,7 +28,7 @@ class CalendarService {
       final jsonBody = jsonDecode(response.body);
       final List data = jsonBody['data'] ?? [];
       
-      print("📥 API'den gelen response: ${response.body}"); // Debug için
+      //print("📥 API'den gelen response: ${response.body}"); // Debug için
 
       return data.map((e) => Reminder.fromJson(e)).toList();
     } else {
@@ -53,7 +53,7 @@ class CalendarService {
       "notification_time": reminder.dateTime,
     });
     
-    print("📤 API'ye gönderilen body: $body"); // Debug için
+    //print("📤 API'ye gönderilen body: $body"); // Debug için
 
     final response = await http.post(
       uri,
@@ -82,7 +82,7 @@ class CalendarService {
       "notification_time": reminder.dateTime,
     });
     
-    print("📤 API'ye gönderilen body (update): $body"); // Debug için
+    //print("📤 API'ye gönderilen body (update): $body"); // Debug için
 
     final response = await http.put(
       uri,

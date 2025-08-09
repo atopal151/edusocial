@@ -97,8 +97,8 @@ class NotificationService {
         }),
       );
 
-      debugPrint("📤 Follow request response: ${response.statusCode}");
-      debugPrint("📤 Follow request body: ${response.body}");
+      //debugPrint("📤 Follow request response: ${response.statusCode}");
+      //debugPrint("📤 Follow request body: ${response.body}");
 
       final jsonResponse = jsonDecode(response.body);
       
@@ -146,8 +146,8 @@ class NotificationService {
         }),
       );
 
-      debugPrint("📤 Follow user response: ${response.statusCode}");
-      debugPrint("📤 Follow user body: ${response.body}");
+      //debugPrint("📤 Follow user response: ${response.statusCode}");
+      //debugPrint("📤 Follow user body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
@@ -181,8 +181,8 @@ class NotificationService {
         }),
       );
 
-      debugPrint("📤 Unfollow user response: ${response.statusCode}");
-      debugPrint("📤 Unfollow user body: ${response.body}");
+      //debugPrint("📤 Unfollow user response: ${response.statusCode}");
+      //debugPrint("📤 Unfollow user body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
@@ -220,8 +220,8 @@ class NotificationService {
         }),
       );
 
-      debugPrint("📤 Group join request response: ${response.statusCode}");
-      debugPrint("📤 Group join request body: ${response.body}");
+      //debugPrint("📤 Group join request response: ${response.statusCode}");
+      //debugPrint("📤 Group join request body: ${response.body}");
 
       final jsonResponse = jsonDecode(response.body);
       

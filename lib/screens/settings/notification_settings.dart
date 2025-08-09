@@ -36,19 +36,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   }
 
   Future<void> _loadNotificationSettings() async {
-    debugPrint('📱 Bildirim ayarları yükleniyor...');
+    //debugPrint('📱 Bildirim ayarları yükleniyor...');
    // final prefs = await SharedPreferences.getInstance();
     final settings = await _oneSignalService.getNotificationSettings();
     final hasPermission = await _oneSignalService.hasNotificationPermission();
     
-    debugPrint('📱 Mevcut ayarlar:');
-    debugPrint('   - Bildirim İzni: $hasPermission');
-    debugPrint('   - Post Bildirimleri: ${settings['post_notifications'] ?? true}');
-    debugPrint('   - Mesaj Bildirimleri: ${settings['message_notifications'] ?? true}');
-    debugPrint('   - Grup Bildirimleri: ${settings['group_notifications'] ?? true}');
-    debugPrint('   - Etkinlik Bildirimleri: ${settings['event_notifications'] ?? true}');
-    debugPrint('   - Takip Bildirimleri: ${settings['follow_notifications'] ?? true}');
-    debugPrint('   - Sistem Bildirimleri: ${settings['system_notifications'] ?? true}');
+    //debugPrint('📱 Mevcut ayarlar:');
+    //debugPrint('   - Bildirim İzni: $hasPermission');
+    //debugPrint('   - Post Bildirimleri: ${settings['post_notifications'] ?? true}');
+    //debugPrint('   - Mesaj Bildirimleri: ${settings['message_notifications'] ?? true}');
+    //debugPrint('   - Grup Bildirimleri: ${settings['group_notifications'] ?? true}');
+    //debugPrint('   - Etkinlik Bildirimleri: ${settings['event_notifications'] ?? true}');
+    //debugPrint('   - Takip Bildirimleri: ${settings['follow_notifications'] ?? true}');
+    //debugPrint('   - Sistem Bildirimleri: ${settings['system_notifications'] ?? true}');
     
     setState(() {
       _notificationPermission = hasPermission;
@@ -60,19 +60,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       _systemNotifications = settings['system_notifications'] ?? true;
     });
     
-    debugPrint('✅ Bildirim ayarları yüklendi');
+    //debugPrint('✅ Bildirim ayarları yüklendi');
   }
 
   Future<void> _saveNotificationSettings() async {
-    debugPrint('💾 Bildirim ayarları kaydediliyor...');
-    debugPrint('💾 Yeni ayarlar:');
-    debugPrint('   - Bildirim İzni: $_notificationPermission');
-    debugPrint('   - Post Bildirimleri: $_postNotifications');
-    debugPrint('   - Mesaj Bildirimleri: $_messageNotifications');
-    debugPrint('   - Grup Bildirimleri: $_groupNotifications');
-    debugPrint('   - Etkinlik Bildirimleri: $_eventNotifications');
-    debugPrint('   - Takip Bildirimleri: $_followNotifications');
-    debugPrint('   - Sistem Bildirimleri: $_systemNotifications');
+    //debugPrint('💾 Bildirim ayarları kaydediliyor...');
+    //debugPrint('💾 Yeni ayarlar:');
+    //debugPrint('   - Bildirim İzni: $_notificationPermission');
+    //debugPrint('   - Post Bildirimleri: $_postNotifications');
+    //debugPrint('   - Mesaj Bildirimleri: $_messageNotifications');
+    //debugPrint('   - Grup Bildirimleri: $_groupNotifications');
+    //debugPrint('   - Etkinlik Bildirimleri: $_eventNotifications');
+    //debugPrint('   - Takip Bildirimleri: $_followNotifications');
+    //debugPrint('   - Sistem Bildirimleri: $_systemNotifications');
     
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notification_permission', _notificationPermission);
@@ -91,21 +91,21 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   }
 
   Future<void> _requestNotificationPermission() async {
-    debugPrint('🔐 Bildirim izni isteniyor...');
+    //debugPrint('🔐 Bildirim izni isteniyor...');
     try {
-      debugPrint('🔐 OneSignal\'dan izin isteniyor...');
+      //debugPrint('🔐 OneSignal\'dan izin isteniyor...');
       await _oneSignalService.requestNotificationPermission();
-      debugPrint('🔐 İzin durumu kontrol ediliyor...');
+      //debugPrint('🔐 İzin durumu kontrol ediliyor...');
       final hasPermission = await _oneSignalService.hasNotificationPermission();
-      debugPrint('🔐 İzin durumu: $hasPermission');
+      //debugPrint('🔐 İzin durumu: $hasPermission');
       
       setState(() {
         _notificationPermission = hasPermission;
       });
-      debugPrint('🔐 State güncellendi: $_notificationPermission');
+      //debugPrint('🔐 State güncellendi: $_notificationPermission');
       
       if (hasPermission) {
-        debugPrint('✅ Bildirim izni verildi, başarı mesajı gösteriliyor');
+        //debugPrint('✅ Bildirim izni verildi, başarı mesajı gösteriliyor');
         Get.snackbar(
           _languageService.tr('notificationSettings.messages.permissionGranted'),
           _languageService.tr('notificationSettings.messages.permissionGrantedDesc'),
@@ -507,8 +507,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           settingsUrl = 'settings://';
         }
         
-        debugPrint('📱 Platform: ${GetPlatform.isIOS ? "iOS" : "Android"}');
-        debugPrint('📱 Settings URL: $settingsUrl');
+        //debugPrint('📱 Platform: ${GetPlatform.isIOS ? "iOS" : "Android"}');
+        //debugPrint('📱 Settings URL: $settingsUrl');
         
         final Uri uri = Uri.parse(settingsUrl);
         if (await canLaunchUrl(uri)) {

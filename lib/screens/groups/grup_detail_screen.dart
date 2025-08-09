@@ -52,7 +52,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     // Get group ID from arguments
     final groupId = Get.arguments?['groupId'];
     if (groupId != null) {
-      debugPrint('🔍 Fetching details for group: $groupId');
+          debugPrint('🔍 Fetching details for group: $groupId');
       // Use Future.microtask to avoid build-time state updates
       Future.microtask(() {
         groupController.fetchGroupDetail(groupId);

@@ -20,15 +20,15 @@ class TopicsController extends GetxController {
 
   // Hot topic'e tıklandığında entry detay sayfasına yönlendir
   void onHotTopicTap(HotTopicsModel topic) async {
-    debugPrint("🔥 Hot topic tıklandı: ${topic.title} (ID: ${topic.id})");
+    //debugPrint("🔥 Hot topic tıklandı: ${topic.title} (ID: ${topic.id})");
     try {
       // Topic ID'si ile ilgili entry'yi bul
       final entry = await _findEntryForTopic(topic.id);
       if (entry != null) {
-        debugPrint("✅ Entry bulundu, detay sayfasına yönlendiriliyor...");
-        debugPrint("📝 Entry ID: ${entry.id}");
-        debugPrint("📝 Entry Topic: ${entry.topic?.name}");
-        debugPrint("📝 Entry Topic Category: ${entry.topic?.category?.title}");
+        //debugPrint("✅ Entry bulundu, detay sayfasına yönlendiriliyor...");
+        //debugPrint("📝 Entry ID: ${entry.id}");
+        //debugPrint("📝 Entry Topic: ${entry.topic?.name}");
+        //debugPrint("📝 Entry Topic Category: ${entry.topic?.category?.title}");
         // Entry detay sayfasına yönlendir
         Get.toNamed("/entryDetail", arguments: {'entry': entry});
       } else {
@@ -47,15 +47,15 @@ class TopicsController extends GetxController {
     try {
       final response = await EntryServices.fetchEntriesByTopicId(topicId);
       if (response != null && response.entries.isNotEmpty) {
-        debugPrint("📦 API yanıtı alındı:");
-        debugPrint("📦 Topic: ${response.topic.name}");
-        debugPrint("📦 Topic Category: ${response.topic.category?.title}");
-        debugPrint("📦 Entry sayısı: ${response.entries.length}");
+        //debugPrint("📦 API yanıtı alındı:");
+        //debugPrint("📦 Topic: ${response.topic.name}");
+        //debugPrint("📦 Topic Category: ${response.topic.category?.title}");
+        //debugPrint("📦 Entry sayısı: ${response.entries.length}");
         
         // İlk entry'yi al (ana entry)
         final firstEntry = response.entries.first;
-        debugPrint("📝 İlk entry ID: ${firstEntry.id}");
-        debugPrint("📝 İlk entry topic: ${firstEntry.topic?.name}");
+        //debugPrint("📝 İlk entry ID: ${firstEntry.id}");
+        //debugPrint("📝 İlk entry topic: ${firstEntry.topic?.name}");
         
         // Topic bilgisini entry'ye enjekte et
         final entryWithTopic = firstEntry.copyWith(
@@ -64,9 +64,9 @@ class TopicsController extends GetxController {
           ),
         );
         
-        debugPrint("✅ Entry topic bilgisi enjekte edildi");
-        debugPrint("✅ Final entry topic: ${entryWithTopic.topic?.name}");
-        debugPrint("✅ Final entry category: ${entryWithTopic.topic?.category?.title}");
+        //debugPrint("✅ Entry topic bilgisi enjekte edildi");
+        //debugPrint("✅ Final entry topic: ${entryWithTopic.topic?.name}");
+        //debugPrint("✅ Final entry category: ${entryWithTopic.topic?.category?.title}");
         
         return entryWithTopic;
       } else {
@@ -86,7 +86,7 @@ class TopicsController extends GetxController {
   }
 
   void fetchHotTopics() async {
-    debugPrint("🔄 TopicsController.fetchHotTopics() çağrıldı");
+      //debugPrint("🔄 TopicsController.fetchHotTopics() çağrıldı");
     isLoading.value = true;
     try {
       final topics = await _service.fetchHotTopics();

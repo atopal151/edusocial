@@ -93,12 +93,12 @@ String getMimeType(File file) {
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
 
-      debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",
-          wrapWidth: 1024);
-      debugPrint("📤 Grup Oluşturma Body: ${response.body}", wrapWidth: 1024);
+      //debugPrint("📤 Grup Oluşturma Response: ${response.statusCode}",
+          //wrapWidth: 1024);
+      //debugPrint("📤 Grup Oluşturma Body: ${response.body}", wrapWidth: 1024);
 
-      debugPrint("📦 Avatar dosyası var mı: ${avatar?.existsSync()}");
-      debugPrint("📦 Banner dosyası var mı: ${banner?.existsSync()}");
+      //debugPrint("📦 Avatar dosyası var mı: ${avatar?.existsSync()}");
+      //debugPrint("📦 Banner dosyası var mı: ${banner?.existsSync()}");
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {

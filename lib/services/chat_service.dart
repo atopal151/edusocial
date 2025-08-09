@@ -32,13 +32,13 @@ class ChatServices {
     
     for (int attempt = 1; attempt <= _maxRetries; attempt++) {
       try {
-        debugPrint('🔄 $operation - Attempt $attempt/$_maxRetries');
+        //debugPrint('🔄 $operation - Attempt $attempt/$_maxRetries');
         
         final response = await request().timeout(_requestTimeout);
         
         if (response.statusCode == 200 || response.statusCode == 201) {
           if (attempt > 1) {
-            debugPrint('✅ $operation - Success on attempt $attempt');
+            //debugPrint('✅ $operation - Success on attempt $attempt');
           }
           return response;
         } else {
@@ -47,7 +47,7 @@ class ChatServices {
         
       } on SocketException catch (e) {
         lastException = e;
-        debugPrint('🌐 $operation - Network error on attempt $attempt: ${e.message}');
+        //debugPrint('🌐 $operation - Network error on attempt $attempt: ${e.message}');
         
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt; // Exponential backoff
@@ -57,17 +57,17 @@ class ChatServices {
         
       } on TimeoutException catch (e) {
         lastException = e;
-        debugPrint('⏰ $operation - Timeout on attempt $attempt');
+        //debugPrint('⏰ $operation - Timeout on attempt $attempt');
         
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
-          debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
+          //debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
           await Future.delayed(delay);
         }
         
       } on HttpException catch (e) {
         lastException = e;
-        debugPrint('🔴 $operation - HTTP error on attempt $attempt: $e');
+        //debugPrint('🔴 $operation - HTTP error on attempt $attempt: $e');
         
         // Don't retry for 4xx errors (client errors)
         if (e.toString().contains('4')) {
@@ -105,12 +105,12 @@ class ChatServices {
     final url = Uri.parse('${AppConstants.baseUrl}/conversation');
 
     // Debug logları ekle
-    debugPrint('📤 ChatServices.sendMessage called:');
-    debugPrint('  - Receiver ID: $receiverId');
-    debugPrint('  - Message: "$message"');
-    debugPrint('  - Conversation ID: $conversationId');
-    debugPrint('  - Media files: ${mediaFiles?.length ?? 0}');
-    debugPrint('  - Links: ${links?.length ?? 0}');
+    //debugPrint('📤 ChatServices.sendMessage called:');
+    //debugPrint('  - Receiver ID: $receiverId');
+    //debugPrint('  - Message: "$message"');
+    //debugPrint('  - Conversation ID: $conversationId');
+    //debugPrint('  - Media files: ${mediaFiles?.length ?? 0}');
+    //debugPrint('  - Links: ${links?.length ?? 0}');
 
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
@@ -134,7 +134,7 @@ class ChatServices {
 
     // Medya dosyalarını ekle (Sadece image dosyaları - private conversation limitation)
     if (mediaFiles != null && mediaFiles.isNotEmpty) {
-      debugPrint('📁 Adding media files to request:');
+      //debugPrint('📁 Adding media files to request:');
       
       // Private conversation sadece image dosyalarını destekliyor
       final imageFiles = mediaFiles.where((file) {
@@ -151,10 +151,10 @@ class ChatServices {
         final fileExtension = file.path.split('.').last.toLowerCase();
         String mimeType = 'image/$fileExtension';
 
-        debugPrint('  - File: ${file.path}');
-        debugPrint('  - Extension: $fileExtension');
-        debugPrint('  - MIME Type: $mimeType');
-        debugPrint('  - Field Name: media[]');
+        //debugPrint('  - File: ${file.path}');
+        //debugPrint('  - Extension: $fileExtension');
+        //debugPrint('  - MIME Type: $mimeType');
+        //debugPrint('  - Field Name: media[]');
 
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -164,16 +164,16 @@ class ChatServices {
           ),
         );
       }
-      debugPrint('📁 Total image files added: ${request.files.length}');
+      //debugPrint('📁 Total image files added: ${request.files.length}');
     }
 
     try {
-      debugPrint('📤 Sending request to: $url');
+      //debugPrint('📤 Sending request to: $url');
       var streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint('📥 Response status: ${response.statusCode}');
-      debugPrint('📥 Response body: ${response.body}');
+      //debugPrint('📥 Response status: ${response.statusCode}');
+      //debugPrint('📥 Response body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Mesaj başarıyla gönderildi!");
@@ -243,8 +243,8 @@ class ChatServices {
       },
     );
 
-    debugPrint("📱 Sohbet mesajları getiriliyor (PAGINATED): $uri");
-    debugPrint("📊 Pagination: limit=$limit, offset=$offset");
+    //debugPrint("📱 Sohbet mesajları getiriliyor (PAGINATED): $uri");
+    //debugPrint("📊 Pagination: limit=$limit, offset=$offset");
 
     // RETRY: Use retry mechanism for network resilience
     final response = await _makeRequestWithRetry(
@@ -258,40 +258,40 @@ class ChatServices {
       operation: 'Fetch Conversation Messages',
     );
 
-    debugPrint("📥 Paginated Mesajlar Yanıt Kodu: ${response.statusCode}");
-    print("📥 Paginated Mesajlar Yanıt Body (TAM):");
-    print("${response.body}");
-    print("📥 Paginated Mesajlar Yanıt Body (TAM) - END");
+    //debugPrint("📥 Paginated Mesajlar Yanıt Kodu: ${response.statusCode}");
+    //print("📥 Paginated Mesajlar Yanıt Body (TAM):");
+    //print("${response.body}");
+    //print("📥 Paginated Mesajlar Yanıt Body (TAM) - END");
     
     // Mesajı parçalara bölerek yazdır
     final responseBody = response.body;
     final chunkSize = 1000; // Her 1000 karakterde bir böl
     for (int i = 0; i < responseBody.length; i += chunkSize) {
       final end = (i + chunkSize < responseBody.length) ? i + chunkSize : responseBody.length;
-      print("📥 CHUNK ${(i ~/ chunkSize) + 1}: ${responseBody.substring(i, end)}");
+      //print("📥 CHUNK ${(i ~/ chunkSize) + 1}: ${responseBody.substring(i, end)}");
     }
-    print("📥 TAM MESAJ BİTTİ");
+    //print("📥 TAM MESAJ BİTTİ");
 
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
     
-    debugPrint("✅ ${messagesJson.length} mesaj yüklendi (pagination)");
+    //debugPrint("✅ ${messagesJson.length} mesaj yüklendi (pagination)");
     
     // İlk 5 mesajın detayını göster
-    debugPrint("📖 === İLK 5 MESAJ DETAYI ===");
+    //debugPrint("📖 === İLK 5 MESAJ DETAYI ===");
     for (int i = 0; i < messagesJson.length && i < 5; i++) {
       final message = messagesJson[i];
-      debugPrint("📖 Mesaj ${i + 1}:");
-      debugPrint("  - ID: ${message['id']}");
-      debugPrint("  - Message: ${message['message']}");
-      debugPrint("  - Sender ID: ${message['sender_id']}");
-      debugPrint("  - Is Read: ${message['is_read']}");
-      debugPrint("  - Is Me: ${message['is_me']}");
-      debugPrint("  - Created At: ${message['created_at']}");
-      debugPrint("  - Raw JSON: ${jsonEncode(message)}");
-      debugPrint("  - ---");
+      //debugPrint("📖 Mesaj ${i + 1}:");
+      //debugPrint("  - ID: ${message['id']}");
+      //debugPrint("  - Message: ${message['message']}");
+      //debugPrint("  - Sender ID: ${message['sender_id']}");
+      //debugPrint("  - Is Read: ${message['is_read']}");
+      //debugPrint("  - Is Me: ${message['is_me']}");
+      //debugPrint("  - Created At: ${message['created_at']}");
+      //debugPrint("  - Raw JSON: ${jsonEncode(message)}");
+      //debugPrint("  - ---");
     }
-    debugPrint("📖 =========================");
+    //debugPrint("📖 =========================");
 
     return messagesJson
         .map((json) => MessageModel.fromJson(json as Map<String, dynamic>,
@@ -322,17 +322,17 @@ class ChatServices {
       );
 
       final body = jsonDecode(response.body);
-      debugPrint("✅ Chat List API Response:");
-      debugPrint("📊 Response Status: ${response.statusCode}");
-      debugPrint("📊 Response Body: ${jsonEncode(body)}");
-      debugPrint("📊 Response Data Type: ${body.runtimeType}");
+      //debugPrint("✅ Chat List API Response:");
+      //debugPrint("📊 Response Status: ${response.statusCode}");
+      //debugPrint("📊 Response Body: ${jsonEncode(body)}");
+      //debugPrint("📊 Response Data Type: ${body.runtimeType}");
       if (body is Map<String, dynamic>) {
-        debugPrint("📊 Response Keys: ${body.keys.toList()}");
+        //  debugPrint("📊 Response Keys: ${body.keys.toList()}");
         if (body.containsKey('data')) {
           final data = body['data'];
-          debugPrint("📊 Data Type: ${data.runtimeType}");
+          //debugPrint("📊 Data Type: ${data.runtimeType}");
           if (data is List && data.isNotEmpty) {
-            debugPrint("📊 First Item Keys: ${(data.first as Map<String, dynamic>).keys.toList()}");
+            //debugPrint("📊 First Item Keys: ${(data.first as Map<String, dynamic>).keys.toList()}");
           }
         }
       }
@@ -341,35 +341,35 @@ class ChatServices {
         final data = body['data'];
         if (data is List) {
           final chatList = data.map((json) {
-            debugPrint("📖 === CHAT ITEM FULL DEBUG ===");
-            debugPrint("📖 Raw JSON: ${jsonEncode(json)}");
-            debugPrint("📖 User ID: ${json['id']}");
-            debugPrint("📖 Name: ${json['name']}");
-            debugPrint("📖 Raw JSON Keys: ${json.keys.toList()}");
-            debugPrint("📖 Unread Count (unread_count): ${json['unread_count']} (type: ${json['unread_count']?.runtimeType})");
-            debugPrint("📖 Unread Count (unread_messages_total_count): ${json['unread_messages_total_count']} (type: ${json['unread_messages_total_count']?.runtimeType})");
-            debugPrint("📖 Unread Count (unreadCount): ${json['unreadCount']} (type: ${json['unreadCount']?.runtimeType})");
-            debugPrint("📖 Unread Count (unread_message_count): ${json['unread_message_count']} (type: ${json['unread_message_count']?.runtimeType})");
-            debugPrint("📖 Unread Count (message_count): ${json['message_count']} (type: ${json['message_count']?.runtimeType})");
-            debugPrint("📖 Unread Count (count): ${json['count']} (type: ${json['count']?.runtimeType})");
-            debugPrint("📖 Last Message: ${json['last_message']?['message'] ?? 'No message'}");
-            debugPrint("📖 Last Message Created: ${json['last_message']?['created_at'] ?? 'No date'}");
-            debugPrint("📖 ==============================");
+            //debugPrint("📖 === CHAT ITEM FULL DEBUG ===");
+            //debugPrint("📖 Raw JSON: ${jsonEncode(json)}");
+            //debugPrint("📖 User ID: ${json['id']}");
+            //debugPrint("📖 Name: ${json['name']}");
+            //debugPrint("📖 Raw JSON Keys: ${json.keys.toList()}");
+            //debugPrint("📖 Unread Count (unread_count): ${json['unread_count']} (type: ${json['unread_count']?.runtimeType})");
+            //debugPrint("📖 Unread Count (unread_messages_total_count): ${json['unread_messages_total_count']} (type: ${json['unread_messages_total_count']?.runtimeType})");
+            //debugPrint("📖 Unread Count (unreadCount): ${json['unreadCount']} (type: ${json['unreadCount']?.runtimeType})");
+            //debugPrint("📖 Unread Count (unread_message_count): ${json['unread_message_count']} (type: ${json['unread_message_count']?.runtimeType})");
+            //debugPrint("📖 Unread Count (message_count): ${json['message_count']} (type: ${json['message_count']?.runtimeType})");
+            //debugPrint("📖 Unread Count (count): ${json['count']} (type: ${json['count']?.runtimeType})");
+            //debugPrint("📖 Last Message: ${json['last_message']?['message'] ?? 'No message'}");
+            //debugPrint("📖 Last Message Created: ${json['last_message']?['created_at'] ?? 'No date'}");
+            //debugPrint("📖 ==============================");
             return ChatModel.fromJson(json);
           }).toList();
           
           // Toplam okunmamış mesaj sayısını hesapla
           final totalUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
-          debugPrint("📊 === CHAT LIST SUMMARY ===");
-          debugPrint("📊 Toplam Chat Sayısı: ${chatList.length}");
-          debugPrint("📊 Toplam Okunmamış Mesaj: $totalUnread");
-          debugPrint("📊 Okunmamış Mesajı Olan Chat'ler:");
+          //debugPrint("📊 === CHAT LIST SUMMARY ===");
+          //debugPrint("📊 Toplam Chat Sayısı: ${chatList.length}");
+          //debugPrint("📊 Toplam Okunmamış Mesaj: $totalUnread");
+          //debugPrint("📊 Okunmamış Mesajı Olan Chat'ler:");
           for (var chat in chatList) {
             if (chat.unreadCount > 0) {
-              debugPrint("  - ${chat.name} (${chat.username}): ${chat.unreadCount} okunmamış mesaj");
+              //  debugPrint("  - ${chat.name} (${chat.username}): ${chat.unreadCount} okunmamış mesaj");
             }
           }
-          debugPrint("📊 =========================");
+          //debugPrint("📊 =========================");
           
           return chatList;
         } else {
@@ -390,12 +390,12 @@ class ChatServices {
   /// Kullanıcı detaylarını getir
   static Future<UserChatDetailModel> fetchUserDetails(int userId) async {
     try {
-      debugPrint('🔍 fetchUserDetails - Başladı');
+      //debugPrint('🔍 fetchUserDetails - Başladı');
       final token = await _box.read('token');
       final url = '${AppConstants.baseUrl}/api/user/$userId';
 
-      debugPrint('  - URL: $url');
-      debugPrint('  - UserID: $userId');
+      //debugPrint('  - URL: $url');
+      //debugPrint('  - UserID: $userId');
 
       final response = await http.get(
         Uri.parse(url),
@@ -405,9 +405,9 @@ class ChatServices {
         },
       );
 
-      debugPrint('📥 fetchUserDetails - API Yanıtı:');
-      debugPrint('  - Status Code: ${response.statusCode}');
-      debugPrint('  - Body: ${response.body}');
+      //debugPrint('📥 fetchUserDetails - API Yanıtı:');
+      //debugPrint('  - Status Code: ${response.statusCode}');
+      //debugPrint('  - Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -428,8 +428,8 @@ class ChatServices {
       }
       throw Exception('Kullanıcı bilgileri getirilemedi!');
     } catch (e) {
-      debugPrint('❌ fetchUserDetails - Hata: $e');
-      debugPrint('  - Hata Mesajı: ${e.toString()}');
+      //debugPrint('❌ fetchUserDetails - Hata: $e');
+      //debugPrint('  - Hata Mesajı: ${e.toString()}');
       throw Exception('Kullanıcı bilgileri getirilemedi!');
     }
   }

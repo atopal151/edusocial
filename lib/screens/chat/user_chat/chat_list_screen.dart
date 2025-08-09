@@ -464,7 +464,7 @@ class _ChatListScreenState extends State<ChatListScreen>
               final group = groupController.userGroups[index];
               
               // DEBUG: Print individual group data when building
-              debugPrint('🏗️ Building group item ${index + 1}: ${group.name} (ID: ${group.id})');
+              //debugPrint('🏗️ Building group item ${index + 1}: ${group.name} (ID: ${group.id})');
               
               return GestureDetector(
                 onTap: () {

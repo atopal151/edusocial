@@ -30,32 +30,32 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
     _searchController = TextEditingController();
     
     // Debug: Followers verilerini listele
-    debugPrint("🔍 === FOLLOWERS SCREEN DEBUG ===");
-    debugPrint("📊 Toplam takipçi sayısı: ${widget.followers.length}");
+    //debugPrint("🔍 === FOLLOWERS SCREEN DEBUG ===");
+    //debugPrint("📊 Toplam takipçi sayısı: ${widget.followers.length}");
     for (int i = 0; i < widget.followers.length; i++) {
       final follower = widget.followers[i];
-      debugPrint("👤 Takipçi ${i + 1}:");
-      debugPrint("  - ID: ${follower['id']}");
-      debugPrint("  - Name: ${follower['name']} ${follower['surname']}");
-      debugPrint("  - Username: ${follower['username']}");
-      debugPrint("  - Avatar URL: ${follower['avatar_url']}");
-      debugPrint("  - Is Following: ${follower['is_following']}");
-      debugPrint("  - Is Following Pending: ${follower['is_following_pending']}");
-      debugPrint("  - Account Type: ${follower['account_type']}");
-      debugPrint("  - Created At: ${follower['created_at']}");
-      debugPrint("  - Raw Data: ${follower.toString()}");
-      debugPrint("  - ---");
+      //debugPrint("👤 Takipçi ${i + 1}:");
+      //debugPrint("  - ID: ${follower['id']}");
+      //debugPrint("  - Name: ${follower['name']} ${follower['surname']}");
+      //debugPrint("  - Username: ${follower['username']}");
+      //debugPrint("  - Avatar URL: ${follower['avatar_url']}");
+      //debugPrint("  - Is Following: ${follower['is_following']}");
+      //debugPrint("  - Is Following Pending: ${follower['is_following_pending']}");
+      //debugPrint("  - Account Type: ${follower['account_type']}");
+      //debugPrint("  - Created At: ${follower['created_at']}");
+      //debugPrint("  - Raw Data: ${follower.toString()}");
+      //debugPrint("  - ---");
     }
-    debugPrint("🔍 === FOLLOWERS DEBUG END ===");
+    //debugPrint("🔍 === FOLLOWERS DEBUG END ===");
     
     // Sadece kabul edilmiş takipçileri göster (is_following_pending != true)
     final approvedFollowers = widget.followers.where((follower) {
       final isPending = follower['is_following_pending'] == true;
-      debugPrint("🔍 Follower ${follower['username']}: isPending = $isPending");
+      //debugPrint("🔍 Follower ${follower['username']}: isPending = $isPending");
       return !isPending; // Pending olmayanları göster
     }).toList();
     
-    debugPrint("📊 Filtrelenmiş takipçi sayısı: ${approvedFollowers.length} (Toplam: ${widget.followers.length})");
+    //debugPrint("📊 Filtrelenmiş takipçi sayısı: ${approvedFollowers.length} (Toplam: ${widget.followers.length})");
     _filteredFollowers = List.from(approvedFollowers);
   }
 
@@ -84,7 +84,7 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
         }).toList();
       }
       
-      debugPrint("🔍 Arama sonucu: ${_filteredFollowers.length} takipçi bulundu");
+      //  debugPrint("🔍 Arama sonucu: ${_filteredFollowers.length} takipçi bulundu");
     });
   }
 

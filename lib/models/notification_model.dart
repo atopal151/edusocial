@@ -141,7 +141,7 @@ class NotificationModel {
         isFollowingPending = false;
         isAccepted = false;
         isRejected = true;
-        debugPrint("🔍   → RESULT: Answer status rejected - buton gösterilmeyecek");
+       //debugPrint("🔍   → RESULT: Answer status rejected - buton gösterilmeyecek");
       } else if (answerStatus == 'pending') {
         // Status pending - buton gösterilir
         isFollowing = false;
@@ -245,26 +245,26 @@ class NotificationModel {
         // group-join tipinde answer.status yoksa, grup durumuna göre belirle
         if (json['type'] == 'group-join') {
           String groupStatus = group['status']?.toString().toLowerCase() ?? '';
-          debugPrint("🔍 Group status: $groupStatus");
+          //debugPrint("🔍 Group status: $groupStatus");
           
           if (groupStatus == 'approved') {
             isAccepted = true;
             isRejected = false;
-            debugPrint("🔍   → RESULT: Group status approved");
+            //debugPrint("🔍   → RESULT: Group status approved");
           } else if (groupStatus == 'rejected') {
             isAccepted = false;
             isRejected = true;
-            debugPrint("🔍   → RESULT: Group status rejected");
+            //debugPrint("🔍   → RESULT: Group status rejected");
           } else {
             // pending veya diğer durumlar için varsayılan olarak beklemede
             isAccepted = false;
             isRejected = false;
-            debugPrint("🔍   → RESULT: Group status pending/other");
+            //debugPrint("🔍   → RESULT: Group status pending/other");
           }
         } else {
           isAccepted = false;
           isRejected = false;
-          debugPrint("🔍   → RESULT: Default group status");
+          //debugPrint("🔍   → RESULT: Default group status");
         }
         isFollowing = false;
         isFollowingPending = false;
