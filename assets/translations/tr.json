@@ -506,6 +506,11 @@
       "success": {
         "created": "Etkinlik başarıyla oluşturuldu!"
       },
+      "createEvent": {
+        "success": {
+          "created": "Etkinlik başarıyla oluşturuldu!"
+        }
+      },
       "error": {
         "createFailed": "Etkinlik oluşturulamadı"
       },
@@ -518,6 +523,13 @@
         "endTimeAfterStart": "Bitiş zamanı başlangıç zamanından sonra olmalı",
         "groupRequired": "Grup seçimi gerekli"
       }
+    },
+    "locationPicker": {
+      "title": "Konum Seç",
+      "selectedLocation": "Seçilen Konum",
+      "tapToSelect": "Konum seçmek için haritaya dokunun",
+      "currentLocation": "Konumum",
+      "confirmLocation": "Onayla"
     },
     "eventCard": {
       "share": "Paylaş",

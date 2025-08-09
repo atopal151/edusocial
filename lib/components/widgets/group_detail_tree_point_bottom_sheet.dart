@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../services/language_service.dart';
 
@@ -35,7 +36,18 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
             // Sadece grup kurucusu/yöneticisi etkinlik oluşturabilir
             if (isFounder) 
               ListTile(
-                leading: const Icon(Icons.event_outlined, color: Color(0xff4CAF50)),
+                leading: Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: SvgPicture.asset(
+                    "images/icons/event.svg",
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(
+                      Color(0xffef5050),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
                 title: Text(
                   languageService.tr("groups.groupDetail.bottomSheet.createEvent"),
                   style: TextStyle(
@@ -50,7 +62,7 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
               ),
             ListTile(
               leading:
-                  const Icon(Icons.outbond, color: Color(0xfffb535c)),
+                  const Icon(Icons.outbond_outlined, color: Color(0xfffb535c)),
               title: Text(
                 languageService.tr("groups.groupDetail.bottomSheet.leaveGroup"),
                 style: TextStyle(
@@ -63,7 +75,7 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(
-                Icons.warning_rounded,
+                Icons.warning_amber_outlined,
                 color: Color(0xfffb535c),
               ),
               title: Text(languageService.tr("groups.groupDetail.bottomSheet.report"),

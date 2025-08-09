@@ -489,6 +489,11 @@
       "success": {
         "created": "Event created successfully!"
       },
+      "createEvent": {
+        "success": {
+          "created": "Event created successfully!"
+        }
+      },
       "error": {
         "createFailed": "Failed to create event"
       },
@@ -501,6 +506,13 @@
         "endTimeAfterStart": "End time must be after start time",
         "groupRequired": "Group selection is required"
       }
+    },
+    "locationPicker": {
+      "title": "Select Location",
+      "selectedLocation": "Selected Location",
+      "tapToSelect": "Tap on map to select location",
+      "currentLocation": "My Location",
+      "confirmLocation": "Confirm"
     },
     "eventCard": {
       "share": "Share",

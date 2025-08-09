@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -54,6 +55,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               hintText: languageService.tr("event.createEvent.eventTitle"),
               backgroundColor: Color(0xffffffff),
               textColor: Color(0xff414751),
+              
             ),
             SizedBox(height: 16),
 
@@ -68,12 +70,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             SizedBox(height: 16),
 
             // Location
-            CustomTextField(
-              controller: controller.locationController,
-              hintText: languageService.tr("event.createEvent.location"),
-              backgroundColor: Color(0xffffffff),
-              textColor: Color(0xff414751),
-            ),
+            _buildLocationField(),
             SizedBox(height: 16),
 
             // Start Date & Time
@@ -92,6 +89,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     label: languageService.tr("event.createEvent.startTime"),
                     value: controller.startTime.value,
                     onTap: () => _selectStartTime(context),
+                    isTimeField: true,
                   ),
                 ),
               ],
@@ -114,6 +112,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     label: languageService.tr("event.createEvent.endTime"),
                     value: controller.endTime.value,
                     onTap: () => _selectEndTime(context),
+                    isTimeField: true,
                   ),
                 ),
               ],
@@ -129,6 +128,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               isLoading: controller.isLoading,
               backgroundColor: Color(0xfffb535c),
               textColor: Color(0xffffffff),
+            
             ),
           ],
         ),
@@ -182,7 +182,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       Text(
                         languageService.tr("event.createEvent.bannerHint"),
                         style: GoogleFonts.inter(
-                          fontSize: 14,
+                          fontSize: 13.27,
+                          fontWeight: FontWeight.w400,
                           color: Color(0xff9ca3ae),
                         ),
                       ),
@@ -194,10 +195,74 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
+  Widget _buildLocationField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          languageService.tr("event.createEvent.location"),
+          style: GoogleFonts.inter(
+            fontSize: 13.27,
+            fontWeight: FontWeight.w500,
+            color: Color(0xff414751),
+          ),
+        ),
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: _openLocationPicker,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            decoration: BoxDecoration(
+              color: Color(0xffffffff),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: Color(0xffe5e7eb),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+               SvgPicture.asset(
+                  "images/icons/location.svg",
+                  width: 16,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(
+                    Color(0xff9ca3ae),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Obx(() => Text(
+                    controller.selectedLocationAddress.value.isEmpty 
+                        ? languageService.tr("event.createEvent.locationHint")
+                        : controller.selectedLocationAddress.value,
+                    style: GoogleFonts.inter(
+                      fontSize: 13.27,
+                      color: controller.selectedLocationAddress.value.isEmpty 
+                          ? Color(0xff9ca3ae) 
+                          : Color(0xff414751),
+                    ),
+                  )),
+                ),
+                Icon(
+                  Icons.keyboard_arrow_right,
+                  size: 16,
+                  color: Color(0xff9ca3ae),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildDateTimeField({
     required String label,
     required String value,
     required VoidCallback onTap,
+    bool isTimeField = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,17 +290,27 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             child: Row(
               children: [
+                SvgPicture.asset(
+                  isTimeField ? "images/icons/clock_icon.svg" : "images/icons/calendar_icon.svg",
+                  width: 16,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(
+                    Color(0xff9ca3ae),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     value.isEmpty ? languageService.tr("event.createEvent.selectDateTime") : value,
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 13.28,
                       color: value.isEmpty ? Color(0xff9ca3ae) : Color(0xff414751),
                     ),
                   ),
                 ),
                 Icon(
-                  Icons.calendar_today_outlined,
+                  Icons.keyboard_arrow_down,
                   size: 18,
                   color: Color(0xff9ca3ae),
                 ),
@@ -258,6 +333,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
     if (image != null) {
       controller.bannerImage.value = File(image.path);
+    }
+  }
+
+  Future<void> _openLocationPicker() async {
+    final result = await Get.toNamed('/locationPicker');
+    if (result != null && result is Map<String, dynamic>) {
+      controller.setSelectedLocation(
+        latitude: result['latitude'],
+        longitude: result['longitude'], 
+        address: result['address'],
+        googleMapsUrl: result['googleMapsUrl'],
+      );
     }
   }
 

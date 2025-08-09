@@ -22,6 +22,12 @@ class EventCreateController extends GetxController {
   final RxString endDate = ''.obs;
   final RxString endTime = ''.obs;
   final RxString groupId = ''.obs;
+  
+  // Location variables
+  final RxString selectedLocationAddress = ''.obs;
+  final RxDouble selectedLatitude = 0.0.obs;
+  final RxDouble selectedLongitude = 0.0.obs;
+  final RxString selectedGoogleMapsUrl = ''.obs;
 
   // Date/Time holders
   DateTime? selectedStartDate;
@@ -32,6 +38,25 @@ class EventCreateController extends GetxController {
   void setGroupId(String id) {
     groupId.value = id;
     debugPrint("📝 Event Create Controller - Group ID set: $id");
+  }
+
+  void setSelectedLocation({
+    required double latitude,
+    required double longitude,
+    required String address,
+    required String googleMapsUrl,
+  }) {
+    selectedLatitude.value = latitude;
+    selectedLongitude.value = longitude;
+    selectedLocationAddress.value = address;
+    selectedGoogleMapsUrl.value = googleMapsUrl;
+    
+    // Update the location controller with the Google Maps URL
+    locationController.text = googleMapsUrl;
+    
+    debugPrint("📍 Location selected: $address");
+    debugPrint("🗺️ Coordinates: $latitude, $longitude");
+    debugPrint("🔗 Maps URL: $googleMapsUrl");
   }
 
   Future<void> createEvent() async {
@@ -73,7 +98,7 @@ class EventCreateController extends GetxController {
         debugPrint("❌ Event creation failed");
         CustomSnackbar.show(
           title: languageService.tr("common.error"),
-          message: languageService.tr("event.createEvent.error.createFailed"),
+          message: languageService.tr("event.error.createFailed"),
           type: SnackbarType.error,
         );
       }
@@ -82,7 +107,7 @@ class EventCreateController extends GetxController {
       debugPrint("💥 Event creation error: $e");
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: "${languageService.tr("event.createEvent.error.createFailed")}: $e",
+        message: "${languageService.tr("event.error.createFailed")}: $e",
         type: SnackbarType.error,
       );
     }
@@ -92,7 +117,7 @@ class EventCreateController extends GetxController {
     if (titleController.text.trim().isEmpty) {
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: languageService.tr("event.createEvent.validation.titleRequired"),
+        message: languageService.tr("event.validation.titleRequired"),
         type: SnackbarType.error,
       );
       return false;
@@ -101,7 +126,7 @@ class EventCreateController extends GetxController {
     if (descriptionController.text.trim().isEmpty) {
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: languageService.tr("event.createEvent.validation.descriptionRequired"),
+        message: languageService.tr("event.validation.descriptionRequired"),
         type: SnackbarType.error,
       );
       return false;
@@ -110,7 +135,7 @@ class EventCreateController extends GetxController {
     if (locationController.text.trim().isEmpty) {
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: languageService.tr("event.createEvent.validation.locationRequired"),
+        message: languageService.tr("event.validation.locationRequired"),
         type: SnackbarType.error,
       );
       return false;
@@ -119,7 +144,7 @@ class EventCreateController extends GetxController {
     if (selectedStartDate == null || selectedStartTime == null) {
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: languageService.tr("event.createEvent.validation.startDateTimeRequired"),
+        message: languageService.tr("event.validation.startDateTimeRequired"),
         type: SnackbarType.error,
       );
       return false;
@@ -128,7 +153,7 @@ class EventCreateController extends GetxController {
     if (selectedEndDate == null || selectedEndTime == null) {
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: languageService.tr("event.createEvent.validation.endDateTimeRequired"),
+        message: languageService.tr("event.validation.endDateTimeRequired"),
         type: SnackbarType.error,
       );
       return false;
@@ -140,7 +165,7 @@ class EventCreateController extends GetxController {
     if (endDateTime.isBefore(startDateTime)) {
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: languageService.tr("event.createEvent.validation.endTimeAfterStart"),
+        message: languageService.tr("event.validation.endTimeAfterStart"),
         type: SnackbarType.error,
       );
       return false;
@@ -149,7 +174,7 @@ class EventCreateController extends GetxController {
     if (groupId.value.isEmpty) {
       CustomSnackbar.show(
         title: languageService.tr("common.error"),
-        message: languageService.tr("event.createEvent.validation.groupRequired"),
+        message: languageService.tr("event.validation.groupRequired"),
         type: SnackbarType.error,
       );
       return false;
@@ -177,6 +202,10 @@ class EventCreateController extends GetxController {
     startTime.value = '';
     endDate.value = '';
     endTime.value = '';
+    selectedLocationAddress.value = '';
+    selectedLatitude.value = 0.0;
+    selectedLongitude.value = 0.0;
+    selectedGoogleMapsUrl.value = '';
     selectedStartDate = null;
     selectedStartTime = null;
     selectedEndDate = null;
