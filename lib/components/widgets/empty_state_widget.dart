@@ -25,11 +25,11 @@ class EmptyStateWidget extends StatelessWidget {
       builder: (context, constraints) {
         // Responsive sizing based on screen constraints
         final isSmallScreen = constraints.maxHeight < 600;
-        final iconSizeValue = iconSize ?? (isSmallScreen ? 36.0 : 48.0);
-        final titleFontSize = isSmallScreen ? 16.0 : 18.0;
-        final descriptionFontSize = isSmallScreen ? 12.0 : 14.0;
+        final iconSizeValue = iconSize ?? (isSmallScreen ? 24.0 : 32.0);
+        final titleFontSize = isSmallScreen ? 11.0 : 13.0;
+        final descriptionFontSize = isSmallScreen ? 9.0 : 10.0;
         final padding = isSmallScreen ? 16.0 : 32.0;
-        final iconPadding = isSmallScreen ? 16.0 : 20.0;
+        final iconPadding = isSmallScreen ? 12.0 : 16.0;
         
         return Center(
           child: SingleChildScrollView(
@@ -42,17 +42,17 @@ class EmptyStateWidget extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(iconPadding),
                     decoration: BoxDecoration(
-                      color: (iconColor ?? const Color(0xFFEF5050)).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(50),
+                      color: (iconColor ?? const Color(0xFF9ca3ae)).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     child: Icon(
                       icon,
                       size: iconSizeValue,
-                      color: iconColor ?? const Color(0xFFEF5050),
+                      color: iconColor ?? const Color(0xFF9ca3ae),
                     ),
                   ),
                   
-                  SizedBox(height: isSmallScreen ? 16.0 : 24.0),
+                  SizedBox(height: isSmallScreen ? 12.0 : 16.0),
                   
                   // Title with responsive font size
                   Text(
@@ -67,7 +67,7 @@ class EmptyStateWidget extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   
-                  SizedBox(height: isSmallScreen ? 6.0 : 8.0),
+                  SizedBox(height: isSmallScreen ? 4.0 : 6.0),
                   
                   // Description with responsive font size
                   Text(
@@ -99,7 +99,7 @@ class EmptyStateWidgets {
       title: languageService.tr("profile.emptyStates.noPostsTitle"),
       description: languageService.tr("profile.emptyStates.noPostsDescription"),
       icon: Icons.inbox_outlined,
-      iconColor: const Color(0xFFEF5050),
+      iconColor: const Color(0xFF9ca3ae),
     );
   }
 
@@ -108,7 +108,7 @@ class EmptyStateWidgets {
       title: languageService.tr("profile.emptyStates.noEntriesTitle"),
       description: languageService.tr("profile.emptyStates.noEntriesDescription"),
       icon: CupertinoIcons.pencil,
-      iconColor: const Color(0xFFEF5050),
+      iconColor: const Color(0xFF9ca3ae),
     );
   }
 } 
