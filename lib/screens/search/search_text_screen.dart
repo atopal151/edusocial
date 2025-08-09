@@ -225,9 +225,11 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                         itemBuilder: (context, index) {
                           var event = controller.filteredEvents[index];
                           return EventCard(
+                            eventId: event.id,
                             eventTitle: event.title,
                             eventDescription: event.description,
-                            eventDate: formatSimpleDateClock(event.endTime),
+                            eventDate: formatEventDate(event.startTime),
+                            eventEndTime: event.endTime, // Event expiration için
                             eventImage: event.bannerUrl,
                             onShare: () {
                               Get.snackbar(languageService.tr("common.messages.success"),

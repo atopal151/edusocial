@@ -46,7 +46,29 @@ class SearchTextController extends GetxController {
       // Aynı zamanda filtered verileri de güncelliyoruz
       filteredUsers.assignAll(response.users);
       filteredGroups.assignAll(response.groups);
-      filteredEvents.assignAll(response.events);
+      
+      // Sort events by expiration status before assigning
+      var sortedEvents = response.events.toList();
+      sortedEvents.sort((a, b) {
+        bool aExpired = _isEventExpired(a);
+        bool bExpired = _isEventExpired(b);
+        
+        // If one is expired and other is not, put active first
+        if (aExpired != bExpired) {
+          return aExpired ? 1 : -1; // Active events (not expired) come first
+        }
+        
+        // If both have same expiration status, sort by end time (newer first)
+        try {
+          final dateA = DateTime.parse(a.endTime);
+          final dateB = DateTime.parse(b.endTime);
+          return dateB.compareTo(dateA); // Newer events first
+        } catch (e) {
+          return 0; // Keep original order if date parsing fails
+        }
+      });
+      
+      filteredEvents.assignAll(sortedEvents);
 
       debugPrint('🔍 Search results loaded:');
       debugPrint('🔍 Users: ${allUsers.length}');
@@ -80,6 +102,16 @@ class SearchTextController extends GetxController {
     filteredEvents.clear();
   }
 
+  // Helper method to check if event has expired
+  bool _isEventExpired(EventModel event) {
+    try {
+      final endTime = DateTime.parse(event.endTime);
+      return DateTime.now().isAfter(endTime);
+    } catch (e) {
+      return false; // If date parsing fails, assume not expired
+    }
+  }
+
   // Eğer filtreli arama yapmak istersek (ekstra filtrelemeler için kullanılabilir)
   void filterResults(String query) {
     searchQuery.value = query.toLowerCase();
@@ -93,11 +125,34 @@ class SearchTextController extends GetxController {
             group.description.toLowerCase().contains(searchQuery.value))
         .toList();
 
-    filteredEvents.value = allEvents
+    // Filter events and sort by expiration status (active events first)
+    var eventsToFilter = allEvents
         .where((event) =>
             event.title.toLowerCase().contains(searchQuery.value) ||
             event.description.toLowerCase().contains(searchQuery.value))
         .toList();
+    
+    // Sort events: active events first, then expired events
+    eventsToFilter.sort((a, b) {
+      bool aExpired = _isEventExpired(a);
+      bool bExpired = _isEventExpired(b);
+      
+      // If one is expired and other is not, put active first
+      if (aExpired != bExpired) {
+        return aExpired ? 1 : -1; // Active events (not expired) come first
+      }
+      
+      // If both have same expiration status, sort by end time (newer first)
+      try {
+        final dateA = DateTime.parse(a.endTime);
+        final dateB = DateTime.parse(b.endTime);
+        return dateB.compareTo(dateA); // Newer events first
+      } catch (e) {
+        return 0; // Keep original order if date parsing fails
+      }
+    });
+    
+    filteredEvents.value = eventsToFilter;
   }
 
   // Grup katılma işlevi

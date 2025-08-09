@@ -11,6 +11,8 @@ class CustomButton extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final Color? iconColor;
+  final Color? borderColor;
+  final double? borderWidth;
   final Widget? icon;
 
 
@@ -25,6 +27,8 @@ class CustomButton extends StatelessWidget {
     required this.textColor,
     this.icon,
     this.iconColor,
+    this.borderColor,
+    this.borderWidth,
   });
 
   @override
@@ -37,6 +41,9 @@ class CustomButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: isLoading.value ? Colors.grey : backgroundColor,
               borderRadius: BorderRadius.circular(borderRadius!),
+              border: borderColor != null && borderWidth != null
+                  ? Border.all(color: borderColor!, width: borderWidth!)
+                  : null,
             ),
             alignment: Alignment.center,
             child: isLoading.value
@@ -49,20 +56,25 @@ class CustomButton extends StatelessWidget {
                     ),
                   )
                 : Row(
-                    mainAxisSize: MainAxisSize.min, // Buton içinde sıkışmaması için
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (icon != null) ...[
                         icon!,
-                        const SizedBox(width: 8), // İkon ile metin arasındaki boşluk
+                        const SizedBox(width: 8),
                       ],
-                      Text(
-                        text,
-                        style: GoogleFonts.inter(
-                          color: textColor,
-                          fontSize: 13.28,
-                          fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Text(
+                          text,
+                          style: GoogleFonts.inter(
+                            color: textColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                     ],

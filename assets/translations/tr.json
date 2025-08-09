@@ -531,11 +531,13 @@
       "currentLocation": "Konumum",
       "confirmLocation": "Onayla"
     },
+  
     "eventCard": {
       "share": "Paylaş",
       "viewLocation": "Konumu Gör",
       "notification": "Bildirim",
       "notificationSet": "Etkinlik bildirimi ayarlandı.",
+      "expired": "Etkinlik Süresi Doldu",
       "more": "Daha fazla",
       "shareText": {
         "downloadApp": "EduSocial Uygulamasını İndir:",
@@ -546,6 +548,7 @@
     },
     "eventDetail": {
       "title": "Etkinlik Detayı",
+      "notFound": "Etkinlik bulunamadı",
       "date": "Tarih",
       "time": "Saat",
       "location": "Konum",
@@ -555,7 +558,41 @@
       "join": "Katıl",
       "leave": "Ayrıl",
       "share": "Paylaş",
-      "report": "Bildir"
+      "report": "Bildir",
+      "until": "Bitiş",
+      "setReminder": "Hatırlatıcı",
+      "joinEvent": "Katıl",
+      "expired": "Bu Etkinlik Sona Erdi",
+      "retry": "Tekrar Dene"
+    },
+    "event": {
+      "reminder": {
+        "success": "Etkinlik hatırlatıcısı ayarlandı",
+        "error": "Hatırlatıcı ayarlanırken bir hata oluştu"
+      },
+      "invitation": {
+        "accepted": "Etkinlik daveti kabul edildi",
+        "declined": "Etkinlik daveti reddedildi",
+        "error": "Davet yanıtlanırken bir hata oluştu",
+        "alreadyResponded": "Bu etkinliğe zaten cevap verdiniz"
+      },
+      "share": {
+        "success": "Etkinlik başarıyla paylaşıldı"
+      },
+      "location": {
+        "viewing": "Konum bilgisi görüntüleniyor"
+      },
+      "notifications": {
+        "invitation": {
+          "accepted": "Etkinlik daveti kabul edildi",
+          "declined": "Etkinlik daveti reddedildi",
+          "error": "Davet yanıtlanırken bir hata oluştu",
+          "alreadyResponded": "Bu etkinliğe zaten cevap verdiniz"
+        },
+        "share": {
+          "success": "Etkinlik başarıyla paylaşıldı"
+        }
+      }
     },
     "loading": {
       "events": "Etkinlikler yükleniyor...",

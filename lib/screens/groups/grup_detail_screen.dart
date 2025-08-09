@@ -700,9 +700,11 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                             itemBuilder: (context, index) {
                               final event = sortedEvents[index];
                               return EventCard(
+                                  eventId: event.id,
                                   eventTitle: event.title,
                                   eventDescription: event.description,
                                   eventDate: formatSimpleDateClock(event.endTime),
+                                  eventEndTime: event.endTime,
                                   eventImage: event.bannerUrl,
                                   onShare: () {},
                                   onLocation: () async {

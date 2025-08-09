@@ -18,6 +18,7 @@ import 'package:edusocial/screens/entry/entry_screen.dart';
 import 'package:edusocial/screens/entry/entry_share_screen.dart';
 import 'package:edusocial/screens/event/event_screen.dart';
 import 'package:edusocial/screens/event/create_event_screen.dart';
+import 'package:edusocial/screens/event/event_detail_screen.dart';
 import 'package:edusocial/screens/event/location_picker_screen.dart';
 import 'package:edusocial/screens/groups/create_group_screen.dart';
 import 'package:edusocial/screens/groups/group_list_screen.dart';
@@ -59,6 +60,7 @@ class Routes {
   static const String chatDetail = '/chat_detail';
   static const String event = '/event';
   static const String createEvent = '/createEvent';
+  static const String eventDetail = '/eventDetail';
   static const String locationPicker = '/locationPicker';
   static const String profile = '/profile';
   static const String match = '/match';
@@ -132,6 +134,10 @@ class Routes {
     GetPage(
       name: createEvent,
       page: () => CreateEventScreen(),
+    ),
+    GetPage(
+      name: eventDetail,
+      page: () => EventDetailScreen(),
     ),
     GetPage(
       name: locationPicker,

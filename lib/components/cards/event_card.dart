@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -5,28 +6,43 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../controllers/search_text_controller.dart';
+import '../../controllers/event_controller.dart';
 import '../buttons/custom_button.dart';
 import '../buttons/icon_button.dart';
 import '../widgets/tree_point_bottom_sheet.dart';
 import '../../services/language_service.dart';
 
 class EventCard extends StatelessWidget {
+  final int? eventId;
   final String eventTitle;
   final String eventDescription;
   final String eventDate;
+  final String? eventEndTime; // Event bitiş zamanı için
   final String eventImage;
   final VoidCallback onShare;
   final VoidCallback onLocation;
 
   const EventCard({
     super.key,
+    this.eventId,
     required this.eventTitle,
     required this.eventDescription,
     required this.eventDate,
+    this.eventEndTime,
     required this.eventImage,
     required this.onShare,
     required this.onLocation,
   });
+
+  bool _isEventExpired() {
+    if (eventEndTime == null) return false;
+    try {
+      final endTime = DateTime.parse(eventEndTime!);
+      return DateTime.now().isAfter(endTime);
+    } catch (e) {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +55,12 @@ class EventCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: InkWell(
+        onTap: eventId != null ? () => _navigateToEventDetail() : null,
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // Etkinlik görseli ve üst ikonlar
           Stack(
             children: [
@@ -71,9 +90,10 @@ class EventCard extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        Get.snackbar(
-                            languageService.tr("events.notification.title"),
-                            languageService.tr("events.notification.message"));
+                        if (eventId != null) {
+                          final eventController = Get.find<EventController>();
+                          eventController.setEventReminder(eventId!);
+                        }
                       },
                     ),
                     const SizedBox(width: 8),
@@ -147,16 +167,51 @@ class EventCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        height: 40,
-                        borderRadius: 15,
-                        text: languageService.tr("common.buttons.share"),
-                        onPressed: () {
-                          final String shareText = """
+                _isEventExpired() 
+                  ? _buildExpiredButton(languageService)
+                  : _buildActiveButtons(languageService, controller)
+              ],
+            ),
+          ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpiredButton(LanguageService languageService) {
+    return SizedBox(
+      width: double.infinity,
+      child: CustomButton(
+        height: 40,
+        borderRadius: 15,
+        text: languageService.tr("event.eventCard.expired"),
+        onPressed: () {}, // No action for expired events
+        isLoading: RxBool(false),
+        icon: SvgPicture.asset(
+          "images/icons/clock_icon.svg",
+          colorFilter: const ColorFilter.mode(
+            Color(0xffffffff),
+            BlendMode.srcIn,
+          ),
+        ),
+        textColor: const Color(0xffffffff),
+        backgroundColor: const Color(0xff9CA3AE),
+      ),
+    );
+  }
+
+  Widget _buildActiveButtons(LanguageService languageService, SearchTextController controller) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          child: CustomButton(
+            height: 40,
+            borderRadius: 15,
+            text: languageService.tr("common.buttons.share"),
+            onPressed: () {
+              final String shareText = """
 $eventTitle
 
 $eventDescription
@@ -168,49 +223,51 @@ $eventDescription
 
 #EduSocial #Eğitim
 """;
-                          Share.share(shareText);
-                        },
-                        icon: SvgPicture.asset(
-                          "images/icons/share.svg",
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xffed7474),
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        textColor: const Color(0xffed7474),
-                        iconColor: const Color(0xffef8181),
-                        isLoading: controller.isSeLoading,
-                        backgroundColor: const Color(0xfffff6f6),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: CustomButton(
-                        height: 40,
-                        borderRadius: 15,
-                        text:
-                            languageService.tr("event.eventCard.viewLocation"),
-                        onPressed: onLocation,
-                        icon: SvgPicture.asset(
-                          "images/icons/location.svg",
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xfffff6f6),
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        textColor: const Color(0xfffff6f6),
-                        iconColor: const Color(0xfffff6f6),
-                        isLoading: controller.isSeLoading,
-                        backgroundColor: const Color(0xfffb535c),
-                      ),
-                    ),
-                  ],
-                )
-              ],
+              Share.share(shareText);
+            },
+            icon: SvgPicture.asset(
+              "images/icons/share.svg",
+              colorFilter: const ColorFilter.mode(
+                Color(0xffed7474),
+                BlendMode.srcIn,
+              ),
             ),
+            textColor: const Color(0xffed7474),
+            iconColor: const Color(0xffef8181),
+            isLoading: controller.isSeLoading,
+            backgroundColor: const Color(0xfffff6f6),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: CustomButton(
+            height: 40,
+            borderRadius: 15,
+            text: languageService.tr("event.eventCard.viewLocation"),
+            onPressed: onLocation,
+            icon: SvgPicture.asset(
+              "images/icons/location.svg",
+              colorFilter: const ColorFilter.mode(
+                Color(0xfffff6f6),
+                BlendMode.srcIn,
+              ),
+            ),
+            textColor: const Color(0xfffff6f6),
+            iconColor: const Color(0xfffff6f6),
+            isLoading: controller.isSeLoading,
+            backgroundColor: const Color(0xfffb535c),
+          ),
+        ),
+      ],
     );
+  }
+
+  void _navigateToEventDetail() {
+    if (eventId != null) {
+      debugPrint("🔗 EventCard - Navigating to event detail with ID: $eventId");
+      Get.toNamed('/eventDetail', arguments: {'eventId': eventId});
+    } else {
+      debugPrint("❌ EventCard - No event ID available for navigation");
+    }
   }
 }

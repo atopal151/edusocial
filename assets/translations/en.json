@@ -514,11 +514,13 @@
       "currentLocation": "My Location",
       "confirmLocation": "Confirm"
     },
+  
     "eventCard": {
       "share": "Share",
       "viewLocation": "View Location",
       "notification": "Notification",
       "notificationSet": "Event notification set.",
+      "expired": "Event Time Expired",
       "more": "More",
       "shareText": {
         "downloadApp": "Download EduSocial App:",
@@ -528,7 +530,8 @@
       }
     },
     "eventDetail": {
-      "title": "Event Details",
+      "title": "Event Detail",
+      "notFound": "Event not found",
       "date": "Date",
       "time": "Time",
       "location": "Location",
@@ -537,8 +540,13 @@
       "participants": "Participants",
       "join": "Join",
       "leave": "Leave",
+      "until": "Finish",
       "share": "Share",
-      "report": "Report"
+      "setReminder": "Reminder",
+      "report": "Report",
+      "joinEvent": "Join",
+      "expired": "This Event Has Ended",
+      "retry": "Retry"
     },
     "loading": {
       "events": "Loading events...",
@@ -570,6 +578,22 @@
       "removeNotification": "Remove Notification"
     },
     "notifications": {
+      "reminder": {
+        "success": "Event reminder set successfully",
+        "error": "Error setting reminder"
+      },
+      "invitation": {
+        "accepted": "Event invitation accepted",
+        "declined": "Event invitation declined",
+        "error": "Error responding to invitation",
+        "alreadyResponded": "You have already responded to this event"
+      },
+      "share": {
+        "success": "Event shared successfully"
+      },
+      "location": {
+        "viewing": "Viewing location information"
+      },
       "shared": "Shared",
       "locationView": "View Location",
       "locationInfo": "location information is being displayed for."

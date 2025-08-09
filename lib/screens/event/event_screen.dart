@@ -6,6 +6,7 @@ import '../../components/widgets/general_loading_indicator.dart';
 import '../../controllers/event_controller.dart';
 import '../../components/cards/event_card.dart';
 import '../../services/language_service.dart';
+import '../../utils/date_format.dart';
 
 class EventScreen extends StatefulWidget {
   const EventScreen({super.key});
@@ -22,7 +23,7 @@ class _EventScreenState extends State<EventScreen> {
 
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
-      appBar: BackAppBar(),
+      appBar: BackAppBar(iconBackgroundColor: Color(0xffffffff),),
       body: Obx(() {
         if (controller.isLoading.value) {
           return Container(
@@ -42,9 +43,9 @@ class _EventScreenState extends State<EventScreen> {
           backgroundColor: Color(0xfffafafa),
           elevation: 0,
           onRefresh: () async {
-            await controller.fetchEvents();
+            await controller.fetchTopEvents();
           },
-          child: controller.eventList.isEmpty
+          child: controller.topEventList.isEmpty
               ? SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   child: SizedBox(
@@ -82,13 +83,15 @@ class _EventScreenState extends State<EventScreen> {
                 )
               : ListView.builder(
                   padding: EdgeInsets.all(10),
-                  itemCount: controller.eventList.length,
+                  itemCount: controller.topEventList.length,
                   itemBuilder: (context, index) {
-                    final event = controller.eventList[index];
+                    final event = controller.topEventList[index];
                     return EventCard(
+                      eventId: event.id,
                       eventTitle: event.title,
                       eventDescription: event.description,
-                      eventDate: event.endTime,
+                      eventDate: formatEventDate(event.startTime),
+                      eventEndTime: event.endTime,
                       eventImage: event.bannerUrl,
                       onShare: () => controller.shareEvent(event.title),
                       onLocation: () => controller.showLocation(event.title),

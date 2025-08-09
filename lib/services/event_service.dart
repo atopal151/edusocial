@@ -1,13 +1,34 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/models/event_model.dart';
 import 'package:edusocial/utils/constants.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 class EventServices {
+  
+  // Helper method to print long strings without truncation
+  void _printLongString(String prefix, String text) {
+    const int maxLength = 800; // Flutter debugPrint limit is around 1000 chars
+    
+    if (text.length <= maxLength) {
+      debugPrint("$prefix: $text");
+      return;
+    }
+    
+    debugPrint("$prefix (PART 1/${(text.length / maxLength).ceil()}): ${text.substring(0, maxLength)}");
+    
+    for (int i = maxLength; i < text.length; i += maxLength) {
+      int end = (i + maxLength < text.length) ? i + maxLength : text.length;
+      int partNumber = (i / maxLength).round() + 1;
+      int totalParts = (text.length / maxLength).ceil();
+      debugPrint("$prefix (PART $partNumber/$totalParts): ${text.substring(i, end)}");
+    }
+  }
   Future<List<EventModel>> fetchEvents() async {
     try {
       final token = GetStorage().read("token");
@@ -20,8 +41,7 @@ class EventServices {
         },
       );
 
-      /*debugPrint("📥 Events Response: ${response.statusCode}", wrapWidth: 1024);
-      debugPrint("📥 Events Body: ${response.body}", wrapWidth: 1024);*/
+      debugPrint("📥 Events Response: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -124,6 +144,7 @@ class EventServices {
       );
 
       debugPrint("📥 Top Events Response: ${response.statusCode}");
+      _printLongString("📥 Top Events Body", response.body);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -143,20 +164,59 @@ class EventServices {
     try {
       final token = GetStorage().read("token");
 
-      final response = await http.get(
-        Uri.parse("${AppConstants.baseUrl}/event/$eventId"),
+      // Önce POST /events/{id} dene
+      var response = await http.post(
+        Uri.parse("${AppConstants.baseUrl}/events/$eventId"),
         headers: {
           "Authorization": "Bearer $token",
           "Accept": "application/json",
+          "Content-Type": "application/json",
         },
+        body: jsonEncode({}),
       );
 
-      debugPrint("📥 Event Detail Response: ${response.statusCode}");
+      debugPrint("📥 Event Detail Response (POST /events/$eventId): ${response.statusCode}");
+
+      // Eğer 405 (Method Not Allowed) alırsan GET dene
+      if (response.statusCode == 405) {
+        debugPrint("🔄 Trying GET method instead...");
+        response = await http.get(
+          Uri.parse("${AppConstants.baseUrl}/events/$eventId"),
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+        );
+        debugPrint("📥 Event Detail Response (GET /events/$eventId): ${response.statusCode}");
+      }
+
+      // Eğer hala başarısız ise /event/{id} dene
+      if (response.statusCode != 200) {
+        debugPrint("🔄 Trying /event/$eventId endpoint...");
+        response = await http.get(
+          Uri.parse("${AppConstants.baseUrl}/event/$eventId"),
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+        );
+        debugPrint("📥 Event Detail Response (GET /event/$eventId): ${response.statusCode}");
+      }
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
+        _printLongString("📥 Event Detail Body", response.body);
+        
+        // Alternative: Use dart:developer log for better viewing
+        if (kDebugMode) {
+          print("=== FULL EVENT DETAIL JSON START ===");
+          print("=== FULL EVENT DETAIL JSON END ===");
+        }
+
         return EventModel.fromJson(body['data']);
       } else {
+        debugPrint("❌ Event detail failed with status: ${response.statusCode}");
+        debugPrint("❌ Response body: ${response.body}");
         return null;
       }
     } catch (e) {
@@ -275,37 +335,48 @@ class EventServices {
     }
   }
 
-  // Event invitation response (accept/decline)
-  Future<bool> respondToEventInvitation(int eventId, bool accept) async {
+  // Respond to event invitation
+  Future<bool> respondToEventInvitation(int eventId, int groupId, bool accept) async {
     try {
       final token = GetStorage().read("token");
-
+      final profileController = Get.find<ProfileController>();
+      final userId = profileController.userId.value;
+      
+      debugPrint("🎯 Responding to event invitation:");
+      debugPrint("  - Event ID: $eventId");
+      debugPrint("  - Group ID: $groupId");
+      debugPrint("  - User ID: $userId");
+      debugPrint("  - Decision: ${accept ? 'accept' : 'decline'}");
+      
       final response = await http.post(
         Uri.parse("${AppConstants.baseUrl}/event-invitation"),
         headers: {
           "Authorization": "Bearer $token",
-          "Accept": "application/json",
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: jsonEncode({
-          'event_id': eventId,
-          'status': accept ? 'accepted' : 'declined',
+          "user_id": userId,
+          "group_id": groupId,
+          "event_id": eventId,
+          "decision": accept ? "accept" : "decline",
         }),
       );
 
       debugPrint("📥 Event Invitation Response: ${response.statusCode}");
       debugPrint("📥 Event Invitation Body: ${response.body}");
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint("✅ Event invitation response sent successfully");
-        return true;
-      } else {
-        debugPrint("❌ Event invitation response failed with status: ${response.statusCode}");
-        return false;
+      if (response.statusCode == 422) {
+        final body = jsonDecode(response.body);
+        if (body['message']?.toString().contains('already responded') == true) {
+          throw Exception('already_responded');
+        }
       }
+
+      return response.statusCode == 200;
     } catch (e) {
-      debugPrint("💥 Event invitation response error: $e");
-      return false;
+      debugPrint("❗ Event invitation yanıtlanırken hata: $e");
+      rethrow; // Re-throw to handle specific exceptions in controller
     }
   }
 }
