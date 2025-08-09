@@ -1,5 +1,6 @@
 
 import 'package:edusocial/models/chat_models/last_message_model.dart';
+import 'package:flutter/foundation.dart';
 
 class ChatModel {
   final int id;
@@ -26,12 +27,14 @@ class ChatModel {
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
     // Backend'den null geliyorsa 0 olarak ayarla
-    final unreadCount = json['unread_count'] ?? 0;
+    // Önce unread_messages_total_count'u dene, yoksa unread_count'u kullan
+    final unreadCount = json['unread_messages_total_count'] ?? json['unread_count'] ?? 0;
     
-    //debugPrint("📊 ChatModel.fromJson Debug:");
-    //debugPrint("  - User: ${json['name']} (${json['username']})");
-    //debugPrint("  - Raw unread_count: ${json['unread_count']}");
-    //debugPrint("  - Parsed unreadCount: $unreadCount");
+    debugPrint("📊 ChatModel.fromJson Debug:");
+    debugPrint("  - User: ${json['name']} (${json['username']})");
+    debugPrint("  - Raw unread_messages_total_count: ${json['unread_messages_total_count']}");
+    debugPrint("  - Raw unread_count: ${json['unread_count']}");
+    debugPrint("  - Parsed unreadCount: $unreadCount");
     
     return ChatModel(
       id: json['id'] ?? 0,

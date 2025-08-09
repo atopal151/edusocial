@@ -421,18 +421,19 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 8),
-                            if (chat.unreadCount > 0)
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor: Color(0xffff565f),
-                                child: Text(
-                                  chat.unreadCount.toString(),
-                                  style: GoogleFonts.inter(
-                                      fontSize: 10,
-                                      color: Color(0xffffffff),
-                                      fontWeight: FontWeight.w400),
-                                ),
+                            CircleAvatar(
+                              radius: 10,
+                              backgroundColor: chat.unreadCount > 0 
+                                  ? Color(0xffff565f) 
+                                  : Color(0xff9ca3ae),
+                              child: Text(
+                                chat.unreadCount.toString(),
+                                style: GoogleFonts.inter(
+                                    fontSize: 10,
+                                    color: Color(0xffffffff),
+                                    fontWeight: FontWeight.w400),
                               ),
+                            ),
                           ],
                         ),
                       ],
@@ -513,16 +514,17 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   fontSize: 10, color: Colors.grey),
                             ),
                             const SizedBox(height: 8),
-                            if (group.messageCount > 0)
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor: Colors.red,
-                                child: Text(
-                                  group.messageCount.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 10, color: Colors.white),
-                                ),
+                            CircleAvatar(
+                              radius: 10,
+                              backgroundColor: group.messageCount > 0 
+                                  ? Colors.red 
+                                  : Color(0xff9ca3ae),
+                              child: Text(
+                                group.messageCount.toString(),
+                                style: const TextStyle(
+                                    fontSize: 10, color: Colors.white),
                               ),
+                            ),
                           ],
                         ),
                       ],

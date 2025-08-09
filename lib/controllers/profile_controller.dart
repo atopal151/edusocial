@@ -46,8 +46,35 @@ class ProfileController extends GetxController {
   // 📦 Takip edilenler listesi (Mock)
   var followingList = [].obs;
 
+  // 📊 Filtrelenmiş sayılar
+  var filteredFollowers = 0.obs;
+  var filteredFollowing = 0.obs;
+
   // 📝 Kullanıcının entries'ları (PeopleProfileScreen'deki gibi)
   var personEntries = <EntryModel>[].obs;
+
+  // 📊 Filtrelenmiş takipçi sayısını hesapla
+  void calculateFilteredFollowers() {
+    final approvedFollowers = followerList.where((follower) {
+      final isPending = follower['is_following_pending'] == true;
+      return !isPending; // Pending olmayanları say
+    }).toList();
+    
+    filteredFollowers.value = approvedFollowers.length;
+    debugPrint("📊 Filtered Followers: ${filteredFollowers.value} (Total: ${followerList.length})");
+  }
+
+  // 📊 Filtrelenmiş takip edilen sayısını hesapla
+  void calculateFilteredFollowing() {
+    final approvedFollowings = followingList.where((following) {
+      final isFollowing = following['is_following'] == true;
+      final isPending = following['is_following_pending'] == true;
+      return isFollowing && !isPending; // Takip ediliyor ve pending değil
+    }).toList();
+    
+    filteredFollowing.value = approvedFollowings.length;
+    debugPrint("📊 Filtered Following: ${filteredFollowing.value} (Total: ${followingList.length})");
+  }
 
 String formatSimpleDate(String dateStr) {
   if (dateStr.isEmpty) return '';
@@ -159,9 +186,13 @@ String formatSimpleDate(String dateStr) {
       followerList.assignAll(profileData.followers);
       followingList.assignAll(profileData.followings);
       
+      // Filtrelenmiş sayıları hesapla
+      calculateFilteredFollowers();
+      calculateFilteredFollowing();
+      
       debugPrint("📊 Takipçi ve takip edilen verileri:");
-      debugPrint("  - Followers: ${followers.value}");
-      debugPrint("  - Following: ${following.value}");
+      debugPrint("  - Followers: ${followers.value} (Filtered: ${filteredFollowers.value})");
+      debugPrint("  - Following: ${following.value} (Filtered: ${filteredFollowing.value})");
       
       // 🚀 Ana profil verisi yüklendi, UI'ı hemen göster
       isLoading.value = false;

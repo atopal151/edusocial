@@ -128,7 +128,7 @@ Widget buildProfileHeader() {
                   'screenTitle': languageService.tr("profile.header.followers"),
                 });
               },
-              child: _buildProfileInfo(languageService.tr("profile.header.followers"), controller.followers),
+              child: _buildProfileInfo(languageService.tr("profile.header.followers"), controller.filteredFollowers),
             ),
           ),
          
@@ -140,7 +140,7 @@ Widget buildProfileHeader() {
                   'screenTitle': languageService.tr("profile.header.following"),
                 });
               },
-              child: _buildProfileInfo(languageService.tr("profile.header.following"), controller.following),
+              child: _buildProfileInfo(languageService.tr("profile.header.following"), controller.filteredFollowing),
             ),
           ),
 

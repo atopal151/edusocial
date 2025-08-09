@@ -259,7 +259,18 @@ class ChatServices {
     );
 
     debugPrint("📥 Paginated Mesajlar Yanıt Kodu: ${response.statusCode}");
-    debugPrint("📥 Paginated Mesajlar Yanıt Body: ${response.body}");
+    print("📥 Paginated Mesajlar Yanıt Body (TAM):");
+    print("${response.body}");
+    print("📥 Paginated Mesajlar Yanıt Body (TAM) - END");
+    
+    // Mesajı parçalara bölerek yazdır
+    final responseBody = response.body;
+    final chunkSize = 1000; // Her 1000 karakterde bir böl
+    for (int i = 0; i < responseBody.length; i += chunkSize) {
+      final end = (i + chunkSize < responseBody.length) ? i + chunkSize : responseBody.length;
+      print("📥 CHUNK ${(i ~/ chunkSize) + 1}: ${responseBody.substring(i, end)}");
+    }
+    print("📥 TAM MESAJ BİTTİ");
 
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
@@ -336,6 +347,7 @@ class ChatServices {
             debugPrint("📖 Name: ${json['name']}");
             debugPrint("📖 Raw JSON Keys: ${json.keys.toList()}");
             debugPrint("📖 Unread Count (unread_count): ${json['unread_count']} (type: ${json['unread_count']?.runtimeType})");
+            debugPrint("📖 Unread Count (unread_messages_total_count): ${json['unread_messages_total_count']} (type: ${json['unread_messages_total_count']?.runtimeType})");
             debugPrint("📖 Unread Count (unreadCount): ${json['unreadCount']} (type: ${json['unreadCount']?.runtimeType})");
             debugPrint("📖 Unread Count (unread_message_count): ${json['unread_message_count']} (type: ${json['unread_message_count']?.runtimeType})");
             debugPrint("📖 Unread Count (message_count): ${json['message_count']} (type: ${json['message_count']?.runtimeType})");

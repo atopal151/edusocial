@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:edusocial/components/input_fields/custom_textfield_step2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -50,7 +48,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
       backgroundColor: const Color(0xffFAFAFA),
       body: Obx(() => controller.isLoading.value
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFEF5050),))
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),

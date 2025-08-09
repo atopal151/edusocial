@@ -1024,11 +1024,13 @@
     },
     "followers": {
       "title": "Followers",
-      "sendMessage": "Send Message"
+      "sendMessage": "Send Message",
+      "searchPlaceholder": "Search followers..."
     },
     "following": {
       "title": "Following",
-      "sendMessage": "Send Message"
+      "sendMessage": "Send Message",
+      "searchPlaceholder": "Search following..."
     },
     "loading": {
       "profile": "Loading profile...",

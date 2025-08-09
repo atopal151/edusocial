@@ -48,7 +48,7 @@ class NotificationModel {
     final answer = fullData['answer'] ?? {};
 
     // Debug için API yanıtını logla
-    debugPrint("🔍 === NOTIFICATION DEBUG ===");
+    /*debugPrint("🔍 === NOTIFICATION DEBUG ===");
     debugPrint("🔍 Notification type: ${json['type']}");
     debugPrint("🔍 Full notification: ${json.toString()}");
     debugPrint("🔍 User data: ${user.toString()}");
@@ -56,7 +56,7 @@ class NotificationModel {
     debugPrint("🔍 is_following: ${user['is_following']} (type: ${user['is_following'].runtimeType})");
     debugPrint("🔍 is_following_pending: ${user['is_following_pending']} (type: ${user['is_following_pending'].runtimeType})");
     debugPrint("🔍 is_self: ${user['is_self']}");
-    debugPrint("🔍 answer.status: ${answer['status']}");
+    debugPrint("🔍 answer.status: ${answer['status']}");*/
 
     // Kullanıcı adını belirle
     String userName = 'Kullanıcı';
@@ -125,7 +125,7 @@ class NotificationModel {
       
       // Status kontrolü ekle - answer objesi içindeki status'u kontrol et
       String answerStatus = answer['status']?.toString().toLowerCase() ?? '';
-      debugPrint("🔍 [FOLLOW NOTIFICATION] Answer Status: $answerStatus");
+      //debugPrint("🔍 [FOLLOW NOTIFICATION] Answer Status: $answerStatus");
       
       // Answer status değerine göre durumu belirle
       if (answerStatus == 'accepted') {
@@ -134,7 +134,7 @@ class NotificationModel {
         isFollowingPending = false;
         isAccepted = true;
         isRejected = false;
-        debugPrint("🔍   → RESULT: Answer status accepted - buton gösterilmeyecek");
+        //debugPrint("🔍   → RESULT: Answer status accepted - buton gösterilmeyecek");
       } else if (answerStatus == 'rejected') {
         // Status rejected - buton gösterilmez
         isFollowing = false;
@@ -148,7 +148,7 @@ class NotificationModel {
         isFollowingPending = true;
         isAccepted = false;
         isRejected = false;
-        debugPrint("🔍   → RESULT: Answer status pending - buton gösterilecek");
+        //debugPrint("🔍   → RESULT: Answer status pending - buton gösterilecek");
       } else if (json['type'] == 'user.folow.request.accepted' || 
           json['type'] == 'follow-request-accepted') {
         // Takip isteği onaylanmış bildirimi
@@ -156,7 +156,7 @@ class NotificationModel {
         isFollowingPending = false;
         isAccepted = true;
         isRejected = false;
-        debugPrint("🔍   → RESULT: Takip isteği onaylandı");
+        //debugPrint("🔍   → RESULT: Takip isteği onaylandı");
       } else if (json['type'] == 'user.folow.start' || 
                  json['type'] == 'follow-start') {
         // Direkt takip başladı bildirimi (açık profil)
@@ -164,7 +164,7 @@ class NotificationModel {
         isFollowingPending = false;
         isAccepted = true;
         isRejected = false;
-        debugPrint("🔍   → RESULT: Direkt takip başladı");
+        //debugPrint("🔍   → RESULT: Direkt takip başladı");
       } else {
         // Takip isteği bildirimi (pending)
         if (userIsFollowing) {
@@ -173,21 +173,21 @@ class NotificationModel {
           isFollowingPending = false;
           isAccepted = true;
           isRejected = false;
-          debugPrint("🔍   → RESULT: Zaten takip ediyor");
+          //debugPrint("🔍   → RESULT: Zaten takip ediyor");
         } else if (userIsFollowingPending) {
           // Takip isteği beklemede
           isFollowing = false;
           isFollowingPending = true;
           isAccepted = false;
           isRejected = false;
-          debugPrint("🔍   → RESULT: Takip isteği beklemede");
+          //debugPrint("🔍   → RESULT: Takip isteği beklemede");
         } else {
           // Yeni takip isteği
           isFollowing = false;
           isFollowingPending = true;
           isAccepted = false;
           isRejected = false;
-          debugPrint("🔍   → RESULT: Yeni takip isteği");
+          //debugPrint("🔍   → RESULT: Yeni takip isteği");
         }
       }
     
@@ -199,7 +199,7 @@ class NotificationModel {
     } else if (json['type'] == 'group-join-request' || json['type'] == 'group-join') {
       // Grup katılma istekleri için answer.status'a göre belirle
       String answerStatus = answer['status']?.toString().toLowerCase() ?? '';
-      debugPrint("🔍 Group join request answer status: $answerStatus");
+      //debugPrint("🔍 Group join request answer status: $answerStatus");
       
       // Answer status değerine göre durumu belirle
       if (answerStatus == 'accepted') {
@@ -208,39 +208,39 @@ class NotificationModel {
         isRejected = false;
         isFollowing = false;
         isFollowingPending = false;
-        debugPrint("🔍   → RESULT: Answer status accepted - buton gösterilmeyecek");
+        //debugPrint("🔍   → RESULT: Answer status accepted - buton gösterilmeyecek");
       } else if (answerStatus == 'rejected') {
         // Status rejected - buton gösterilmez
         isAccepted = false;
         isRejected = true;
         isFollowing = false;
         isFollowingPending = false;
-        debugPrint("🔍   → RESULT: Answer status rejected - buton gösterilmeyecek");
+        //debugPrint("🔍   → RESULT: Answer status rejected - buton gösterilmeyecek");
       } else if (answerStatus == 'pending') {
         // Status pending - buton gösterilir
         isAccepted = false;
         isRejected = false;
         isFollowing = false;
         isFollowingPending = false;
-        debugPrint("🔍   → RESULT: Answer status pending - buton gösterilecek");
+        //debugPrint("🔍   → RESULT: Answer status pending - buton gösterilecek");
       } else if (answerStatus == 'approved') {
         isAccepted = true;
         isRejected = false;
         isFollowing = false;
         isFollowingPending = false;
-        debugPrint("🔍   → RESULT: Answer status approved");
+        //debugPrint("🔍   → RESULT: Answer status approved");
       } else if (answerStatus == 'rejected') {
         isAccepted = false;
         isRejected = true;
         isFollowing = false;
         isFollowingPending = false;
-        debugPrint("🔍   → RESULT: Answer status rejected");
+        //debugPrint("🔍   → RESULT: Answer status rejected");
       } else if (answerStatus == 'pending') {
         isAccepted = false;
         isRejected = false;
         isFollowing = false;
         isFollowingPending = false;
-        debugPrint("🔍   → RESULT: Answer status pending");
+        //debugPrint("🔍   → RESULT: Answer status pending");
       } else {
         // group-join tipinde answer.status yoksa, grup durumuna göre belirle
         if (json['type'] == 'group-join') {

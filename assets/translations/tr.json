@@ -1096,11 +1096,13 @@
     },
     "followers": {
       "title": "Takipçi",
-      "sendMessage": "Mesaj Gönder"
+      "sendMessage": "Mesaj Gönder",
+      "searchPlaceholder": "Takipçi ara..."
     },
     "following": {
       "title": "Takip edilen",
-      "sendMessage": "Mesaj Gönder"
+      "sendMessage": "Mesaj Gönder",
+      "searchPlaceholder": "Takip edilen ara..."
     },
     "loading": {
       "profile": "Profil yükleniyor...",
