@@ -470,6 +470,38 @@
         "subtitle": "New events will be added soon"
       }
     },
+    "createEvent": {
+      "title": "Create Event",
+      "eventTitle": "Event Title",
+      "eventTitleHint": "Enter event title",
+      "eventDescription": "Event Description", 
+      "eventDescriptionHint": "Describe your event",
+      "eventBanner": "Event Banner",
+      "bannerHint": "Tap to select banner image",
+      "location": "Location",
+      "locationHint": "Event location or Google Maps link",
+      "startDate": "Start Date",
+      "startTime": "Start Time",
+      "endDate": "End Date", 
+      "endTime": "End Time",
+      "selectDateTime": "Select",
+      "createButton": "Create Event",
+      "success": {
+        "created": "Event created successfully!"
+      },
+      "error": {
+        "createFailed": "Failed to create event"
+      },
+      "validation": {
+        "titleRequired": "Event title is required",
+        "descriptionRequired": "Event description is required",
+        "locationRequired": "Event location is required",
+        "startDateTimeRequired": "Start date and time are required",
+        "endDateTimeRequired": "End date and time are required",
+        "endTimeAfterStart": "End time must be after start time",
+        "groupRequired": "Group selection is required"
+      }
+    },
     "eventCard": {
       "share": "Share",
       "viewLocation": "View Location",
@@ -568,7 +600,8 @@
       },
       "bottomSheet": {
         "leaveGroup": "Leave Group",
-        "report": "Report"
+        "report": "Report",
+        "createEvent": "Create Event"
       },
       "emptyStates": {
         "documents": "No documents added yet",

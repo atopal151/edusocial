@@ -127,13 +127,17 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
         actions: [
           InkWell(
             onTap: () {
+              final group = groupController.groupDetail.value;
               showModalBottomSheet(
                 backgroundColor: Colors.white,
                 context: context,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                 ),
-                builder: (context) => const GroupDetailTreePointBottomSheet(),
+                builder: (context) => GroupDetailTreePointBottomSheet(
+                  groupId: group?.id,
+                  isFounder: group?.isFounder ?? false,
+                ),
               );
             },
             child: Container(
@@ -679,27 +683,39 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       SizedBox(height: 8),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: group.groupEvents.length,
-                        itemBuilder: (context, index) {
-                          final event = group.groupEvents[index];
-                          return EventCard(
-                              eventTitle: event.title,
-                              eventDescription: event.description,
-                              eventDate: formatSimpleDateClock(event.endTime),
-                              eventImage: event.bannerUrl,
-                              onShare: () {},
-                              onLocation: () async {
-                                if (event.location.isNotEmpty) {
-                                  final uri = Uri.parse(event.location);
-                                  if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri,
-                                        mode: LaunchMode.externalApplication);
-                                  }
-                                }
-                              });
+                      Builder(
+                        builder: (context) {
+                          // Etkinlikleri ters sırada sırala (en yeni en üstte)
+                          final sortedEvents = List.from(group.groupEvents);
+                          sortedEvents.sort((a, b) {
+                            final dateA = DateTime.tryParse(a.startTime) ?? DateTime.now();
+                            final dateB = DateTime.tryParse(b.startTime) ?? DateTime.now();
+                            return dateB.compareTo(dateA); // Ters sıralama (en yeni önce)
+                          });
+                          
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: sortedEvents.length,
+                            itemBuilder: (context, index) {
+                              final event = sortedEvents[index];
+                              return EventCard(
+                                  eventTitle: event.title,
+                                  eventDescription: event.description,
+                                  eventDate: formatSimpleDateClock(event.endTime),
+                                  eventImage: event.bannerUrl,
+                                  onShare: () {},
+                                  onLocation: () async {
+                                    if (event.location.isNotEmpty) {
+                                      final uri = Uri.parse(event.location);
+                                      if (await canLaunchUrl(uri)) {
+                                        await launchUrl(uri,
+                                            mode: LaunchMode.externalApplication);
+                                      }
+                                    }
+                                  });
+                            },
+                          );
                         },
                       ),
                     ],

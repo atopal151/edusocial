@@ -3,7 +3,14 @@ import 'package:get/get.dart';
 import '../../services/language_service.dart';
 
 class GroupDetailTreePointBottomSheet extends StatelessWidget {
-  const GroupDetailTreePointBottomSheet({super.key});
+  final String? groupId;
+  final bool isFounder;
+  
+  const GroupDetailTreePointBottomSheet({
+    super.key, 
+    this.groupId,
+    this.isFounder = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +32,22 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
                 ),
               ),
             ),
+            // Sadece grup kurucusu/yöneticisi etkinlik oluşturabilir
+            if (isFounder) 
+              ListTile(
+                leading: const Icon(Icons.event_outlined, color: Color(0xff4CAF50)),
+                title: Text(
+                  languageService.tr("groups.groupDetail.bottomSheet.createEvent"),
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff414751)),
+                ),
+                onTap: () {
+                  Get.back(); // Bottom sheet'i kapat
+                  _navigateToCreateEvent();
+                },
+              ),
             ListTile(
               leading:
                   const Icon(Icons.outbond, color: Color(0xfffb535c)),
@@ -56,5 +79,13 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateToCreateEvent() {
+    if (groupId != null) {
+      Get.toNamed('/createEvent', arguments: {
+        'groupId': groupId,
+      });
+    }
   }
 }

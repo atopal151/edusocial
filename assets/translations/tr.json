@@ -487,6 +487,38 @@
         "subtitle": "Yakında yeni etkinlikler eklenecek"
       }
     },
+    "createEvent": {
+      "title": "Etkinlik Oluştur",
+      "eventTitle": "Etkinlik Başlığı",
+      "eventTitleHint": "Etkinlik başlığını girin",
+      "eventDescription": "Etkinlik Açıklaması", 
+      "eventDescriptionHint": "Etkinliğinizi açıklayın",
+      "eventBanner": "Etkinlik Kapak Fotoğrafı",
+      "bannerHint": "Kapak fotoğrafı seçmek için tıklayın",
+      "location": "Konum",
+      "locationHint": "Etkinlik konumu veya Google Maps linki",
+      "startDate": "Başlangıç Tarihi",
+      "startTime": "Başlangıç Saati",
+      "endDate": "Bitiş Tarihi", 
+      "endTime": "Bitiş Saati",
+      "selectDateTime": "Seç",
+      "createButton": "Etkinlik Oluştur",
+      "success": {
+        "created": "Etkinlik başarıyla oluşturuldu!"
+      },
+      "error": {
+        "createFailed": "Etkinlik oluşturulamadı"
+      },
+      "validation": {
+        "titleRequired": "Etkinlik başlığı gerekli",
+        "descriptionRequired": "Etkinlik açıklaması gerekli",
+        "locationRequired": "Etkinlik konumu gerekli",
+        "startDateTimeRequired": "Başlangıç tarihi ve saati gerekli",
+        "endDateTimeRequired": "Bitiş tarihi ve saati gerekli",
+        "endTimeAfterStart": "Bitiş zamanı başlangıç zamanından sonra olmalı",
+        "groupRequired": "Grup seçimi gerekli"
+      }
+    },
     "eventCard": {
       "share": "Paylaş",
       "viewLocation": "Konumu Gör",
@@ -589,7 +621,8 @@
 
       "bottomSheet": {
         "leaveGroup": "Gruptan Ayrıl",
-        "report": "Şikayet Et"
+        "report": "Şikayet Et",
+        "createEvent": "Etkinlik Oluştur"
       },
       "emptyStates": {
         "documents": "Henüz belge eklenmemiş",
@@ -1229,7 +1262,8 @@
         },
         "bottomSheet": {
           "leaveGroup": "Gruptan Ayrıl",
-          "report": "Şikayet Et"
+          "report": "Şikayet Et",
+          "createEvent": "Etkinlik Oluştur"
         },
         "emptyStates": {
           "documents": "Bu grupta henüz belge paylaşılmamış",
