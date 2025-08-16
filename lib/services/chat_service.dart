@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import '../models/chat_models/chat_model.dart';
 import '../models/user_chat_detail_model.dart';
+import '../components/print_full_text.dart';
 
 class ChatServices {
   static final _box = GetStorage();
@@ -132,24 +133,37 @@ class ChatServices {
       }
     }
 
-    // Medya dosyalarını ekle (Sadece image dosyaları - private conversation limitation)
+    // Medya dosyalarını ekle (Sadece görsel dosyalar - private chat için)
     if (mediaFiles != null && mediaFiles.isNotEmpty) {
       //debugPrint('📁 Adding media files to request:');
       
-      // Private conversation sadece image dosyalarını destekliyor
+      // Sadece görsel dosyaları kabul et (private chat için)
       final imageFiles = mediaFiles.where((file) {
         final fileExtension = file.path.split('.').last.toLowerCase();
-        return ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension);
+        return [
+          // Sadece görsel dosyalar
+          'jpg', 'jpeg', 'png', 'gif', 'webp'
+        ].contains(fileExtension);
       }).toList();
       
       if (imageFiles.length != mediaFiles.length) {
-        debugPrint('⚠️ Private conversation sadece resim dosyalarını destekliyor!');
-        debugPrint('⚠️ Toplam dosya: ${mediaFiles.length}, Geçerli resim: ${imageFiles.length}');
+        debugPrint('⚠️ Private chat\'te sadece görsel dosyalar desteklenir!');
+        debugPrint('⚠️ Toplam dosya: ${mediaFiles.length}, Görsel: ${imageFiles.length}');
+        
+        // Doküman dosyalarını listele
+        final documentFiles = mediaFiles.where((file) {
+          final fileExtension = file.path.split('.').last.toLowerCase();
+          return ['pdf', 'doc', 'docx', 'txt', 'rtf'].contains(fileExtension);
+        }).toList();
+        
+        for (var file in documentFiles) {
+          debugPrint('❌ Doküman dosyası (desteklenmiyor): ${file.path}');
+        }
       }
       
       for (var file in imageFiles) {
         final fileExtension = file.path.split('.').last.toLowerCase();
-        String mimeType = 'image/$fileExtension';
+        String mimeType = _getMimeType(fileExtension);
 
         //debugPrint('  - File: ${file.path}');
         //debugPrint('  - Extension: $fileExtension');
@@ -164,7 +178,7 @@ class ChatServices {
           ),
         );
       }
-      //debugPrint('📁 Total image files added: ${request.files.length}');
+      //debugPrint('📁 Total files added: ${request.files.length}');
     }
 
     try {
@@ -188,6 +202,37 @@ class ChatServices {
     }
   }
 
+  /// Dosya uzantısına göre MIME type döndürür
+  static String _getMimeType(String extension) {
+    switch (extension.toLowerCase()) {
+      // Görsel dosyalar
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      
+      // Doküman dosyalar
+      case 'pdf':
+        return 'application/pdf';
+      case 'doc':
+        return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'txt':
+        return 'text/plain';
+      case 'rtf':
+        return 'application/rtf';
+      
+      default:
+        return 'application/octet-stream';
+    }
+  }
+
   static Future<List<ChatUserModel>> fetchOnlineFriends() async {
     final token = _box.read('token');
     final url = Uri.parse("${AppConstants.baseUrl}/timeline/last-conversation");
@@ -205,10 +250,16 @@ class ChatServices {
         operation: 'Fetch Online Friends',
       );
 
-      //debugPrint("🌐 Online Arkadaşlar URL: ${url.toString()}");
-      //debugPrint("🔑 Online Arkadaşlar Token: $token");
-      //debugPrint("📥 Online Arkadaşlar Response Status Code: ${response.statusCode}");
-      //debugPrint("📥 Online Arkadaşlar Response Body: ${response.body}");
+      // Raw API response'u yazdır
+      printFullText('''
+🌐 ONLINE FRIENDS API RAW RESPONSE
+====================================
+📡 URL: ${url.toString()}
+📊 Status Code: ${response.statusCode}
+📦 Raw Response Body:
+${response.body}
+====================================
+''');
 
       final body = jsonDecode(response.body);
       final dataList = body['data'] as List<dynamic>;
@@ -258,19 +309,16 @@ class ChatServices {
       operation: 'Fetch Conversation Messages',
     );
 
-    //debugPrint("📥 Paginated Mesajlar Yanıt Kodu: ${response.statusCode}");
-    //print("📥 Paginated Mesajlar Yanıt Body (TAM):");
-    //print("${response.body}");
-    //print("📥 Paginated Mesajlar Yanıt Body (TAM) - END");
-    
-    // Mesajı parçalara bölerek yazdır
-    final responseBody = response.body;
-    final chunkSize = 1000; // Her 1000 karakterde bir böl
-    for (int i = 0; i < responseBody.length; i += chunkSize) {
-      final end = (i + chunkSize < responseBody.length) ? i + chunkSize : responseBody.length;
-      //print("📥 CHUNK ${(i ~/ chunkSize) + 1}: ${responseBody.substring(i, end)}");
-    }
-    //print("📥 TAM MESAJ BİTTİ");
+    // Raw API response'u yazdır
+    printFullText('''
+🌐 PRIVATE CHAT MESSAGES API RAW RESPONSE
+==========================================
+📡 URL: $uri
+📊 Status Code: ${response.statusCode}
+📦 Raw Response Body:
+${response.body}
+==========================================
+''');
 
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];

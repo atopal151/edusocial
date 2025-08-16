@@ -8,33 +8,20 @@ import 'package:edusocial/components/widgets/chat_widget/document_message_widget
 
 class MessageWidgetFactory {
   static Widget buildMessageWidget(MessageModel message) {
-         // Media içinde document vs image ayrımı
-     bool hasDocumentInMedia = false;
-     bool hasImageInMedia = false;
-     
-     if (message.messageMedia.isNotEmpty) {
-       for (var media in message.messageMedia) {
-         final mediaPath = media.path.toLowerCase();
-         
-         // Document kontrolü
-         if (mediaPath.endsWith('.pdf') ||
-             mediaPath.endsWith('.doc') ||
-             mediaPath.endsWith('.docx') ||
-             mediaPath.endsWith('.txt')) {
-           hasDocumentInMedia = true;
-         }
-         // Image kontrolü  
-         else if (mediaPath.endsWith('.jpg') ||
-                  mediaPath.endsWith('.jpeg') ||
-                  mediaPath.endsWith('.png') ||
-                  mediaPath.endsWith('.gif') ||
-                  mediaPath.endsWith('.webp') ||
-                  mediaPath.contains('image_picker') ||
-                  mediaPath.contains('user-chats/')) {
-           hasImageInMedia = true;
-         }
-       }
-     }
+    // Media içinde document vs image ayrımı
+    bool hasDocumentInMedia = false;
+    bool hasImageInMedia = false;
+    
+    if (message.messageMedia.isNotEmpty) {
+      for (var media in message.messageMedia) {
+        // Yeni MessageMediaModel özelliklerini kullan
+        if (media.isDocument) {
+          hasDocumentInMedia = true;
+        } else if (media.isImage) {
+          hasImageInMedia = true;
+        }
+      }
+    }
      
      // Document mesajları (messageDocument field'ında veya messageMedia'da document)
      if ((message.messageDocument?.isNotEmpty ?? false) || hasDocumentInMedia) {

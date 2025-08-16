@@ -177,7 +177,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 padding: const EdgeInsets.all(12.0),
                 child: Obx(() => CircleAvatar(
                       radius: 20,
-                      backgroundColor: Color(0xffffeeee),
+                      backgroundColor: Color(0xffffffff),
                       backgroundImage: profileController
                               .profileImage.value.isNotEmpty
                           ? NetworkImage(profileController.profileImage.value)

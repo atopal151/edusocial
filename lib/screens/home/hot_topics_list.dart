@@ -35,8 +35,10 @@ class HotTopicsListView extends StatelessWidget {
 
             return GestureDetector(
               onTap: () {
-                controller.selectTopic(topic.title);
-                controller.onHotTopicTap(topic);
+                if (!controller.isTopicLoading.value) {
+                  controller.selectTopic(topic.title);
+                  controller.onHotTopicTap(topic);
+                }
               },
               child: Container(
                 width: 230,
@@ -59,31 +61,40 @@ class HotTopicsListView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    isSelected
-                        ? ShaderMask(
-                            shaderCallback: (bounds) => LinearGradient(
-                              colors: [Color(0xFFfffce6), Color(0xFFffefd8)],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ).createShader(bounds),
-                            blendMode: BlendMode.srcIn,
-                            child: SvgPicture.asset(
-                              "images/icons/selected_star.svg",
-                             
-                            ),
-                          )
-                        : ShaderMask(
-                            shaderCallback: (bounds) => LinearGradient(
-                              colors: [Color(0xFFffe61c), Color(0xFFffa929)],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ).createShader(bounds),
-                            blendMode: BlendMode.srcIn,
-                            child: SvgPicture.asset(
-                              "images/icons/selected_star.svg",
-                             
-                            ),
-                          ),
+                    // Loading durumunda spinner göster
+                    if (isSelected && controller.isTopicLoading.value)
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    else if (isSelected)
+                      ShaderMask(
+                        shaderCallback: (bounds) => LinearGradient(
+                          colors: [Color(0xFFfffce6), Color(0xFFffefd8)],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ).createShader(bounds),
+                        blendMode: BlendMode.srcIn,
+                        child: SvgPicture.asset(
+                          "images/icons/selected_star.svg",
+                        ),
+                      )
+                    else
+                      ShaderMask(
+                        shaderCallback: (bounds) => LinearGradient(
+                          colors: [Color(0xFFffe61c), Color(0xFFffa929)],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ).createShader(bounds),
+                        blendMode: BlendMode.srcIn,
+                        child: SvgPicture.asset(
+                          "images/icons/selected_star.svg",
+                        ),
+                      ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(

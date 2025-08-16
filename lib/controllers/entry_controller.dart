@@ -26,7 +26,12 @@ class EntryController extends GetxController {
   final TextEditingController titleEntryController = TextEditingController();
   final TextEditingController bodyEntryController = TextEditingController();
   final RxString topicName = ''.obs;
-  final TextEditingController entrySearchController = TextEditingController();
+  TextEditingController? _entrySearchController;
+  
+  TextEditingController get entrySearchController {
+    _entrySearchController ??= TextEditingController();
+    return _entrySearchController!;
+  }
 
   var allTopics = <TopicModel>[].obs; // Tüm tartışma konuları (Eski, artık tam kullanılmayacak)
   var user = Rxn<UserModel>(); // Current user for EntryController
@@ -45,6 +50,7 @@ class EntryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    
     fetchAndPrepareEntries();
 
     // ProfileController'dan kullanıcı bilgisini al ve EntryController.user'a ata
@@ -62,7 +68,11 @@ class EntryController extends GetxController {
   void onClose() {
     titleEntryController.dispose();
     bodyEntryController.dispose();
-    entrySearchController.dispose();
+    
+    // Controller'ı güvenli bir şekilde dispose et
+    _entrySearchController?.dispose();
+    _entrySearchController = null;
+    
     super.onClose();
   }
 
@@ -346,7 +356,7 @@ class EntryController extends GetxController {
 
   // IMPROVED: Arama ve kategori filtresini birlikte uygular
   void applySearchFilterToDisplayList() {
-    final query = entrySearchController.text.toLowerCase();
+    final query = _entrySearchController?.text.toLowerCase() ?? '';
     
     // Önce kategori filtresini uygula
     List<DisplayEntryItem> categoryFiltered;

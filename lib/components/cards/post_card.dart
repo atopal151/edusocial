@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:intl/intl.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../widgets/comment_bottom_sheet.dart';
@@ -18,6 +18,7 @@ class PostCard extends StatefulWidget {
   final int postId;
   final String profileImage;
   final String name;
+  final String surname;
   final String userName;
   final String postDate;
   final String postDescription;
@@ -35,6 +36,7 @@ class PostCard extends StatefulWidget {
       required this.postId,
       required this.userName,
       required this.name,
+      required this.surname,
       required this.postDate,
       required this.postDescription,
       required this.mediaUrls,
@@ -100,6 +102,40 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  // Tarihi "gg.aa.yyyy hh:mm" formatında formatla
+  String _formatDate(String dateString) {
+    try {
+      if (dateString.contains('T')) {
+        final parts = dateString.split('T');
+        if (parts.length >= 2) {
+          final datePart = parts[0]; // 2025-05-28
+          final timePart = parts[1]; // 22:37:10.000000Z
+          
+          // Tarih kısmını parçala
+          final dateParts = datePart.split('-');
+          if (dateParts.length >= 3) {
+            final year = dateParts[0];
+            final month = dateParts[1];
+            final day = dateParts[2];
+            
+            // Saat kısmını parçala
+            final timeParts = timePart.split(':');
+            if (timeParts.length >= 2) {
+              final hour = timeParts[0];
+              final minute = timeParts[1];
+              
+              // "gg.aa.yyyy hh:mm" formatında döndür
+              return "$day.$month.$year $hour:$minute";
+            }
+          }
+        }
+      }
+      return dateString; // Format edilemezse orijinal string'i döndür
+    } catch (e) {
+      return dateString; // Hata durumunda orijinal string'i döndür
+    }
+  }
+
   /// 🆕 Double tap like fonksiyonu
   void _handleDoubleTapLike() {
     // Sadece beğenilmemiş postları beğen
@@ -162,20 +198,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ProfileController profileController = Get.find<ProfileController>();
     final PostController postController = Get.find<PostController>();
-    final languageService = Get.find<LanguageService>();
-    final locale = languageService.currentLanguage.value;
-    String formattedDate;
-    try {
-      final date = DateTime.tryParse(widget.postDate);
-      if (date != null) {
-        final dateFormat = locale == "tr" ? "dd.MM.yyyy" : "MM/dd/yyyy";
-        formattedDate = DateFormat(dateFormat, locale).format(date);
-      } else {
-        formattedDate = widget.postDate;
-      }
-    } catch (_) {
-      formattedDate = widget.postDate;
-    }
+        final languageService = Get.find<LanguageService>();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -221,7 +244,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  widget.name,
+                                  widget.userName.isNotEmpty ? widget.userName : '${widget.name} ${widget.surname}',
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
@@ -230,7 +253,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  formattedDate,
+                                  _formatDate(widget.postDate),
                                   style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w400,
@@ -493,11 +516,12 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                     const Spacer(),
                     InkWell(
                       onTap: () {
-                        String shareText = "${widget.userName} bir gönderi paylaştı:\n\n${widget.postDescription}";
+                        final languageService = Get.find<LanguageService>();
+                        String shareText = "${widget.userName} ${languageService.tr("common.buttons.postShared")}:\n\n${widget.postDescription}";
                         
                         // Eğer linkler varsa onları da ekle
                         if (widget.links.isNotEmpty) {
-                          shareText += "\n\nLinkler:\n";
+                          shareText += "\n\n${languageService.tr("common.buttons.links")}:\n";
                           for (String link in widget.links) {
                             shareText += "$link\n";
                           }

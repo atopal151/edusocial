@@ -143,15 +143,19 @@ class ChatController extends GetxController {
     }
   }
 
-  /// 🔥 Online arkadaşları getir
+  /// 🔥 Online arkadaşları getir (is_recent alanına göre filtrele)
   Future<void> fetchOnlineFriends() async {
     try {
       isLoading(true);
       final friends = await ChatServices.fetchOnlineFriends();
-      onlineFriends.assignAll(friends);
-      //debugPrint('Online Arkadaşlar:$friends', wrapWidth: 1024);
+      
+      // is_recent alanına göre filtrele - sadece son aktif olanları göster
+      final recentFriends = friends.where((friend) => friend.isRecent == true).toList();
+      
+      onlineFriends.assignAll(recentFriends);
+      debugPrint('✅ Online arkadaşlar filtrelendi: ${friends.length} -> ${recentFriends.length}');
     } catch (e) {
-      debugPrint('Online arkadaşlar çekilirken hata: $e');
+      debugPrint('❌ Online arkadaşlar çekilirken hata: $e');
     } finally {
       isLoading(false);
     }

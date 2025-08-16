@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../../utils/constants.dart';
+import '../components/print_full_text.dart';
 
 class PeopleProfileService {
   static final box = GetStorage();
@@ -21,6 +22,17 @@ class PeopleProfileService {
       ).timeout(const Duration(seconds: 10)); // 10 saniye timeout
       
       if (response.statusCode == 200) {
+        // Raw API response'u yazdır
+        printFullText('''
+🌐 PEOPLE PROFILE API RAW RESPONSE
+====================================
+📡 URL: $url
+📊 Status Code: ${response.statusCode}
+📦 Raw Response Body:
+${response.body}
+====================================
+''');
+
         final body = jsonDecode(response.body);
 
         //final bodyString = const JsonEncoder.withIndent('  ').convert(body);
@@ -57,6 +69,17 @@ class PeopleProfileService {
       //debugPrint("📥 Response status: ${response.statusCode}");
       
       if (response.statusCode == 200) {
+        // Raw API response'u yazdır
+        printFullText('''
+🌐 PEOPLE PROFILE BY ID API RAW RESPONSE
+==========================================
+📡 URL: $url
+📊 Status Code: ${response.statusCode}
+📦 Raw Response Body:
+${response.body}
+==========================================
+''');
+
         final body = jsonDecode(response.body);
         //debugPrint("📦 Response body keys: ${body.keys.toList()}");
         

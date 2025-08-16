@@ -437,8 +437,8 @@ class GroupChatDetailController extends GetxController {
       final groupChats = groupData.value!.groupChats;
       final currentUserId = Get.find<ProfileController>().userId.value;
       
-      // DEBUG: Group mesajlarının tam verisini yazdır
-      printFullText('GROUP CHATS FULL DATA: ${json.encode(groupChats)}');
+      // DEBUG: Group mesajlarının sayısını yazdır
+      debugPrint('📊 Group chats count: ${groupChats.length}');
       
       // PAGINATION: Process all messages without limit
       final messagesToProcess = groupChats;

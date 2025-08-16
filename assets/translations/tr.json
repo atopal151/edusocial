@@ -448,7 +448,9 @@
       "topicCreateFailed": "Konu oluşturulamadı",
       "voteFailed": "Oylama başarısız",
       "networkError": "Ağ bağlantısı hatası",
-      "serverError": "Sunucu hatası oluştu"
+      "serverError": "Sunucu hatası oluştu",
+      "entryNotFound": "Bu konu için entry bulunamadı",
+      "generalError": "Bir hata oluştu"
     },
     "success": {
       "entrySent": "Entry başarıyla gönderildi",
@@ -1422,7 +1424,10 @@
       "leaving": "Ayrılınıyor...",
       "following": "Takip ediliyor...",
       "unfollowing": "Takipten çıkarılıyor...",
-      "retry": "Tekrar Dene"
+      "retry": "Tekrar Dene",
+      "postShared": "bir gönderi paylaştı",
+      "entryShared": "bir entry paylaştı",
+      "links": "Linkler"
     },
     "cancel": "İptal",
     "messages": {

@@ -50,6 +50,7 @@ class PostHomeList extends StatelessWidget {
               postDate: post.postDate,
               postDescription: post.postDescription,
               name: post.name,
+              surname: post.surname,
               mediaUrls: post.mediaUrls, // ✅ doğru alan // 🔁 boş liste
               likeCount: post.likeCount,
               commentCount: post.commentCount,

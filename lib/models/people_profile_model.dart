@@ -147,6 +147,7 @@ class PeopleProfileModel {
               e,
               json['avatar'] ?? '',
               "${json['name']} ${json['surname']}",
+              json['username'] ?? '', // Ana kullanıcının username'ini geç
             );
           }).toList() ??
           [],

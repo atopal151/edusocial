@@ -76,7 +76,6 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
         debugPrint('🔄 Yanıt gönderiliyor: $text');
         debugPrint('🔄 Yanıtlanan yorum: ${replyingTo!.userName}');
         
-        // TODO: API çağrısı yapılacak
         // await controller.addReply(widget.postId, replyingTo!.id, text);
         
         _cancelReply();
@@ -210,6 +209,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
         children: [
           // Profil resmi
           CircleAvatar(
+            backgroundColor: Color(0xfffafafa),
             radius: 16,
             backgroundImage: NetworkImage(
               comment.userAvatar.isNotEmpty

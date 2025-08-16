@@ -3,13 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SearchTextField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String label;
   final Function(String)? onChanged;
 
   const SearchTextField({
     super.key,
-    required this.controller,
+    this.controller,
     this.onChanged, 
     required this.label,
   });

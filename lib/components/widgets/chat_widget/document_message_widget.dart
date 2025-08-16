@@ -26,17 +26,10 @@ class DocumentMessageWidget extends StatelessWidget {
     // messageMedia'da document var mı kontrol et
     if (message.messageMedia.isNotEmpty) {
       for (var media in message.messageMedia) {
-        final mediaPath = media.path.toLowerCase();
-        if (mediaPath.endsWith('.pdf') ||
-            mediaPath.endsWith('.doc') ||
-            mediaPath.endsWith('.docx') ||
-            mediaPath.endsWith('.txt')) {
-          // Media document'i için URL oluştur
-          if (media.path.startsWith('http')) {
-            return media.path;
-          } else {
-            return 'https://stageapi.edusocial.pl/storage/${media.path}';
-          }
+        if (media.isDocument) {
+          // Yeni MessageMediaModel'in fullPath özelliğini kullan
+          return media.fullPath.isNotEmpty ? media.fullPath : 
+                 (media.path.startsWith('http') ? media.path : 'https://stageapi.edusocial.pl/storage/${media.path}');
         }
       }
     }
@@ -54,11 +47,7 @@ class DocumentMessageWidget extends StatelessWidget {
     // messageMedia'da document var mı kontrol et
     if (message.messageMedia.isNotEmpty) {
       for (var media in message.messageMedia) {
-        final mediaPath = media.path.toLowerCase();
-        if (mediaPath.endsWith('.pdf') ||
-            mediaPath.endsWith('.doc') ||
-            mediaPath.endsWith('.docx') ||
-            mediaPath.endsWith('.txt')) {
+        if (media.isDocument) {
           // Media document'i için dosya ismini al
           return media.path.split('/').last;
         }
@@ -135,7 +124,7 @@ class DocumentMessageWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.insert_drive_file, 
+                        _getDocumentIcon(),
                         color: message.isMe ? Colors.white : const Color(0xff000000),
                         size: 24,
                       ),
@@ -201,6 +190,26 @@ class DocumentMessageWidget extends StatelessWidget {
           ),
       ),
     );
+  }
+
+  /// Dosya tipine göre uygun ikonu döndürür
+  IconData _getDocumentIcon() {
+    if (message.messageMedia.isNotEmpty) {
+      for (var media in message.messageMedia) {
+        if (media.isDocument) {
+          if (media.isPdf) {
+            return Icons.picture_as_pdf;
+          } else if (media.isWord) {
+            return Icons.description;
+          } else if (media.isText) {
+            return Icons.text_snippet;
+          }
+        }
+      }
+    }
+    
+    // Fallback
+    return Icons.insert_drive_file;
   }
 
   String _formatTime(String dateTimeString) {

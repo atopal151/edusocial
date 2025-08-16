@@ -260,6 +260,7 @@
               postId: post.id,
               profileImage: post.profileImage,
               name: post.name,
+              surname: post.surname,
               userName: post.username,
               postDate: date,
               postDescription: post.postDescription,
@@ -355,13 +356,13 @@
                     final String shareText = """
   📝 **$topicName** (#${entry.id})
 
-  🏷️ **Kategori:** $categoryTitle
-  👤 **Yazar:** ${user.name} ${user.surname}
+  🏷️ **${languageService.tr("profile.peopleProfile.shareText.category")}:** $categoryTitle
+  👤 **${languageService.tr("profile.peopleProfile.shareText.author")}:** ${user.name} ${user.surname}
 
-  💬 **Entry İçeriği:**
+  💬 **${languageService.tr("profile.peopleProfile.shareText.entryContent")}:**
   ${entry.content}
 
-  📱 **${languageService.tr("profile.peopleProfile.shareText.appLink")}**
+  📱 **${languageService.tr("profile.peopleProfile.shareText.downloadApp")}**
   📲 ${languageService.tr("profile.peopleProfile.shareText.appStore")}
   📱 ${languageService.tr("profile.peopleProfile.shareText.playStore")}
 

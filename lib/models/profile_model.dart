@@ -147,6 +147,7 @@ class ProfileModel {
                   e,
                   json['avatar_url'] ?? '',
                   "${json['name']} ${json['surname']}",
+                  json['username'] ?? '', // Ana kullanıcının username'ini geç
                 ))
             .toList() ??
         [],

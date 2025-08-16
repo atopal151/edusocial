@@ -431,7 +431,9 @@
       "topicCreateFailed": "Failed to create topic",
       "voteFailed": "Vote failed",
       "networkError": "Network connection error",
-      "serverError": "Server error occurred"
+      "serverError": "Server error occurred",
+      "entryNotFound": "No entry found for this topic",
+      "generalError": "An error occurred"
     },
     "success": {
       "entrySent": "Entry sent successfully",
@@ -1371,7 +1373,10 @@
       "unfollowing": "Unfollowing...",
       "accepting": "Accepting...",
       "declining": "Declining...",
-      "retry": "Retry"
+      "retry": "Retry",
+      "postShared": "shared a post",
+      "entryShared": "shared an entry",
+      "links": "Links"
     },
     "cancel": "Cancel",
     "messages": {

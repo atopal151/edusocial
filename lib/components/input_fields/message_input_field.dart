@@ -171,21 +171,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
                 ),
               ),
               
-              // Document picker butonu - Private chat'te devre dışı (bilgilendirme ile)
-              /*Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InkWell(
-                  onTap: () {
-                    // Private chat'te document desteği yok - bilgilendirme göster
-                   
-                  },
-                  child: Icon(
-                    Icons.description,
-                    color: Color(0xffd0d0d0), // Disabled renk
-                    size: 24,
-                  ),
-                ),
-              ),*/
+
               IconButton(
                 icon: Container(
                   width: 40,

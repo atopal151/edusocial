@@ -8,6 +8,7 @@ import 'package:edusocial/utils/network_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../models/chat_models/chat_detail_model.dart';
 import '../../models/chat_models/sender_model.dart';
 import '../../models/user_chat_detail_model.dart';
@@ -540,55 +541,7 @@ class ChatDetailController extends GetxController {
     }
   }
 
-  Future<void> pickDocument() async {
-    // Private conversation'da document desteklenmiyor
-    debugPrint("📄 Private conversation'da document picker devre dışı");
-    Get.snackbar(
-      'Bilgi',
-      'Özel sohbetlerde sadece resim paylaşabilirsiniz. Dosya paylaşımı için grup sohbetlerini kullanın.',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.blue[100],
-      colorText: Colors.blue[800],
-      duration: const Duration(seconds: 3),
-      icon: Icon(Icons.info, color: Colors.blue[800]),
-    );
-    return;
-    
-    // Eski kod - artık kullanılmıyor
-    // try {
-    //   debugPrint("📄 Document picker başlatılıyor...");
-    //   FilePickerResult? result = await FilePicker.platform.pickFiles(
-    //     type: FileType.custom,
-    //     allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
-    //   );
-    //   debugPrint("📄 File picker sonucu: ${result != null ? 'Dosya seçildi' : 'İptal edildi'}");
 
-    //   if (result != null && result.files.single.path != null) {
-    //     final filePath = result.files.single.path!;
-    //     final fileName = result.files.single.name;
-    //     final fileSize = result.files.single.size;
-    //     final file = File(filePath);
-        
-    //     debugPrint("📄 Seçilen dosya detayları:");
-    //     debugPrint("  - İsim: $fileName");
-    //     debugPrint("  - Yol: $filePath");
-    //     debugPrint("  - Boyut: ${(fileSize / 1024).toStringAsFixed(2)} KB");
-    //     debugPrint("  - Dosya var mı: ${await file.exists()}");
-        
-    //     selectedFiles.add(file);
-    //     debugPrint("📁 Toplam seçilen dosya sayısı: ${selectedFiles.length}");
-    //     debugPrint("📁 Seçilen dosyalar:");
-    //     for (int i = 0; i < selectedFiles.length; i++) {
-    //       debugPrint("  ${i + 1}. ${selectedFiles[i].path.split('/').last}");
-    //     }
-    //   } else {
-    //     debugPrint("📄 Dosya seçilmedi veya path null");
-    //   }
-    // } catch (e) {
-    //   debugPrint("❌ Belge seçme hatası: $e");
-    //   debugPrint("❌ Hata detayı: ${e.toString()}");
-    // }
-  }
 
   Future<void> sendMessage(String message) async {
     if (currentChatId.value == null) return;

@@ -3,6 +3,8 @@ import '../models/hot_topics_model.dart';
 import '../services/hot_topics_service.dart';
 import '../models/entry_model.dart';
 import '../services/entry_services.dart';
+import '../components/snackbars/custom_snackbar.dart';
+import '../services/language_service.dart';
 import 'package:flutter/foundation.dart';
 
 class TopicsController extends GetxController {
@@ -10,8 +12,10 @@ class TopicsController extends GetxController {
   var hotTopics = <HotTopicsModel>[].obs;
 
   final HotTopicsService _service = HotTopicsService();
+  final LanguageService _languageService = Get.find<LanguageService>();
 
   var selectedTopic = ''.obs;
+  var isTopicLoading = false.obs; // Hot topic tıklama loading state'i
 
   void selectTopic(String topic) {
     selectedTopic.value = topic;
@@ -20,24 +24,40 @@ class TopicsController extends GetxController {
 
   // Hot topic'e tıklandığında entry detay sayfasına yönlendir
   void onHotTopicTap(HotTopicsModel topic) async {
-    //debugPrint("🔥 Hot topic tıklandı: ${topic.title} (ID: ${topic.id})");
+    debugPrint("🔥 Hot topic tıklandı: ${topic.title} (ID: ${topic.id})");
+
+    // Loading state'ini başlat
+    isTopicLoading.value = true;
+    selectedTopic.value = topic.title; // Seçili topic'i güncelle
+
     try {
       // Topic ID'si ile ilgili entry'yi bul
       final entry = await _findEntryForTopic(topic.id);
       if (entry != null) {
-        //debugPrint("✅ Entry bulundu, detay sayfasına yönlendiriliyor...");
-        //debugPrint("📝 Entry ID: ${entry.id}");
-        //debugPrint("📝 Entry Topic: ${entry.topic?.name}");
-        //debugPrint("📝 Entry Topic Category: ${entry.topic?.category?.title}");
+        debugPrint("✅ Entry bulundu, detay sayfasına yönlendiriliyor...");
+        debugPrint("📝 Entry ID: ${entry.id}");
+        debugPrint("📝 Entry Topic: ${entry.topic?.name}");
+        debugPrint("📝 Entry Topic Category: ${entry.topic?.category?.title}");
         // Entry detay sayfasına yönlendir
         Get.toNamed("/entryDetail", arguments: {'entry': entry});
       } else {
         debugPrint("❌ Entry bulunamadı");
-        Get.snackbar("Hata", "Bu konu için entry bulunamadı");
+        CustomSnackbar.show(
+          title: _languageService.tr("common.error"),
+          message: _languageService.tr("entry.errors.entryNotFound"),
+          type: SnackbarType.error,
+        );
       }
     } catch (e) {
       debugPrint("❌ Hata oluştu: $e");
-      Get.snackbar("Hata", "Bir hata oluştu");
+      CustomSnackbar.show(
+        title: _languageService.tr("common.error"),
+        message: _languageService.tr("entry.errors.generalError"),
+        type: SnackbarType.error,
+      );
+    } finally {
+      // Loading state'ini bitir
+      isTopicLoading.value = false;
     }
   }
 
@@ -51,23 +71,23 @@ class TopicsController extends GetxController {
         //debugPrint("📦 Topic: ${response.topic.name}");
         //debugPrint("📦 Topic Category: ${response.topic.category?.title}");
         //debugPrint("📦 Entry sayısı: ${response.entries.length}");
-        
+
         // İlk entry'yi al (ana entry)
         final firstEntry = response.entries.first;
         //debugPrint("📝 İlk entry ID: ${firstEntry.id}");
         //debugPrint("📝 İlk entry topic: ${firstEntry.topic?.name}");
-        
+
         // Topic bilgisini entry'ye enjekte et
         final entryWithTopic = firstEntry.copyWith(
           topic: response.topic.copyWith(
             category: response.topic.category,
           ),
         );
-        
+
         //debugPrint("✅ Entry topic bilgisi enjekte edildi");
         //debugPrint("✅ Final entry topic: ${entryWithTopic.topic?.name}");
         //debugPrint("✅ Final entry category: ${entryWithTopic.topic?.category?.title}");
-        
+
         return entryWithTopic;
       } else {
         debugPrint("⚠️ API yanıtı boş veya entry yok");
@@ -86,12 +106,13 @@ class TopicsController extends GetxController {
   }
 
   void fetchHotTopics() async {
-      //debugPrint("🔄 TopicsController.fetchHotTopics() çağrıldı");
+    //debugPrint("🔄 TopicsController.fetchHotTopics() çağrıldı");
     isLoading.value = true;
     try {
       final topics = await _service.fetchHotTopics();
       hotTopics.value = topics;
-      debugPrint("✅ Gündemdeki konular başarıyla yüklendi: ${topics.length} konu");
+      debugPrint(
+          "✅ Gündemdeki konular başarıyla yüklendi: ${topics.length} konu");
     } catch (e) {
       debugPrint("❌ Gündemdeki konular yüklenirken hata: $e");
     } finally {

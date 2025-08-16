@@ -4,6 +4,7 @@ class ChatUserModel {
   final String username;
   final String profileImage;
   final bool isOnline;
+  final bool isRecent;
 
   ChatUserModel({
     required this.id,
@@ -11,6 +12,7 @@ class ChatUserModel {
     required this.username,
     required this.profileImage,
     this.isOnline = false,
+    this.isRecent = false,
   });
 
   factory ChatUserModel.fromJson(Map<String, dynamic>? json) {
@@ -28,6 +30,7 @@ class ChatUserModel {
       username: json['username'] ?? '',
       profileImage: json['avatar'] ?? '',
       isOnline: json['is_online'] ?? false,
+      isRecent: json['is_recent'] ?? false,
     );
   }
 
@@ -38,6 +41,7 @@ class ChatUserModel {
       'username': username,
       'avatar': profileImage,
       'is_online': isOnline,
+      'is_recent': isRecent,
     };
   }
 }

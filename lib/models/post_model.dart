@@ -6,6 +6,7 @@ class PostModel {
   final String status;
   final String profileImage;
   final String name;
+  final String surname;
   final String username; // @kullaniciadi gibi göstermek için
   final String postDate;
   final String postDescription;
@@ -22,6 +23,7 @@ class PostModel {
     required this.status,
     required this.profileImage,
     required this.name,
+    required this.surname,
     required this.username,
     required this.postDate,
     required this.postDescription,
@@ -64,6 +66,7 @@ class PostModel {
               : "${AppConstants.baseUrl}/${user['avatar']}")
           : "${AppConstants.baseUrl}/images/static/avatar.png",
       name: user['full_name'] ?? '',
+      surname: user['surname'] ?? '', 
       username: user['username'] ?? '',
       postDate: json['created_at'] ?? '',
       postDescription: json['content'] ?? '',
@@ -82,7 +85,7 @@ class PostModel {
   }
 
 factory PostModel.fromJsonForProfile(
-    Map<String, dynamic> json, String avatarUrl, String fullName) {
+    Map<String, dynamic> json, String avatarUrl, String fullName, String username) {
   final mediaList = json['media'];
 
   List<String> mediaUrls = [];
@@ -99,13 +102,24 @@ factory PostModel.fromJsonForProfile(
     }
   }
 
+  // Username için fallback değeri oluştur
+  String finalUsername = username.isNotEmpty ? username : (json['username'] ?? '');
+  if (finalUsername.isEmpty && fullName.isNotEmpty) {
+    // Full name'den username türet
+    final nameParts = fullName.split(' ');
+    if (nameParts.isNotEmpty) {
+      finalUsername = nameParts.last.toLowerCase();
+    }
+  }
+
   return PostModel(
     id: json['id'] ?? 0,
     slug: json['slug'] ?? '',
     status: json['status'] ?? '',
     profileImage: avatarUrl,  // dışarıdan parametre ile geliyor
     name: fullName,       // dışarıdan parametre ile geliyor
-    username: json['username'] ?? '', // JSON’da yoksa boş kalsın
+    surname: json['surname'] ?? '',
+    username: finalUsername, // Düzeltilmiş username
     postDate: json['created_at'] ?? '',
     postDescription: json['content'] ?? '',
     mediaUrls: mediaUrls,

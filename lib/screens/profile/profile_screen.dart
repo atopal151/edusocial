@@ -220,6 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               profileImage: post.profileImage,
               userName: post.username,
               name: post.name,
+              surname: post.surname,
               postDate: post.postDate,
               postDescription: post.postDescription,
               mediaUrls: post.mediaUrls,
@@ -289,13 +290,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                   final String shareText = """
 📝 **$topicName** (#${entry.id})
 
-🏷️ **Kategori:** $categoryTitle
-👤 **Yazar:** ${user.name} ${user.surname}
+🏷️ **${languageService.tr("profile.mainProfile.shareText.category")}:** $categoryTitle
+👤 **${languageService.tr("profile.mainProfile.shareText.author")}:** ${user.name} ${user.surname}
 
-💬 **Entry İçeriği:**
+💬 **${languageService.tr("profile.mainProfile.shareText.entryContent")}:**
 ${entry.content}
 
-📱 **EduSocial Uygulamasını İndir:**
+📱 **${languageService.tr("profile.mainProfile.shareText.downloadApp")}**
 🔗 ${languageService.tr("profile.mainProfile.shareText.appLink")}
 📲 ${languageService.tr("profile.mainProfile.shareText.appStore")}
 📱 ${languageService.tr("profile.mainProfile.shareText.playStore")}
