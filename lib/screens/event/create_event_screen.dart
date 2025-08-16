@@ -157,10 +157,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             decoration: BoxDecoration(
               color: Color(0xfff5f6f7),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: Color(0xffe5e7eb),
-                width: 1,
-              ),
+             
             ),
             child: controller.bannerImage.value != null
                 ? ClipRRect(
@@ -215,10 +212,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             decoration: BoxDecoration(
               color: Color(0xffffffff),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: Color(0xffe5e7eb),
-                width: 1,
-              ),
+             
             ),
             child: Row(
               children: [
@@ -283,10 +277,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             decoration: BoxDecoration(
               color: Color(0xffffffff),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: Color(0xffe5e7eb),
-                width: 1,
-              ),
+            
             ),
             child: Row(
               children: [

@@ -489,22 +489,22 @@
       "success": {
         "created": "Event created successfully!"
       },
-      "createEvent": {
-        "success": {
-          "created": "Event created successfully!"
-        }
-      },
-      "error": {
-        "createFailed": "Failed to create event"
-      },
       "validation": {
         "titleRequired": "Event title is required",
         "descriptionRequired": "Event description is required",
-        "locationRequired": "Event location is required",
-        "startDateTimeRequired": "Start date and time are required",
-        "endDateTimeRequired": "End date and time are required",
-        "endTimeAfterStart": "End time must be after start time",
-        "groupRequired": "Group selection is required"
+        "startDateRequired": "Start date is required",
+        "endDateRequired": "End date is required",
+        "endBeforeStart": "End date must be after start date"
+      }
+    },
+    "editEvent": {
+      "title": "Edit Event",
+      "updateButton": "Update Event",
+      "success": {
+        "updated": "Event updated successfully!"
+      },
+      "error": {
+        "updateFailed": "Error updating event"
       }
     },
     "locationPicker": {

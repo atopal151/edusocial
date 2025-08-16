@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:edusocial/components/print_full_text.dart';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -14,79 +15,78 @@ import '../../models/group_models/group_detail_model.dart';
 class GroupServices {
   // OPTIMIZE: HTTP client configuration for better network resilience
   static final http.Client _httpClient = http.Client();
-  
+
+
   // RETRY: Configuration for retry mechanism
   static const int _maxRetries = 3;
-  static const Duration _baseDelay = Duration(seconds: 3); // 2'den 3'e çıkarıldı
-  static const Duration _requestTimeout = Duration(seconds: 30); // 15'ten 30'a çıkarıldı
+  static const Duration _baseDelay =
+      Duration(seconds: 3); // 2'den 3'e çıkarıldı
+  static const Duration _requestTimeout =
+      Duration(seconds: 30); // 15'ten 30'a çıkarıldı
 
   /// RETRY: Generic retry mechanism for HTTP requests
   static Future<http.Response> _makeRequestWithRetry(
-    Future<http.Response> Function() request,
-    {String operation = 'API call'}
-  ) async {
+      Future<http.Response> Function() request,
+      {String operation = 'API call'}) async {
     Exception? lastException;
-    
+
     for (int attempt = 1; attempt <= _maxRetries; attempt++) {
       try {
         //debugPrint('🔄 $operation - Attempt $attempt/$_maxRetries');
-        
+
         final response = await request().timeout(_requestTimeout);
-        
+
         if (response.statusCode == 200 || response.statusCode == 201) {
           if (attempt > 1) {
             //debugPrint('✅ $operation - Success on attempt $attempt');
           }
           return response;
         } else {
-          throw HttpException('HTTP ${response.statusCode}: ${response.reasonPhrase}');
+          throw HttpException(
+              'HTTP ${response.statusCode}: ${response.reasonPhrase}');
         }
-        
       } on SocketException catch (e) {
         lastException = e;
         //debugPrint('🌐 $operation - Network error on attempt $attempt: ${e.message}');
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt; // Exponential backoff
           debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
           await Future.delayed(delay);
         }
-        
       } on TimeoutException catch (e) {
         lastException = e;
         //debugPrint('⏰ $operation - Timeout on attempt $attempt');
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
           debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
           await Future.delayed(delay);
         }
-        
       } on HttpException catch (e) {
         lastException = e;
         debugPrint('🔴 $operation - HTTP error on attempt $attempt: $e');
-        
+
         // Don't retry for 4xx errors (client errors)
         if (e.toString().contains('4')) {
           rethrow;
         }
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
           await Future.delayed(delay);
         }
-        
       } catch (e) {
         lastException = Exception(e.toString());
         debugPrint('❌ $operation - Unexpected error on attempt $attempt: $e');
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
           await Future.delayed(delay);
         }
       }
     }
-    
+
     debugPrint('💥 $operation - All $_maxRetries attempts failed');
     throw lastException ?? Exception('All retry attempts failed');
   }
@@ -139,20 +139,23 @@ class GroupServices {
       );
 
       //debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}");
-      //debugPrint("📥 Kullanıcı Grupları Raw Response Body:");
-      //debugPrint("${response.body}");
+      print("📥 User Groups Response: ${response.statusCode}");
+      printFullText("📥 User Groups Body: ${response.body}");
+
       //debugPrint("📥 Kullanıcı Grupları Response Headers:");
       //debugPrint("${response.headers}");
       //debugPrint("📥 Response Body Length: ${response.body.length} characters");
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
-        //debugPrint("📦 Parsed JSON Response:");
-        //debugPrint("${json.encode(jsonBody)}");
-        
+        // Parsed JSON response (commented out to avoid duplication)
+        // debugPrint("📦 Parsed JSON Response:");
+        // debugPrint("${json.encode(jsonBody)}");
+        printFullText("GROUPS DATA:${json.encode(jsonBody)}");
+
         final List<dynamic> data = jsonBody['data'] ?? [];
         //debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}");
-        
+
         // Show all available fields in the first group (if exists)
         if (data.isNotEmpty) {
           final firstGroup = data[0];
@@ -160,13 +163,13 @@ class GroupServices {
           //debugPrint('${firstGroup.keys.toList()}');
           //debugPrint('');
         }
-        
+
         // Print each group data individually with detailed analysis
         for (int i = 0; i < data.length; i++) {
           final groupData = data[i];
           //debugPrint("📋 Group ${i + 1} Raw Data:");
           //debugPrint("${json.encode(groupData)}");
-          
+
           // Detailed analysis of each group
           //debugPrint('🔍 Group ${i + 1} Detailed Analysis:');
           //debugPrint('   ID: ${groupData['id']}');
@@ -188,7 +191,7 @@ class GroupServices {
           //debugPrint('   Deleted At: ${groupData['deleted_at']}');
           //debugPrint('   User ID: ${groupData['user_id']}');
           //debugPrint('   Group Area ID: ${groupData['group_area_id']}');
-          
+
           // Pivot data analysis
           if (groupData['pivot'] != null) {
             final pivot = groupData['pivot'];
@@ -198,11 +201,12 @@ class GroupServices {
             //debugPrint('      Pivot Created At: ${pivot['created_at']}');
             //debugPrint('      Pivot Updated At: ${pivot['updated_at']}');
           }
-          
+
           //debugPrint(''); // Empty line for separation
         }
 
-        final userGroupList = data.map((item) => GroupModel.fromJson(item)).toList();
+        final userGroupList =
+            data.map((item) => GroupModel.fromJson(item)).toList();
         //debugPrint("✅ Başarıyla ${userGroupList.length} grup parse edildi");
 
         return userGroupList;
@@ -263,7 +267,8 @@ class GroupServices {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
 
-        final groupList = data.map((item) => GroupModel.fromJson(item)).toList();
+        final groupList =
+            data.map((item) => GroupModel.fromJson(item)).toList();
 
         return groupList;
       } else {
@@ -317,15 +322,14 @@ class GroupServices {
     try {
       //debugPrint('📱 Fetching paginated group messages for ID: $groupId');
       //debugPrint('📊 Pagination: limit=$limit, offset=$offset');
-      
-      final uri = Uri.parse('${AppConstants.baseUrl}/group-messages/$groupId').replace(
-        queryParameters: {
-          'limit': limit.toString(),
-          'offset': offset.toString(),
-          'sort': 'desc', // En yeniden eskiye
-        }
-      );
-      
+
+      final uri = Uri.parse('${AppConstants.baseUrl}/group-messages/$groupId')
+          .replace(queryParameters: {
+        'limit': limit.toString(),
+        'offset': offset.toString(),
+        'sort': 'desc', // En yeniden eskiye
+      });
+
       // RETRY: Use retry mechanism for network resilience
       final response = await _makeRequestWithRetry(
         () => _httpClient.get(
@@ -345,14 +349,15 @@ class GroupServices {
         final jsonBody = json.decode(response.body);
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
           final messages = jsonBody['data'] as List? ?? [];
+          printFullText("GROUPS MESSAGES DATA:${json.encode(messages)}");
           //debugPrint('✅ ${messages.length} group messages loaded (paginated)');
           return messages;
         }
       }
-      
-      debugPrint('❌ Failed to fetch paginated group messages: ${response.statusCode}');
+
+      debugPrint(
+          '❌ Failed to fetch paginated group messages: ${response.statusCode}');
       return [];
-      
     } catch (e) {
       debugPrint('❌ Paginated group messages fetch error: $e');
       return [];
@@ -364,17 +369,16 @@ class GroupServices {
     final box = GetStorage();
     try {
       //debugPrint('🚀 Optimized group detail fetch for ID: $groupId');
-      
+
       // OPTIMIZE: Add query parameters to request only essential data
-      final uri = Uri.parse('${AppConstants.baseUrl}/group-detail/$groupId').replace(
-        queryParameters: {
-          'minimal': 'true', // Request minimal data if backend supports
-          'limit_messages': '1000', // Increased from 50 to 1000 to remove limit
-          'include': 'messages,basic_info', // Only essential data
-        }
-      );
-      
-      // RETRY: Use retry mechanism for network resilience  
+      final uri = Uri.parse('${AppConstants.baseUrl}/group-detail/$groupId')
+          .replace(queryParameters: {
+        'minimal': 'true', // Request minimal data if backend supports
+        'limit_messages': '1000', // Increased from 50 to 1000 to remove limit
+        'include': 'messages,basic_info', // Only essential data
+      });
+
+      // RETRY: Use retry mechanism for network resilience
       final response = await _makeRequestWithRetry(
         () => _httpClient.get(
           uri,
@@ -397,23 +401,24 @@ class GroupServices {
           //debugPrint('�� GRUP DETAY VERİLERİ (OPTIMIZED):');
           //debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           //debugPrint('ID: ${groupData['id']}');
-          
+
           // OPTIMIZE: Count instead of logging full data
           final groupChats = groupData['group_chats'] as List? ?? [];
           final groupEvents = groupData['group_events'] as List? ?? [];
           final users = jsonBody['data']['users'] as List? ?? [];
-          
+
           //debugPrint('Messages: ${groupChats.length} adet');
           //debugPrint('Events: ${groupEvents.length} adet');
           //debugPrint('Users: ${users.length} adet');
           //debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          
+
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
         throw Exception('No group data found');
       } else {
         debugPrint('❌ API Error: ${response.statusCode} - ${response.body}');
-        throw Exception('Failed to fetch group details: ${response.statusCode}');
+        throw Exception(
+            'Failed to fetch group details: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('❌ Group detail fetch error: $e');
@@ -429,7 +434,8 @@ class GroupServices {
   /// Get group detail with caching
   Future<GroupDetailModel> fetchGroupDetailCached(String groupId) async {
     // Check cache first
-    if (_groupCache.containsKey(groupId) && _cacheTimestamps.containsKey(groupId)) {
+    if (_groupCache.containsKey(groupId) &&
+        _cacheTimestamps.containsKey(groupId)) {
       final cacheTime = _cacheTimestamps[groupId]!;
       if (DateTime.now().difference(cacheTime) < _cacheTimeout) {
         //debugPrint('✅ Returning cached group data for ID: $groupId');
@@ -439,11 +445,11 @@ class GroupServices {
 
     // Fetch fresh data
     final groupDetail = await fetchGroupDetail(groupId);
-    
+
     // Cache the result
     _groupCache[groupId] = groupDetail;
     _cacheTimestamps[groupId] = DateTime.now();
-    
+
     //debugPrint('💾 Cached group data for ID: $groupId');
     return groupDetail;
   }
@@ -468,10 +474,10 @@ class GroupServices {
     try {
       final uri = Uri.parse('${AppConstants.baseUrl}/group-message');
       var request = http.MultipartRequest('POST', uri);
-      
+
       request.headers['Authorization'] = 'Bearer $token';
       request.fields['group_id'] = groupId;
-      
+
       // Message alanını her zaman gönder (boş string olsa bile)
       request.fields['message'] = message ?? '';
 
@@ -482,7 +488,7 @@ class GroupServices {
           if (await file.exists()) {
             final fileExtension = file.path.split('.').last.toLowerCase();
             String mimeType = 'application/octet-stream';
-            
+
             // MIME type belirle
             if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(fileExtension)) {
               mimeType = 'image/$fileExtension';
@@ -493,7 +499,7 @@ class GroupServices {
             } else if (['txt'].contains(fileExtension)) {
               mimeType = 'text/plain';
             }
-            
+
             request.files.add(await http.MultipartFile.fromPath(
               'media[]',
               file.path,
@@ -543,7 +549,7 @@ class GroupServices {
       //debugPrint('👥 Kullanıcının katıldığı gruplar alınıyor...');
       //debugPrint('🔑 Token: $token');
       //debugPrint('🌐 Request URL: ${AppConstants.baseUrl}/timeline/groups');
-      
+
       final response = await _makeRequestWithRetry(
         () => http.get(
           Uri.parse('${AppConstants.baseUrl}/timeline/groups'),
@@ -554,21 +560,21 @@ class GroupServices {
         ),
         operation: 'Get User Groups',
       );
-      
+
       //debugPrint('👥 Get User Groups Response Status: ${response.statusCode}');
       //debugPrint('👥 Get User Groups Response Headers:');
       //debugPrint('${response.headers}');
       //debugPrint('👥 Get User Groups Raw Response Body:');
       //debugPrint(response.body);
-      
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         //    debugPrint('📦 Parsed JSON Response:');
         //debugPrint(json.encode(responseData));
-        
+
         final List<dynamic> data = responseData['data'] as List<dynamic>;
         //debugPrint('📦 Data array length: ${data.length}');
-        
+
         // Show all available fields in the first group (if exists)
         if (data.isNotEmpty) {
           final firstGroup = data[0];
@@ -576,14 +582,14 @@ class GroupServices {
           //debugPrint('${firstGroup.keys.toList()}');
           //debugPrint('');
         }
-        
+
         // Print each group data individually with detailed analysis
         for (int i = 0; i < data.length; i++) {
           final groupData = data[i];
           //  debugPrint('📋 Group ${i + 1} Raw Data:');
           //debugPrint(json.encode(groupData));
-          
-        /*  // Detailed analysis of each group
+
+          /*  // Detailed analysis of each group
           debugPrint('🔍 Group ${i + 1} Detailed Analysis:');
           debugPrint('   ID: ${groupData['id']}');
           debugPrint('   Name: ${groupData['name']}');
@@ -618,12 +624,14 @@ class GroupServices {
           debugPrint(''); // Empty line for separation
           */
         }
-        
-        final List<GroupModel> groups = data.map((json) => GroupModel.fromJson(json)).toList();
+
+        final List<GroupModel> groups =
+            data.map((json) => GroupModel.fromJson(json)).toList();
         //debugPrint('✅ Kullanıcının ${groups.length} adet grubu başarıyla parse edildi');
         return groups;
       } else {
-        debugPrint('❌ Get user groups failed with status: ${response.statusCode}');
+        debugPrint(
+            '❌ Get user groups failed with status: ${response.statusCode}');
         debugPrint('❌ Error Response Body: ${response.body}');
         return null;
       }

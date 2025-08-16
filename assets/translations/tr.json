@@ -506,10 +506,22 @@
       "success": {
         "created": "Etkinlik başarıyla oluşturuldu!"
       },
-      "createEvent": {
-        "success": {
-          "created": "Etkinlik başarıyla oluşturuldu!"
-        }
+      "validation": {
+        "titleRequired": "Etkinlik başlığı gereklidir",
+        "descriptionRequired": "Etkinlik açıklaması gereklidir",
+        "startDateRequired": "Başlangıç tarihi gereklidir",
+        "endDateRequired": "Bitiş tarihi gereklidir",
+        "endBeforeStart": "Bitiş tarihi başlangıç tarihinden sonra olmalıdır"
+      }
+    },
+    "editEvent": {
+      "title": "Etkinliği Düzenle",
+      "updateButton": "Etkinliği Güncelle",
+      "success": {
+        "updated": "Etkinlik başarıyla güncellendi!"
+      },
+      "error": {
+        "updateFailed": "Etkinlik güncellenirken bir hata oluştu"
       },
       "error": {
         "createFailed": "Etkinlik oluşturulamadı"

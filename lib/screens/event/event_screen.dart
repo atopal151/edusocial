@@ -86,11 +86,15 @@ class _EventScreenState extends State<EventScreen> {
                   itemCount: controller.topEventList.length,
                   itemBuilder: (context, index) {
                     final event = controller.topEventList[index];
+                    // Debug tarih formatı
+                    final formattedDate = formatEventDate(event.startTime, event.endTime);
+                    debugPrint("📅 Event ${event.id} - Start: ${event.startTime}, End: ${event.endTime}, Formatted: $formattedDate");
+                    
                     return EventCard(
                       eventId: event.id,
                       eventTitle: event.title,
                       eventDescription: event.description,
-                      eventDate: formatEventDate(event.startTime),
+                      eventDate: formattedDate,
                       eventEndTime: event.endTime,
                       eventImage: event.bannerUrl,
                       onShare: () => controller.shareEvent(event.title),

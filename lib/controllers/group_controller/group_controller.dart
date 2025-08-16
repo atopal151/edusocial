@@ -10,6 +10,7 @@ import '../../models/group_models/group_model.dart';
 import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../components/snackbars/custom_snackbar.dart';
+import '../../components/print_full_text.dart';
 
 class GroupController extends GetxController {
   var userGroups = <GroupModel>[].obs;
@@ -52,8 +53,89 @@ class GroupController extends GetxController {
 //-------------------------------fetch-------------------------------
   Future<void> fetchUserGroups() async {
     isLoading.value = true;
-    userGroups.value = await _groupServices.fetchUserGroups();
-    isLoading.value = false;
+    debugPrint("🔄 GroupController.fetchUserGroups() çağrıldı");
+    
+    try {
+      final groups = await _groupServices.fetchUserGroups();
+      debugPrint("📥 API'den gelen user groups verisi (${groups.length} grup):");
+      
+      // Private gruplar için filtreleme: sadece üye olan ve bekleyen olmayan gruplar
+      final filteredGroups = groups.where((group) {
+        // Eğer grup private değilse, her zaman göster
+        if (!group.isPrivate) {
+          debugPrint("✅ Group '${group.name}' gösteriliyor (public grup)");
+          return true;
+        }
+        
+        // Eğer grup private ise, sadece üye olan ve bekleyen olmayan kullanıcılar görebilir
+        if (group.isPrivate && group.isMember && !group.isPending) {
+          debugPrint("✅ Group '${group.name}' gösteriliyor (private grup, üye)");
+          return true;
+        } else {
+          debugPrint("❌ Group '${group.name}' gizlendi (private grup, üye değil veya bekleyen)");
+          return false;
+        }
+              }).toList();
+        
+        // Her grubun JSON formatında tam verisini yazdır
+        for (int i = 0; i < groups.length; i++) {
+          final group = groups[i];
+          final groupJson = {
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
+            'messageCount': group.messageCount,
+            'humanCreatedAt': group.humanCreatedAt,
+            'avatarUrl': group.avatarUrl,
+            'bannerUrl': group.bannerUrl,
+            'status': group.status,
+            'isPrivate': group.isPrivate,
+            'userCountWithAdmin': group.userCountWithAdmin,
+            'userCountWithoutAdmin': group.userCountWithoutAdmin,
+            'isFounder': group.isFounder,
+            'isMember': group.isMember,
+            'isPending': group.isPending,
+            'createdAt': group.createdAt,
+            'updatedAt': group.updatedAt,
+          };
+          printFullText('GROUP ${i + 1} FULL JSON DATA: ${groupJson}');
+        }
+        
+        debugPrint("🔍 Filtreleme sonucu: ${groups.length} gruptan ${filteredGroups.length} grup gösteriliyor");
+      
+      // printFullText kullanarak her grubun detaylı bilgilerini yazdır
+      for (int i = 0; i < filteredGroups.length; i++) {
+        final group = filteredGroups[i];
+        final groupInfo = '''
+🏷️ Group ${i + 1} - ${group.name}:
+  - ID: ${group.id}
+  - Name: ${group.name}
+  - Description: ${group.description}
+  - Message Count: ${group.messageCount}
+  - Human Created At: ${group.humanCreatedAt}
+  - Avatar URL: ${group.avatarUrl}
+  - Banner URL: ${group.bannerUrl}
+  - Status: ${group.status}
+  - Is Private: ${group.isPrivate}
+  - User Count With Admin: ${group.userCountWithAdmin}
+  - User Count Without Admin: ${group.userCountWithoutAdmin}
+  - Is Founder: ${group.isFounder}
+  - Is Member: ${group.isMember}
+  - Is Pending: ${group.isPending}
+  - Created At: ${group.createdAt}
+  - Updated At: ${group.updatedAt}
+  ---
+''';
+        printFullText(groupInfo);
+      }
+      
+      userGroups.value = filteredGroups;
+      debugPrint("✅ User groups başarıyla yüklendi: ${filteredGroups.length} grup");
+    } catch (e) {
+      debugPrint("❌ User groups yüklenirken hata: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void fetchSuggestionGroups() async {

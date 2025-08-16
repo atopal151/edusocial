@@ -228,7 +228,7 @@ class _SearchTextScreenState extends State<SearchTextScreen>
                             eventId: event.id,
                             eventTitle: event.title,
                             eventDescription: event.description,
-                            eventDate: formatEventDate(event.startTime),
+                            eventDate: formatEventDate(event.startTime, event.endTime),
                             eventEndTime: event.endTime, // Event expiration için
                             eventImage: event.bannerUrl,
                             onShare: () {

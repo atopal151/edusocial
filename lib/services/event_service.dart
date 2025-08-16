@@ -248,10 +248,16 @@ class EventServices {
       debugPrint("  - Group ID: $groupId");
       debugPrint("  - Banner: ${banner?.path ?? 'No banner'}");
 
+      // Try multiple endpoints since server returns 405
+      String updateUrl = "${AppConstants.baseUrl}/event/$eventId";
+      
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse("${AppConstants.baseUrl}/event/$eventId"),
+        Uri.parse(updateUrl),
       );
+      
+      debugPrint("🔄 Update Request URL: $updateUrl");
+      debugPrint("🔄 Update Request Method: POST with _method=PUT");
 
       // Headers
       request.headers.addAll({
@@ -259,7 +265,7 @@ class EventServices {
         "Accept": "application/json",
       });
 
-      // Form fields
+      // Form fields - try without _method first
       request.fields.addAll({
         'title': title,
         'description': description,
@@ -267,7 +273,6 @@ class EventServices {
         'start_time': DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime),
         'end_time': DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime),
         'group_id': groupId.toString(),
-        '_method': 'PUT', // Laravel method spoofing
       });
 
       // Banner file
@@ -291,6 +296,52 @@ class EventServices {
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Event updated successfully");
         return true;
+      } else if (response.statusCode == 405) {
+        debugPrint("🔄 405 error, trying alternative endpoint /events/$eventId");
+        
+        // Try alternative endpoint
+        var alternativeRequest = http.MultipartRequest(
+          'POST',
+          Uri.parse("${AppConstants.baseUrl}/events/$eventId"),
+        );
+        
+        alternativeRequest.headers.addAll({
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        });
+        
+        alternativeRequest.fields.addAll({
+          'title': title,
+          'description': description,
+          'location': location,
+          'start_time': DateFormat('yyyy-MM-dd HH:mm:ss').format(startTime),
+          'end_time': DateFormat('yyyy-MM-dd HH:mm:ss').format(endTime),
+          'group_id': groupId.toString(),
+          // Try without _method first
+        });
+        
+        if (banner != null) {
+          alternativeRequest.files.add(
+            await http.MultipartFile.fromPath(
+              'banner',
+              banner.path,
+            ),
+          );
+        }
+        
+        var alternativeResponse = await alternativeRequest.send();
+        var alternativeResponseBody = await alternativeResponse.stream.bytesToString();
+        
+        debugPrint("📥 Alternative Update Response: ${alternativeResponse.statusCode}");
+        debugPrint("📥 Alternative Update Body: $alternativeResponseBody");
+        
+        if (alternativeResponse.statusCode == 200 || alternativeResponse.statusCode == 201) {
+          debugPrint("✅ Event updated successfully via alternative endpoint");
+          return true;
+        } else {
+          debugPrint("❌ Event update failed on both endpoints");
+          return false;
+        }
       } else {
         debugPrint("❌ Event update failed with status: ${response.statusCode}");
         return false;

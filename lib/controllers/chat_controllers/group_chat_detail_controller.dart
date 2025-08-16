@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:edusocial/components/print_full_text.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -434,6 +436,9 @@ class GroupChatDetailController extends GetxController {
     try {
       final groupChats = groupData.value!.groupChats;
       final currentUserId = Get.find<ProfileController>().userId.value;
+      
+      // DEBUG: Group mesajlarının tam verisini yazdır
+      printFullText('GROUP CHATS FULL DATA: ${json.encode(groupChats)}');
       
       // PAGINATION: Process all messages without limit
       final messagesToProcess = groupChats;

@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../components/buttons/custom_button.dart';
-import '../../components/user_appbar/back_appbar.dart';
+
 import '../../components/widgets/custom_loading_indicator.dart';
 import '../../controllers/event_controller.dart';
+import '../../controllers/profile_controller.dart';
 import '../../services/language_service.dart';
 import '../../utils/date_format.dart';
 
@@ -30,8 +31,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     debugPrint("🔍 Event Detail Screen - Event ID: $eventId");
 
     if (eventId != null) {
-      debugPrint("📞 Calling fetchEventDetail with ID: $eventId");
-      eventController.fetchEventDetail(eventId);
+      // Use addPostFrameCallback to avoid setState during build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        debugPrint("📞 Calling fetchEventDetail with ID: $eventId");
+        eventController.fetchEventDetail(eventId);
+      });
     } else {
       debugPrint("❌ No event ID provided in arguments");
     }
@@ -39,12 +43,93 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xfffafafa),
-      appBar: BackAppBar(
-        iconBackgroundColor: Color(0xffffffff),
-        title: languageService.tr("event.eventDetail.title"),
-      ),
+    final profileController = Get.find<ProfileController>();
+    
+    return Obx(() {
+      final event = eventController.selectedEvent.value;
+      final currentUserId = profileController.userId.value;
+      final isEventCreator = event?.userId.toString() == currentUserId;
+      
+      // Debug logs
+      if (event != null) {
+        debugPrint("🔍 Event Creator Check:");
+        debugPrint("  - Event User ID: ${event.userId} (${event.userId.runtimeType})");
+        debugPrint("  - Current User ID: $currentUserId (${currentUserId.runtimeType})");
+        debugPrint("  - Event User ID String: '${event.userId.toString()}'");
+        debugPrint("  - Current User ID String: '$currentUserId'");
+        debugPrint("  - Is Event Creator: $isEventCreator");
+      }
+      
+      return Scaffold(
+        backgroundColor: Color(0xfffafafa),
+        appBar: AppBar(
+          backgroundColor: Color(0xfffafafa),
+          surfaceTintColor: Color(0xfffafafa),
+          elevation: 0,
+          title: Text(
+            languageService.tr("event.eventDetail.title"),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff272727),
+            ),
+          ),
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: () => Get.back(),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xffffffff),
+                  shape: BoxShape.circle,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: SvgPicture.asset(
+                    'images/icons/back_icon.svg',
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Show edit button only if current user is the event creator
+          actions: isEventCreator && event != null ? [
+            Container(
+              margin: EdgeInsets.only(right: 16),
+              child: GestureDetector(
+                onTap: () async {
+                  // Navigate to edit event screen and wait for result
+                  final result = await Get.toNamed('/editEvent', arguments: {'eventId': event.id});
+                  
+                  // If edit was successful, event detail is already refreshed by EventEditController
+                  if (result != null && result['success'] == true) {
+                    debugPrint("✅ Event edit completed successfully");
+                  }
+                },
+                child: Container(
+                  height: 44,
+                  width: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xffffffff),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(13.0),
+                    child: SvgPicture.asset(
+                      'images/icons/edit_icon.svg',
+                      width: 16,
+                      height: 16,
+                      colorFilter: ColorFilter.mode(
+                        Color(0xff414751),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ] : null,
+        ),
       body: Obx(() {
         final event = eventController.selectedEvent.value;
 
@@ -328,7 +413,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                        isLoading: RxBool(false),
                        backgroundColor: Color(0xffef5050),
                        textColor: Color(0xffffffff),
-                     
+                       icon: SvgPicture.asset(
+                         "images/icons/event.svg",
+                         width: 18,
+                         height: 18,
+                         colorFilter: ColorFilter.mode(
+                           Color(0xffffffff),
+                           BlendMode.srcIn,
+                         ),
+                       ),
                      ),
                    ),
                 ],
@@ -337,6 +430,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
         );
       }),
-    );
+      );
+    });
   }
 }
