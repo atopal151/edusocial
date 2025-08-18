@@ -45,6 +45,7 @@ class MyStoryList extends StatelessWidget {
                     width: 65,
                     height: 65,
                     decoration: BoxDecoration(
+                      
                       shape: BoxShape.circle,
                       color: Color(0xfffafafa),
                       image: profileController.profileImage.value.isNotEmpty &&

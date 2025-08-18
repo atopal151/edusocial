@@ -183,6 +183,7 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
               child: Row(
                 children: [
                   CircleAvatar(
+                    backgroundColor: Color(0xffffffff),
                     backgroundImage: NetworkImage(story.profileImage),
                   ),
                   const SizedBox(width: 10),

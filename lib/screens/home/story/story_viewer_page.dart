@@ -205,6 +205,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                     child: Row(
                       children: [
                         CircleAvatar(
+                          backgroundColor: Color(0xffffffff),
                           backgroundImage: NetworkImage(story.profileImage),
                         ),
                         SizedBox(width: 10),

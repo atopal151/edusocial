@@ -3,6 +3,7 @@ import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/entry_controller.dart';
 import 'package:edusocial/controllers/entry_detail_controller.dart';
+import 'package:edusocial/controllers/topics_controller.dart';
 import 'package:edusocial/models/entry_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,10 +28,21 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   final EntryController entryController = Get.find<EntryController>();
   final TextEditingController commentController = TextEditingController();
   final LanguageService languageService = Get.find<LanguageService>();
+  
+  // TopicsController'ı bul (eğer varsa)
+  TopicsController? _topicsController;
 
   @override
   void initState() {
     super.initState();
+    
+    // TopicsController'ı bul (eğer varsa)
+    try {
+      _topicsController = Get.find<TopicsController>();
+    } catch (e) {
+      debugPrint("⚠️ TopicsController bulunamadı: $e");
+    }
+    
     // Eğer entry'nin bir topic'i varsa, onu ayarla.
     if (widget.entry.topic != null) {
       entryDetailController.setCurrentTopic(widget.entry.topic!);
@@ -52,6 +64,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         "⚠️ EntryDetailScreen dispose: Widget yok ediliyor ve yorumlar temizleniyor.");
     entryDetailController.entryComments
         .clear(); // Yorum listesini doğrudan burada temizle
+    
+    // TopicsController loading state'ini sıfırla
+    if (_topicsController != null) {
+      _topicsController!.resetTopicLoadingState();
+      debugPrint("🔄 EntryDetailScreen dispose: TopicsController loading state sıfırlandı");
+    }
+    
     super.dispose();
   }
 

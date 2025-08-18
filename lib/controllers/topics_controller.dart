@@ -61,6 +61,13 @@ class TopicsController extends GetxController {
     }
   }
 
+  // Loading state'ini sıfırla (entry detay sayfasından geri dönüldüğünde çağrılır)
+  void resetTopicLoadingState() {
+    debugPrint("🔄 TopicsController: Loading state sıfırlanıyor");
+    isTopicLoading.value = false;
+    selectedTopic.value = '';
+  }
+
   // Topic ID'si ile ilgili entry'yi bul ve topic bilgisini enjekte et
   Future<EntryModel?> _findEntryForTopic(int topicId) async {
     debugPrint("🔍 Topic ID $topicId için entry aranıyor...");

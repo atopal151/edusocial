@@ -205,15 +205,16 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         color: Color(0xffffffff),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Stack(
+      child: GestureDetector(
+        onDoubleTap: _handleDoubleTapLike,
+        behavior: HitTestBehavior.translucent,
+        child: Stack(
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 🔹 Profil ve açıklama kısmı - Double tap eklenmiş
-              GestureDetector(
-                onDoubleTap: _handleDoubleTapLike, // 🆕 Double tap eklendi
-                child: Padding(
+              // 🔹 Profil ve açıklama kısmı
+              Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,13 +401,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-              ),
 
               // 🔹 Slider Alanı - Double tap eklenmiş
               if (widget.mediaUrls.isNotEmpty)
-                GestureDetector(
-                  onDoubleTap: _handleDoubleTapLike, // 🆕 Double tap eklendi
-                  child: Column(
+                Column(
                     children: [
                       SizedBox(
                         height: 200,
@@ -438,7 +436,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                      
                     ],
                   ),
-                ),
 
               // 🔹 Alt butonlar (like, yorum, paylaş)
               Padding(
@@ -558,6 +555,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
               ),
             ),
         ],
+      ),
       ),
     );
   }
