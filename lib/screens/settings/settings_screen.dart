@@ -85,6 +85,24 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
             SizedBox(
               height: 6,
             ),
+           
+            PrimaryButton(
+              text: languageService.tr("verification.title"),
+              onPressed: () {
+                Get.toNamed('/verification');
+              },
+              backgroundColor: Color(0xffffffff),
+              textColor: Color(0xff414751),
+              icon: Icon(
+                Icons.verified_user,
+                color:Color(0xff9ca3ae),
+                size: 18,
+              ),
+              iconColor: Color(0xffc8cdd5),
+            ),
+            SizedBox(
+              height: 6,
+            ),
             PrimaryButton(
               text: languageService.tr("settings.buttons.logout"),
               onPressed: () {

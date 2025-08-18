@@ -198,7 +198,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ProfileController profileController = Get.find<ProfileController>();
     final PostController postController = Get.find<PostController>();
-        final languageService = Get.find<LanguageService>();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),

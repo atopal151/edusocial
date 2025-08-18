@@ -1713,6 +1713,58 @@
         "openSettings": "Open Settings"
       }
     }
+  },
+  "verification": {
+    "title": "ID Verification",
+    "documentSelection": {
+      "title": "Select Document Type",
+      "passport": "Passport",
+      "passportSubtitle": "EU Passports only",
+      "idCard": "ID Card",
+      "idCardSubtitle": "We accept EU ID cards",
+      "driverLicense": "Driver's License",
+      "driverLicenseSubtitle": "We accept EU Driver License's"
+    },
+    "documentUpload": {
+      "title": "Upload Document",
+      "passport": "Passport",
+      "id_card": "ID Card",
+      "driverLicense": "Driver's License",
+      "description": "Take a passport, ID card or driver's license to check your information",
+      "uploadArea": {
+        "passport": "Passport Scan",
+        "id_card": "ID Card Scan",
+        "driverLicense": "Driver's License Scan",
+        "uploadFile": "Upload File",
+        "changeFile": "Change File",
+        "fileUploaded": "File uploaded successfully"
+      }
+    },
+    "actions": {
+      "verify": "Verify",
+      "upload": "Upload",
+      "change": "Change",
+      "remove": "Remove"
+    },
+    "messages": {
+      "verificationSuccess": "Verification submitted successfully",
+      "verificationFailed": "Verification failed",
+      "fileUploadSuccess": "File uploaded successfully",
+      "fileUploadFailed": "File upload failed",
+      "fileRemoved": "File removed successfully"
+    },
+            "validation": {
+          "documentTypeRequired": "Please select a document type",
+          "fileRequired": "Please upload a document",
+          "fileSizeLimit": "File size must be less than 10MB",
+          "fileTypeNotSupported": "File type not supported. Please upload JPG, PNG or PDF"
+        },
+        "snackbar": {
+          "success": "Success",
+          "error": "Error",
+          "warning": "Warning",
+          "info": "Information"
+        }
   }
 
 }

@@ -523,11 +523,10 @@
         "updated": "Etkinlik başarıyla güncellendi!"
       },
       "error": {
-        "updateFailed": "Etkinlik güncellenirken bir hata oluştu"
-      },
-      "error": {
+        "updateFailed": "Etkinlik güncellenirken bir hata oluştu",
         "createFailed": "Etkinlik oluşturulamadı"
       },
+    
       "validation": {
         "titleRequired": "Etkinlik başlığı gerekli",
         "descriptionRequired": "Etkinlik açıklaması gerekli",
@@ -1824,5 +1823,60 @@
       "requestRejected": "İstek reddedildi, 'Reddedildi' butonu gösteriliyor",
       "requestPending": "İstek beklemede, onayla/reddet butonları gösteriliyor"
     }
+  },
+  "verification": {
+    "title": "Hesap Doğrulama",
+    "documentSelection": {
+      "title": "Belge Türü Seçin",
+      "passport": "Pasaport",
+      "passportSubtitle": "Sadece AB Pasaportları",
+      "idCard": "Kimlik Kartı",
+      "idCardSubtitle": "AB Kimlik kartlarını kabul ediyoruz",
+      "driverLicense": "Sürücü Belgesi",
+      "driverLicenseSubtitle": "AB Sürücü belgelerini kabul ediyoruz"
+    },
+    "documentUpload": {
+      "title": "Belge Yükle",
+      "passport": "Pasaport",
+      "passportSubtitle": "Sadece AB Pasaportları",
+      "id_card": "Kimlik Kartı",
+      "idCardSubtitle": "AB Kimlik kartlarını kabul ediyoruz",
+      "driverLicense": "Sürücü Belgesi",
+      "driverLicenseSubtitle": "AB Sürücü belgelerini kabul ediyoruz",
+      "description": "Bilgilerinizi kontrol etmek için pasaport, kimlik kartı veya sürücü belgesi yükleyin",
+      "uploadArea": { 
+        "passport": "Pasaport Taraması",
+        "id_card": "Kimlik Kartı Taraması",
+        "driverLicense": "Sürücü Belgesi Taraması",
+        "uploadFile": "Dosya Yükle",
+        "changeFile": "Dosyayı Değiştir",
+        "fileUploaded": "Dosya başarıyla yüklendi"
+      }
+    },
+    "actions": {
+      "verify": "Doğrula",
+      "upload": "Yükle",
+      "change": "Değiştir",
+      "remove": "Kaldır"
+    },
+    "messages": {
+      "verificationSuccess": "Doğrulama başarıyla gönderildi",
+      "verificationFailed": "Doğrulama başarısız",
+      "fileUploadSuccess": "Dosya başarıyla yüklendi",
+      "fileUploadFailed": "Dosya yükleme başarısız",
+      "fileRemoved": "Dosya başarıyla kaldırıldı"
+    },
+            "validation": {
+          "documentTypeRequired": "Lütfen bir belge türü seçin",
+          "fileRequired": "Lütfen bir belge yükleyin",
+          "fileSizeLimit": "Dosya boyutu 10MB'dan küçük olmalıdır",
+          "fileTypeNotSupported": "Dosya türü desteklenmiyor. Lütfen JPG, PNG veya PDF yükleyin"
+        },
+        "snackbar": {
+          "success": "Başarılı",
+          "error": "Hata",
+          "warning": "Uyarı",
+          "info": "Bilgi"
+        }
   }
 } 

@@ -136,7 +136,14 @@ flutter:
     - images/icons/lock.svg
     - images/icons/subjects.svg
     - images/icons/logonew.png
+    - images/icons/driverLicense.svg
+    - images/icons/id_card.svg 
+    - images/icons/passport.svg
+    - images/icons/passportimage.svg
+    - images/icons/id_cardimage.svg
+    - images/icons/driverLicenseimage.svg
     - images/icons/profile_icon_settings.svg
+    - images/icons/delete.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png
