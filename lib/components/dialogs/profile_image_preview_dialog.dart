@@ -94,7 +94,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
         animation: _fadeAnimation,
         builder: (context, child) {
           return Container(
-            color: Colors.black.withAlpha((0.8 * _fadeAnimation.value * 255).toInt()),
+            color: Colors.black.withAlpha((0.7 * _fadeAnimation.value * 255).toInt()),
             child: Stack(
               children: [
                 // Background tap to close
@@ -115,10 +115,10 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                       return Transform.scale(
                         scale: _scaleAnimation.value,
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.85,
-                          height: MediaQuery.of(context).size.height * 0.75,
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          height: MediaQuery.of(context).size.width * 0.7,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
+                            shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withAlpha((0.3 * 255).toInt()),
@@ -128,114 +128,8 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                               ),
                             ],
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
-                            child: Stack(
-                              children: [
-                                // Image
-                                Positioned.fill(
-                                  child: _buildImage(),
-                                ),
-
-                                // Gradient overlay for better text visibility
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.black.withAlpha((0.3 * 255).toInt()),
-                                          Colors.transparent,
-                                          Colors.transparent,
-                                          Colors.black.withAlpha((0.4 * 255).toInt()),
-                                        ],
-                                        stops: const [0.0, 0.2, 0.8, 1.0],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // Top controls
-                                Positioned(
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      top: MediaQuery.of(context).padding.top + 20,
-                                      left: 20,
-                                      right: 20,
-                                      bottom: 20,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                       
-
-                                        // Close button
-                                        GestureDetector(
-                                          onTap: _closeDialog,
-                                          child: Container(
-                                            width: 40,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withAlpha((0.6 * 255).toInt()),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.close,
-                                              color: Colors.white,
-                                              size: 24,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                // Bottom controls
-                                Positioned(
-                                  bottom: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                      left: 20,
-                                      right: 20,
-                                      bottom: MediaQuery.of(context).padding.bottom + 20,
-                                      top: 20,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        // Zoom info
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                            vertical: 8,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black.withAlpha((0.6 * 255).toInt()),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.zoom_in,
-                                                color: Colors.white,
-                                                size: 16,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          child: ClipOval(
+                            child: _buildImage(),
                           ),
                         ),
                       );

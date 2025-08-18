@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../components/dialogs/profile_image_preview_dialog.dart';
 import '../../controllers/profile_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../services/language_service.dart';
@@ -53,20 +54,37 @@ Widget buildProfileHeader() {
             child: Obx(
               () {
                 final imageUrl = controller.profileImage.value.trim();
-                return CircleAvatar(
-                  radius: 42,
-                  backgroundColor: Color(0xffffffff),
+                final GlobalKey avatarKey = GlobalKey();
+                return GestureDetector(
+                  onTap: () {
+                    if (imageUrl.isNotEmpty) {
+                      final RenderBox? renderBox = avatarKey.currentContext?.findRenderObject() as RenderBox?;
+                      if (renderBox != null) {
+                        showProfileImagePreviewDialog(
+                          imageUrl: imageUrl,
+                          title: '${controller.fullName.value} - Profil Fotoğrafı',
+                          context: Get.context!,
+                          renderBox: renderBox,
+                        );
+                      }
+                    }
+                  },
                   child: CircleAvatar(
-                    radius: 40,
-                    backgroundColor: const Color(0xfffafafa),
-                    backgroundImage:
-                        imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
-                    child: imageUrl.isEmpty
-                        ? Image.asset(
-                            'images/user1.png',
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    key: avatarKey,
+                    radius: 42,
+                    backgroundColor: Color(0xffffffff),
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundColor: const Color(0xfffafafa),
+                      backgroundImage:
+                          imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+                      child: imageUrl.isEmpty
+                          ? Image.asset(
+                              'images/user1.png',
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
                   ),
                 );
               },
