@@ -1019,6 +1019,11 @@
       "sentMessage": "size mesaj gönderdi",
       "sentGroupMessage": "grubunda mesaj gönderdi",
       "invitedToEvent": "sizi bir etkinliğe davet etti"
+    },
+    "actions": {
+      "accept": "Onayla",
+      "decline": "Reddet",
+      "sendMessage": "Mesaj Gönder"
     }
   },
   "slidingNotifications": {

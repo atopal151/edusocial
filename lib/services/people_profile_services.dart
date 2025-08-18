@@ -20,10 +20,10 @@ class PeopleProfileService {
         url,
         headers: {"Authorization": "Bearer $token"},
       ).timeout(const Duration(seconds: 10)); // 10 saniye timeout
-      
+
       if (response.statusCode == 200) {
         // Raw API response'u yazdır
-        printFullText('''
+        /*printFullText('''
 🌐 PEOPLE PROFILE API RAW RESPONSE
 ====================================
 📡 URL: $url
@@ -31,7 +31,7 @@ class PeopleProfileService {
 📦 Raw Response Body:
 ${response.body}
 ====================================
-''');
+''');*/
 
         final body = jsonDecode(response.body);
 
@@ -41,10 +41,11 @@ ${response.body}
         final model = PeopleProfileModel.fromJson(body['data']);
         // debugPrint("🏗️ Model oluşturuldu: ${model != null ? 'BAŞARILI' : 'BAŞARISIZ'}");
         //debugPrint("📊 Model entries sayısı: ${model.entries.length}");
-        
+
         return model;
       } else {
-        debugPrint("❌ [fetchUserByUsername] API başarısız: ${response.statusCode}");
+        debugPrint(
+            "❌ [fetchUserByUsername] API başarısız: ${response.statusCode}");
         return null;
       }
     } catch (e) {
@@ -60,14 +61,14 @@ ${response.body}
     try {
       //debugPrint("🔄 fetchUserById çağrılıyor: user_id = $userId");
       //debugPrint("🌐 URL: $url");
-      
+
       final response = await http.get(
         url,
         headers: {"Authorization": "Bearer $token"},
       ).timeout(const Duration(seconds: 8)); // 8 saniye timeout
-      
+
       //debugPrint("📥 Response status: ${response.statusCode}");
-      
+
       if (response.statusCode == 200) {
         // Raw API response'u yazdır
         printFullText('''
@@ -82,7 +83,7 @@ ${response.body}
 
         final body = jsonDecode(response.body);
         //debugPrint("📦 Response body keys: ${body.keys.toList()}");
-        
+
         if (body['data'] != null) {
           final userData = body['data'];
           //debugPrint("👤 Kullanıcı verileri:");
@@ -90,25 +91,25 @@ ${response.body}
           //debugPrint("  - Name: ${userData['name']} ${userData['surname']}");
           //debugPrint("  - Avatar: ${userData['avatar']}");
           //debugPrint("  - Avatar URL: ${userData['avatar_url']}");
-          
+
           // Tüm avatar ile ilgili alanları kontrol et
           //debugPrint("🔍 Avatar ile ilgili tüm alanlar:");
           userData.forEach((key, value) {
-            if (key.toString().toLowerCase().contains('avatar') || 
+            if (key.toString().toLowerCase().contains('avatar') ||
                 key.toString().toLowerCase().contains('image') ||
                 key.toString().toLowerCase().contains('photo') ||
                 key.toString().toLowerCase().contains('profile')) {
-                //debugPrint("  - $key: '$value' (tip: ${value.runtimeType})");
+              //debugPrint("  - $key: '$value' (tip: ${value.runtimeType})");
             }
           });
-          
+
           // Tüm alanları da göster
           //debugPrint("📋 Tüm kullanıcı alanları:");
           userData.forEach((key, value) {
             //debugPrint("  - $key: '$value' (tip: ${value.runtimeType})");
           });
         }
-        
+
         return PeopleProfileModel.fromJson(body['data']);
       } else {
         debugPrint("❌ [fetchUserById] API başarısız: ${response.statusCode}");
@@ -195,9 +196,10 @@ ${response.body}
   }
 
   /// Birden fazla kullanıcıyı tek seferde çek (performans için)
-  static Future<Map<int, PeopleProfileModel>> fetchUsersByIds(List<int> userIds) async {
+  static Future<Map<int, PeopleProfileModel>> fetchUsersByIds(
+      List<int> userIds) async {
     if (userIds.isEmpty) return {};
-    
+
     final Map<int, PeopleProfileModel> users = {};
     //final token = box.read('token');
 
@@ -217,7 +219,7 @@ ${response.body}
 
       // Tüm kullanıcıları 15 saniye içinde çekmeye çalış
       await Future.wait(futures).timeout(const Duration(seconds: 15));
-      
+
       return users;
     } catch (e) {
       debugPrint("❌ Batch kullanıcı çekme hatası: $e");

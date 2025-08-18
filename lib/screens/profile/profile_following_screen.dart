@@ -106,83 +106,106 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
         backgroundColor: Color(0xfffafafa),
         iconBackgroundColor: Color(0xffffffff),
       ),
-      body: Column(
-        children: [
-          // Arama alanı
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SearchTextField(
-              controller: _searchController,
-              label: languageService.tr("profile.following.searchPlaceholder"),
-              onChanged: _filterFollowings,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Refresh işlemi - şimdilik sadece UI'ı yeniden yüklüyoruz
+          // İleride API çağrısı eklenebilir
+          setState(() {
+            // Mevcut filtreyi koruyarak listeyi yeniden yükle
+            final approvedFollowings = widget.followings.where((following) {
+              final isFollowing = following['is_following'] == true;
+              final isPending = following['is_following_pending'] == true;
+              return isFollowing && !isPending; // Takip ediliyor ve pending değil
+            }).toList();
+            _filteredFollowings = List.from(approvedFollowings);
+          });
+          
+          // Kısa bir gecikme ekleyerek refresh animasyonunu göster
+          await Future.delayed(Duration(milliseconds: 500));
+        },
+        color: const Color(0xFFEF5050),
+        backgroundColor: Color(0xfffafafa),
+        elevation: 0,
+        strokeWidth: 2.0,
+        displacement: 40.0,
+        child: Column(
+          children: [
+            // Arama alanı
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SearchTextField(
+                controller: _searchController,
+                label: languageService.tr("profile.following.searchPlaceholder"),
+                onChanged: _filterFollowings,
+              ),
             ),
-          ),
-          // Takip edilenler listesi
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filteredFollowings.length,
-              itemBuilder: (context, index) {
-                final user = _filteredFollowings[index];
-                return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Color(0xffffffff),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: ListTile(
-                      onTap: () {
-                        Get.to(() =>
-                            PeopleProfileScreen(username: user['username']));
-                      },
-                      leading: CircleAvatar(
-                        backgroundColor: Color(0xffffffff),
-                        backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
+            // Takip edilenler listesi
+            Expanded(
+              child: ListView.builder(
+                itemCount: _filteredFollowings.length,
+                itemBuilder: (context, index) {
+                  final user = _filteredFollowings[index];
+                  return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Color(0xffffffff),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      title: Text(
-                        '${user["name"]} ${user["surname"]} ',
-                        style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xff414751)),
-                      ),
-                      subtitle: Text(
-                        '@${user["username"]}',
-                        style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xff9ca3ae)),
-                      ),
-                      trailing: TextButton(
-                        onPressed: () {
-                          // Mesaj gönderme ekranına yönlendirme
-                          Get.toNamed(Routes.chatDetail, arguments: {
-                            'userId': user['id'],
-                            'conversationId': null, // Yeni konuşma başlatılacak
-                            'name': '${user["name"]} ${user["surname"]}',
-                            'username': user["username"],
-                            'avatarUrl': user["avatar_url"] ?? '',
-                            'isOnline': false, // Varsayılan olarak çevrimdışı
-                          });
+                      child: ListTile(
+                        onTap: () {
+                          Get.to(() =>
+                              PeopleProfileScreen(username: user['username']));
                         },
-                        style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xfff0f1f3),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
+                        leading: CircleAvatar(
+                          backgroundColor: Color(0xffffffff),
+                          backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
                         ),
-                        child: Text(
-                          languageService.tr("profile.following.sendMessage"),
+                        title: Text(
+                          '${user["name"]} ${user["surname"]} ',
+                          style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff414751)),
+                        ),
+                        subtitle: Text(
+                          '@${user["username"]}',
                           style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: Color(0xff414751)),
+                              color: Color(0xff9ca3ae)),
                         ),
-                      ),
-                    ));
-              },
+                        trailing: TextButton(
+                          onPressed: () {
+                            // Mesaj gönderme ekranına yönlendirme
+                            Get.toNamed(Routes.chatDetail, arguments: {
+                              'userId': user['id'],
+                              'conversationId': null, // Yeni konuşma başlatılacak
+                              'name': '${user["name"]} ${user["surname"]}',
+                              'username': user["username"],
+                              'avatarUrl': user["avatar_url"] ?? '',
+                              'isOnline': false, // Varsayılan olarak çevrimdışı
+                            });
+                          },
+                          style: TextButton.styleFrom(
+                            backgroundColor: const Color(0xfff0f1f3),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: Text(
+                            languageService.tr("profile.following.sendMessage"),
+                            style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xff414751)),
+                          ),
+                        ),
+                      ));
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

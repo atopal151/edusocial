@@ -305,7 +305,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget buildNotificationTile(NotificationModel n) {
-    //final LanguageService languageService = Get.find<LanguageService>();
+    final LanguageService languageService = Get.find<LanguageService>();
     
     return ListTile(
       tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),
@@ -348,7 +348,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   GoogleFonts.inter(fontWeight: FontWeight.w400, fontSize: 12),
             ),
             TextSpan(
-              text: _timeAgo(n.timestamp),
+              text: " ${_timeAgo(n.timestamp)}",
               style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
             ),
           ],

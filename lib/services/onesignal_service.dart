@@ -376,6 +376,12 @@ class OneSignalService extends GetxService {
     }
   }
 
+  // Flag'i sıfırla (debug için)
+  void resetNotificationFlag() {
+    _isShowingNotification = false;
+    debugPrint('🔧 Flag sıfırlandı: $_isShowingNotification');
+  }
+
   // Test bildirimi gönder
   Future<void> sendTestNotification() async {
     try {
@@ -556,10 +562,12 @@ class OneSignalService extends GetxService {
       // Global bildirim kontrolü - aynı anda sadece bir bildirim göster
       if (_isShowingNotification) {
         debugPrint('⚠️ Başka bir bildirim gösteriliyor, bu bildirim atlanıyor');
+        debugPrint('🔍 Flag durumu: $_isShowingNotification');
         return;
       }
       
       _isShowingNotification = true;
+      debugPrint('🔍 Flag true yapıldı: $_isShowingNotification');
       
       // Eğer notification tipi ise özel tasarım kullan
       if (notificationType == 'notification' && data != null) {
@@ -573,6 +581,13 @@ class OneSignalService extends GetxService {
       if ((title == 'Yeni Mesaj' || title == 'message') && data != null) {
         debugPrint('📱 Özel mesaj bildirimi kullanılacak');
         await _sendCustomMessageNotificationFromData(data);
+        return;
+      }
+      
+      // Eğer grup mesajı bildirimi ise özel tasarım kullan
+      if (data != null && data['type'] == 'group') {
+        debugPrint('📱 Özel grup mesajı bildirimi kullanılacak');
+        await _sendCustomGroupMessageNotificationFromData(data);
         return;
       }
       
@@ -591,8 +606,15 @@ class OneSignalService extends GetxService {
       );
       
       debugPrint('✅ Yerel bildirim gösterildi: $title - $message');
+      
+      // Bildirim gösterildikten sonra flag'i false yap
+      _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (normal): $_isShowingNotification');
     } catch (e) {
       debugPrint('❌ Yerel bildirim gösterilemedi: $e');
+      // Hata durumunda da flag'i false yap
+      _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (hata - normal): $_isShowingNotification');
     }
   }
 
@@ -710,9 +732,140 @@ class OneSignalService extends GetxService {
       debugPrint('✅ Özel notification bildirimi gösterildi');
       debugPrint('📱 Bildirim detayları: title=$title, message=$message, user=$userName, avatar=$userAvatar');
       _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (notification): $_isShowingNotification');
     } catch (e) {
       debugPrint('❌ Özel notification bildirimi gösterilemedi: $e');
       _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (hata - notification): $_isShowingNotification');
+    }
+  }
+
+  // Data'dan özel grup mesajı bildirimi gönder
+  Future<void> _sendCustomGroupMessageNotificationFromData(Map<String, dynamic> data) async {
+    try {
+      debugPrint('📱 Özel grup mesajı bildirimi gösteriliyor...');
+      
+      // Bildirim iznini kontrol et
+      final hasPermission = await hasNotificationPermission();
+      debugPrint('🔍 Bildirim izni durumu: $hasPermission');
+      if (!hasPermission) {
+        debugPrint('❌ Bildirim izni yok, grup mesajı bildirimi gösterilmeyecek');
+        _isShowingNotification = false;
+        debugPrint('🔍 Flag false yapıldı (izin yok): $_isShowingNotification');
+        return;
+      }
+      
+      // Grup bildirimleri ayarını kontrol et
+      final prefs = await SharedPreferences.getInstance();
+      final groupNotificationsEnabled = prefs.getBool('group_notifications') ?? true;
+      debugPrint('🔍 Grup bildirimleri ayarı: $groupNotificationsEnabled');
+      
+      if (!groupNotificationsEnabled) {
+        debugPrint('🚫 Grup bildirimleri kapalı, bildirim gösterilmeyecek');
+        _isShowingNotification = false;
+        debugPrint('🔍 Flag false yapıldı (grup bildirimleri kapalı): $_isShowingNotification');
+        return;
+      }
+      
+      // Grup mesajı verilerini al
+      final groupName = data['group_name'] ?? 'Grup';
+      final senderName = data['sender_name'] ?? 'Bilinmeyen';
+      final message = data['message'] ?? '';
+      final groupAvatar = data['group_avatar'] ?? '';
+      
+      debugPrint('👥 Grup mesajı detayları: group=$groupName, sender=$senderName, message=$message');
+      
+      // Bildirim ID'si oluştur (çoklu bildirim önlemek için)
+      final groupId = data['group_id'] ?? '';
+      final notificationId = 'group_message_$groupId';
+      
+      // Çoklu bildirim kontrolü - daha sıkı kontrol
+      if (_activeNotifications.containsKey(notificationId)) {
+        final lastNotificationTime = _activeNotifications[notificationId]!;
+        final timeSinceLastNotification = DateTime.now().difference(lastNotificationTime);
+        
+        if (timeSinceLastNotification < _notificationCooldown) {
+          debugPrint('⚠️ Çoklu grup mesajı bildirimi önlendi: $notificationId (${timeSinceLastNotification.inMilliseconds}ms)');
+          return;
+        }
+      }
+      
+      // Aktif bildirimleri temizle (eski olanları)
+      _activeNotifications.removeWhere((key, value) {
+        return DateTime.now().difference(value) > _notificationCooldown;
+      });
+      
+      // Yeni bildirimi kaydet
+      _activeNotifications[notificationId] = DateTime.now();
+      
+      debugPrint('📱 Özel grup mesajı notification gönderiliyor: $notificationId');
+      debugPrint('📱 Aktif bildirim sayısı: ${_activeNotifications.length}');
+      
+      // Özel grup mesajı bildirim widget'ı oluştur
+      Get.snackbar(
+        groupName, // Başlık olarak grup adı
+        '$senderName: $message', // Mesaj içeriği: "Gönderen: Mesaj"
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.black87,
+        duration: const Duration(seconds: 4),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+        borderRadius: 16,
+        snackStyle: SnackStyle.FLOATING,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        icon: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Container(
+            width: 35,
+            height: 35,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade200, width: 1.5),
+              color: Colors.grey.shade100,
+            ),
+            child: ClipOval(
+              child: groupAvatar.isNotEmpty && !groupAvatar.endsWith('/0')
+                  ? Image.network(
+                      groupAvatar.startsWith('http') 
+                          ? groupAvatar 
+                          : 'https://stageapi.edusocial.pl/storage/$groupAvatar',
+                      fit: BoxFit.cover,
+                      width: 35,
+                      height: 35,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey.shade300,
+                          child: const Icon(Icons.group, color: Colors.grey, size: 16),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: Colors.grey.shade300,
+                      child: const Icon(Icons.group, color: Colors.grey, size: 16),
+                    ),
+            ),
+          ),
+        ),
+        snackbarStatus: (status) {
+          debugPrint('👥 Grup mesajı bildirim durumu: $status');
+        },
+        // Kapatma butonu
+        mainButton: TextButton(
+          onPressed: () {
+            // Bildirimi kapat
+            Get.closeCurrentSnackbar();
+          },
+          child: const Icon(Icons.close, color: Colors.grey, size: 20),
+        ),
+      );
+      
+      debugPrint('✅ Özel grup mesajı bildirimi gösterildi: $groupName - $senderName: $message');
+      _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (group): $_isShowingNotification');
+    } catch (e) {
+      debugPrint('❌ Özel grup mesajı bildirimi gösterilemedi: $e');
+      _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (hata - group): $_isShowingNotification');
     }
   }
 
@@ -849,9 +1002,11 @@ class OneSignalService extends GetxService {
       
       debugPrint('✅ Özel mesaj bildirimi gösterildi: $senderName - $message');
       _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (message): $_isShowingNotification');
     } catch (e) {
       debugPrint('❌ Özel mesaj bildirimi gösterilemedi: $e');
       _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (hata - message): $_isShowingNotification');
     }
   }
 
@@ -936,9 +1091,11 @@ class OneSignalService extends GetxService {
       debugPrint('✅ Local notification gönderildi');
       debugPrint('📱 Bildirim detayları: title=$senderName, message=$message, avatar=$senderAvatar');
       _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (local message): $_isShowingNotification');
     } catch (e) {
       debugPrint('❌ OneSignal local notification gönderilemedi: $e');
       _isShowingNotification = false;
+      debugPrint('🔍 Flag false yapıldı (hata - local message): $_isShowingNotification');
     }
   }
 

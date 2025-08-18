@@ -1386,6 +1386,7 @@ class SocketService extends GetxService {
         {
           'type': 'group', // Group tipi olarak işaretle
           'group_id': groupId,
+          'group_name': groupName, // Grup adını da ekle
           'sender_name': senderName,
           'message': messageText,
           'group_avatar': groupAvatar,
