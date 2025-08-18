@@ -110,7 +110,7 @@ class PostServices {
         
         // Her post için detaylı bilgi
         for (int i = 0; i < postList.length; i++) {
-          final post = postList[i];
+          //final post = postList[i];
           //debugPrint("📋 Post ${i + 1} Detayları:");
           //debugPrint("  - ID: ${post.id}");
           //debugPrint("  - Username: ${post.username}");

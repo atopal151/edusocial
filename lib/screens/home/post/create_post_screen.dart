@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:edusocial/components/buttons/icon_button.dart';
-import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';

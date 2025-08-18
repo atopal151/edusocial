@@ -140,7 +140,7 @@ class EntryServices {
       //debugPrint("   - Response Body: ${response.body}");
 
       return response.statusCode == 200 || response.statusCode == 201;
-    } catch (e, stackTrace) {
+    } catch (e) {
       //debugPrint("❌ API çağrısı sırasında hata oluştu:");
       //debugPrint("   - Hata: $e");
       //debugPrint("   - Stack Trace: $stackTrace");

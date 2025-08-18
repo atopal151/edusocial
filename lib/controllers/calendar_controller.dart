@@ -1,6 +1,5 @@
 import 'package:edusocial/utils/hex_color.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../components/buttons/custom_button.dart';
@@ -58,7 +57,7 @@ class CalendarController extends GetxController {
               onPrimary: Colors.white, // Seçili tarih üzerindeki yazı rengi
               onSurface: Colors.black, // Diğer yazılar
             ),
-            dialogBackgroundColor: Colors.white, // Modal arka planı
+            scaffoldBackgroundColor: Colors.white, // Modal arka planı
           ),
           child: child!,
         );
@@ -138,7 +137,7 @@ class CalendarController extends GetxController {
                                   onPrimary: Colors.white, // Seçili tarih üzerindeki yazı rengi
                                   onSurface: Colors.black, // Diğer yazılar
                                 ),
-                                dialogBackgroundColor: Colors.white, // Modal arka planı
+                                scaffoldBackgroundColor: Colors.white, // Modal arka planı
                               ),
                               child: child!,
                             );
@@ -184,7 +183,7 @@ class CalendarController extends GetxController {
                                   onPrimary: Colors.white, // Seçili saat üzerindeki yazı rengi
                                   onSurface: Colors.black, // Diğer yazılar
                                 ),
-                                dialogBackgroundColor: Colors.white, // Modal arka planı
+                                scaffoldBackgroundColor: Colors.white, // Modal arka planı
                               ),
                               child: child!,
                             );
@@ -363,8 +362,7 @@ class CalendarController extends GetxController {
                     final formatted = DateFormat('yyyy-MM-dd HH:mm:ss')
                         .format(selectedDateTime.value);
                     final colorHex = selectedColor.value.toHex();
-                    print("🎨 Seçilen renk: $colorHex"); // Debug için
-                    print("🎨 Seçilen renk RGB: ${selectedColor.value.red}, ${selectedColor.value.green}, ${selectedColor.value.blue}"); // Debug için
+                   
                     
                     final reminder = Reminder(
                       id: existing?.id ?? 0,

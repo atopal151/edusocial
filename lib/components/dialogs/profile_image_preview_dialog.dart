@@ -25,9 +25,8 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
   late AnimationController _fadeController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-  late Animation<Offset> _positionAnimation;
+  late Animation<Offset> positionAnimation;
   
-  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -59,7 +58,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
       curve: Curves.easeInOut,
     ));
 
-    _positionAnimation = Tween<Offset>(
+    positionAnimation = Tween<Offset>(
       begin: Offset.zero,
       end: Offset.zero,
     ).animate(CurvedAnimation(
@@ -95,7 +94,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
         animation: _fadeAnimation,
         builder: (context, child) {
           return Container(
-            color: Colors.black.withOpacity(0.8 * _fadeAnimation.value),
+            color: Colors.black.withAlpha((0.8 * _fadeAnimation.value * 255).toInt()),
             child: Stack(
               children: [
                 // Background tap to close
@@ -122,7 +121,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                             borderRadius: BorderRadius.circular(25),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withAlpha((0.3 * 255).toInt()),
                                 blurRadius: 30,
                                 spreadRadius: 10,
                                 offset: const Offset(0, 10),
@@ -146,10 +145,10 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                                         begin: Alignment.topCenter,
                                         end: Alignment.bottomCenter,
                                         colors: [
-                                          Colors.black.withOpacity(0.3),
+                                          Colors.black.withAlpha((0.3 * 255).toInt()),
                                           Colors.transparent,
                                           Colors.transparent,
-                                          Colors.black.withOpacity(0.4),
+                                          Colors.black.withAlpha((0.4 * 255).toInt()),
                                         ],
                                         stops: const [0.0, 0.2, 0.8, 1.0],
                                       ),
@@ -180,7 +179,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                                             width: 40,
                                             height: 40,
                                             decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.6),
+                                              color: Colors.black.withAlpha((0.6 * 255).toInt()),
                                               shape: BoxShape.circle,
                                             ),
                                             child: const Icon(
@@ -217,7 +216,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                                             vertical: 8,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(0.6),
+                                            color: Colors.black.withAlpha((0.6 * 255).toInt()),
                                             borderRadius: BorderRadius.circular(20),
                                           ),
                                           child: const Row(
@@ -337,7 +336,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withAlpha((0.2 * 255).toInt()),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

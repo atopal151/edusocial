@@ -328,7 +328,7 @@ ${response.body}
     // İlk 5 mesajın detayını göster
     //debugPrint("📖 === İLK 5 MESAJ DETAYI ===");
     for (int i = 0; i < messagesJson.length && i < 5; i++) {
-      final message = messagesJson[i];
+      //final message = messagesJson[i];
       //debugPrint("📖 Mesaj ${i + 1}:");
       //debugPrint("  - ID: ${message['id']}");
       //debugPrint("  - Message: ${message['message']}");
@@ -407,7 +407,7 @@ ${response.body}
           }).toList();
           
           // Toplam okunmamış mesaj sayısını hesapla
-          final totalUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
+          //final totalUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
           //debugPrint("📊 === CHAT LIST SUMMARY ===");
           //debugPrint("📊 Toplam Chat Sayısı: ${chatList.length}");
           //debugPrint("📊 Toplam Okunmamış Mesaj: $totalUnread");

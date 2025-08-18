@@ -158,7 +158,7 @@ class GroupServices {
 
         // Show all available fields in the first group (if exists)
         if (data.isNotEmpty) {
-          final firstGroup = data[0];
+          //final firstGroup = data[0];
           //debugPrint('📊 Available Fields in API Response:');
           //debugPrint('${firstGroup.keys.toList()}');
           //debugPrint('');
@@ -194,7 +194,7 @@ class GroupServices {
 
           // Pivot data analysis
           if (groupData['pivot'] != null) {
-            final pivot = groupData['pivot'];
+            //final pivot = groupData['pivot'];
             //debugPrint('   📌 Pivot Data:');
             //debugPrint('      User ID: ${pivot['user_id']}');
             //debugPrint('      Group ID: ${pivot['group_id']}');
@@ -396,16 +396,16 @@ class GroupServices {
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
-          final groupData = jsonBody['data']['group'];
+          //final groupData = jsonBody['data']['group'];
 
           //debugPrint('�� GRUP DETAY VERİLERİ (OPTIMIZED):');
           //debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           //debugPrint('ID: ${groupData['id']}');
 
           // OPTIMIZE: Count instead of logging full data
-          final groupChats = groupData['group_chats'] as List? ?? [];
-          final groupEvents = groupData['group_events'] as List? ?? [];
-          final users = jsonBody['data']['users'] as List? ?? [];
+          //final groupChats = groupData['group_chats'] as List? ?? [];
+          //final groupEvents = groupData['group_events'] as List? ?? [];
+          //final users = jsonBody['data']['users'] as List? ?? [];
 
           //debugPrint('Messages: ${groupChats.length} adet');
           //debugPrint('Events: ${groupEvents.length} adet');
@@ -577,7 +577,7 @@ class GroupServices {
 
         // Show all available fields in the first group (if exists)
         if (data.isNotEmpty) {
-          final firstGroup = data[0];
+          //final firstGroup = data[0];
           //debugPrint('📊 Available Fields in API Response:');
           //debugPrint('${firstGroup.keys.toList()}');
           //debugPrint('');
@@ -585,7 +585,7 @@ class GroupServices {
 
         // Print each group data individually with detailed analysis
         for (int i = 0; i < data.length; i++) {
-          final groupData = data[i];
+          //final groupData = data[i];
           //  debugPrint('📋 Group ${i + 1} Raw Data:');
           //debugPrint(json.encode(groupData));
 

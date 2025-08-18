@@ -457,7 +457,7 @@ class NotificationController extends GetxController {
           final postData = notificationFullData['post'] as Map<String, dynamic>?;
           
           final userName = userData?['name'] ?? 'Bilinmeyen';
-          final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
+          //final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
           
           String title = '';
           String message = '';

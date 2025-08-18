@@ -92,12 +92,12 @@ String formatSimpleDate(String dateStr) {
       
       // /me endpoint'inden gelen profil verisindeki postları kullan
       final profileData = profile.value;
-      if (profileData != null && profileData.posts != null) {
+      if (profileData != null) {
         debugPrint("📦 /me endpoint'inden ${profileData.posts!.length} post alındı");
         
         // Her post için detaylı debug
-        for (int i = 0; i < profileData.posts!.length; i++) {
-          final post = profileData.posts![i];
+        for (int i = 0; i < profileData.posts.length; i++) {
+          final post = profileData.posts[i];
           debugPrint("📋 Post ${i + 1}: ID=${post.id}, Content=${post.postDescription}, isOwner=${post.isOwner}, MediaUrls=${post.mediaUrls.length}");
           if (post.mediaUrls.isNotEmpty) {
             debugPrint("🖼️ Post ${i + 1} Media URLs: ${post.mediaUrls}");
@@ -321,7 +321,7 @@ String formatSimpleDate(String dateStr) {
       
       // /me endpoint'inden gelen profil verisindeki entries'ları kullan
       final profileData = profile.value;
-      if (profileData != null && profileData.entries != null) {
+      if (profileData != null) {
         //debugPrint("📦 /me endpoint'inden ${profileData.entries!.length} entry alındı");
         
         // Hesap tipi kontrolü - kendi profilimizde olduğumuz için her zaman göster
@@ -333,7 +333,7 @@ String formatSimpleDate(String dateStr) {
         }
         
         // /me endpoint'inden gelen entries'lar zaten kullanıcının kendi entries'ları
-        final userEntries = profileData.entries!;
+        final userEntries = profileData.entries;
         //debugPrint("👤 /me endpoint'inden gelen entry sayısı: ${userEntries.length}");
         
         // Entries'ları işle

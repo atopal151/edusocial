@@ -596,6 +596,10 @@
         "viewing": "Konum bilgisi görüntüleniyor"
       },
       "notifications": {
+        "reminder": {
+          "success": "Etkinlik hatırlatıcısı ayarlandı",
+          "error": "Hatırlatıcı ayarlanırken bir hata oluştu"
+        },
         "invitation": {
           "accepted": "Etkinlik daveti kabul edildi",
           "declined": "Etkinlik daveti reddedildi",
@@ -604,6 +608,9 @@
         },
         "share": {
           "success": "Etkinlik başarıyla paylaşıldı"
+        },
+        "location": {
+          "viewing": "Konum bilgisi görüntüleniyor"
         }
       }
     },
@@ -1723,106 +1730,6 @@
     "noCategory": "Kategori Yok",
     "noTopicInfo": "Konu Bilgisi Yok",
     "commentPlaceholder": "Bu konuya bir entry paylaş"
-  },
-  "notifications": {
-    "title": "Bildirimler",
-    "grouping": {
-      "today": "Bugün",
-      "yesterday": "Dün",
-      "lastWeek": "Son 7 Gün",
-      "older": "Daha Önce"
-    },
-    "timeAgo": {
-      "justNow": "az önce",
-      "minutesAgo": "dk",
-      "hoursAgo": "s",
-      "daysAgo": "g",
-      "weeksAgo": "h",
-      "monthsAgo": "a",
-      "yearsAgo": "y"
-    },
-    "actions": {
-      "accept": "Onayla",
-      "decline": "Reddet",
-      "accepted": "Onaylandı",
-      "rejected": "Reddedildi",
-      "follow": "Takip Et",
-      "unfollow": "Takibi Bırak",
-      "close": "Kapat"
-    },
-    "notificationTypes": {
-      "followRequest": "Takip İsteği",
-      "followJoinRequest": "Takip ve Katılma İsteği",
-      "postLike": "Gönderi Beğenisi",
-      "postComment": "Gönderi Yorumu",
-      "groupJoinRequest": "Grup Katılma İsteği",
-      "groupJoin": "Grup Katılımı",
-      "createGroupEvent": "Grup Etkinliği Oluşturma",
-      "groupAccept": "Grup Onayı"
-    },
-    "messages": {
-      "followRequest": "seni takip etmek istiyor",
-      "postLiked": "gönderini beğendi",
-      "postCommented": "gönderine yorum yaptı",
-      "groupJoinRequest": "grubuna katılmak istiyor",
-      "groupJoined": "grubuna katıldı",
-      "eventCreated": "bir grup etkinliği oluşturdu",
-      "groupAccepted": "grup isteğin onaylandı"
-    },
-    "loading": {
-      "notifications": "Bildirimler yükleniyor...",
-      "refreshing": "Bildirimler yenileniyor...",
-      "refreshed": "Bildirimler başarıyla yenilendi",
-      "accepting": "Onaylanıyor...",
-      "declining": "Reddediliyor...",
-      "following": "Takip ediliyor...",
-      "unfollowing": "Takip bırakılıyor..."
-    },
-    "errors": {
-      "notificationsLoadFailed": "Bildirimler yüklenemedi",
-      "followRequestFailed": "Takip isteği onaylanamadı",
-      "groupJoinRequestFailed": "Grup katılma isteği işlenemedi",
-      "followFailed": "Takip işlemi başarısız",
-      "unfollowFailed": "Takip bırakma işlemi başarısız",
-      "eventCreateRequestFailed": "Etkinlik oluşturma isteği onaylanamadı",
-      "networkError": "Ağ bağlantı hatası",
-      "serverError": "Sunucu hatası oluştu",
-      "generalError": "Bir hata oluştu"
-    },
-    "success": {
-      "notificationsRefreshed": "Bildirimler başarıyla yenilendi",
-      "followRequestAccepted": "Takip isteği onaylandı",
-      "followRequestDeclined": "Takip isteği reddedildi",
-      "groupJoinRequestAccepted": "Grup katılma isteği onaylandı",
-      "groupJoinRequestDeclined": "Grup katılma isteği reddedildi",
-      "userFollowed": "Kullanıcı takip edildi",
-      "userUnfollowed": "Kullanıcı takipten çıkarıldı",
-      "eventCreateRequestAccepted": "Etkinlik oluşturma isteği onaylandı",
-      "eventCreateRequestDeclined": "Etkinlik oluşturma isteği reddedildi"
-    },
-    "validation": {
-      "userIdRequired": "Kullanıcı ID gerekli",
-      "groupIdRequired": "Grup ID gerekli",
-      "eventIdRequired": "Etkinlik ID gerekli",
-      "decisionRequired": "Karar gerekli"
-    },
-    "debug": {
-      "buildingButton": "Bildirim için buton oluşturuluyor:",
-      "notificationType": "Tip:",
-      "isFollowing": "Takip Ediliyor:",
-      "isFollowingPending": "Takip Beklemede:",
-      "isAccepted": "Onaylandı:",
-      "isRejected": "Reddedildi:",
-      "status": "Durum:",
-      "groupId": "Grup ID:",
-      "senderUserId": "Gönderen Kullanıcı ID:",
-      "message": "Mesaj:",
-      "groupJoinRequestButton": "Grup katılma isteği butonu oluşturuluyor:",
-      "groupIdNull": "Grup ID null, buton gösterilmiyor",
-      "requestAccepted": "İstek zaten onaylandı, 'Onaylandı' butonu gösteriliyor",
-      "requestRejected": "İstek reddedildi, 'Reddedildi' butonu gösteriliyor",
-      "requestPending": "İstek beklemede, onayla/reddet butonları gösteriliyor"
-    }
   },
   "verification": {
     "title": "Hesap Doğrulama",

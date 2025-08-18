@@ -33,7 +33,7 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
     //debugPrint("🔍 === FOLLOWERS SCREEN DEBUG ===");
     //debugPrint("📊 Toplam takipçi sayısı: ${widget.followers.length}");
     for (int i = 0; i < widget.followers.length; i++) {
-      final follower = widget.followers[i];
+      //final follower = widget.followers[i];
       //debugPrint("👤 Takipçi ${i + 1}:");
       //debugPrint("  - ID: ${follower['id']}");
       //debugPrint("  - Name: ${follower['name']} ${follower['surname']}");

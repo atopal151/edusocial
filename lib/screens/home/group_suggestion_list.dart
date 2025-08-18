@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/group_controller/group_controller.dart';
 import '../../components/cards/group_suggestion_card.dart';
 import '../../services/language_service.dart';
-import '../../components/snackbars/custom_snackbar.dart';
 
 class GroupSuggestionListView extends StatelessWidget {
   GroupSuggestionListView({super.key});
