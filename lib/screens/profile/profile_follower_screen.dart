@@ -3,6 +3,7 @@ import 'package:edusocial/components/input_fields/search_text_field.dart';
 import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../routes/app_routes.dart';
 import '../../services/language_service.dart';
 
@@ -118,56 +119,65 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
               itemCount: _filteredFollowers.length,
               itemBuilder: (context, index) {
                 final user = _filteredFollowers[index];
-          return ListTile(
-            onTap: () {
-              Get.to(() => PeopleProfileScreen(
-                  username: user['username']));
-            },
-            leading: CircleAvatar(
-              backgroundColor: Color(0xffffffff),
-              backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+            decoration: BoxDecoration(
+              color: Color(0xffffffff),
+              borderRadius: BorderRadius.circular(16),
+              
             ),
-            title: Text(
-              '${user["name"]} ${user["surname"]}',
-              style: TextStyle(
-                  fontSize: 13.28,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff414751)),
-            ),
-            subtitle: Text(
-              '@${user["username"]}',
-              style: TextStyle(
-                  fontSize: 13.28,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff9ca3ae)),
-            ),
-            trailing: TextButton(
-              onPressed: () {
-                // Mesaj gönderme ekranına yönlendirme
-                Get.toNamed(Routes.chatDetail, arguments: {
-                  'userId': user['id'],
-                  'conversationId': null, // Yeni konuşma başlatılacak
-                  'name': '${user["name"]} ${user["surname"]}',
-                  'username': user["username"],
-                  'avatarUrl': user["avatar_url"] ?? '',
-                  'isOnline': false, // Varsayılan olarak çevrimdışı
-                });
+            child: ListTile(
+              
+              onTap: () {
+                Get.to(() => PeopleProfileScreen(
+                    username: user['username']));
               },
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xfff0f1f3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+              leading: CircleAvatar(
+                backgroundColor: Color(0xffffffff),
+                backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
+              ),
+              title: Text(
+                '${user["name"]} ${user["surname"]}',
+                style: GoogleFonts.inter(
+                    fontSize: 13.28,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff414751)),
+              ),
+              subtitle: Text(
+                '@${user["username"]}',
+                style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff9ca3ae)),
+              ),
+              trailing: TextButton(
+                onPressed: () {
+                  // Mesaj gönderme ekranına yönlendirme
+                  Get.toNamed(Routes.chatDetail, arguments: {
+                    'userId': user['id'],
+                    'conversationId': null, // Yeni konuşma başlatılacak
+                    'name': '${user["name"]} ${user["surname"]}',
+                    'username': user["username"],
+                    'avatarUrl': user["avatar_url"] ?? '',
+                    'isOnline': false, // Varsayılan olarak çevrimdışı
+                  });
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xfff0f1f3),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child:Text(
+                  languageService.tr("profile.followers.sendMessage"),
+                   style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff414751)),
                 ),
               ),
-              child: Text(
-                languageService.tr("profile.followers.sendMessage"),
-                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff414751)),
-              ),
-            ),
-                );
+                  ),
+          );
               },
             ),
           ),

@@ -3,7 +3,10 @@ import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../components/user_appbar/back_appbar.dart';
 import '../../services/language_service.dart';
 
@@ -17,6 +20,8 @@ class VerificationUploadScreen extends StatefulWidget {
 
 class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
   String? uploadedFileName;
+  File? uploadedFile;
+  final ImagePicker _picker = ImagePicker();
   final Map<String, String> documentTypeNames = {
     'passport': 'passport',
     'id_card': 'id_card',
@@ -225,15 +230,43 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(8),
+          width: 48,
+          height: 48,
           decoration: BoxDecoration(
             color: Color(0xfff9fafb),
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: Color(0xffe2e5ea),
+              width: 1,
+            ),
           ),
-          child: Icon(
-            Icons.image,
-            color: Color(0xff9ca3ae),
-            size: 24,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(7),
+            child: uploadedFile != null
+                ? Image.file(
+                    uploadedFile!,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        padding: EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.image,
+                          color: Color(0xff9ca3ae),
+                          size: 24,
+                        ),
+                      );
+                    },
+                  )
+                : Container(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.image,
+                      color: Color(0xff9ca3ae),
+                      size: 24,
+                    ),
+                  ),
           ),
         ),
         SizedBox(width: 12),
@@ -242,12 +275,14 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                uploadedFileName ?? "whatsapp33.435-392.png",
+                uploadedFileName ?? "image.jpg",
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: Color(0xff414751),
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               GestureDetector(
                 onTap: () => _showFileOptions(),
@@ -284,6 +319,8 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
 
   void _showFileOptions() {
     showModalBottomSheet(
+      
+      backgroundColor: Color(0xffffffff),
       context: context,
       builder: (context) => Container(
         padding: EdgeInsets.all(16),
@@ -291,7 +328,11 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.camera_alt),
+              leading:  CircleAvatar(
+                radius: 18,
+                backgroundColor: Color(0xffffeded),
+                child: const Icon(Icons.camera_alt, color: Color(0xffef5050), size: 20),
+              ),
               title: Text('Camera'),
               onTap: () {
                 Navigator.pop(context);
@@ -299,7 +340,11 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library),
+              leading:  CircleAvatar(
+                radius: 18,
+                backgroundColor: Color(0xffffeded),
+                child: const Icon(Icons.photo_library, color: Color(0xffef5050), size: 20),
+              ),
               title: Text('Gallery'),
               onTap: () {
                 Navigator.pop(context);
@@ -312,23 +357,56 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
     );
   }
 
-  void _uploadFile(String source) {
-    setState(() {
-      uploadedFileName =
-          "uploaded_file_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    });
+  Future<void> _uploadFile(String source) async {
+    try {
+      XFile? pickedFile;
+      
+      if (source == 'camera') {
+        pickedFile = await _picker.pickImage(
+          source: ImageSource.camera,
+          maxWidth: 1920,
+          maxHeight: 1080,
+          imageQuality: 85,
+        );
+      } else if (source == 'gallery') {
+        pickedFile = await _picker.pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 1920,
+          maxHeight: 1080,
+          imageQuality: 85,
+        );
+      }
 
-    final LanguageService languageService = Get.find<LanguageService>();
-    CustomSnackbar.show(
-      title: languageService.tr("verification.snackbar.success"),
-      message: languageService.tr("verification.messages.fileUploadSuccess"),
-      type: SnackbarType.success,
-    );
+      if (pickedFile != null) {
+        final file = File(pickedFile.path);
+        final fileName = pickedFile.name;
+        setState(() {
+          uploadedFile = file;
+          uploadedFileName = fileName;
+        });
+
+        final LanguageService languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("verification.snackbar.success"),
+          message: languageService.tr("verification.messages.fileUploadSuccess"),
+          type: SnackbarType.success,
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ Dosya yükleme hatası: $e");
+      final LanguageService languageService = Get.find<LanguageService>();
+      CustomSnackbar.show(
+        title: languageService.tr("verification.snackbar.error"),
+        message: languageService.tr("verification.messages.fileUploadError"),
+        type: SnackbarType.error,
+      );
+    }
   }
 
   void _removeFile() {
     setState(() {
       uploadedFileName = null;
+      uploadedFile = null;
     });
 
     final LanguageService languageService = Get.find<LanguageService>();
