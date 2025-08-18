@@ -3,6 +3,7 @@ import 'package:edusocial/controllers/story_controller.dart';
 import 'package:edusocial/models/post_model.dart';
 import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:edusocial/services/entry_services.dart';
+import 'package:edusocial/services/people_profile_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import 'package:intl/intl.dart';
 import '../models/profile_model.dart';
 import '../models/entry_model.dart';
 import '../models/user_model.dart';
+import '../models/people_profile_model.dart';
 import '../services/profile_service.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -52,6 +54,9 @@ class ProfileController extends GetxController {
   // 📝 Kullanıcının entries'ları (PeopleProfileScreen'deki gibi)
   var personEntries = <EntryModel>[].obs;
 
+  // Kullanıcı cache'i - performans için (PeopleProfileController'dan alındı)
+  final Map<int, UserModel> _userCache = {};
+
   // 📊 Filtrelenmiş takipçi sayısını hesapla
   void calculateFilteredFollowers() {
     final approvedFollowers = followerList.where((follower) {
@@ -85,7 +90,7 @@ String formatSimpleDate(String dateStr) {
   }
 }
 
-  /// Profil postlarını ayrı bir endpoint'ten çek
+  /// Profil postlarını ayrı bir endpoint'ten çek (Eski yöntem - geriye uyumluluk için)
   Future<void> fetchProfilePosts() async {
     try {
       debugPrint("🔄 fetchProfilePosts() başlatıldı");
@@ -93,7 +98,7 @@ String formatSimpleDate(String dateStr) {
       // /me endpoint'inden gelen profil verisindeki postları kullan
       final profileData = profile.value;
       if (profileData != null) {
-        debugPrint("📦 /me endpoint'inden ${profileData.posts!.length} post alındı");
+        debugPrint("📦 /me endpoint'inden ${profileData.posts.length} post alındı");
         
         // Her post için detaylı debug
         for (int i = 0; i < profileData.posts.length; i++) {
@@ -105,7 +110,7 @@ String formatSimpleDate(String dateStr) {
         }
         
         // /me endpoint'inden gelen postlar zaten kullanıcının kendi postları
-        final userPosts = profileData.posts!;
+        final userPosts = profileData.posts;
         debugPrint("👤 /me endpoint'inden gelen post sayısı: ${userPosts.length}");
         
         // Hesap tipi kontrolü - kendi profilimizde olduğumuz için her zaman göster
@@ -135,6 +140,7 @@ String formatSimpleDate(String dateStr) {
 
   Future<void> loadProfile() async {
     isLoading.value = true;
+    _userCache.clear(); // Cache'i temizle
     
     try {
       debugPrint("🔄 ProfileController.loadProfile() başlatıldı");
@@ -147,24 +153,17 @@ String formatSimpleDate(String dateStr) {
       }
       debugPrint("🔑 Token kontrolü başarılı");
       
-      // Ana profil verisi
-      debugPrint("📥 Ana profil verisi çekiliyor...");
+      // Önce /me endpoint'inden temel profil verilerini al
+      debugPrint("📥 Temel profil verisi çekiliyor (/me endpoint)...");
       final profileData = await _profileService.fetchProfileData();
       profile.value = profileData;
       userId.value = profileData.id.toString();
       
-      debugPrint("✅ Ana profil verisi yüklendi:");
-      //debugPrint("  - ID: ${profileData.id}");
-      //debugPrint("  - Name: ${profileData.name} ${profileData.surname}");
-      //debugPrint("  - Username: ${profileData.username}");
-      //debugPrint("  - Account Type: ${profileData.accountType}");
-      //debugPrint("  - Avatar: ${profileData.avatarUrl}");
-      //debugPrint("  - Banner: ${profileData.bannerUrl}");
-      //debugPrint("  - Bio: ${profileData.description}");
-      //debugPrint("  - Followers: ${profileData.followers.length}");
-      //debugPrint("  - Following: ${profileData.followings.length}");
-      //debugPrint("  - Posts: ${profileData.posts?.length ?? 0}");
-      //debugPrint("  - Entries: ${profileData.entries?.length ?? 0}");
+      debugPrint("✅ Temel profil verisi yüklendi:");
+      debugPrint("  - ID: ${profileData.id}");
+      debugPrint("  - Name: ${profileData.name} ${profileData.surname}");
+      debugPrint("  - Username: ${profileData.username}");
+      debugPrint("  - Account Type: ${profileData.accountType}");
       
       // Temel veriler
       fullName.value = "${profileData.name} ${profileData.surname}";
@@ -193,17 +192,17 @@ String formatSimpleDate(String dateStr) {
       debugPrint("  - Followers: ${followers.value} (Filtered: ${filteredFollowers.value})");
       debugPrint("  - Following: ${following.value} (Filtered: ${filteredFollowing.value})");
       
-      // 🚀 Ana profil verisi yüklendi, UI'ı hemen göster
+      // 🚀 Temel profil verisi yüklendi, UI'ı hemen göster
       isLoading.value = false;
-      debugPrint("✅ Ana profil verisi UI'da gösteriliyor");
+      debugPrint("✅ Temel profil verisi UI'da gösteriliyor");
+      
+      // 🔄 Şimdi PeopleProfileService ile detaylı verileri yükle
+      debugPrint("🔄 PeopleProfileService ile detaylı veriler yükleniyor...");
+      await _loadDetailedProfileData(profileData.username);
       
       // 🔄 Diğer veriler paralel olarak arka planda yüklenir
       debugPrint("🔄 Arka plan verileri yükleniyor...");
-      Future.wait([
-        fetchProfilePosts(),
-        _fetchEntriesFromUsername(profileData.username),
-      ]).then((_) {
-        _updateRelatedData();
+      _updateRelatedData().then((_) {
         debugPrint("✅ Tüm profil verileri yüklendi");
       }).catchError((e) {
         debugPrint("❌ Arka plan veri yükleme hatası: $e");
@@ -214,12 +213,40 @@ String formatSimpleDate(String dateStr) {
       isLoading.value = false;
       rethrow;
     }
+  }
+
+  /// PeopleProfileService ile detaylı profil verilerini yükle
+  Future<void> _loadDetailedProfileData(String username) async {
+    try {
+      debugPrint("🔄 _loadDetailedProfileData() başlatıldı: $username");
+      
+      final data = await PeopleProfileService.fetchUserByUsername(username);
+      debugPrint("📥 PeopleProfileService'den dönen data: ${data != null ? 'VAR' : 'YOK'}");
+      
+      if (data != null) {
+        debugPrint("✅ PeopleProfileService'den veri alındı:");
+        debugPrint("  - Posts: ${data.posts.length}");
+        debugPrint("  - Entries: ${data.entries.length}");
+        
+        // Posts'ları işle
+        await _processPostsFromPeopleProfile(data.posts);
+        
+        // Entries'ları işle
+        await _processEntriesFromPeopleProfile(data.entries);
+        
+        debugPrint("✅ Detaylı profil verileri yüklendi");
+      } else {
+        debugPrint("⚠️ PeopleProfileService'den veri alınamadı");
+      }
+    } catch (e) {
+      debugPrint("❌ Detaylı profil veri yükleme hatası: $e");
+    }
   } 
 
   /// Profil yüklendikten sonra ilgili verileri güncelle
-  void _updateRelatedData() {
+  Future<void> _updateRelatedData() async {
     // AppBar ve Story'leri paralel güncelle
-    Future.wait([
+    await Future.wait([
       Future(() async {
         try {
           appBarController.fetchAndSetProfileImage();
@@ -244,6 +271,13 @@ String formatSimpleDate(String dateStr) {
 
   void getToUserSettingScreen() async {
     Get.toNamed("/userSettings");
+  }
+
+  @override
+  void onClose() {
+    // Controller dispose edildiğinde cache'i temizle
+    _userCache.clear();
+    super.onClose();
   }
 
   void getToPeopleProfileScreen(String username) async {
@@ -314,7 +348,125 @@ String formatSimpleDate(String dateStr) {
     }
   }
 
-  /// Username'den entries'ları çek
+  /// PeopleProfileService'den gelen posts'ları işle
+  Future<void> _processPostsFromPeopleProfile(List<PostModel> posts) async {
+    try {
+      debugPrint("🔄 _processPostsFromPeopleProfile() başlatıldı: ${posts.length} post");
+      
+      // PeopleProfileService'den gelen posts'lar zaten kullanıcının kendi posts'ları
+      profilePosts.assignAll(posts);
+      postCount.value = posts.length;
+      
+      debugPrint("✅ Profile posts yüklendi: ${posts.length} post");
+      debugPrint("👤 Kullanıcının kendi posts'ları her zaman görünür");
+      
+    } catch (e) {
+      debugPrint("❌ Profile posts işleme hatası: $e");
+    }
+  }
+
+  /// PeopleProfileService'den gelen entries'ları işle
+  Future<void> _processEntriesFromPeopleProfile(List<EntryModel> entries) async {
+    try {
+      debugPrint("🔄 _processEntriesFromPeopleProfile() başlatıldı: ${entries.length} entry");
+      
+      if (entries.isEmpty) {
+        personEntries.assignAll([]);
+        return;
+      }
+
+      // 1. Önce tüm benzersiz topic user_id'lerini topla
+      final Set<int> uniqueUserIds = {};
+      for (final entry in entries) {
+        final topicUserId = entry.topic?.userId;
+        if (topicUserId != null) {
+          uniqueUserIds.add(topicUserId);
+        }
+      }
+
+      debugPrint("🔍 ${uniqueUserIds.length} benzersiz kullanıcı ID'si bulundu");
+
+      // 2. Tüm kullanıcıları batch olarak çek
+      if (uniqueUserIds.isNotEmpty) {
+        final userDataMap = await PeopleProfileService.fetchUsersByIds(uniqueUserIds.toList());
+        
+        // Cache'e ekle
+        for (final entry in userDataMap.entries) {
+          _userCache[entry.key] = _createUserModelFromProfile(entry.value);
+        }
+        
+        debugPrint("✅ ${_userCache.length} kullanıcı verisi batch olarak cache'lendi");
+      }
+
+      // 3. Entry'leri işle ve cache'den kullanıcı bilgilerini al
+      final processedEntries = entries.map((entry) {
+        final topicUserId = entry.topic?.userId;
+        
+        if (topicUserId != null && _userCache.containsKey(topicUserId)) {
+          final user = _userCache[topicUserId]!;
+          
+          return EntryModel(
+            id: entry.id,
+            content: entry.content,
+            upvotescount: entry.upvotescount,
+            downvotescount: entry.downvotescount,
+            humancreatedat: entry.humancreatedat,
+            createdat: entry.createdat,
+            user: user,
+            topic: entry.topic,
+            islike: entry.islike,
+            isdislike: entry.isdislike,
+          );
+        } else {
+          // Cache'de yoksa orijinal entry'yi kullan
+          return entry;
+        }
+      }).toList();
+
+      personEntries.assignAll(processedEntries);
+      debugPrint("✅ Tüm entries optimize edilmiş şekilde işlendi");
+      
+    } catch (e) {
+      debugPrint("❌ Entries işleme hatası: $e");
+      // Hata durumunda orijinal entries'ları kullan
+      personEntries.assignAll(entries);
+    }
+  }
+
+  /// PeopleProfileModel'den UserModel oluştur
+  UserModel _createUserModelFromProfile(PeopleProfileModel profile) {
+    return UserModel(
+      id: profile.id,
+      accountType: profile.accountType,
+      languageId: profile.languageId != null ? int.tryParse(profile.languageId!) ?? 1 : 1,
+      avatar: profile.avatar,
+      banner: profile.banner,
+      schoolId: profile.schoolId != null ? int.tryParse(profile.schoolId!) ?? 1 : 1,
+      schoolDepartmentId: profile.schoolDepartmentId != null ? int.tryParse(profile.schoolDepartmentId!) ?? 1 : 1,
+      name: profile.name,
+      surname: profile.surname,
+      username: profile.username,
+      email: profile.email,
+      phone: profile.phone,
+      birthday: profile.birthDate.isNotEmpty ? DateTime.tryParse(profile.birthDate) : null,
+      instagram: profile.instagram,
+      tiktok: profile.tiktok,
+      twitter: profile.twitter,
+      facebook: profile.facebook,
+      linkedin: profile.linkedin,
+      notificationEmail: profile.notificationEmail,
+      notificationMobile: profile.notificationMobile,
+      isActive: profile.isActive,
+      isOnline: profile.isOnline,
+      avatarUrl: profile.avatarUrl.isNotEmpty ? profile.avatarUrl : profile.avatar,
+      bannerUrl: profile.bannerUrl,
+      isFollowing: profile.isFollowing,
+      isFollowingPending: profile.isFollowingPending,
+      isSelf: profile.isSelf,
+    );
+  }
+
+  /// Username'den entries'ları çek (Eski yöntem - geriye uyumluluk için)
   Future<void> _fetchEntriesFromUsername(String username) async {
     try {
       debugPrint("🔄 _fetchEntriesFromUsername() başlatıldı: $username");

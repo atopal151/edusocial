@@ -60,7 +60,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                       languageService
                           .tr("verification.documentUpload.$documentTypeKey"),
                       style: GoogleFonts.inter(
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Color(0xff414751),
                       ),
@@ -72,8 +72,9 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                       languageService
                           .tr("verification.documentUpload.description"),
                       style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Color(0xff6b7280),
+                        fontSize: 12,
+                        color: Color(0xff9ca3ae),
+                        fontWeight: FontWeight.w400,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -81,7 +82,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
 
                     // Divider
                     Divider(
-                      color: Color(0xffe5e7eb),
+                      color: Color(0xffe2e5ea),
                       height: 1,
                     ),
                     SizedBox(height: 2),
@@ -146,7 +147,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                     height: 50,
                     borderRadius: 16,
                     isLoading: false.obs,
-                    backgroundColor: Color(0xffef5050),
+                    backgroundColor: Color(0xfffb535c),
                     textColor: Colors.white,
                     onPressed: uploadedFileName != null
                         ? () {
@@ -184,8 +185,8 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
           ),
           child: SvgPicture.asset(
             'images/icons/selected_document.svg',
-            width: 24,
-            height: 24,
+            width: 28,
+            height: 28,
           ),
         ),
         SizedBox(width: 8),
@@ -197,8 +198,8 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                 languageService.tr(
                     "verification.documentUpload.uploadArea.$documentTypeKey"),
                 style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 13.28,
+                  fontWeight: FontWeight.w700,
                   color: Color(0xff374151),
                 ),
               ),
@@ -206,8 +207,9 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                 languageService
                     .tr("verification.documentUpload.uploadArea.uploadFile"),
                 style: GoogleFonts.inter(
-                  fontSize: 10,
-                  color: Color(0xff6b7280),
+                  fontSize: 12,
+                  color: Color(0xff9ca3ae),
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ],
@@ -231,7 +233,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
           child: Icon(
             Icons.image,
             color: Color(0xff9ca3ae),
-            size: 20,
+            size: 24,
           ),
         ),
         SizedBox(width: 12),

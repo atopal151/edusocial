@@ -70,7 +70,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 height: 50,
                 borderRadius: 16,
                 isLoading: false.obs,
-                backgroundColor: Color(0xffef5050),
+                backgroundColor: Color(0xfffb535c),
                 textColor: Colors.white,
                 onPressed: () {
                   if (selectedDocumentType != null) {
@@ -152,7 +152,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     subtitle,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: Color(0xff6b7280),
+                      color: Color(0xff9ca3ae),
                     ),
                   ),
                 ],
