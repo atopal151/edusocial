@@ -12,6 +12,8 @@ class MatchModel {
   final int grade;
   final List<String> matchedTopics;
   final bool isFollowing;
+  final bool isPrivate; // Profil gizlilik durumu
+  final bool isPending; // Takip isteği beklemede mi
 
   int? get age {
     if (birthday == null) return null;
@@ -38,6 +40,8 @@ class MatchModel {
     required this.grade,
     required this.matchedTopics,
     required this.isFollowing,
+    required this.isPrivate,
+    required this.isPending,
   });
 
   factory MatchModel.fromJson(Map<String, dynamic> json) {
@@ -62,10 +66,12 @@ class MatchModel {
       matchedTopics:
           json['matched_lesson'] != null ? [json['matched_lesson']] : [],
       isFollowing: user['is_following'] ?? false,
+      isPrivate: user['account_type'] == 'private' || user['is_private'] == true,
+      isPending: user['is_pending'] ?? false,
     );
   }
 
-  MatchModel copyWith({bool? isFollowing}) {
+  MatchModel copyWith({bool? isFollowing, bool? isPending}) {
     return MatchModel(
       userId: userId,
       name: name,
@@ -80,6 +86,8 @@ class MatchModel {
       grade: grade,
       matchedTopics: matchedTopics,
       isFollowing: isFollowing ?? this.isFollowing,
+      isPrivate: isPrivate,
+      isPending: isPending ?? this.isPending,
     );
   }
 }

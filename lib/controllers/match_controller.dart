@@ -1,5 +1,6 @@
 import 'package:edusocial/services/match_service.dart';
 import 'package:edusocial/services/language_service.dart';
+import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,19 +28,31 @@ class MatchController extends GetxController {
       for (var topic in savedTopics) {
         bool success = await MatchServices.addLesson(topic);
         if (!success) {
-          Get.snackbar(languageService.tr("common.error"), "'$topic' ${languageService.tr("common.messages.courseAlreadyAdded")}",
-              snackPosition: SnackPosition.BOTTOM);
+          CustomSnackbar.show(
+            title: languageService.tr("common.error"),
+            message: "'$topic' ${languageService.tr("common.messages.courseAlreadyAdded")}",
+            type: SnackbarType.error,
+            duration: const Duration(seconds: 3),
+          );
         }
       }
-      Get.snackbar(languageService.tr("common.success"), languageService.tr("common.messages.courseSavedToProfile"),
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: languageService.tr("common.success"),
+        message: languageService.tr("common.messages.courseSavedToProfile"),
+        type: SnackbarType.success,
+        duration: const Duration(seconds: 3),
+      );
       
       // Kurslar kaydedildikten sonra ana sayfaya dön
       Get.offAllNamed('/main');
     } catch (e) {
       debugPrint("❗ Ders kaydedilirken hata: $e");
-      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.generalError"),
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("common.messages.generalError"),
+        type: SnackbarType.error,
+        duration: const Duration(seconds: 4),
+      );
     } finally {
       isLoading.value = false;
     }
@@ -47,18 +60,35 @@ class MatchController extends GetxController {
 
   void followUser() async {
     final userId = currentMatch.userId;
+    final isPrivate = currentMatch.isPrivate;
 
     final success = await MatchServices.followUser(userId);
     if (success) {
-      Get.snackbar(languageService.tr("common.success"), "${currentMatch.name} ${languageService.tr("common.messages.userFollowed")}",
-          snackPosition: SnackPosition.BOTTOM);
+      // Profil gizlilik durumuna göre farklı mesajlar göster
+      String message;
+      if (isPrivate) {
+        message = "${currentMatch.name} ${languageService.tr("common.messages.followRequestSent")}";
+        // Gizli profil için pending durumunu güncelle
+        matches[currentIndex.value] = matches[currentIndex.value].copyWith(isPending: true);
+      } else {
+        message = "${currentMatch.name} ${languageService.tr("common.messages.userFollowed")}";
+        // Açık profil için following durumunu güncelle
+        matches[currentIndex.value] = matches[currentIndex.value].copyWith(isFollowing: true);
+      }
 
-      // Match modelini güncelle
-      matches[currentIndex.value] =
-          matches[currentIndex.value].copyWith(isFollowing: true);
+      CustomSnackbar.show(
+        title: languageService.tr("common.success"),
+        message: message,
+        type: SnackbarType.success,
+        duration: const Duration(seconds: 3),
+      );
     } else {
-      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.followOperationFailed"),
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("common.messages.followOperationFailed"),
+        type: SnackbarType.error,
+        duration: const Duration(seconds: 4),
+      );
     }
   }
 

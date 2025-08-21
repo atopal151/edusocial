@@ -123,12 +123,8 @@ class GroupServices {
     final box = GetStorage();
     final token = box.read('token');
 
-    //debugPrint("🚀 fetchUserGroups() çağrıldı");
-    //debugPrint("🔑 Token: $token");
-
     try {
       final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
-      //debugPrint("🌐 İstek Atılıyor: $uri");
 
       final response = await http.get(
         uri,
@@ -138,76 +134,16 @@ class GroupServices {
         },
       );
 
-      //debugPrint("📥 Kullanıcı Grupları Status: ${response.statusCode}");
-      print("📥 User Groups Response: ${response.statusCode}");
-      printFullText("📥 User Groups Body: ${response.body}");
-
-      //debugPrint("📥 Kullanıcı Grupları Response Headers:");
-      //debugPrint("${response.headers}");
-      //debugPrint("📥 Response Body Length: ${response.body.length} characters");
+      printFullText("📥 USER GROUPS API RESPONSE:");
+      printFullText("Status Code: ${response.statusCode}");
+      printFullText("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
-        // Parsed JSON response (commented out to avoid duplication)
-        // debugPrint("📦 Parsed JSON Response:");
-        // debugPrint("${json.encode(jsonBody)}");
-        printFullText("GROUPS DATA:${json.encode(jsonBody)}");
-
         final List<dynamic> data = jsonBody['data'] ?? [];
-        //debugPrint("📦 Gelen Kullanıcı Grubu Sayısı: ${data.length}");
-
-        // Show all available fields in the first group (if exists)
-        if (data.isNotEmpty) {
-          //final firstGroup = data[0];
-          //debugPrint('📊 Available Fields in API Response:');
-          //debugPrint('${firstGroup.keys.toList()}');
-          //debugPrint('');
-        }
-
-        // Print each group data individually with detailed analysis
-        for (int i = 0; i < data.length; i++) {
-          final groupData = data[i];
-          //debugPrint("📋 Group ${i + 1} Raw Data:");
-          //debugPrint("${json.encode(groupData)}");
-
-          // Detailed analysis of each group
-          //debugPrint('🔍 Group ${i + 1} Detailed Analysis:');
-          //debugPrint('   ID: ${groupData['id']}');
-          //debugPrint('   Name: ${groupData['name']}');
-          //debugPrint('   Description: ${groupData['description']}');
-          //debugPrint('   Status: ${groupData['status']}');
-          //debugPrint('   Is Private: ${groupData['is_private']}');
-          //debugPrint('   Message Count: ${groupData['message_count']}');
-          //debugPrint('   User Count With Admin: ${groupData['user_count_with_admin']}');
-          //debugPrint('   User Count Without Admin: ${groupData['user_count_without_admin']}');
-          //debugPrint('   Is Founder: ${groupData['is_founder']}');
-          //debugPrint('   Is Member: ${groupData['is_member']}');
-          //debugPrint('   Is Pending: ${groupData['is_pending']}');
-          //debugPrint('   Avatar URL: ${groupData['avatar_url']}');
-          //debugPrint('   Banner URL: ${groupData['banner_url']}');
-          //debugPrint('   Created At: ${groupData['created_at']}');
-          //debugPrint('   Updated At: ${groupData['updated_at']}');
-          //debugPrint('   Human Created At: ${groupData['human_created_at']}');
-          //debugPrint('   Deleted At: ${groupData['deleted_at']}');
-          //debugPrint('   User ID: ${groupData['user_id']}');
-          //debugPrint('   Group Area ID: ${groupData['group_area_id']}');
-
-          // Pivot data analysis
-          if (groupData['pivot'] != null) {
-            //final pivot = groupData['pivot'];
-            //debugPrint('   📌 Pivot Data:');
-            //debugPrint('      User ID: ${pivot['user_id']}');
-            //debugPrint('      Group ID: ${pivot['group_id']}');
-            //debugPrint('      Pivot Created At: ${pivot['created_at']}');
-            //debugPrint('      Pivot Updated At: ${pivot['updated_at']}');
-          }
-
-          //debugPrint(''); // Empty line for separation
-        }
 
         final userGroupList =
             data.map((item) => GroupModel.fromJson(item)).toList();
-        //debugPrint("✅ Başarıyla ${userGroupList.length} grup parse edildi");
 
         return userGroupList;
       } else {
@@ -262,6 +198,10 @@ class GroupServices {
           'Accept': 'application/json',
         },
       );
+
+      printFullText("📥 ALL GROUPS API RESPONSE:");
+      printFullText("Status Code: ${response.statusCode}");
+      printFullText("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);

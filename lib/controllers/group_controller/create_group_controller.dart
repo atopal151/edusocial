@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:edusocial/models/group_models/group_area_model.dart';
 import 'package:edusocial/services/group_services/create_group_service.dart';
 import 'package:edusocial/services/language_service.dart';
+import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,10 +48,14 @@ Future<void> createGroup() async {
   final area = selectedGroupArea.value;
 
   if (name.isEmpty || desc.isEmpty || area == null) {
-    Get.snackbar(languageService.tr("common.messages.missingInfo"), languageService.tr("common.messages.fillAllFields"));
+    CustomSnackbar.show(
+      title: languageService.tr("common.messages.missingInfo"),
+      message: languageService.tr("common.messages.fillAllFields"),
+      type: SnackbarType.warning,
+      duration: const Duration(seconds: 4),
+    );
     return;
   }
-
 
   isLoading.value = true;
 
@@ -68,15 +73,30 @@ Future<void> createGroup() async {
 
     if (success) {
       Get.back();
-      Get.snackbar(languageService.tr("common.success"), languageService.tr("common.messages.groupCreatedSuccessfully"));
+      CustomSnackbar.show(
+        title: languageService.tr("common.success"),
+        message: languageService.tr("common.messages.groupCreatedSuccessfully"),
+        type: SnackbarType.success,
+        duration: const Duration(seconds: 3),
+      );
     } else {
-      Get.snackbar(languageService.tr("common.error"), languageService.tr("common.messages.groupCreationFailed"));
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("common.messages.groupCreationFailed"),
+        type: SnackbarType.error,
+        duration: const Duration(seconds: 4),
+      );
     }
   } catch (e, stack) {
     isLoading.value = false;
     debugPrint("❌ Grup oluşturulurken hata oluştu: $e");
     debugPrint("📛 Stack Trace:\n$stack");
-    Get.snackbar(languageService.tr("common.error"), "${languageService.tr("common.messages.groupCreationFailed")}: $e");
+    CustomSnackbar.show(
+      title: languageService.tr("common.error"),
+      message: "${languageService.tr("common.messages.groupCreationFailed")}: $e",
+      type: SnackbarType.error,
+      duration: const Duration(seconds: 5),
+    );
   }
 }
 

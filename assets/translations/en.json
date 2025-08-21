@@ -919,6 +919,8 @@
       "noInfoYet": "No info yet",
       "matchedTopics": "Topics matched with you",
       "following": "Following",
+      "sendFollowRequest": "Send Follow Request",
+      "pendingApproval": "Pending Approval",
       "message": "Message"
     }
   },
@@ -1423,6 +1425,7 @@
       "courseAlreadyAdded": "course is already added or could not be added",
       "courseSavedToProfile": "Courses saved to your profile!",
       "userFollowed": "followed!",
+      "followRequestSent": "follow request sent!",
       "followOperationFailed": "Follow operation failed",
       "connectionErrorMessage": "Connection Error",
       "tryAgainButton": "Try Again",

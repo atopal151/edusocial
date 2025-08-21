@@ -76,7 +76,7 @@ class _MatchCardState extends State<MatchCard> {
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
                               _dragOffset.dx > 0 
-                                ? languageService.tr("match.card.follow") 
+                                ? _getFollowButtonText(match, languageService)
                                 : languageService.tr("match.card.next"),
                               style: GoogleFonts.inter(
                                 fontSize: 30,
@@ -254,9 +254,7 @@ class _MatchCardState extends State<MatchCard> {
               children: [
                 _buildActionButton(
                   iconPath: 'images/icons/match_user_add_icon.svg',
-                  label: match.isFollowing 
-                    ? languageService.tr("match.card.following") 
-                    : languageService.tr("match.card.follow"),
+                  label: _getFollowButtonText(match, languageService),
                   color: const Color(0xff65D384),
                   onTap: controller.followUser,
                 ),
@@ -278,6 +276,26 @@ class _MatchCardState extends State<MatchCard> {
         ),
       ),
     );
+  }
+
+  String _getFollowButtonText(match, LanguageService languageService) {
+    // Eğer kullanıcı zaten takip ediliyorsa
+    if (match.isFollowing) {
+      return languageService.tr("match.card.following");
+    }
+    
+    // Eğer takip isteği beklemedeyse
+    if (match.isPending) {
+      return languageService.tr("match.card.pendingApproval");
+    }
+    
+    // Eğer profil gizliyse
+    if (match.isPrivate) {
+      return languageService.tr("match.card.sendFollowRequest");
+    }
+    
+    // Eğer profil açıksa
+    return languageService.tr("match.card.follow");
   }
 
   Widget _buildActionButton({

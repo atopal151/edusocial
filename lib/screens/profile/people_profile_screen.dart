@@ -195,7 +195,7 @@
                             ),
                           ),
                         ),
-                        SliverFillRemaining(
+                        SliverToBoxAdapter(
                           child: Obx(() {
                             return selectedTabIndex.value == 0
                                 ? _buildPosts()
@@ -249,12 +249,8 @@
 
       return Container(
         decoration: BoxDecoration(color: Color(0xfffafafa)),
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: posts.length,
-          itemBuilder: (context, index) {
-            final post = posts[index];
+        child: Column(
+          children: posts.map((post) {
             final date = formatSimpleDateClock(post.postDate);
             return PostCard(
               postId: post.id,
@@ -272,7 +268,7 @@
               links: post.links,
               slug: post.slug,
             );
-          },
+          }).toList(),
         ),
       );
     }
@@ -313,13 +309,8 @@
           );
         }
 
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: controller.peopleEntries.length,
-          itemBuilder: (context, index) {
-            final entry = controller.peopleEntries[index];
-
+        return Column(
+          children: controller.peopleEntries.map((entry) {
             // Entry'nin kullanıcı bilgilerini al
             final user = entry.user;
           
@@ -373,7 +364,7 @@
                 ),
               ),
             );
-          },
+          }).toList(),
         );
       });
     }

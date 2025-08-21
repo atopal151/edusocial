@@ -980,6 +980,8 @@
       "noInfoYet": "Henüz bilgi yok",
       "matchedTopics": "Seninle eşleştiği konular",
       "following": "Takip Ediliyor",
+      "sendFollowRequest": "Takip İsteği Gönder",
+      "pendingApproval": "Onay Bekliyor",
       "message": "Mesaj"
     }
   },
@@ -1485,6 +1487,7 @@
       "courseAlreadyAdded": "dersi zaten eklenmiş veya eklenemedi",
       "courseSavedToProfile": "Dersler profilinize kaydedildi!",
       "userFollowed": "takip edildi!",
+      "followRequestSent": "takip isteği gönderildi!",
       "followOperationFailed": "Takip işlemi başarısız",
       "connectionErrorMessage": "Bağlantı Hatası",
       "tryAgainButton": "Tekrar Dene",

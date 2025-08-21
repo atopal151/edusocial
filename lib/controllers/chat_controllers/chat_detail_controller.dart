@@ -413,10 +413,18 @@ class ChatDetailController extends GetxController {
         }
       }
       
-      // Son fallback: ilk mesajın sender'ını al
+      // Son fallback: currentChatId.value'yu kullanarak API'den kullanıcı bilgilerini al
       if (targetSender == null) {
-        targetSender = messages.first.sender;
-        debugPrint('  ⚠️ Final fallback: ilk mesajın sender\'ı alındı');
+        debugPrint('  ⚠️ Final fallback: currentChatId.value kullanılarak kullanıcı bilgileri alınacak');
+        // Bu durumda UI'dan gelen bilgileri kullan (onInit'te atanan)
+        targetSender = SenderModel(
+          id: currentChatId.value ?? 0,
+          accountType: 'public', // Default değer
+          name: name.value.split(' ').first,
+          surname: name.value.split(' ').length > 1 ? name.value.split(' ').skip(1).join(' ') : '',
+          username: username.value,
+          avatarUrl: avatarUrl.value,
+        );
       }
       
       final userName = '${targetSender.name} ${targetSender.surname}'.trim();

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../controllers/story_controller.dart';
 import '../../../controllers/profile_controller.dart';
 import '../../../components/snackbars/custom_snackbar.dart';
+import '../../../components/buttons/custom_button.dart';
 import '../../../services/language_service.dart';
 
 class AddStoryScreen extends StatefulWidget {
@@ -327,70 +328,30 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF5F5F5),
-                      foregroundColor: const Color(0xFFF26B6B),
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: pickImages,
-                    label: Text(
-                      languageService.tr("home.story.addStory.selectFromGallery"),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFFF26B6B),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            child: CustomButton(
+              height: 45,
+              borderRadius: 8,
+              text: languageService.tr("home.story.addStory.selectFromGallery"),
+              onPressed: pickImages,
+              isLoading: false.obs,
+              backgroundColor: const Color(0xFFF5F5F5),
+              textColor: const Color(0xFFF26B6B),
+              borderColor: const Color(0xFFF26B6B),
+             
             ),
           ),
           if (_selectedImages.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-              child: Obx(() => SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: isPosting.value ? null : shareStory,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isPosting.value
-                            ? Colors.grey
-                            : const Color(0xFFF26B6B),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: isPosting.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              languageService.tr("home.story.addStory.share"),
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                    ),
-                  )),
+              child: CustomButton(
+                height: 45,
+                borderRadius: 8,
+                text: languageService.tr("home.story.addStory.share"),
+                onPressed: shareStory,
+                isLoading: isPosting,
+                backgroundColor: const Color(0xFFF26B6B),
+                textColor: Colors.white,
+              ),
             ),
           const SizedBox(height: 20),
         ],
