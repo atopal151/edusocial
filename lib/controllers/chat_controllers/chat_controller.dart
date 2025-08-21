@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/chat_models/chat_model.dart';
 import '../../models/chat_models/group_chat_model.dart';
+import '../../services/chat_service.dart';
 
-class ChatController extends GetxController {
+class ChatController extends GetxController with WidgetsBindingObserver {
   /// Observable veriler
   var onlineFriends = <ChatUserModel>[].obs;
   var chatList = <ChatModel>[].obs;
@@ -17,6 +18,9 @@ class ChatController extends GetxController {
   var filteredChatList = <ChatModel>[].obs;
   var filteredGroupChatList = <GroupChatModel>[].obs;
   var isLoading = false.obs;
+  
+  // Socket'ten gelen toplam okunmamış mesaj sayısı
+  var totalUnreadCount = 0.obs;
 
   final TextEditingController searchController = TextEditingController();
 
@@ -24,19 +28,50 @@ class ChatController extends GetxController {
   late StreamSubscription _privateMessageSubscription;
   late StreamSubscription _groupMessageSubscription;
   late StreamSubscription _unreadCountSubscription;
+  late StreamSubscription _perChatUnreadCountSubscription;
   
+  // Kalıcı kırmızı nokta durumları
+  var unreadConversationIds = <int>[].obs;
+
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
+    
+    // Socket service'i initialize et
     _socketService = Get.find<SocketService>();
+    
+    // Kalıcı kırmızı nokta durumlarını yükle
+    _loadPersistentUnreadStatus();
+    
     _setupSocketListeners();
     
+    // Uygulama başlatıldığında chat listesini çek
     fetchChatList();
     fetchOnlineFriends();
+    
+    // Socket bağlantısı hazır olduğunda conversation bazında unread count iste
+    Future.delayed(Duration(seconds: 2), () {
+      _requestConversationUnreadCounts();
+      
+      // Toplam unread count'u da iste
+      if (_socketService.isConnected.value) {
+        _socketService.sendMessage('get:unread_count', {});
+      }
+    });
+    
+    // 5 saniye sonra tekrar kontrol et
+    Future.delayed(Duration(seconds: 5), () {
+      _requestConversationUnreadCounts();
+      if (_socketService.isConnected.value) {
+        _socketService.sendMessage('get:unread_count', {});
+      }
+    });
   }
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     _privateMessageSubscription.cancel();
     _groupMessageSubscription.cancel();
     _unreadCountSubscription.cancel();
@@ -54,8 +89,13 @@ class ChatController extends GetxController {
       handleNewGroupMessage(data);
     });
 
-    _unreadCountSubscription = _socketService.onUnreadMessageCount.listen((data) {
-      updateUnreadCount(data['count'] ?? 0);
+    _unreadCountSubscription = _socketService.onUnreadMessageCount.listen((data) async {
+      await updateUnreadCount(data);
+    });
+
+    // Conversation bazında unread count dinleyicisi
+    _socketService.onPerChatUnreadCount.listen((data) {
+      handleConversationUnreadCount(data);
     });
   }
 
@@ -90,10 +130,10 @@ class ChatController extends GetxController {
         _privateMessageSubscription.resume();
         debugPrint('▶️ SUCCESS: ChatController private message listener resumed');
       } else {
-        debugPrint('▶️ ALREADY ACTIVE: ChatController private message listener was already active');
+        debugPrint('▶️ ALREADY RESUMED: ChatController private message listener was already active');
       }
       
-      // Verification  
+      // Verification
       debugPrint('▶️ VERIFICATION: isPaused=${_privateMessageSubscription.isPaused}');
       
     } catch (e) {
@@ -146,7 +186,6 @@ class ChatController extends GetxController {
   /// 🔥 Online arkadaşları getir (is_recent alanına göre filtrele)
   Future<void> fetchOnlineFriends() async {
     try {
-      isLoading(true);
       final friends = await ChatServices.fetchOnlineFriends();
       
       // is_recent alanına göre filtrele - sadece son aktif olanları göster
@@ -157,14 +196,13 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint('❌ Online arkadaşlar çekilirken hata: $e');
     } finally {
-      isLoading(false);
+      // isLoading(false); // Removed as per new_code
     }
   }
 
   Future<void> fetchChatList() async {
     try {
       isLoading(true);
-      //debugPrint("📱 Chat listesi çekiliyor...");
       
       final fetchedChats = await ChatServices.fetchChatList();
 
@@ -175,27 +213,10 @@ class ChatController extends GetxController {
       chatList.assignAll(filteredChats);
       filteredChatList.assignAll(filteredChats);
 
-      // Okunmamış mesaj özeti
-      //final totalUnread = filteredChats.fold(0, (sum, chat) => sum + chat.unreadCount);
-      final unreadChats = filteredChats.where((chat) => chat.unreadCount > 0).toList();
-      
-      //debugPrint("📊 === CHAT CONTROLLER SUMMARY ===");
-      //debugPrint("📊 Toplam Chat: ${filteredChats.length}");
-      //debugPrint("📊 Toplam Okunmamış: $totalUnread");
-      //debugPrint("📊 Okunmamış Mesajı Olan Chat: ${unreadChats.length}");
-      
-      if (unreadChats.isNotEmpty) {
-        //debugPrint("📊 Okunmamış Mesaj Detayları:");
-        for (var chat in unreadChats) {
-          debugPrint("  - ${chat.name} (@${chat.username}): ${chat.unreadCount} mesaj");
-          debugPrint("    Son mesaj: ${chat.lastMessage?.message ?? 'No message'}");
-        }
-      } else {
-        //debugPrint("📊 Tüm mesajlar okunmuş");
-      }
-      //debugPrint("📊 ==============================");
+      // Kalıcı kırmızı nokta durumlarını uygula
+      _updateChatListUnreadStatus();
 
-      //debugPrint("✅ Chat listesi güncellendi. Toplam: ${chatList.length} sohbet");
+      debugPrint("✅ Chat listesi güncellendi. Toplam: ${chatList.length} sohbet");
     } catch (e) {
       debugPrint('❌ Chat listesi çekilirken hata: $e');
     } finally {
@@ -204,20 +225,26 @@ class ChatController extends GetxController {
   }
 
   /// 📥 Yeni birebir mesaj geldiğinde listeyi güncelle
-  void handleNewPrivateMessage(dynamic data) {
-    //debugPrint("📡 [ChatController] Yeni birebir mesaj payload alındı");
-    //debugPrint("📡 [ChatController] Listener State: isPaused=${_privateMessageSubscription.isPaused}");
-    //debugPrint("📡 [ChatController] Processing: $data");
-
+  Future<void> handleNewPrivateMessage(dynamic data) async {
     try {
-      final conversationId = data['conversation_id'] ?? 0;
+      debugPrint("📡 [ChatController] Yeni birebir mesaj payload alındı");
+      debugPrint("📡 [ChatController] Listener State: isPaused=${_privateMessageSubscription.isPaused}");
+      debugPrint("📡 [ChatController] Processing: $data");
+      
+      final conversationId = data['conversation_id'];
       final messageContent = data['message'] ?? '';
       final timestamp = data['created_at'] ?? '';
+      final isMyMessage = data['is_me'] ?? false;
+      final isRead = data['is_read'] ?? false;
       
-      // Socket'ten gelen is_me field'ını kontrol et (kendi mesajını unread count'a dahil etme)
-      final isMyMessage = data['is_me'] == true;
-      
-      //debugPrint("📡 [ChatController] Mesaj detayları: conversationId=$conversationId, isMyMessage=$isMyMessage");
+      // Detaylı debug print - her mesaj için conversation ID ve is_read bilgisi
+      debugPrint("🔍 === SOCKET MESAJ DETAYI ===");
+      debugPrint("🔍 Conversation ID: $conversationId");
+      debugPrint("🔍 Message: $messageContent");
+      debugPrint("🔍 Is My Message: $isMyMessage");
+      debugPrint("🔍 Is Read: $isRead");
+      debugPrint("🔍 Timestamp: $timestamp");
+      debugPrint("🔍 =========================");
 
       final index =
           chatList.indexWhere((chat) => chat.conversationId == conversationId);
@@ -230,120 +257,160 @@ class ChatController extends GetxController {
           message: messageContent,
           createdAt: timestamp,
         );
-        
-        // Sadece başkasının mesajıysa unread count artır (API'den gelen değeri koru)
-        if (!isMyMessage) {
-          chat.unreadCount += 1;    
-          //debugPrint("📬 [ChatController] Unread count artırıldı: ${chat.name} (${chat.unreadCount})");
+
+        // Socket'ten gelen is_read bilgisine göre kalıcı kırmızı nokta durumunu ayarla
+        if (!isRead) {
+          // Okunmamış mesaj - kalıcı kırmızı nokta ekle
+          if (!unreadConversationIds.contains(conversationId)) {
+            unreadConversationIds.add(conversationId);
+            await ChatServices.markConversationAsUnread(conversationId);
+            
+            // Toplam unread count'u güncelle (1 artır)
+            final newTotalCount = totalUnreadCount.value + 1;
+            totalUnreadCount.value = newTotalCount;
+            await ChatServices.saveTotalUnreadCount(newTotalCount);
+            debugPrint("📊 Toplam unread count artırıldı: ${totalUnreadCount.value} -> $newTotalCount");
+          }
+          chat.hasUnreadMessages = true;
+          debugPrint("🔴 [ChatController] KALICI KIRMIZI NOKTA EKLENDİ: ${chat.name} (conversation: $conversationId)");
         } else {
-          //debugPrint("📤 [ChatController] Kendi mesajım, unread count artırılmadı");
+          // Okunmuş mesaj - kalıcı kırmızı nokta kaldır
+          if (unreadConversationIds.contains(conversationId)) {
+            unreadConversationIds.remove(conversationId);
+            await ChatServices.markConversationAsRead(conversationId);
+            
+            // Toplam unread count'u güncelle (1 azalt)
+            final newTotalCount = (totalUnreadCount.value - 1).clamp(0, double.infinity).toInt();
+            totalUnreadCount.value = newTotalCount;
+            await ChatServices.saveTotalUnreadCount(newTotalCount);
+            debugPrint("📊 Toplam unread count azaltıldı: ${totalUnreadCount.value} -> $newTotalCount");
+          }
+          chat.hasUnreadMessages = false;
+          debugPrint("⚪ [ChatController] KALICI KIRMIZI NOKTA KALDIRILDI: ${chat.name} (conversation: $conversationId)");
         }
+        
+        // Her mesaj işleminden sonra count'ları doğrula
+        await _validateAndFixUnreadCount();
 
         // Güncellenen sohbeti listenin en başına taşı
         chatList.removeAt(index);
         chatList.insert(0, chat);
 
+        // Filtrelenmiş listeyi de güncelle
+        final filteredIndex = filteredChatList.indexWhere((c) => c.conversationId == conversationId);
+        if (filteredIndex != -1) {
+          final filteredChat = filteredChatList[filteredIndex];
+          filteredChat.lastMessage = chat.lastMessage;
+          filteredChat.hasUnreadMessages = chat.hasUnreadMessages;
+          filteredChatList.removeAt(filteredIndex);
+          filteredChatList.insert(0, filteredChat);
+        }
+
+        // Observable'ları tetikle
+        chatList.refresh();
+        filteredChatList.refresh();
+
       } else {
-        // Yeni sohbet ekle
-        final sender = data['sender'] ?? {};
-        final newChat = ChatModel(
-          id: sender['id'] ?? 0,
-          name: sender['name'] ?? '',
-          surname: sender['surname'] ?? '',
-          username: sender['username'] ?? '',
-          avatar: sender['avatar_url'] ?? '',
-          conversationId: conversationId,
-          isOnline: true, // Yeni mesaj geldiyse online kabul edilebilir
-          unreadCount: isMyMessage ? 0 : 1, // Kendi mesajıysa 0, değilse 1
-          lastMessage: LastMessage(
-            message: messageContent,
-            createdAt: timestamp,
-          ),
-        );
-        chatList.insert(0, newChat);
-        //debugPrint("📝 [ChatController] Yeni chat oluşturuldu: ${newChat.name} (unread: ${newChat.unreadCount})");
+        // Yeni sohbet ekle - bu durumda API'den chat listesini yeniden çek
+        debugPrint("📡 [ChatController] Yeni conversation bulundu, chat listesi yenileniyor...");
+        fetchChatList();
       }
 
-      // Filtrelenmiş listeyi de güncelle
-      filterChatList(searchController.text);
-      
       debugPrint("✅ [ChatController] Mesaj işleme tamamlandı");
-
     } catch (e) {
-      debugPrint("❌ [ChatController] Hata handleNewPrivateMessage: $e");
+      debugPrint("❌ [ChatController] Mesaj işleme hatası: $e");
     }
   }
 
   /// 📥 Yeni grup mesajı geldiğinde listeyi güncelle
   void handleNewGroupMessage(dynamic data) {
-    //debugPrint("📡 Yeni grup mesajı payload: $data");
-    
-    final groupId = data['group_id'];
-    final message = data['message'];
-    final timestamp = data['created_at'];
-
-    final index = groupChatList.indexWhere((group) => group.groupId == groupId);
-    if (index != -1) {
-      groupChatList[index].lastMessage = message;
-      groupChatList[index].lastMessageTime = timestamp;
-      groupChatList[index].unreadCount += 1;
-    } else {
-      groupChatList.add(GroupChatModel(
-        groupId: groupId,
-        groupName: data['group_name'] ?? 'Yeni Grup',
-        groupImage: data['sender']['avatar_url'],
-        lastMessage: message,
-        lastMessageTime: timestamp,
-        unreadCount: 1,
-      ));
-    }
-
-    filteredGroupChatList.assignAll(groupChatList);
-
-    // Filtrelenmiş listeyi de güncelle
-    filterChatList(searchController.text);
-  }
-
-  /// 🔴 Okunmamış mesaj sayısını güncelle
-  void updateUnreadCount(int count) {
-    debugPrint("📬 Socket'ten gelen okunmamış mesaj sayısı: $count");
-    
-    // Socket'ten gelen count'u kullanarak chat listesini yenile
-    // Bu count backend'den gelen gerçek unread count
-    // Chat listesini API'den yeniden çek
-    _refreshChatListWithSocketCount(count);
-  }
-
-  /// Socket count ile chat listesini yenile
-  Future<void> _refreshChatListWithSocketCount(int socketCount) async {
     try {
-      debugPrint("🔄 Socket count ile chat listesi yenileniyor...");
+      debugPrint("📡 [ChatController] Yeni grup mesajı payload alındı");
+      debugPrint("📡 [ChatController] Processing: $data");
       
-      // API'den chat listesini çek
-      final fetchedChats = await ChatServices.fetchChatList();
+      final groupId = data['group_id'];
+      final messageContent = data['message'] ?? '';
+      final timestamp = data['created_at'] ?? '';
+      final isMyMessage = data['is_me'] ?? false;
       
-      // last_message alanı null olanları filtrele
-      final filteredChats = fetchedChats.where((chat) => chat.lastMessage != null).toList();
-      
-      // Socket'ten gelen count ile API count'u karşılaştır
-      final apiTotalUnread = filteredChats.fold(0, (sum, chat) => sum + chat.unreadCount);
-      debugPrint("📊 API Toplam Unread: $apiTotalUnread, Socket Count: $socketCount");
-      
-      // Eğer socket count daha yüksekse, chat listesini güncelle
-      if (socketCount > apiTotalUnread) {
-        debugPrint("📬 Socket count daha yüksek, chat listesi güncelleniyor...");
+      debugPrint("📡 [ChatController] Grup mesaj detayları: groupId=$groupId, isMyMessage=$isMyMessage");
+
+      final index = groupChatList.indexWhere((group) => group.groupId == groupId);
+      if (index != -1) {
+        // Var olan grubu güncelle
+        final group = groupChatList[index];
         
-        // Chat listesini güncelle
-        chatList.assignAll(filteredChats);
-        filteredChatList.assignAll(filteredChats);
-        
-        debugPrint("✅ Chat listesi socket count ile güncellendi. Yeni toplam: ${chatList.fold(0, (sum, chat) => sum + chat.unreadCount)}");
+        // Son mesajı güncelle
+        group.lastMessage = messageContent;
+        group.lastMessageTime = timestamp;
+
+        // Güncellenen grubu listenin en başına taşı
+        groupChatList.removeAt(index);
+        groupChatList.insert(0, group);
+
+        // Filtrelenmiş listeyi de güncelle
+        final filteredIndex = filteredGroupChatList.indexWhere((g) => g.groupId == groupId);
+        if (filteredIndex != -1) {
+          final filteredGroup = filteredGroupChatList[filteredIndex];
+          filteredGroup.lastMessage = group.lastMessage;
+          filteredGroup.lastMessageTime = group.lastMessageTime;
+          filteredGroupChatList.removeAt(filteredIndex);
+          filteredGroupChatList.insert(0, filteredGroup);
+        }
+
+        // Observable'ları tetikle
+        groupChatList.refresh();
+        filteredGroupChatList.refresh();
+
       } else {
-        debugPrint("📊 Socket count API count'tan düşük veya eşit, güncelleme yapılmadı");
+        // Yeni grup ekle - bu durumda API'den grup listesini yeniden çek
+        debugPrint("📡 [ChatController] Yeni grup bulundu, grup listesi yenileniyor...");
+        // fetchGroupList(); // Bu metod varsa çağır
       }
+
+      debugPrint("✅ [ChatController] Grup mesaj işleme tamamlandı");
     } catch (e) {
-      debugPrint("❌ Socket count ile chat listesi yenileme hatası: $e");
+      debugPrint("❌ [ChatController] Grup mesaj işleme hatası: $e");
     }
+  }
+
+  /// 🔴 Socket'ten gelen toplam okunmamış mesaj sayısını güncelle
+  Future<void> updateUnreadCount(dynamic data) async {
+    debugPrint("📬 Socket'ten gelen toplam okunmamış mesaj verisi: $data");
+    
+    int count = 0;
+    
+    if (data is Map<String, dynamic>) {
+      // Farklı key'leri kontrol et
+      count = data['count'] ?? 
+              data['total'] ?? 
+              data['unread'] ?? 
+              data['message_count'] ?? 
+              data['conversation_count'] ?? 0;
+              
+      debugPrint("📬 === UNREAD COUNT VERİ ANALİZİ ===");
+      debugPrint("📬 Count: ${data['count']}");
+      debugPrint("📬 Total: ${data['total']}");
+      debugPrint("📬 Unread: ${data['unread']}");
+      debugPrint("📬 Message Count: ${data['message_count']}");
+      debugPrint("📬 Conversation Count: ${data['conversation_count']}");
+      debugPrint("📬 Seçilen Count: $count");
+      debugPrint("📬 =================================");
+    } else if (data is int) {
+      count = data;
+    } else {
+      debugPrint("⚠️ Beklenmeyen data tipi: ${data.runtimeType}");
+      return;
+    }
+    
+    totalUnreadCount.value = count;
+    
+    // Kalıcı olarak kaydet
+    await ChatServices.saveTotalUnreadCount(count);
+    debugPrint("💾 Toplam unread count kalıcı olarak kaydedildi: $count");
+    
+    // Count'u doğrula ve düzelt
+    await _validateAndFixUnreadCount();
   }
 
   /// 📃 Chat detay sayfasına git
@@ -355,10 +422,10 @@ class ChatController extends GetxController {
     required bool isOnline,
     required String username,
   }) async {
-    // Chat açıldığında o chat'in unreadCount'unu sıfırla
-    markChatAsRead(userId, conversationId);
+    // Chat açıldığında o chat'in hasUnreadMessages'ını false yap
+    await markChatAsRead(userId, conversationId);
     
-    // Chat detail sayfasına git ve döndüğünde chat listesini yenile
+    // Chat detail sayfasına git
     await Get.toNamed('/chat_detail', arguments: {
       'userId': userId,
       'conversationId': conversationId,
@@ -368,37 +435,57 @@ class ChatController extends GetxController {
       'username': username,
     });
     
-    // Chat detail sayfasından döndüğünde verileri yenile
-    debugPrint("🔄 Chat detail sayfasından dönüldü, chat listesi yenileniyor...");
-    await refreshAllChatData();
+    // Chat detail sayfasından döndüğünde socket'ten güncel unread count'u kontrol et
+    debugPrint("🔄 Chat detail sayfasından dönüldü, socket'ten güncel unread count kontrol ediliyor...");
+    await _checkAndUpdateUnreadCountAfterChat();
   }
 
   /// 📖 Chat'i okundu olarak işaretle (Local state'i güncelle)
-  void markChatAsRead(int userId, int? conversationId) {
+  Future<void> markChatAsRead(int userId, int? conversationId) async {
     try {
-      // UserId veya conversationId ile chat bul
-      int chatIndex = -1;
+      debugPrint("📖 markChatAsRead çağrıldı: userId=$userId, conversationId=$conversationId");
       
-      if (conversationId != null) {
-        // Önce conversationId ile bul
-        chatIndex = chatList.indexWhere((chat) => chat.conversationId == conversationId);
+      // Conversation ID varsa onu kullan, yoksa user ID ile bul
+      int? targetConversationId = conversationId;
+      
+      if (targetConversationId == null) {
+        // User ID ile conversation'ı bul
+        final chat = chatList.firstWhereOrNull((chat) => chat.id == userId);
+        if (chat != null) {
+          targetConversationId = chat.conversationId;
+        }
       }
       
-      if (chatIndex == -1) {
-        // conversationId ile bulunamadıysa userId ile bul
-        chatIndex = chatList.indexWhere((chat) => chat.id == userId);
+      if (targetConversationId == null) {
+        debugPrint("⚠️ markChatAsRead: Conversation ID bulunamadı");
+        return;
       }
       
+      // Kalıcı kırmızı nokta durumunu güncelle
+      if (unreadConversationIds.contains(targetConversationId)) {
+        unreadConversationIds.remove(targetConversationId);
+        await ChatServices.markConversationAsRead(targetConversationId);
+        debugPrint("✅ [ChatController] KALICI KIRMIZI NOKTA KALDIRILDI: conversation $targetConversationId");
+        
+        // Toplam unread count'u güncelle (1 azalt)
+        final newTotalCount = (totalUnreadCount.value - 1).clamp(0, double.infinity).toInt();
+        totalUnreadCount.value = newTotalCount;
+        await ChatServices.saveTotalUnreadCount(newTotalCount);
+        debugPrint("📊 Toplam unread count güncellendi: ${totalUnreadCount.value} -> $newTotalCount");
+      }
+      
+      // Chat'i bul ve hasUnreadMessages'ı false yap
+      final chatIndex = chatList.indexWhere((chat) => chat.conversationId == targetConversationId);
       if (chatIndex != -1) {
         final chat = chatList[chatIndex];
-        if (chat.unreadCount > 0) {
-          debugPrint("📖 Chat okundu olarak işaretleniyor: ${chat.name} (unread: ${chat.unreadCount} -> 0)");
-          chat.unreadCount = 0;
+        if (chat.hasUnreadMessages) {
+          chat.hasUnreadMessages = false;
+          debugPrint("📖 Chat okundu olarak işaretlendi: ${chat.name}");
           
           // Filtrelenmiş listeyi de güncelle
-          final filteredIndex = filteredChatList.indexWhere((c) => c.id == chat.id);
+          final filteredIndex = filteredChatList.indexWhere((c) => c.conversationId == targetConversationId);
           if (filteredIndex != -1) {
-            filteredChatList[filteredIndex].unreadCount = 0;
+            filteredChatList[filteredIndex].hasUnreadMessages = false;
           }
           
           // Observable'ları tetikle
@@ -406,6 +493,8 @@ class ChatController extends GetxController {
           filteredChatList.refresh();
         }
       }
+      
+      debugPrint("📖 Chat okundu olarak işaretlendi: conversationId=$targetConversationId");
     } catch (e) {
       debugPrint("❌ markChatAsRead hatası: $e");
     }
@@ -417,9 +506,9 @@ class ChatController extends GetxController {
       'groupId': groupId,
     });
     
-    // Grup chat sayfasından döndüğünde verileri yenile
-    debugPrint("🔄 Grup chat sayfasından dönüldü, chat listesi yenileniyor...");
-    await refreshAllChatData();
+    // Grup chat sayfasından döndüğünde socket'ten güncel unread count'u kontrol et
+    debugPrint("🔄 Grup chat sayfasından dönüldü, socket'ten güncel unread count kontrol ediliyor...");
+    await _checkAndUpdateUnreadCountAfterChat();
   }
 
   /// 🔄 Tüm chat verilerini yenile
@@ -429,9 +518,112 @@ class ChatController extends GetxController {
         fetchChatList(),
         fetchOnlineFriends(),
       ]);
-      debugPrint("✅ Tüm chat verileri başarıyla yenilendi");
+      debugPrint("✅ Chat verileri yenilendi");
     } catch (e) {
       debugPrint("❌ Chat verileri yenileme hatası: $e");
+    }
+  }
+
+  /// 🔄 Chat listesini ve unread count'ları tamamen yenile
+  Future<void> refreshChatListAndUnreadCounts() async {
+    try {
+      debugPrint("🔄 Chat listesi ve unread count'lar yenileniyor...");
+      
+      // Chat listesini yenile
+      await fetchChatList();
+      
+      // Mevcut unread conversation'ları kontrol et
+      debugPrint("🔍 Mevcut unread conversation'lar kontrol ediliyor...");
+      debugPrint("🔍 Unread conversation ID'leri: $unreadConversationIds");
+      
+      // Eğer hiç unread conversation yoksa ama total count > 0 ise, count'u sıfırla
+      if (unreadConversationIds.isEmpty && totalUnreadCount.value > 0) {
+        debugPrint("⚠️ Unread conversation yok ama total count > 0, count sıfırlanıyor...");
+        totalUnreadCount.value = 0;
+        await ChatServices.saveTotalUnreadCount(0);
+        debugPrint("✅ Total unread count sıfırlandı");
+      }
+      
+      // Socket'ten güncel unread count'ları iste
+      if (_socketService.isConnected.value) {
+        debugPrint("📤 Socket'ten güncel unread count isteniyor...");
+        
+        // Toplam unread count'u iste
+        _socketService.sendMessage('get:unread_count', {});
+        
+        // Conversation bazında unread count'ları iste
+        _requestConversationUnreadCounts();
+        
+        // 3 saniye bekle ve tekrar iste (socket gecikmeli olabilir)
+        await Future.delayed(Duration(seconds: 3));
+        _socketService.sendMessage('get:unread_count', {});
+        _socketService.sendMessage('get:conversation_unread_counts', {});
+        
+        // 5 saniye daha bekle ve son kez iste
+        await Future.delayed(Duration(seconds: 2));
+        _socketService.sendMessage('get:unread_count', {});
+        
+        // Son kontrol: Eğer hala uyumsuzluk varsa düzelt
+        await Future.delayed(Duration(seconds: 2));
+        _validateAndFixUnreadCount();
+      }
+      
+      debugPrint("✅ Chat listesi ve unread count'lar yenilendi");
+    } catch (e) {
+      debugPrint("❌ Chat listesi ve unread count yenileme hatası: $e");
+    }
+  }
+
+  /// 🚀 Uygulama başlatıldığında chat listesini socket ile senkronize et
+  Future<void> _initializeChatListWithSocketSync() async {
+    try {
+      debugPrint("🚀 Uygulama başlatıldı, chat listesi socket ile senkronize ediliyor...");
+      
+      // Önce API'den chat listesini çek
+      await fetchChatList();
+      
+      // Socket bağlantısının hazır olmasını bekle
+      await Future.delayed(Duration(milliseconds: 500));
+      
+      // Socket count'u kontrol et ve gerekirse güncelle
+      _checkAndSyncWithSocketCount();
+      
+      // 5 saniye sonra tekrar kontrol et (socket bağlantısı gecikmeli olabilir)
+      Future.delayed(Duration(seconds: 5), () {
+        debugPrint("🔄 5 saniye sonra socket count tekrar kontrol ediliyor...");
+        _checkAndSyncWithSocketCount();
+      });
+      
+    } catch (e) {
+      debugPrint("❌ Chat listesi socket senkronizasyon hatası: $e");
+      // Hata durumunda normal fetchChatList'i çağır
+      await fetchChatList();
+    }
+  }
+
+  /// 🔍 Socket count'u kontrol et ve gerekirse senkronize et
+  void _checkAndSyncWithSocketCount() {
+    try {
+      debugPrint("🔍 Socket count kontrolü:");
+      debugPrint("  - Socket bağlantı durumu: ${_socketService.isConnected.value}");
+      
+      // Socket bağlıysa, toplam unread count'u dinle
+      if (_socketService.isConnected.value) {
+        // Hemen socket count iste
+        debugPrint("📤 Socket count isteniyor...");
+        _socketService.sendMessage('get:unread_count', {});
+        
+        // 3 saniye sonra tekrar iste
+        Future.delayed(Duration(seconds: 3), () {
+          debugPrint("⏰ 3 saniye geçti, socket count tekrar isteniyor...");
+          _socketService.sendMessage('get:unread_count', {});
+        });
+      } else {
+        debugPrint("⚠️ Socket bağlı değil, sadece API'den chat listesi çekiliyor...");
+      }
+      
+    } catch (e) {
+      debugPrint("❌ Socket count kontrol hatası: $e");
     }
   }
 
@@ -459,15 +651,270 @@ class ChatController extends GetxController {
     }
   }
 
+  /// 📊 Kişisel mesajların toplam okunmamış sayısını hesapla (Socket'ten gelen değer)
+  int get privateUnreadCount {
+    return totalUnreadCount.value;
+  }
+
   /// 📊 Toplam okunmamış mesaj sayısını hesapla
-  int get totalUnreadCount {
-    int privateChatUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
+  int get totalUnreadCountValue {
+    int privateChatUnread = totalUnreadCount.value;
     int groupChatUnread = groupChatList.fold(0, (sum, group) => sum + group.unreadCount);
     return privateChatUnread + groupChatUnread;
   }
 
-  /// 📊 Kişisel mesajların toplam okunmamış sayısını hesapla (API'den gelen değerlere göre)
-  int get privateUnreadCount {
-    return chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
+  /// 🔍 Conversation bazında unread count'ları iste
+  void _requestConversationUnreadCounts() {
+    try {
+      debugPrint("🔍 Conversation bazında unread count'lar isteniyor...");
+      
+      if (_socketService.isConnected.value) {
+        // Socket'ten conversation bazında unread count'ları iste
+        _socketService.sendMessage('get:conversation_unread_counts', {});
+        _socketService.sendMessage('request:per_chat_unread', {});
+        _socketService.sendMessage('conversation:get_unread_details', {});
+        _socketService.sendMessage('get:unread_count', {});
+        
+        debugPrint("✅ Conversation unread count istekleri gönderildi");
+      } else {
+        debugPrint("⚠️ Socket bağlı değil, conversation unread count istenemiyor");
+      }
+    } catch (e) {
+      debugPrint("❌ Conversation unread count isteği hatası: $e");
+    }
+  }
+
+  /// 📨 Conversation bazında unread count'ları handle et
+  void handleConversationUnreadCount(dynamic data) {
+    try {
+      debugPrint("📨 Conversation bazında unread count geldi: $data");
+      debugPrint("📨 Data type: ${data.runtimeType}");
+      debugPrint("📨 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}");
+      
+      if (data is Map<String, dynamic>) {
+        // Eğer data'da conversation_id ve unread_count varsa
+        if (data.containsKey('conversation_id')) {
+          final conversationId = data['conversation_id'];
+          final unreadCount = data['unread_count'] ?? 
+                              data['count'] ?? 
+                              data['message_count'] ?? 0;
+          
+          debugPrint("📨 === CONVERSATION UNREAD COUNT DETAYI ===");
+          debugPrint("📨 Conversation ID: $conversationId");
+          debugPrint("📨 Unread Count: ${data['unread_count']}");
+          debugPrint("📨 Count: ${data['count']}");
+          debugPrint("📨 Message Count: ${data['message_count']}");
+          debugPrint("📨 Seçilen Count: $unreadCount");
+          debugPrint("📨 ======================================");
+          
+          // Chat'i bul ve hasUnreadMessages'ı ayarla
+          final chatIndex = chatList.indexWhere((chat) => chat.conversationId == conversationId);
+          if (chatIndex != -1) {
+            final chat = chatList[chatIndex];
+            chat.hasUnreadMessages = unreadCount > 0;
+            
+            // Filtrelenmiş listeyi de güncelle
+            final filteredIndex = filteredChatList.indexWhere((c) => c.conversationId == conversationId);
+            if (filteredIndex != -1) {
+              filteredChatList[filteredIndex].hasUnreadMessages = unreadCount > 0;
+            }
+            
+            // Observable'ları tetikle
+            chatList.refresh();
+            filteredChatList.refresh();
+            
+            debugPrint("✅ Conversation $conversationId unread count güncellendi: $unreadCount -> hasUnreadMessages: ${chat.hasUnreadMessages}");
+          }
+        }
+        // Eğer data bir liste ise (birden fazla conversation'ın unread count'u)
+        else if (data.containsKey('conversations') && data['conversations'] is List) {
+          final conversations = data['conversations'] as List;
+          debugPrint("📨 ${conversations.length} conversation'un unread count'u işleniyor...");
+          
+          for (final conv in conversations) {
+            if (conv is Map<String, dynamic>) {
+              final conversationId = conv['conversation_id'] ?? conv['id'];
+              final unreadCount = conv['unread_count'] ?? 
+                                  conv['count'] ?? 
+                                  conv['message_count'] ?? 0;
+              
+              if (conversationId != null) {
+                debugPrint("📨 Conversation $conversationId: $unreadCount unread");
+                
+                // Chat'i bul ve hasUnreadMessages'ı ayarla
+                final chatIndex = chatList.indexWhere((chat) => chat.conversationId == conversationId);
+                if (chatIndex != -1) {
+                  final chat = chatList[chatIndex];
+                  chat.hasUnreadMessages = unreadCount > 0;
+                  
+                  // Filtrelenmiş listeyi de güncelle
+                  final filteredIndex = filteredChatList.indexWhere((c) => c.conversationId == conversationId);
+                  if (filteredIndex != -1) {
+                    filteredChatList[filteredIndex].hasUnreadMessages = unreadCount > 0;
+                  }
+                }
+              }
+            }
+          }
+          
+          // Observable'ları tetikle
+          chatList.refresh();
+          filteredChatList.refresh();
+          
+          debugPrint("✅ ${conversations.length} conversation'un unread count'u güncellendi");
+        }
+      }
+    } catch (e) {
+      debugPrint("❌ Conversation unread count işleme hatası: $e");
+    }
+  }
+
+  /// 🔍 Socket count'u kontrol et (public metod)
+  void checkSocketCount() {
+    debugPrint("🔍 Socket count kontrolü başlatılıyor...");
+    _checkAndSyncWithSocketCount();
+    
+    // 3 saniye sonra tekrar kontrol et
+    Future.delayed(Duration(seconds: 3), () {
+      debugPrint("🔄 Socket count tekrar kontrol ediliyor...");
+      _checkAndSyncWithSocketCount();
+    });
+  }
+
+  /// 🔄 Chat'ten çıktıktan sonra socket'ten güncel unread count'u kontrol et
+  Future<void> _checkAndUpdateUnreadCountAfterChat() async {
+    try {
+      debugPrint("🔄 Chat'ten çıktıktan sonra unread count kontrol ediliyor...");
+      
+      // Socket bağlıysa güncel unread count'u iste
+      if (_socketService.isConnected.value) {
+        debugPrint("📤 Socket'ten güncel unread count isteniyor...");
+        
+        // Toplam unread count'u iste
+        _socketService.sendMessage('get:unread_count', {});
+        
+        // Conversation bazında unread count'ları da iste
+        _requestConversationUnreadCounts();
+        
+        // 2 saniye bekle ve tekrar iste (socket gecikmeli olabilir)
+        await Future.delayed(Duration(seconds: 2));
+        _socketService.sendMessage('get:unread_count', {});
+        
+        // 5 saniye daha bekle ve son kez iste
+        await Future.delayed(Duration(seconds: 3));
+        _socketService.sendMessage('get:unread_count', {});
+        
+        debugPrint("✅ Chat'ten çıktıktan sonra unread count kontrolü tamamlandı");
+      } else {
+        debugPrint("⚠️ Socket bağlı değil, unread count kontrol edilemiyor");
+      }
+    } catch (e) {
+      debugPrint("❌ Chat'ten çıktıktan sonra unread count kontrol hatası: $e");
+    }
+  }
+
+  /// 🔍 Unread count'ları doğrula ve düzelt
+  Future<void> _validateAndFixUnreadCount() async {
+    try {
+      debugPrint("🔍 Unread count'lar doğrulanıyor...");
+      
+      // Chat listesindeki unread conversation sayısını hesapla
+      final actualUnreadCount = chatList.where((chat) => chat.hasUnreadMessages).length;
+      final storedUnreadCount = totalUnreadCount.value;
+      
+      debugPrint("🔍 === UNREAD COUNT DOĞRULAMA ===");
+      debugPrint("🔍 Chat listesindeki unread sayısı: $actualUnreadCount");
+      debugPrint("🔍 Stored total count: $storedUnreadCount");
+      debugPrint("🔍 Unread conversation ID'leri: $unreadConversationIds");
+      debugPrint("🔍 ==============================");
+      
+      // Eğer uyumsuzluk varsa düzelt
+      if (actualUnreadCount != storedUnreadCount) {
+        debugPrint("⚠️ Unread count uyumsuzluğu tespit edildi!");
+        debugPrint("⚠️ Chat listesinde: $actualUnreadCount, Stored: $storedUnreadCount");
+        
+        // Chat listesindeki gerçek sayıyı kullan
+        totalUnreadCount.value = actualUnreadCount;
+        await ChatServices.saveTotalUnreadCount(actualUnreadCount);
+        
+        debugPrint("✅ Unread count düzeltildi: $storedUnreadCount -> $actualUnreadCount");
+      } else {
+        debugPrint("✅ Unread count'lar uyumlu");
+      }
+      
+      // Eğer hiç unread conversation yoksa count'u sıfırla
+      if (actualUnreadCount == 0 && storedUnreadCount > 0) {
+        debugPrint("⚠️ Hiç unread conversation yok ama count > 0, sıfırlanıyor...");
+        totalUnreadCount.value = 0;
+        await ChatServices.saveTotalUnreadCount(0);
+        debugPrint("✅ Total unread count sıfırlandı");
+      }
+      
+    } catch (e) {
+      debugPrint("❌ Unread count doğrulama hatası: $e");
+    }
+  }
+
+  /// 📂 Kalıcı kırmızı nokta durumlarını yükle
+  Future<void> _loadPersistentUnreadStatus() async {
+    try {
+      debugPrint("📂 Kalıcı kırmızı nokta durumları yükleniyor...");
+      final unreadIds = await ChatServices.loadUnreadChats();
+      unreadConversationIds.assignAll(unreadIds);
+      debugPrint("✅ Kalıcı kırmızı nokta durumları yüklendi: $unreadIds");
+      
+      // Toplam unread count'u yükle
+      final savedTotalCount = await ChatServices.loadTotalUnreadCount();
+      totalUnreadCount.value = savedTotalCount;
+      debugPrint("✅ Kalıcı toplam unread count yüklendi: $savedTotalCount");
+      
+      // Chat listesini güncelle
+      _updateChatListUnreadStatus();
+    } catch (e) {
+      debugPrint("❌ Kalıcı kırmızı nokta durumları yüklenemedi: $e");
+    }
+  }
+
+  /// 🔄 Chat listesindeki kırmızı nokta durumlarını güncelle
+  void _updateChatListUnreadStatus() {
+    for (final chat in chatList) {
+      chat.hasUnreadMessages = unreadConversationIds.contains(chat.conversationId);
+    }
+    chatList.refresh();
+    
+    for (final chat in filteredChatList) {
+      chat.hasUnreadMessages = unreadConversationIds.contains(chat.conversationId);
+    }
+    filteredChatList.refresh();
+    
+    debugPrint("🔄 Chat listesi kırmızı nokta durumları güncellendi");
+  }
+
+  /// 💾 Kalıcı kırmızı nokta durumlarını kaydet
+  Future<void> _savePersistentUnreadStatus() async {
+    try {
+      await ChatServices.saveUnreadChats(unreadConversationIds.toList());
+      debugPrint("💾 Kalıcı kırmızı nokta durumları kaydedildi");
+    } catch (e) {
+      debugPrint("❌ Kalıcı kırmızı nokta durumları kaydedilemedi: $e");
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.paused:
+        debugPrint("📱 Uygulama duraklatıldı - kırmızı nokta durumları kaydediliyor...");
+        _savePersistentUnreadStatus();
+        break;
+      case AppLifecycleState.resumed:
+        debugPrint("📱 Uygulama devam ettirildi - kırmızı nokta durumları yükleniyor...");
+        _loadPersistentUnreadStatus();
+        break;
+      default:
+        break;
+    }
   }
 }

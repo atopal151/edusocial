@@ -39,8 +39,13 @@ class _ChatListScreenState extends State<ChatListScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Uygulama ön plana geldiğinde chat verilerini yenile
+      // Uygulama ön plana geldiğinde chat verilerini yenile ve unread count'u kontrol et
       _refreshChatData();
+      
+      // Socket'ten güncel unread count'u da kontrol et
+      Future.delayed(Duration(seconds: 1), () {
+        chatController.checkSocketCount();
+      });
     }
   }
 
@@ -49,10 +54,13 @@ class _ChatListScreenState extends State<ChatListScreen>
     debugPrint("🔄 Chat verileri yenileniyor...");
     try {
       await Future.wait([
-        chatController.refreshAllChatData(),
+        chatController.refreshChatListAndUnreadCounts(),
         groupController.fetchUserGroups(),
       ]);
       debugPrint("✅ Chat verileri başarıyla yenilendi");
+      
+      // Socket count'u da kontrol et
+      chatController.checkSocketCount();
     } catch (e) {
       debugPrint("❌ Chat verileri yenileme hatası: $e");
     }
@@ -421,19 +429,21 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 8),
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: chat.unreadCount > 0 
-                                  ? Color(0xffff565f) 
-                                  : Color(0xff9ca3ae),
-                              child: Text(
-                                chat.unreadCount.toString(),
-                                style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    color: Color(0xffffffff),
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
+                            // Kırmızı nokta sadece hasUnreadMessages=true olan chat'ler için göster
+                            chat.hasUnreadMessages 
+                                ? Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffff565f),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  )
+                                : Container(
+                                    width: 8,
+                                    height: 8,
+                                    // Boş container (görünmez)
+                                  ),
                           ],
                         ),
                       ],

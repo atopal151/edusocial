@@ -148,27 +148,120 @@ class SocketService extends GetxService {
       debugPrint('💬 Yeni private mesaj geldi (SocketService): $data');
       debugPrint('💬 Data type: ${data.runtimeType}');
       debugPrint('💬 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      // CONVERSATION alanını detaylı incele
+      if (data is Map<String, dynamic>) {
+        debugPrint('💬 === CONVERSATION NEW MESSAGE DETAYLI ANALİZ ===');
+        debugPrint('💬 Message: ${data['message']}');
+        debugPrint('💬 Conversation ID: ${data['conversation_id']}');
+        debugPrint('💬 Sender ID: ${data['sender_id']}');
+        debugPrint('💬 Is Me: ${data['is_me']}');
+        debugPrint('💬 Is Read: ${data['is_read']}');
+        debugPrint('💬 Created At: ${data['created_at']}');
+        
+        // KIRMIZI NOKTA MANTIĞI ANALİZİ
+        final isRead = data['is_read'] ?? false;
+        
+        if (!isRead) {
+          debugPrint('🔴 KIRMIZI NOKTA GÖSTERİLECEK: Okunmamış mesaj (is_read: $isRead)');
+        } else {
+          debugPrint('⚪ KIRMIZI NOKTA GÖSTERİLMEYECEK: Okunmuş mesaj (is_read: $isRead)');
+        }
+        
+        // CONVERSATION alanını kontrol et
+        if (data.containsKey('conversation')) {
+          final conversation = data['conversation'];
+          debugPrint('💬 📁 CONVERSATION ALANı VAR: ${conversation.runtimeType}');
+          debugPrint('💬 📁 Conversation data: $conversation');
+          
+          if (conversation is Map<String, dynamic>) {
+            debugPrint('💬 📁 Conversation keys: ${conversation.keys.toList()}');
+            if (conversation.containsKey('unread_count')) {
+              debugPrint('💬 🔥 UNREAD COUNT BULUNDU: ${conversation['unread_count']}');
+            }
+            if (conversation.containsKey('unread_messages_count')) {
+              debugPrint('💬 🔥 UNREAD MESSAGES COUNT BULUNDU: ${conversation['unread_messages_count']}');
+            }
+          }
+        } else {
+          debugPrint('💬 ❌ Conversation alanı yok');
+        }
+        
+        // SENDER alanını kontrol et
+        if (data.containsKey('sender')) {
+          final sender = data['sender'];
+          debugPrint('💬 👤 SENDER ALANı VAR: ${sender.runtimeType}');
+          if (sender is Map<String, dynamic>) {
+            debugPrint('💬 👤 Sender keys: ${sender.keys.toList()}');
+            if (sender.containsKey('unread_messages_total_count')) {
+              debugPrint('💬 🔥 SENDER UNREAD COUNT: ${sender['unread_messages_total_count']}');
+            }
+          }
+        }
+        
+        debugPrint('💬 === ANALİZ TAMAMLANDI ===');
+      }
+      
       _privateMessageController.add(data);
       
       // Mesaj bildirimi gönder (uygulama açıkken)
-      debugPrint('💬 Bildirim gönderiliyor...');
-      debugPrint('💬 Data içeriği: message=${data['message']}, sender=${data['sender']}, conversation_id=${data['conversation_id']}');
-      
-      // Sender bilgilerini kontrol et
-      if (data is Map<String, dynamic>) {
-        debugPrint('💬 Sender data: ${data['sender']}');
-        debugPrint('💬 Message data: ${data['message']}');
-        debugPrint('💬 Conversation ID: ${data['conversation_id']}');
-      }
-      
       _sendOneSignalNotification('message', data);
       debugPrint('💬 Bildirim gönderme tamamlandı');
     });
 
-    // 3. Okunmamış mesaj sayısı
+    // 3. Okunmamış mesaj sayısı (toplam)
     _socket!.on('conversation:un_read_message_count', (data) {
       debugPrint('📨 Okunmamış mesaj sayısı (SocketService): $data');
+      debugPrint('📨 Data type: ${data.runtimeType}');
+      debugPrint('📨 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      if (data is Map<String, dynamic>) {
+        debugPrint('📨 === TOPLAM UNREAD COUNT DETAYI ===');
+        debugPrint('📨 Count: ${data['count']}');
+        debugPrint('📨 Total: ${data['total']}');
+        debugPrint('📨 Unread: ${data['unread']}');
+        debugPrint('📨 Message Count: ${data['message_count']}');
+        debugPrint('📨 Conversation Count: ${data['conversation_count']}');
+        debugPrint('📨 ================================');
+      }
+      
       _unreadMessageCountController.add(data);
+    });
+
+    // Chat bazında unread count event'lerini dinle
+    _socket!.on('conversation:unread_count', (data) {
+      debugPrint('📨 Chat bazında unread count (conversation:unread_count): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('chat:unread_count', (data) {
+      debugPrint('📨 Chat bazında unread count (chat:unread_count): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('conversation:unread', (data) {
+      debugPrint('📨 Chat bazında unread count (conversation:unread): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('chat:unread', (data) {
+      debugPrint('📨 Chat bazında unread count (chat:unread): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('user:conversation_unread', (data) {
+      debugPrint('📨 Chat bazında unread count (user:conversation_unread): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('unread:conversation', (data) {
+      debugPrint('📨 Chat bazında unread count (unread:conversation): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('conversation:count', (data) {
+      debugPrint('📨 Chat bazında unread count (conversation:count): $data');
+      _handlePerChatUnreadCount(data);
     });
 
     // 4. Yeni bildirim
@@ -1015,10 +1108,67 @@ class SocketService extends GetxService {
         
         // Katıldığımız gruplara join ol
         await _joinUserGroups();
+        
+        // Unread count'u iste
+        _requestUnreadCount();
       }
     } catch (e) {
       debugPrint('❌ Bağlantı sonrası user kanalına join olma hatası: $e');
     }
+  }
+
+  /// Unread count'u iste
+  void _requestUnreadCount() {
+    if (_socket != null && _socket!.connected) {
+      debugPrint('📨 Unread count isteniyor...');
+      
+      // Farklı event isimlerini dene
+      _socket!.emit('get:unread_count');
+      _socket!.emit('request:unread_count');
+      _socket!.emit('unread:count');
+      _socket!.emit('conversation:get_unread_count');
+      _socket!.emit('chat:unread_count');
+      _socket!.emit('get:conversation_unread_counts');
+      _socket!.emit('request:per_chat_unread');
+      
+      // Chat bazında unread count için yeni event'ler
+      _socket!.emit('get:conversation_unread_details');
+      _socket!.emit('request:unread_by_conversation');
+      _socket!.emit('conversation:get_unread_details');
+      _socket!.emit('chat:get_unread_details');
+      
+      debugPrint('✅ Unread count istekleri gönderildi');
+    } else {
+      debugPrint('❌ Socket bağlı değil, unread count istenemiyor');
+    }
+  }
+
+  // Stream Controller for per-chat unread counts
+  final _perChatUnreadCountController = StreamController<dynamic>.broadcast();
+  
+  // Public stream for per-chat unread counts
+  Stream<dynamic> get onPerChatUnreadCount => _perChatUnreadCountController.stream;
+
+  /// Chat bazında unread count'ları handle et
+  void _handlePerChatUnreadCount(dynamic data) {
+    debugPrint('🔍 Chat bazında unread count işleniyor: $data');
+    debugPrint('🔍 Data type: ${data.runtimeType}');
+    debugPrint('🔍 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+    
+    if (data is Map<String, dynamic>) {
+      debugPrint('🔍 === PER CHAT UNREAD COUNT DETAYI ===');
+      debugPrint('🔍 Conversation ID: ${data['conversation_id']}');
+      debugPrint('🔍 Chat ID: ${data['chat_id']}');
+      debugPrint('🔍 User ID: ${data['user_id']}');
+      debugPrint('🔍 Unread Count: ${data['unread_count']}');
+      debugPrint('🔍 Count: ${data['count']}');
+      debugPrint('🔍 Message Count: ${data['message_count']}');
+      debugPrint('🔍 Is Read: ${data['is_read']}');
+      debugPrint('🔍 ====================================');
+    }
+    
+    // Chat controller'a gönder
+    _perChatUnreadCountController.add(data);
   }
 
   // Kullanıcının katıldığı gruplara join ol
@@ -1420,6 +1570,7 @@ class SocketService extends GetxService {
     _privateMessageController.close();
     _groupMessageController.close();
     _unreadMessageCountController.close();
+    _perChatUnreadCountController.close();
     _notificationController.close();
     _postNotificationController.close();
     _userNotificationController.close();

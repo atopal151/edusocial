@@ -67,7 +67,7 @@ class _NavbarMenuState extends State<NavbarMenu> {
                             if (index == 1) // Chat index'i
                               Builder(builder: (context) {
                                 final unreadCount =
-                                    chatController.totalUnreadCount;
+                                    chatController.totalUnreadCountValue;
                                 if (unreadCount > 0) {
                                   return Positioned(
                                     right: -8,

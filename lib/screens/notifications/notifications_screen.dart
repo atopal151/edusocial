@@ -129,100 +129,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       debugPrint('❌ NotificationScreen: User kanalından ayrılma hatası: $e');
     }
   }
-/*
-  /// Socket durumunu kontrol et
-  void _checkSocketConnection() {
-    debugPrint('🔍 === NOTIFICATION SCREEN SOCKET DURUMU ===');
-    debugPrint('🔍 Socket bağlı: ${_socketService.isConnected.value}');
-    debugPrint('🔍 User notification subscription aktif: ${!_userNotificationSubscription.isPaused}');
-    debugPrint('🔍 Socket ID: ${_socketService.socket?.id}');
-    debugPrint('🔍 Socket connected: ${_socketService.socket?.connected}');
-    
-    // Socket service'den detaylı durum raporu al
-    _socketService.checkSocketStatus();
-    
-    debugPrint('🔍 === SOCKET DURUM RAPORU ===');
-    debugPrint('🔍 Socket nesnesi: ${_socketService.socket != null ? "✅ Var" : "❌ Yok"}');
-    debugPrint('🔍 Bağlantı durumu: ${_socketService.socket?.connected == true ? "✅ Bağlı" : "❌ Bağlı Değil"}');
-    debugPrint('🔍 Socket ID: ${_socketService.socket?.id}');
-    debugPrint('🔍 isConnected observable: ${_socketService.isConnected.value}');
-    debugPrint('🔍 Dinlenen event\'ler:');
-    debugPrint('  - conversation:new_message');
-    debugPrint('  - group_conversation:new_message');
-    debugPrint('  - conversation:un_read_message_count');
-    debugPrint('  - notification:new');
-    debugPrint('  - user:notification');
-    debugPrint('  - user:*');
-    debugPrint('  - private:notification');
-    debugPrint('  - user:message');
-    debugPrint('  - direct:notification');
-    debugPrint('  - personal:notification');
-    debugPrint('  - post:comment');
-    debugPrint('  - comment:new');
-    debugPrint('  - post:activity');
-    debugPrint('  - timeline:notification');
-    debugPrint('  - follow:notification');
-    debugPrint('  - like:notification');
-    debugPrint('  - group:notification');
-    debugPrint('  - event:notification');
-    debugPrint('  - activity:notification');
-    debugPrint('  - realtime:notification');
-    debugPrint('  - * (wildcard)');
-    debugPrint('  - onAny (tüm event\'ler)');
-    debugPrint('🔍 ===========================');
-    debugPrint('🔍 ===========================================');
-  }
-*/
-/*
-  /// Test event gönder
-  void _sendTestEvent() {
-    debugPrint('🧪 Test event gönderiliyor...');
-    
-    // Tüm notification tiplerini test et
-    final testEvents = [
-      'notification:event',
-      'comment:event',
-      'like:event',
-      'follow:event',
-      'post:event',
-      'group:join_request',
-      'group:join_accepted',
-      'group:join_declined',
-      'follow:request',
-      'follow:accepted',
-      'follow:declined',
-      'event:invitation',
-      'event:reminder',
-      'post:mention',
-      'comment:mention',
-      'system:notification',
-      'notification:new',
-      'user:notification',
-      'post:comment',
-      'comment:new',
-      'like:notification',
-      'follow:notification',
-      'test:notification',
-    ];
-    
-    for (String eventName in testEvents) {
-      _socketService.sendTestEvent(eventName, {
-        'type': 'test',
-        'message': 'Test notification for $eventName',
-        'user_id': 6,
-        'timestamp': DateTime.now().toIso8601String(),
-        'conversation_id': 'test_123', // Private chat'teki gibi
-        'notification_type': eventName.replaceAll(':', '_'),
-      });
-    }
-    
-    Get.snackbar(
-      'Test',
-      'Tüm notification tipleri test edildi',
-      duration: Duration(seconds: 2),
-    );
-  }
-*/
+
   @override
   Widget build(BuildContext context) {
     final LanguageService languageService = Get.find<LanguageService>();
@@ -305,7 +212,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget buildNotificationTile(NotificationModel n) {
-    final LanguageService languageService = Get.find<LanguageService>();
     
     return ListTile(
       tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),

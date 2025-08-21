@@ -71,7 +71,7 @@ ${response.body}
 
       if (response.statusCode == 200) {
         // Raw API response'u yazdır
-        printFullText('''
+      /*  printFullText('''
 🌐 PEOPLE PROFILE BY ID API RAW RESPONSE
 ==========================================
 📡 URL: $url
@@ -79,7 +79,7 @@ ${response.body}
 📦 Raw Response Body:
 ${response.body}
 ==========================================
-''');
+''');*/
 
         final body = jsonDecode(response.body);
         //debugPrint("📦 Response body keys: ${body.keys.toList()}");

@@ -12,13 +12,98 @@ import 'package:http_parser/http_parser.dart';
 import '../models/chat_models/chat_model.dart';
 import '../models/user_chat_detail_model.dart';
 import '../components/print_full_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/chat_models/group_chat_model.dart';
+import '../utils/api_helper.dart';
 
 class ChatServices {
   static final _box = GetStorage();
-  
+
+  // Kırmızı nokta durumunu kaydetmek için key
+  static const String _unreadChatsKey = 'unread_chat_conversation_ids';
+
+  /// 🔴 Kırmızı nokta olan conversation ID'leri kaydet
+  static Future<void> saveUnreadChats(List<int> conversationIds) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = conversationIds.map((id) => id.toString()).toList();
+      await prefs.setStringList(_unreadChatsKey, jsonList);
+      printFullText('💾 Kırmızı nokta durumları kaydedildi: $conversationIds');
+    } catch (e) {
+      printFullText('❌ Kırmızı nokta durumları kaydedilemedi: $e');
+    }
+  }
+
+  /// 🔴 Kırmızı nokta olan conversation ID'leri geri yükle
+  static Future<List<int>> loadUnreadChats() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = prefs.getStringList(_unreadChatsKey) ?? [];
+      final conversationIds = jsonList.map((id) => int.parse(id)).toList();
+      printFullText('📂 Kırmızı nokta durumları yüklendi: $conversationIds');
+      return conversationIds;
+    } catch (e) {
+      printFullText('❌ Kırmızı nokta durumları yüklenemedi: $e');
+      return [];
+    }
+  }
+
+  /// 🔴 Belirli bir conversation'ı okunmuş olarak işaretle
+  static Future<void> markConversationAsRead(int conversationId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = prefs.getStringList(_unreadChatsKey) ?? [];
+      final conversationIds = jsonList.map((id) => int.parse(id)).toList();
+      
+      // Conversation ID'yi listeden çıkar
+      conversationIds.remove(conversationId);
+      
+      // Güncellenmiş listeyi kaydet
+      final updatedJsonList = conversationIds.map((id) => id.toString()).toList();
+      await prefs.setStringList(_unreadChatsKey, updatedJsonList);
+      
+      printFullText('✅ Conversation $conversationId okunmuş olarak işaretlendi');
+    } catch (e) {
+      printFullText('❌ Conversation okunmuş olarak işaretlenemedi: $e');
+    }
+  }
+
+  /// 🔴 Belirli bir conversation'ı okunmamış olarak işaretle
+  static Future<void> markConversationAsUnread(int conversationId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = prefs.getStringList(_unreadChatsKey) ?? [];
+      final conversationIds = jsonList.map((id) => int.parse(id)).toList();
+      
+      // Conversation ID'yi listeye ekle (eğer yoksa)
+      if (!conversationIds.contains(conversationId)) {
+        conversationIds.add(conversationId);
+      }
+      
+      // Güncellenmiş listeyi kaydet
+      final updatedJsonList = conversationIds.map((id) => id.toString()).toList();
+      await prefs.setStringList(_unreadChatsKey, updatedJsonList);
+      
+      printFullText('🔴 Conversation $conversationId okunmamış olarak işaretlendi');
+    } catch (e) {
+      printFullText('❌ Conversation okunmamış olarak işaretlenemedi: $e');
+    }
+  }
+
+  /// 🔴 Tüm kırmızı nokta durumlarını temizle
+  static Future<void> clearAllUnreadChats() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_unreadChatsKey);
+      printFullText('🗑️ Tüm kırmızı nokta durumları temizlendi');
+    } catch (e) {
+      printFullText('❌ Kırmızı nokta durumları temizlenemedi: $e');
+    }
+  }
+
   // OPTIMIZE: HTTP client configuration for better network resilience
   static final http.Client _httpClient = http.Client();
-  
+
   // RETRY: Configuration for retry mechanism
   static const int _maxRetries = 3;
   static const Duration _baseDelay = Duration(seconds: 2);
@@ -26,71 +111,67 @@ class ChatServices {
 
   /// RETRY: Generic retry mechanism for HTTP requests
   static Future<http.Response> _makeRequestWithRetry(
-    Future<http.Response> Function() request,
-    {String operation = 'API call'}
-  ) async {
+      Future<http.Response> Function() request,
+      {String operation = 'API call'}) async {
     Exception? lastException;
-    
+
     for (int attempt = 1; attempt <= _maxRetries; attempt++) {
       try {
         //debugPrint('🔄 $operation - Attempt $attempt/$_maxRetries');
-        
+
         final response = await request().timeout(_requestTimeout);
-        
+
         if (response.statusCode == 200 || response.statusCode == 201) {
           if (attempt > 1) {
             //debugPrint('✅ $operation - Success on attempt $attempt');
           }
           return response;
         } else {
-          throw HttpException('HTTP ${response.statusCode}: ${response.reasonPhrase}');
+          throw HttpException(
+              'HTTP ${response.statusCode}: ${response.reasonPhrase}');
         }
-        
       } on SocketException catch (e) {
         lastException = e;
         //debugPrint('🌐 $operation - Network error on attempt $attempt: ${e.message}');
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt; // Exponential backoff
           debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
           await Future.delayed(delay);
         }
-        
       } on TimeoutException catch (e) {
         lastException = e;
         //debugPrint('⏰ $operation - Timeout on attempt $attempt');
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
           //debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
           await Future.delayed(delay);
         }
-        
       } on HttpException catch (e) {
         lastException = e;
         //debugPrint('🔴 $operation - HTTP error on attempt $attempt: $e');
-        
+
         // Don't retry for 4xx errors (client errors)
         if (e.toString().contains('4')) {
           rethrow;
         }
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
           await Future.delayed(delay);
         }
-        
       } catch (e) {
         lastException = Exception(e.toString());
         debugPrint('❌ $operation - Unexpected error on attempt $attempt: $e');
-        
+
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
           await Future.delayed(delay);
         }
       }
     }
-    
+
     debugPrint('💥 $operation - All $_maxRetries attempts failed');
     throw lastException ?? Exception('All retry attempts failed');
   }
@@ -136,7 +217,7 @@ class ChatServices {
     // Medya dosyalarını ekle (Sadece görsel dosyalar - private chat için)
     if (mediaFiles != null && mediaFiles.isNotEmpty) {
       //debugPrint('📁 Adding media files to request:');
-      
+
       // Sadece görsel dosyaları kabul et (private chat için)
       final imageFiles = mediaFiles.where((file) {
         final fileExtension = file.path.split('.').last.toLowerCase();
@@ -145,22 +226,23 @@ class ChatServices {
           'jpg', 'jpeg', 'png', 'gif', 'webp'
         ].contains(fileExtension);
       }).toList();
-      
+
       if (imageFiles.length != mediaFiles.length) {
         debugPrint('⚠️ Private chat\'te sadece görsel dosyalar desteklenir!');
-        debugPrint('⚠️ Toplam dosya: ${mediaFiles.length}, Görsel: ${imageFiles.length}');
-        
+        debugPrint(
+            '⚠️ Toplam dosya: ${mediaFiles.length}, Görsel: ${imageFiles.length}');
+
         // Doküman dosyalarını listele
         final documentFiles = mediaFiles.where((file) {
           final fileExtension = file.path.split('.').last.toLowerCase();
           return ['pdf', 'doc', 'docx', 'txt', 'rtf'].contains(fileExtension);
         }).toList();
-        
+
         for (var file in documentFiles) {
           debugPrint('❌ Doküman dosyası (desteklenmiyor): ${file.path}');
         }
       }
-      
+
       for (var file in imageFiles) {
         final fileExtension = file.path.split('.').last.toLowerCase();
         String mimeType = _getMimeType(fileExtension);
@@ -215,7 +297,7 @@ class ChatServices {
         return 'image/gif';
       case 'webp':
         return 'image/webp';
-      
+
       // Doküman dosyalar
       case 'pdf':
         return 'application/pdf';
@@ -227,7 +309,7 @@ class ChatServices {
         return 'text/plain';
       case 'rtf':
         return 'application/rtf';
-      
+
       default:
         return 'application/octet-stream';
     }
@@ -279,14 +361,16 @@ ${response.body}
   /// Mesaj detaylarını getir (Show Conversation) - PAGINATION SUPPORT ADDED
   static Future<List<MessageModel>> fetchConversationMessages(
     int conversationId, {
-    int limit = 1000,  // Increased from 25 to 1000 to remove limit
-    int offset = 0,  // Hangi mesajdan başlayacağı
+    int limit = 1000, // Increased from 25 to 1000 to remove limit
+    int offset = 0, // Hangi mesajdan başlayacağı
   }) async {
     final token = _box.read('token');
     final currentUserId = _box.read('userId');
-    
+
     // OPTIMIZE: Query parameters ile pagination
-    final uri = Uri.parse('${AppConstants.baseUrl}/conversation/$conversationId').replace(
+    final uri =
+        Uri.parse('${AppConstants.baseUrl}/conversation/$conversationId')
+            .replace(
       queryParameters: {
         'limit': limit.toString(),
         'offset': offset.toString(),
@@ -322,9 +406,9 @@ ${response.body}
 
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
-    
+
     //debugPrint("✅ ${messagesJson.length} mesaj yüklendi (pagination)");
-    
+
     // İlk 5 mesajın detayını göster
     //debugPrint("📖 === İLK 5 MESAJ DETAYI ===");
     for (int i = 0; i < messagesJson.length && i < 5; i++) {
@@ -348,7 +432,8 @@ ${response.body}
   }
 
   /// Eski API metodu (backward compatibility)
-  static Future<List<MessageModel>> fetchAllConversationMessages(int conversationId) async {
+  static Future<List<MessageModel>> fetchAllConversationMessages(
+      int conversationId) async {
     return fetchConversationMessages(conversationId, limit: 1000, offset: 0);
   }
 
@@ -356,7 +441,7 @@ ${response.body}
   static Future<List<ChatModel>> fetchChatList() async {
     try {
       final token = _box.read('token');
-      
+
       // RETRY: Use retry mechanism for network resilience
       final response = await _makeRequestWithRetry(
         () => _httpClient.get(
@@ -370,55 +455,14 @@ ${response.body}
       );
 
       final body = jsonDecode(response.body);
-      //debugPrint("✅ Chat List API Response:");
-      //debugPrint("📊 Response Status: ${response.statusCode}");
-      //debugPrint("📊 Response Body: ${jsonEncode(body)}");
-      //debugPrint("📊 Response Data Type: ${body.runtimeType}");
-      if (body is Map<String, dynamic>) {
-        //  debugPrint("📊 Response Keys: ${body.keys.toList()}");
-        if (body.containsKey('data')) {
-          final data = body['data'];
-          //debugPrint("📊 Data Type: ${data.runtimeType}");
-          if (data is List && data.isNotEmpty) {
-            //debugPrint("📊 First Item Keys: ${(data.first as Map<String, dynamic>).keys.toList()}");
-          }
-        }
-      }
 
       if (body is Map<String, dynamic> && body.containsKey('data')) {
         final data = body['data'];
         if (data is List) {
           final chatList = data.map((json) {
-            //debugPrint("📖 === CHAT ITEM FULL DEBUG ===");
-            //debugPrint("📖 Raw JSON: ${jsonEncode(json)}");
-            //debugPrint("📖 User ID: ${json['id']}");
-            //debugPrint("📖 Name: ${json['name']}");
-            //debugPrint("📖 Raw JSON Keys: ${json.keys.toList()}");
-            //debugPrint("📖 Unread Count (unread_count): ${json['unread_count']} (type: ${json['unread_count']?.runtimeType})");
-            //debugPrint("📖 Unread Count (unread_messages_total_count): ${json['unread_messages_total_count']} (type: ${json['unread_messages_total_count']?.runtimeType})");
-            //debugPrint("📖 Unread Count (unreadCount): ${json['unreadCount']} (type: ${json['unreadCount']?.runtimeType})");
-            //debugPrint("📖 Unread Count (unread_message_count): ${json['unread_message_count']} (type: ${json['unread_message_count']?.runtimeType})");
-            //debugPrint("📖 Unread Count (message_count): ${json['message_count']} (type: ${json['message_count']?.runtimeType})");
-            //debugPrint("📖 Unread Count (count): ${json['count']} (type: ${json['count']?.runtimeType})");
-            //debugPrint("📖 Last Message: ${json['last_message']?['message'] ?? 'No message'}");
-            //debugPrint("📖 Last Message Created: ${json['last_message']?['created_at'] ?? 'No date'}");
-            //debugPrint("📖 ==============================");
             return ChatModel.fromJson(json);
           }).toList();
-          
-          // Toplam okunmamış mesaj sayısını hesapla
-          //final totalUnread = chatList.fold(0, (sum, chat) => sum + chat.unreadCount);
-          //debugPrint("📊 === CHAT LIST SUMMARY ===");
-          //debugPrint("📊 Toplam Chat Sayısı: ${chatList.length}");
-          //debugPrint("📊 Toplam Okunmamış Mesaj: $totalUnread");
-          //debugPrint("📊 Okunmamış Mesajı Olan Chat'ler:");
-          for (var chat in chatList) {
-            if (chat.unreadCount > 0) {
-              //  debugPrint("  - ${chat.name} (${chat.username}): ${chat.unreadCount} okunmamış mesaj");
-            }
-          }
-          //debugPrint("📊 =========================");
-          
+
           return chatList;
         } else {
           debugPrint(
@@ -479,6 +523,33 @@ ${response.body}
       //debugPrint('❌ fetchUserDetails - Hata: $e');
       //debugPrint('  - Hata Mesajı: ${e.toString()}');
       throw Exception('Kullanıcı bilgileri getirilemedi!');
+    }
+  }
+
+  // Toplam unread count için key
+  static const String _totalUnreadCountKey = 'total_unread_count';
+
+  /// 📊 Toplam unread count'u kaydet
+  static Future<void> saveTotalUnreadCount(int count) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_totalUnreadCountKey, count);
+      printFullText('💾 Toplam unread count kaydedildi: $count');
+    } catch (e) {
+      printFullText('❌ Toplam unread count kaydedilemedi: $e');
+    }
+  }
+
+  /// 📊 Toplam unread count'u geri yükle
+  static Future<int> loadTotalUnreadCount() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final count = prefs.getInt(_totalUnreadCountKey) ?? 0;
+      printFullText('📂 Toplam unread count yüklendi: $count');
+      return count;
+    } catch (e) {
+      printFullText('❌ Toplam unread count yüklenemedi: $e');
+      return 0;
     }
   }
 }
