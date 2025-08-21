@@ -6,6 +6,7 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'onesignal_service.dart';
 import 'package:get_storage/get_storage.dart';
 import 'group_services/group_service.dart';
+import '../components/print_full_text.dart';
 
 class SocketService extends GetxService {
   io.Socket? _socket;
@@ -425,10 +426,31 @@ class SocketService extends GetxService {
 
     // 21. User notification (user:{user_id} kanalı)
     _socket!.on('user:notification', (data) {
-      debugPrint('👤 =======================================');
-      debugPrint('👤 User notification geldi (SocketService): $data');
-      debugPrint('👤 User notification data type: ${data.runtimeType}');
-      debugPrint('👤 User notification data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      printFullText('👤 =======================================');
+      printFullText('👤 User notification geldi (SocketService): $data');
+      printFullText('👤 User notification data type: ${data.runtimeType}');
+      printFullText('👤 User notification data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      // is_read alanını kontrol et ve logla
+      if (data is Map && data.containsKey('notification_data')) {
+        final notificationData = data['notification_data'];
+        if (notificationData is Map && notificationData.containsKey('is_read')) {
+          final isRead = notificationData['is_read'];
+          printFullText('👤 🔍 SocketService - is_read değeri: $isRead (Type: ${isRead.runtimeType})');
+          
+          if (isRead == true) {
+            printFullText('👤 ✅ SocketService - Bildirim zaten okunmuş');
+          } else {
+            printFullText('👤 🔴 SocketService - Bildirim okunmamış');
+          }
+        } else {
+          printFullText('👤 ⚠️ SocketService - notification_data içinde is_read alanı bulunamadı');
+        }
+      } else {
+        printFullText('👤 ⚠️ SocketService - notification_data alanı bulunamadı');
+      }
+      
+
       
       // Çoklu bildirim kontrolü
       final notificationId = data['notification_data']?['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
@@ -482,8 +504,54 @@ class SocketService extends GetxService {
 
     // 21.5. Group message notification (user:{user_id} kanalından)
     _socket!.on('user:group_message', (data) {
-      debugPrint('👥 Group message notification geldi (SocketService): $data');
+      printFullText('👥 Group message notification geldi (SocketService): $data');
+      printFullText('👥 Data type: ${data.runtimeType}');
+      printFullText('👥 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      if (data is Map<String, dynamic>) {
+        printFullText('👥 === GROUP MESSAGE DETAYLI ANALİZ ===');
+        
+        // Grup ID'sini doğru yerden al
+        dynamic groupId = data['group_id'];
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          groupId = messageData['group_id'] ?? data['group_id'];
+        }
+        printFullText('👥 Group ID: $groupId');
+        
+        printFullText('👥 Message: ${data['message']}');
+        printFullText('👥 Sender ID: ${data['sender_id']}');
+        printFullText('👥 Is Me: ${data['is_me']}');
+        printFullText('👥 Is Read: ${data['is_read']}');
+        printFullText('👥 Created At: ${data['created_at']}');
+        printFullText('👥 Message ID: ${data['id']}');
+        
+        // Message alanını kontrol et
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          printFullText('👥 📝 MESSAGE ALANı VAR: ${messageData.runtimeType}');
+          printFullText('👥 📝 Message data: $messageData');
+          printFullText('👥 📝 Message keys: ${messageData.keys.toList()}');
+          printFullText('👥 📝 Message text: ${messageData['message']}');
+          printFullText('👥 📝 Message is_read: ${messageData['is_read']}');
+          printFullText('👥 📝 Message is_me: ${messageData['is_me']}');
+        }
+        
+        // User alanını kontrol et
+        if (data.containsKey('user') && data['user'] is Map<String, dynamic>) {
+          final userData = data['user'] as Map<String, dynamic>;
+          printFullText('👥 👤 USER ALANı VAR: ${userData.runtimeType}');
+          printFullText('👥 👤 User keys: ${userData.keys.toList()}');
+          printFullText('👥 👤 User name: ${userData['name']}');
+          printFullText('👥 👤 User ID: ${userData['id']}');
+        }
+        
+        printFullText('👥 === ANALİZ TAMAMLANDI ===');
+      }
+      
+      debugPrint('📡 [SocketService] user:group_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] user:group_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -493,8 +561,54 @@ class SocketService extends GetxService {
 
     // 21.6. Group message (alternatif event isimleri)
     _socket!.on('group:message', (data) {
-      debugPrint('👥 Group message event geldi (SocketService): $data');
+      printFullText('👥 Group message event geldi (SocketService): $data');
+      printFullText('👥 Data type: ${data.runtimeType}');
+      printFullText('👥 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      if (data is Map<String, dynamic>) {
+        printFullText('👥 === GROUP MESSAGE EVENT DETAYLI ANALİZ ===');
+        
+        // Grup ID'sini doğru yerden al
+        dynamic groupId = data['group_id'];
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          groupId = messageData['group_id'] ?? data['group_id'];
+        }
+        printFullText('👥 Group ID: $groupId');
+        
+        printFullText('👥 Message: ${data['message']}');
+        printFullText('👥 Sender ID: ${data['sender_id']}');
+        printFullText('👥 Is Me: ${data['is_me']}');
+        printFullText('👥 Is Read: ${data['is_read']}');
+        printFullText('👥 Created At: ${data['created_at']}');
+        printFullText('👥 Message ID: ${data['id']}');
+        
+        // Message alanını kontrol et
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          printFullText('👥 📝 MESSAGE ALANı VAR: ${messageData.runtimeType}');
+          printFullText('👥 📝 Message data: $messageData');
+          printFullText('👥 📝 Message keys: ${messageData.keys.toList()}');
+          printFullText('👥 📝 Message text: ${messageData['message']}');
+          printFullText('👥 📝 Message is_read: ${messageData['is_read']}');
+          printFullText('👥 📝 Message is_me: ${messageData['is_me']}');
+        }
+        
+        // User alanını kontrol et
+        if (data.containsKey('user') && data['user'] is Map<String, dynamic>) {
+          final userData = data['user'] as Map<String, dynamic>;
+          printFullText('👥 👤 USER ALANı VAR: ${userData.runtimeType}');
+          printFullText('👥 👤 User keys: ${userData.keys.toList()}');
+          printFullText('👥 👤 User name: ${userData['name']}');
+          printFullText('👥 👤 User ID: ${userData['id']}');
+        }
+        
+        printFullText('👥 === ANALİZ TAMAMLANDI ===');
+      }
+      
+      debugPrint('📡 [SocketService] group:message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group:message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -504,7 +618,9 @@ class SocketService extends GetxService {
 
     _socket!.on('group_conversation:new_message', (data) {
       debugPrint('👥 Group conversation new message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group_conversation:new_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group_conversation:new_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -514,7 +630,9 @@ class SocketService extends GetxService {
 
     _socket!.on('conversation:group_message', (data) {
       debugPrint('👥 Conversation group message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] conversation:group_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] conversation:group_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -524,8 +642,46 @@ class SocketService extends GetxService {
 
     // 21.7. Ek grup mesaj event'leri (backend'de farklı isimler kullanılıyor olabilir)
     _socket!.on('group:new_message', (data) {
-      debugPrint('👥 Group new message geldi (SocketService): $data');
+      printFullText('👥 Group new message geldi (SocketService): $data');
+      printFullText('👥 Data type: ${data.runtimeType}');
+      printFullText('👥 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      if (data is Map<String, dynamic>) {
+        printFullText('👥 === GROUP NEW MESSAGE DETAYLI ANALİZ ===');
+        printFullText('👥 Group ID: ${data['group_id']}');
+        printFullText('👥 Message: ${data['message']}');
+        printFullText('👥 Sender ID: ${data['sender_id']}');
+        printFullText('👥 Is Me: ${data['is_me']}');
+        printFullText('👥 Is Read: ${data['is_read']}');
+        printFullText('👥 Created At: ${data['created_at']}');
+        printFullText('👥 Message ID: ${data['id']}');
+        
+        // Message alanını kontrol et
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          printFullText('👥 📝 MESSAGE ALANı VAR: ${messageData.runtimeType}');
+          printFullText('👥 📝 Message data: $messageData');
+          printFullText('👥 📝 Message keys: ${messageData.keys.toList()}');
+          printFullText('👥 📝 Message text: ${messageData['message']}');
+          printFullText('👥 📝 Message is_read: ${messageData['is_read']}');
+          printFullText('👥 📝 Message is_me: ${messageData['is_me']}');
+        }
+        
+        // User alanını kontrol et
+        if (data.containsKey('user') && data['user'] is Map<String, dynamic>) {
+          final userData = data['user'] as Map<String, dynamic>;
+          printFullText('👥 👤 USER ALANı VAR: ${userData.runtimeType}');
+          printFullText('👥 👤 User keys: ${userData.keys.toList()}');
+          printFullText('👥 👤 User name: ${userData['name']}');
+          printFullText('👥 👤 User ID: ${userData['id']}');
+        }
+        
+        printFullText('👥 === ANALİZ TAMAMLANDI ===');
+      }
+      
+      debugPrint('📡 [SocketService] group:new_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group:new_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -535,7 +691,9 @@ class SocketService extends GetxService {
 
     _socket!.on('group_chat:message', (data) {
       debugPrint('👥 Group chat message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group_chat:message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group_chat:message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -545,7 +703,9 @@ class SocketService extends GetxService {
 
     _socket!.on('group_chat:new_message', (data) {
       debugPrint('👥 Group chat new message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group_chat:new_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group_chat:new_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -555,7 +715,9 @@ class SocketService extends GetxService {
 
     _socket!.on('chat:group_message', (data) {
       debugPrint('👥 Chat group message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] chat:group_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] chat:group_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -565,7 +727,9 @@ class SocketService extends GetxService {
 
     _socket!.on('message:group', (data) {
       debugPrint('👥 Message group geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] message:group - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] message:group - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -575,7 +739,9 @@ class SocketService extends GetxService {
 
     _socket!.on('new:group_message', (data) {
       debugPrint('👥 New group message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] new:group_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] new:group_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -585,7 +751,9 @@ class SocketService extends GetxService {
 
     _socket!.on('group:chat_message', (data) {
       debugPrint('👥 Group chat message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group:chat_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group:chat_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -595,7 +763,9 @@ class SocketService extends GetxService {
 
     _socket!.on('user:group_chat', (data) {
       debugPrint('👥 User group chat geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] user:group_chat - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] user:group_chat - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -605,7 +775,9 @@ class SocketService extends GetxService {
 
     _socket!.on('user:group_chat_message', (data) {
       debugPrint('👥 User group chat message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] user:group_chat_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] user:group_chat_message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -1095,10 +1267,16 @@ class SocketService extends GetxService {
   // Bağlantı kurulduktan sonra tüm kanallara join ol
   Future<void> _joinAllChannelsAfterConnection() async {
     try {
+      debugPrint('🔔 _joinAllChannelsAfterConnection() başlatıldı');
+      
       // Token'dan user ID'yi çıkar
       final token = GetStorage().read('token');
+      debugPrint('🔔 Token var mı: ${token != null}');
+      
       if (token != null) {
         debugPrint('🔔 Bağlantı sonrası user kanalına join olunuyor...');
+        debugPrint('🔔 Socket bağlı mı: ${_socket?.connected}');
+        debugPrint('🔔 Socket ID: ${_socket?.id}');
         
         // User kanalına join ol (user ID olmadan genel join)
         _socket!.emit('join', {'channel': 'user'});
@@ -1107,13 +1285,20 @@ class SocketService extends GetxService {
         debugPrint('✅ Bağlantı sonrası user kanalına join istekleri gönderildi');
         
         // Katıldığımız gruplara join ol
+        debugPrint('👥 Gruplara join olma işlemi başlatılıyor...');
         await _joinUserGroups();
+        debugPrint('👥 Gruplara join olma işlemi tamamlandı');
         
         // Unread count'u iste
+        debugPrint('📨 Unread count isteği başlatılıyor...');
         _requestUnreadCount();
+        debugPrint('📨 Unread count isteği tamamlandı');
+      } else {
+        debugPrint('❌ Token bulunamadı, join işlemleri yapılamıyor');
       }
     } catch (e) {
       debugPrint('❌ Bağlantı sonrası user kanalına join olma hatası: $e');
+      debugPrint('❌ Hata detayı: ${e.toString()}');
     }
   }
 
@@ -1179,11 +1364,17 @@ class SocketService extends GetxService {
       // Kullanıcının katıldığı grupları al
       final userGroups = await _groupServices.getUserGroups();
       
+      debugPrint('👥 getUserGroups() sonucu: ${userGroups?.length ?? 0} grup');
+      debugPrint('👥 getUserGroups() null mu: ${userGroups == null}');
+      debugPrint('👥 getUserGroups() boş mu: ${userGroups?.isEmpty ?? true}');
+      
       if (userGroups != null && userGroups.isNotEmpty) {
         debugPrint('👥 ${userGroups.length} adet gruba join olunuyor...');
         
         for (final group in userGroups) {
           final groupId = group.id.toString();
+          debugPrint('👥 Grup detayı: ${group.name} (ID: $groupId)');
+          
           if (groupId.isNotEmpty) {
             debugPrint('👥 Gruba join olunuyor: ${group.name} (ID: $groupId)');
             
@@ -1191,15 +1382,20 @@ class SocketService extends GetxService {
             _socket!.emit('group:join', {'group_id': groupId});
             
             debugPrint('✅ Gruba join isteği gönderildi: ${group.name}');
+          } else {
+            debugPrint('⚠️ Boş grup ID: ${group.name}');
           }
         }
         
         debugPrint('✅ Tüm gruplara join istekleri gönderildi');
       } else {
         debugPrint('ℹ️ Kullanıcının katıldığı grup bulunamadı');
+        debugPrint('ℹ️ userGroups null: ${userGroups == null}');
+        debugPrint('ℹ️ userGroups empty: ${userGroups?.isEmpty ?? true}');
       }
     } catch (e) {
       debugPrint('❌ Gruplara join olma hatası: $e');
+      debugPrint('❌ Hata detayı: ${e.toString()}');
     }
   }
 

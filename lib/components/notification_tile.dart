@@ -9,7 +9,13 @@ Widget buildNotificationTile(NotificationModel n) {
   final NotificationController controller = Get.find();
   final LanguageService languageService = Get.find<LanguageService>();
   
-  debugPrint('🔔 Bildirim tipi: ${n.type}');
+  // Her bildirim satırı için is_read değerini debug et
+  debugPrint('🔔 === NOTIFICATION TILE COMPONENT DEBUG ===');
+  debugPrint('🔔 Notification ID: ${n.id}');
+  debugPrint('🔔 Notification Type: ${n.type}');
+  debugPrint('🔔 isRead: ${n.isRead}');
+  debugPrint('🔔 Message: ${n.message}');
+  debugPrint('🔔 ========================================');
   return ListTile(
     leading: Stack(
       children: [

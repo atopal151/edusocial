@@ -2,11 +2,12 @@ import 'package:flutter/foundation.dart';
 
 class GroupChatModel {
   final int groupId;
-  final String groupName;
-  final String groupImage;
+  String groupName; // final kaldırıldı
+  String groupImage; // final kaldırıldı
   String lastMessage;
   String lastMessageTime;
   int unreadCount;
+  bool hasUnreadMessages; // Okunmamış mesaj var mı?
 
   GroupChatModel({
     required this.groupId,
@@ -15,6 +16,7 @@ class GroupChatModel {
     required this.lastMessage,
     required this.lastMessageTime,
     this.unreadCount = 0,
+    this.hasUnreadMessages = false, // Başlangıçta false
   });
 
   factory GroupChatModel.fromJson(Map<String, dynamic> json) {

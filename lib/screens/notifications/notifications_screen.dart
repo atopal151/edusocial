@@ -10,6 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../services/language_service.dart';
 import 'dart:async';
 import 'package:edusocial/controllers/profile_controller.dart';
+import 'package:edusocial/components/print_full_text.dart';
+import 'package:flutter/foundation.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -75,11 +77,165 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// Yeni bildirimi işle ve kayan bildirim göster
   void _handleNewNotification(dynamic data) {
     try {
-      debugPrint('📱 =======================================');
-      debugPrint('📱 YENİ BİLDİRİM İŞLENİYOR!');
-      debugPrint('📱 Data: $data');
-      debugPrint('📱 Data Type: ${data.runtimeType}');
-      debugPrint('📱 Data Keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      printFullText('📱 =======================================');
+      printFullText('📱 YENİ BİLDİRİM İŞLENİYOR!');
+      printFullText('📱 Data: $data');
+      printFullText('📱 Data Type: ${data.runtimeType}');
+      
+      if (data is Map) {
+        printFullText('📱 Data Keys: ${data.keys.toList()}');
+        
+        // Detaylı alan analizi
+        printFullText('📱 === DETAYLI ALAN ANALİZİ ===');
+        
+        // Ana alanlar
+        if (data.containsKey('id')) {
+          printFullText('📱 ID: ${data['id']} (Type: ${data['id'].runtimeType})');
+        }
+        
+        if (data.containsKey('type')) {
+          printFullText('📱 Type: ${data['type']} (Type: ${data['type'].runtimeType})');
+        }
+        
+        if (data.containsKey('user_id')) {
+          printFullText('📱 User ID: ${data['user_id']} (Type: ${data['user_id'].runtimeType})');
+        }
+        
+        if (data.containsKey('sender_id')) {
+          printFullText('📱 Sender ID: ${data['sender_id']} (Type: ${data['sender_id'].runtimeType})');
+        }
+        
+        if (data.containsKey('message')) {
+          printFullText('📱 Message: ${data['message']} (Type: ${data['message'].runtimeType})');
+        }
+        
+        if (data.containsKey('text')) {
+          printFullText('📱 Text: ${data['text']} (Type: ${data['text'].runtimeType})');
+        }
+        
+        if (data.containsKey('created_at')) {
+          printFullText('📱 Created At: ${data['created_at']} (Type: ${data['created_at'].runtimeType})');
+        }
+        
+        if (data.containsKey('updated_at')) {
+          printFullText('📱 Updated At: ${data['updated_at']} (Type: ${data['updated_at'].runtimeType})');
+        }
+        
+        if (data.containsKey('is_read')) {
+          printFullText('📱 Is Read: ${data['is_read']} (Type: ${data['is_read'].runtimeType})');
+        }
+        
+        if (data.containsKey('group_id')) {
+          printFullText('📱 Group ID: ${data['group_id']} (Type: ${data['group_id'].runtimeType})');
+        }
+        
+        if (data.containsKey('event_id')) {
+          printFullText('📱 Event ID: ${data['event_id']} (Type: ${data['event_id'].runtimeType})');
+        }
+        
+        if (data.containsKey('conversation_id')) {
+          printFullText('📱 Conversation ID: ${data['conversation_id']} (Type: ${data['conversation_id'].runtimeType})');
+        }
+        
+        // Nested objects
+        if (data.containsKey('notification_data')) {
+          printFullText('📱 === NOTIFICATION_DATA OBJECT ===');
+          final notificationData = data['notification_data'];
+          if (notificationData is Map) {
+            printFullText('📱 Notification Data Keys: ${notificationData.keys.toList()}');
+            
+            for (String key in notificationData.keys) {
+              printFullText('📱   ${key}: ${notificationData[key]} (Type: ${notificationData[key].runtimeType})');
+            }
+          } else {
+            printFullText('📱 Notification Data: $notificationData (Type: ${notificationData.runtimeType})');
+          }
+        }
+        
+        if (data.containsKey('user')) {
+          printFullText('📱 === USER OBJECT ===');
+          final user = data['user'];
+          if (user is Map) {
+            printFullText('📱 User Keys: ${user.keys.toList()}');
+            
+            for (String key in user.keys) {
+              printFullText('📱   ${key}: ${user[key]} (Type: ${user[key].runtimeType})');
+            }
+          } else {
+            printFullText('📱 User: $user (Type: ${user.runtimeType})');
+          }
+        }
+        
+        if (data.containsKey('group')) {
+          printFullText('📱 === GROUP OBJECT ===');
+          final group = data['group'];
+          if (group is Map) {
+            printFullText('📱 Group Keys: ${group.keys.toList()}');
+            
+            for (String key in group.keys) {
+              printFullText('📱   ${key}: ${group[key]} (Type: ${group[key].runtimeType})');
+            }
+          } else {
+            printFullText('📱 Group: $group (Type: ${group.runtimeType})');
+          }
+        }
+        
+        if (data.containsKey('data')) {
+          printFullText('📱 === DATA OBJECT ===');
+          final dataObj = data['data'];
+          if (dataObj is Map) {
+            printFullText('📱 Data Keys: ${dataObj.keys.toList()}');
+            
+            for (String key in dataObj.keys) {
+              printFullText('📱   ${key}: ${dataObj[key]} (Type: ${dataObj[key].runtimeType})');
+            }
+          } else {
+            printFullText('📱 Data: $dataObj (Type: ${dataObj.runtimeType})');
+          }
+        }
+        
+        if (data.containsKey('answer')) {
+          printFullText('📱 === ANSWER OBJECT ===');
+          final answer = data['answer'];
+          if (answer is Map) {
+            printFullText('📱 Answer Keys: ${answer.keys.toList()}');
+            
+            for (String key in answer.keys) {
+              printFullText('📱   ${key}: ${answer[key]} (Type: ${answer[key].runtimeType})');
+            }
+          } else {
+            printFullText('📱 Answer: $answer (Type: ${answer.runtimeType})');
+          }
+        }
+        
+        if (data.containsKey('notification_full_data')) {
+          printFullText('📱 === NOTIFICATION_FULL_DATA OBJECT ===');
+          final fullData = data['notification_full_data'];
+          if (fullData is Map) {
+            printFullText('📱 Full Data Keys: ${fullData.keys.toList()}');
+            
+            for (String key in fullData.keys) {
+              printFullText('📱   ${key}: ${fullData[key]} (Type: ${fullData[key].runtimeType})');
+            }
+          } else {
+            printFullText('📱 Full Data: $fullData (Type: ${fullData.runtimeType})');
+          }
+        }
+        
+        // Diğer olası alanlar
+        final otherKeys = data.keys.where((key) => !['id', 'type', 'user_id', 'sender_id', 'message', 'text', 'created_at', 'updated_at', 'is_read', 'group_id', 'event_id', 'conversation_id', 'notification_data', 'user', 'group', 'data', 'answer', 'notification_full_data'].contains(key)).toList();
+        
+        if (otherKeys.isNotEmpty) {
+          printFullText('📱 === DİĞER ALANLAR ===');
+          for (String key in otherKeys) {
+            printFullText('📱   ${key}: ${data[key]} (Type: ${data[key].runtimeType})');
+          }
+        }
+        
+        printFullText('📱 === ALAN ANALİZİ TAMAMLANDI ===');
+      } else {
+        printFullText('📱 Data is not a Map, it is: ${data.runtimeType}');
+      }
       
       // Yeni bildirim geldiğinde API'den verileri yeniden çek
       // Loading state'i göstermek için önce loading'i true yap
@@ -87,9 +243,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       controller.fetchNotifications();
       
       // Badge sayısı otomatik güncellenir
-      debugPrint('📱 =======================================');
+      printFullText('📱 =======================================');
     } catch (e) {
-      debugPrint('❌ Bildirim işleme hatası: $e');
+      printFullText('❌ Bildirim işleme hatası: $e');
     }
   }
 
@@ -212,6 +368,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget buildNotificationTile(NotificationModel n) {
+    // Her bildirim satırı için is_read değerini debug et
+    debugPrint('📱 === NOTIFICATION TILE DEBUG ===');
+    debugPrint('📱 Notification ID: ${n.id}');
+    debugPrint('📱 Notification Type: ${n.type}');
+    debugPrint('📱 isRead: ${n.isRead}');
+    debugPrint('📱 Message: ${n.message}');
+    debugPrint('📱 ==============================');
     
     return ListTile(
       tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),
@@ -262,10 +425,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
       ),
       trailing: _buildTrailingButton(n),
       onTap: () {
-        // Bildirimi okundu olarak işaretle
-        if (!n.isRead) {
-          controller.markAsRead(n.id);
-        }
         // İstenirse detay ekranına yönlendirme yapılabilir
       },
     );
@@ -530,5 +689,71 @@ class _NotificationScreenState extends State<NotificationScreen> {
     if (diff.inDays < 30) return "${(diff.inDays / 7).floor()}${languageService.tr("notifications.timeAgo.weeksAgo")}";
     if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}${languageService.tr("notifications.timeAgo.monthsAgo")}";
     return "${(diff.inDays / 365).floor()}${languageService.tr("notifications.timeAgo.yearsAgo")}";
+  }
+  
+  /// Test method for notification logging - can be called manually for testing
+  void _testNotificationLogging() {
+    printFullText('🧪 === TEST NOTIFICATION LOGGING ===');
+    
+    // Simulate a sample notification data structure
+    final testData = {
+      'id': '12345',
+      'type': 'follow-request',
+      'user_id': '67890',
+      'sender_id': '11111',
+      'message': 'Test notification message',
+      'text': 'Test notification text',
+      'created_at': '2024-01-01T12:00:00Z',
+      'updated_at': '2024-01-01T12:00:00Z',
+      'is_read': false,
+      'group_id': 'group123',
+      'event_id': 'event456',
+      'conversation_id': 'conv789',
+      'notification_data': {
+        'id': '12345',
+        'type': 'follow-request',
+        'text': 'Test notification data text',
+        'user_id': '67890',
+        'created_at': '2024-01-01T12:00:00Z',
+      },
+      'user': {
+        'id': '11111',
+        'username': 'testuser',
+        'name': 'Test',
+        'surname': 'User',
+        'avatar_url': 'https://example.com/avatar.jpg',
+        'is_following': false,
+        'is_following_pending': true,
+        'is_self': false,
+      },
+      'group': {
+        'id': 'group123',
+        'name': 'Test Group',
+        'status': 'pending',
+      },
+      'data': {
+        'data': {
+          'user_id': '11111',
+          'group_id': 'group123',
+        }
+      },
+      'answer': {
+        'status': 'pending',
+        'created_at': '2024-01-01T12:00:00Z',
+      },
+      'notification_full_data': {
+        'text': 'Test full data text',
+        'user_id': '67890',
+        'group_id': 'group123',
+        'event_id': 'event456',
+        'group_name': 'Test Group',
+      },
+      'extra_field': 'extra_value',
+    };
+    
+    // Call the notification handler with test data
+    _handleNewNotification(testData);
+    
+    printFullText('🧪 === TEST COMPLETED ===');
   }
 }

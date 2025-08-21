@@ -7,10 +7,12 @@ import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/group_models/group_model.dart';
+import '../../models/chat_models/group_chat_model.dart';
 import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../components/snackbars/custom_snackbar.dart';
 import '../../components/print_full_text.dart';
+import '../chat_controllers/chat_controller.dart';
 
 class GroupController extends GetxController {
   var userGroups = <GroupModel>[].obs;
@@ -130,6 +132,10 @@ class GroupController extends GetxController {
       }
       
       userGroups.value = filteredGroups;
+      
+      // ChatController ile grup listesini senkronize et
+      syncGroupListWithChatController();
+      
       debugPrint("✅ User groups başarıyla yüklendi: ${filteredGroups.length} grup");
     } catch (e) {
       debugPrint("❌ User groups yüklenirken hata: $e");
@@ -301,9 +307,69 @@ class GroupController extends GetxController {
     }
   }
 
-  /// 📊 Grup mesajlarının toplam okunmamış sayısını hesapla (API'den gelen değerlere göre)
+  /// 📊 Grup mesajlarının toplam okunmamış sayısını hesapla (ChatController'dan al)
   int get groupUnreadCount {
-    return userGroups.fold(0, (sum, group) => sum + group.messageCount);
+    try {
+      // ChatController'dan grup unread count'unu al
+      final chatController = Get.find<ChatController>();
+      final unreadCount = chatController.groupUnreadCount;
+      
+      debugPrint("📊 GroupController.groupUnreadCount: $unreadCount (ChatController'dan alındı)");
+      
+      return unreadCount;
+    } catch (e) {
+      debugPrint("❌ GroupController.groupUnreadCount hatası: $e");
+      return 0;
+    }
+  }
+
+  /// 🔄 ChatController'daki grup listesini GroupController'daki verilerle senkronize et
+  void syncGroupListWithChatController() {
+    try {
+      final chatController = Get.find<ChatController>();
+      
+      // GroupController'daki userGroups'u ChatController'daki groupChatList ile senkronize et
+      for (final userGroup in userGroups) {
+        final chatGroupIndex = chatController.groupChatList.indexWhere((g) => g.groupId == int.parse(userGroup.id));
+        
+        if (chatGroupIndex != -1) {
+          // ChatController'daki grubu güncelle
+          final chatGroup = chatController.groupChatList[chatGroupIndex];
+          chatGroup.groupName = userGroup.name;
+          chatGroup.lastMessage = userGroup.description; // Geçici olarak description kullan
+          chatGroup.lastMessageTime = userGroup.humanCreatedAt;
+          
+          // hasUnreadMessages durumunu da güncelle
+          userGroup.hasUnreadMessages = chatGroup.hasUnreadMessages;
+          
+          debugPrint("🔄 Grup senkronize edildi: ${userGroup.name} (ID: ${userGroup.id}) - hasUnreadMessages: ${userGroup.hasUnreadMessages}");
+        } else {
+          // Yeni grup ekle
+          final newChatGroup = GroupChatModel(
+            groupId: int.parse(userGroup.id),
+            groupName: userGroup.name,
+            groupImage: userGroup.avatarUrl,
+            lastMessage: userGroup.description,
+            lastMessageTime: userGroup.humanCreatedAt,
+            hasUnreadMessages: false, // Başlangıçta false
+          );
+          
+          chatController.groupChatList.add(newChatGroup);
+          debugPrint("🔄 Yeni grup eklendi: ${userGroup.name} (ID: ${userGroup.id})");
+        }
+      }
+      
+      // GroupController'ı güncelle
+      userGroups.refresh();
+      debugPrint("🔄 GroupController userGroups listesi güncellendi");
+      
+      // ChatController'ı güncelle
+      chatController.groupChatList.refresh();
+      
+      debugPrint("✅ Grup listesi senkronizasyonu tamamlandı");
+    } catch (e) {
+      debugPrint("❌ Grup listesi senkronizasyon hatası: $e");
+    }
   }
 
   /// 🎯 Dinamik buton metni için yardımcı metod

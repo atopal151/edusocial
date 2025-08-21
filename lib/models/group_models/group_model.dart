@@ -20,6 +20,7 @@ class GroupModel {
   final String humanCreatedAt;
   final String? pivotCreatedAt;
   final String? pivotUpdatedAt;
+  bool hasUnreadMessages; // Okunmamış mesaj var mı?
 
   GroupModel({
     required this.id,
@@ -43,6 +44,7 @@ class GroupModel {
     required this.humanCreatedAt,
     this.pivotCreatedAt,
     this.pivotUpdatedAt,
+    this.hasUnreadMessages = false, // Başlangıçta false
   });
 
   factory GroupModel.fromJson(Map<String, dynamic> json) {

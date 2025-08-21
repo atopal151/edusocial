@@ -270,9 +270,9 @@ class _ChatListScreenState extends State<ChatListScreen>
                       ),
                     );
                   }),
-                  // Grup Mesajları Tab'ı (API'den gelen messageCount ile)
+                  // Grup Mesajları Tab'ı (ChatController'dan gelen groupUnreadCount ile)
                   Obx(() {
-                    final unreadCount = groupController.groupUnreadCount;
+                    final unreadCount = chatController.groupUnreadCount;
                     final groupsText = languageService.tr("chat.chatList.tabs.groups");
                     return Tab(
                       child: Row(
@@ -524,17 +524,21 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   fontSize: 10, color: Colors.grey),
                             ),
                             const SizedBox(height: 8),
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: group.messageCount > 0 
-                                  ? Colors.red 
-                                  : Color(0xff9ca3ae),
-                              child: Text(
-                                group.messageCount.toString(),
-                                style: const TextStyle(
-                                    fontSize: 10, color: Colors.white),
-                              ),
-                            ),
+                            // Kırmızı nokta sadece hasUnreadMessages=true olan gruplar için göster
+                            group.hasUnreadMessages 
+                                ? Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffff565f),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  )
+                                : Container(
+                                    width: 8,
+                                    height: 8,
+                                    // Boş container (görünmez)
+                                  ),
                           ],
                         ),
                       ],

@@ -143,33 +143,22 @@ class GroupAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             ),
-                         // Bildirim badge'i
+                         // Bildirim badge'i - Sadece kırmızı nokta
              Obx(() {
                final unreadCount = notificationController.unreadCount.value;
                if (unreadCount > 0) {
                 return Positioned(
-                  right: -2,
-                  top: -2,
+                  right: 2,
+                  top: 2,
                   child: Container(
-                    constraints: BoxConstraints(minWidth: 18),
-                    height: 18,
-                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    width: 12,
+                    height:12,
                     decoration: BoxDecoration(
                       color: Color(0xFFEF5050),
-                      borderRadius: BorderRadius.circular(9),
+                      shape: BoxShape.circle,
                       border: Border.all(
                         color: Colors.white,
-                        width: 2,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        unreadCount > 99 ? '99+' : unreadCount.toString(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        width: 1.5,
                       ),
                     ),
                   ),

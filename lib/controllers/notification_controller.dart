@@ -7,6 +7,7 @@ import '../services/socket_services.dart';
 import '../services/onesignal_service.dart';
 import '../services/language_service.dart';
 import 'dart:async';
+import '../components/print_full_text.dart';
 
 class NotificationController extends GetxController {
   var notifications = <NotificationModel>[].obs;
@@ -79,7 +80,55 @@ class NotificationController extends GetxController {
     });
     
     _userNotificationSubscription = _socketService.onUserNotification.listen((data) {
-      debugPrint('👤 Yeni user notification geldi (NotificationController): $data');
+      printFullText('👤 Yeni user notification geldi (NotificationController): $data');
+      printFullText('👤 Data type: ${data.runtimeType}');
+      
+      if (data is Map) {
+        printFullText('👤 === NOTIFICATION CONTROLLER DETAYLI ANALİZ ===');
+        printFullText('👤 Data Keys: ${data.keys.toList()}');
+        
+        // Ana alanları kontrol et
+        for (String key in data.keys) {
+          printFullText('👤   ${key}: ${data[key]} (Type: ${data[key].runtimeType})');
+        }
+        
+        // Nested objects'leri detaylı incele
+        if (data.containsKey('notification_data') && data['notification_data'] is Map) {
+          printFullText('👤 === NOTIFICATION_DATA DETAYLI ===');
+          final notificationData = data['notification_data'] as Map;
+          for (String key in notificationData.keys) {
+            printFullText('👤     ${key}: ${notificationData[key]} (Type: ${notificationData[key].runtimeType})');
+          }
+          
+          // is_read alanını özel olarak kontrol et
+          if (notificationData.containsKey('is_read')) {
+            final isRead = notificationData['is_read'];
+            printFullText('👤 🔍 is_read değeri: $isRead (Type: ${isRead.runtimeType})');
+            
+            // Eğer is_read true ise, bu bildirim zaten okunmuş demektir
+            if (isRead == true) {
+              printFullText('👤 ✅ Socket\'ten gelen bildirim zaten okunmuş (is_read: true)');
+            } else {
+              printFullText('👤 🔴 Socket\'ten gelen bildirim okunmamış (is_read: false)');
+            }
+          } else {
+            printFullText('👤 ⚠️ notification_data içinde is_read alanı bulunamadı');
+          }
+        } else {
+          printFullText('👤 ⚠️ notification_data alanı bulunamadı veya Map değil');
+        }
+        
+        if (data.containsKey('user') && data['user'] is Map) {
+          printFullText('👤 === USER DETAYLI ===');
+          final user = data['user'] as Map;
+          for (String key in user.keys) {
+            printFullText('👤     ${key}: ${user[key]} (Type: ${user[key].runtimeType})');
+          }
+        }
+        
+        printFullText('👤 === ANALİZ TAMAMLANDI ===');
+      }
+      
       // API'den verileri yeniden çek
       isLoading.value = true;
       fetchNotifications();
@@ -118,75 +167,7 @@ class NotificationController extends GetxController {
     }
   }
 */
-  /// Bildirimi okundu olarak işaretle
-  void markAsRead(String notificationId) {
-    final index = notifications.indexWhere((n) => n.id == notificationId);
-    if (index != -1) {
-      // NotificationModel immutable olduğu için yeni bir instance oluştur
-      final notification = notifications[index];
-      final updatedNotification = NotificationModel(
-        id: notification.id,
-        userId: notification.userId,
-        senderUserId: notification.senderUserId,
-        userName: notification.userName,
-        profileImageUrl: notification.profileImageUrl,
-        type: notification.type,
-        message: notification.message,
-        timestamp: notification.timestamp,
-        isRead: true, // Okundu olarak işaretle
-        groupId: notification.groupId,
-        eventId: notification.eventId,
-        groupName: notification.groupName,
-        isAccepted: notification.isAccepted,
-        isFollowing: notification.isFollowing,
-        isFollowingPending: notification.isFollowingPending,
-        isRejected: notification.isRejected,
-      );
-      
-      notifications[index] = updatedNotification;
-      debugPrint('📖 Bildirim okundu olarak işaretlendi: $notificationId');
-      
-      // Okunmamış sayısını güncelle
-      _updateUnreadCount();
-    }
-  }
 
-  /// Tüm bildirimleri okundu olarak işaretle
-  void markAllAsRead() {
-    bool hasChanges = false;
-    for (int i = 0; i < notifications.length; i++) {
-      if (!notifications[i].isRead) {
-        // Her bir bildirimi işaretle ama _updateUnreadCount çağırma
-        final notification = notifications[i];
-        final updatedNotification = NotificationModel(
-          id: notification.id,
-          userId: notification.userId,
-          senderUserId: notification.senderUserId,
-          userName: notification.userName,
-          profileImageUrl: notification.profileImageUrl,
-          type: notification.type,
-          message: notification.message,
-          timestamp: notification.timestamp,
-          isRead: true,
-          groupId: notification.groupId,
-          eventId: notification.eventId,
-          groupName: notification.groupName,
-          isAccepted: notification.isAccepted,
-          isFollowing: notification.isFollowing,
-          isFollowingPending: notification.isFollowingPending,
-          isRejected: notification.isRejected,
-        );
-        notifications[i] = updatedNotification;
-        hasChanges = true;
-      }
-    }
-    
-    if (hasChanges) {
-      debugPrint('📚 Tüm bildirimler okundu olarak işaretlendi');
-      // Sadece değişiklik varsa güncelle
-      _updateUnreadCount();
-    }
-  }
 
   /// Bildirimleri çek
   Future<void> fetchNotifications() async {

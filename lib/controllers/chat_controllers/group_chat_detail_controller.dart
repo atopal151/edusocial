@@ -237,14 +237,8 @@ class GroupChatDetailController extends GetxController {
       return;
     }
     
-    // Chat liste controller'ın group message listener'ını durdur
-    try {
-      final chatController = Get.find<ChatController>();
-      chatController.pauseGroupMessageListener();
-      debugPrint('📴 ChatController group message listener duraklatıldı');
-    } catch (e) {
-      debugPrint('⚠️ ChatController bulunamadı: $e');
-    }
+    // Chat liste controller'ın group message listener'ını durdur (Artık gerekli değil - sürekli aktif)
+    debugPrint('📴 ChatController group message listener artık duraklatılmıyor - sürekli aktif');
     
     // Group mesaj dinleyicisi - user:{user_id} kanalından
     _groupMessageSubscription = _socketService.onGroupMessage.listen((data) {
@@ -1161,14 +1155,8 @@ class GroupChatDetailController extends GetxController {
 
   @override
   void onClose() {
-    // Chat liste controller'ın group message listener'ını tekrar başlat
-    try {
-      final chatController = Get.find<ChatController>();
-      chatController.resumeGroupMessageListener();
-      debugPrint('▶️ ChatController group message listener tekrar başlatıldı');
-    } catch (e) {
-      debugPrint('⚠️ ChatController resume edilemedi: $e');
-    }
+    // Chat liste controller'ın group message listener'ını tekrar başlat (Artık gerekli değil - sürekli aktif)
+    debugPrint('▶️ ChatController group message listener artık başlatılmıyor - sürekli aktif');
     
     // Socket listener guard'ı reset et
     _isSocketListenerSetup = false;

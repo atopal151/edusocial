@@ -101,6 +101,77 @@ class ChatServices {
     }
   }
 
+  // Grup mesajları için kalıcı kırmızı nokta durumunu kaydetmek için key
+  static const String _unreadGroupsKey = 'unread_group_ids';
+
+  /// 🔴 Kırmızı nokta olan grup ID'lerini kaydet
+  static Future<void> saveUnreadGroups(List<int> groupIds) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = groupIds.map((id) => id.toString()).toList();
+      await prefs.setStringList(_unreadGroupsKey, jsonList);
+      printFullText('💾 Grup kırmızı nokta durumları kaydedildi: $groupIds');
+    } catch (e) {
+      printFullText('❌ Grup kırmızı nokta durumları kaydedilemedi: $e');
+    }
+  }
+
+  /// 🔴 Kırmızı nokta olan grup ID'lerini geri yükle
+  static Future<List<int>> loadUnreadGroups() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = prefs.getStringList(_unreadGroupsKey) ?? [];
+      final groupIds = jsonList.map((id) => int.parse(id)).toList();
+      printFullText('📂 Grup kırmızı nokta durumları yüklendi: $groupIds');
+      return groupIds;
+    } catch (e) {
+      printFullText('❌ Grup kırmızı nokta durumları yüklenemedi: $e');
+      return [];
+    }
+  }
+
+  /// 🔴 Belirli bir grubu okunmuş olarak işaretle
+  static Future<void> markGroupAsRead(int groupId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = prefs.getStringList(_unreadGroupsKey) ?? [];
+      final groupIds = jsonList.map((id) => int.parse(id)).toList();
+      
+      // Group ID'yi listeden çıkar
+      groupIds.remove(groupId);
+      
+      // Güncellenmiş listeyi kaydet
+      final updatedJsonList = groupIds.map((id) => id.toString()).toList();
+      await prefs.setStringList(_unreadGroupsKey, updatedJsonList);
+      
+      printFullText('✅ Grup $groupId okunmuş olarak işaretlendi');
+    } catch (e) {
+      printFullText('❌ Grup okunmuş olarak işaretlenemedi: $e');
+    }
+  }
+
+  /// 🔴 Belirli bir grubu okunmamış olarak işaretle
+  static Future<void> markGroupAsUnread(int groupId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = prefs.getStringList(_unreadGroupsKey) ?? [];
+      final groupIds = jsonList.map((id) => int.parse(id)).toList();
+      
+      // Group ID'yi listeye ekle (eğer yoksa)
+      if (!groupIds.contains(groupId)) {
+        groupIds.add(groupId);
+      }
+      
+      // Güncellenmiş listeyi kaydet
+      final updatedJsonList = groupIds.map((id) => id.toString()).toList();
+      await prefs.setStringList(_unreadGroupsKey, updatedJsonList);
+      
+      printFullText('🔴 Grup $groupId okunmamış olarak işaretlendi');
+    } catch (e) {
+      printFullText('❌ Grup okunmamış olarak işaretlenemedi: $e');
+    }
+  }
+
   // OPTIMIZE: HTTP client configuration for better network resilience
   static final http.Client _httpClient = http.Client();
 
