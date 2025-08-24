@@ -497,28 +497,9 @@ class GroupChatDetailController extends GetxController {
             // FIXED: Safe message type determination
             final messageData = _determineMessageType(chat);
             
-            // Debug: Tüm mesajları kontrol et
-            debugPrint('🔍 Processing message: ${chat.id}');
-            debugPrint('🔍 Chat messageType: ${chat.messageType}');
-            debugPrint('🔍 Chat message: ${chat.message}');
             
-            // Boş mesajları kontrol et (survey olabilir)
-            if (chat.message.isEmpty || chat.message == '') {
-              debugPrint('🔍 EMPTY MESSAGE DETECTED - might be survey!');
-              debugPrint('🔍 Message data: $messageData');
-              debugPrint('🔍 FULL CHAT OBJECT: ${chat.toString()}');
-              debugPrint('🔍 Chat ID: ${chat.id}');
-              debugPrint('🔍 Chat Type: ${chat.messageType}');
-              debugPrint('🔍 Chat Message: "${chat.message}"');
-              debugPrint('🔍 Chat Survey ID: ${chat.surveyId}');
-              debugPrint('🔍 Chat Survey: ${chat.survey}');
-            }
             
-            // Survey mesajları için özel log
-            if (chat.messageType == 'survey') {
-              debugPrint('🔍 SURVEY MESSAGE DETECTED!');
-              debugPrint('🔍 Message data: $messageData');
-            }
+
             
                             final message = GroupMessageModel(
                   id: chat.id.toString(),
@@ -597,10 +578,7 @@ class GroupChatDetailController extends GetxController {
               List<int>? choiceIds;
               Map<String, dynamic>? surveyData;
     
-    // Debug: Mesaj tipini kontrol et
-    debugPrint('🔍 _determineMessageType called for message: ${chat.id}');
-    debugPrint('🔍 chat.messageType: ${chat.messageType}');
-    debugPrint('🔍 chat.message: ${chat.message}');
+
     
                   try {
                 if (chat.messageType == 'poll') {

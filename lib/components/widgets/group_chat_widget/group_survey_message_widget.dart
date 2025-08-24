@@ -146,7 +146,6 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
 
   Widget _buildSurveyOption(String option) {
     final message = widget.message;
-    final controller = widget.controller;
     final isMultipleChoice = message.isMultipleChoice ?? false;
     
     // Choice ID'sini bul
