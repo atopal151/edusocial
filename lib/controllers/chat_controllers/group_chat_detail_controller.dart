@@ -12,6 +12,7 @@ import '../../models/link_model.dart';
 import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
+import '../../services/survey_service.dart';
 import '../profile_controller.dart';
 import 'chat_controller.dart'; // Added import for ChatController
 import '../../components/snackbars/custom_snackbar.dart';
@@ -61,6 +62,12 @@ class GroupChatDetailController extends GetxController {
   RxMap<String, int> pollVotes = <String, int>{}.obs;
   RxString selectedPollOption = ''.obs;
   TextEditingController pollTitleController = TextEditingController();
+
+  // Survey variables
+  RxString surveyTitle = ''.obs;
+  RxList<String> surveyChoices = <String>[].obs;
+  RxBool isMultipleChoice = false.obs;
+  TextEditingController surveyTitleController = TextEditingController();
 
   // Performance optimization: Cache kullanıcı verileri
   final Map<String, Map<String, dynamic>> _userCache = {};
@@ -348,7 +355,34 @@ class GroupChatDetailController extends GetxController {
       // User data'yı al
       final userData = messageData['user'] as Map<String, dynamic>?;
       
-      // Basit implementasyon - gerçek socket data'ya göre ayarlanmalı
+      // Message type'ı belirle
+      GroupMessageType messageType = GroupMessageType.text;
+      String content = messageData['message'] ?? '';
+      List<String>? pollOptions;
+      bool? isMultipleChoice;
+      int? surveyId;
+      
+      // Survey mesajları için özel işlem
+      if (messageData['type'] == 'survey' && messageData['survey'] != null) {
+        messageType = GroupMessageType.survey;
+        final surveyData = messageData['survey'] as Map<String, dynamic>;
+        content = surveyData['title'] ?? '';
+        isMultipleChoice = surveyData['multiple_choice'] ?? false;
+        surveyId = surveyData['id'];
+        
+        // Survey seçeneklerini al
+        if (surveyData['choices'] != null) {
+          final choices = surveyData['choices'] as List<dynamic>;
+          pollOptions = choices.map((choice) => (choice['title'] ?? '').toString()).toList();
+        }
+      } else if (messageData['type'] == 'poll') {
+        messageType = GroupMessageType.poll;
+        // Poll seçeneklerini al
+        if (messageData['poll_options'] != null) {
+          pollOptions = List<String>.from(messageData['poll_options']);
+        }
+      }
+      
       final newMessage = GroupMessageModel(
         id: messageId,
         senderId: messageData['user_id']?.toString() ?? '',
@@ -357,10 +391,13 @@ class GroupChatDetailController extends GetxController {
         surname: userData?['surname'] ?? '',
         username: userData?['username'] ?? '',
         profileImage: userData?['avatar_url'] ?? '',
-        content: messageData['message'] ?? '',
-        messageType: GroupMessageType.text, // Socket data'ya göre ayarla
+        content: content,
+        messageType: messageType,
         timestamp: DateTime.parse(messageData['created_at'] ?? DateTime.now().toIso8601String()),
         isSentByMe: messageData['user_id']?.toString() == currentUserId,
+        pollOptions: pollOptions,
+        isMultipleChoice: isMultipleChoice,
+        surveyId: surveyId,
       );
       
       messages.add(newMessage);
@@ -460,22 +497,48 @@ class GroupChatDetailController extends GetxController {
             // FIXED: Safe message type determination
             final messageData = _determineMessageType(chat);
             
-            final message = GroupMessageModel(
-              id: chat.id.toString(),
-              senderId: userId,
-              receiverId: chat.groupId.toString(),
-              name: user['name'] ?? '',
-              surname: user['surname'] ?? '',
-              username: user['username'] ?? user['name'] ?? '',
-              profileImage: user['avatar_url'] ?? '',
-              content: messageData['content'],
-              messageType: messageData['type'],
-              timestamp: DateTime.parse(chat.createdAt),
-              isSentByMe: isSentByMe,
-              pollOptions: messageData['pollOptions'],
-              additionalText: messageData['additionalText'],
-              links: messageData['links'],
-            );
+            // Debug: Tüm mesajları kontrol et
+            debugPrint('🔍 Processing message: ${chat.id}');
+            debugPrint('🔍 Chat messageType: ${chat.messageType}');
+            debugPrint('🔍 Chat message: ${chat.message}');
+            
+            // Boş mesajları kontrol et (survey olabilir)
+            if (chat.message.isEmpty || chat.message == '') {
+              debugPrint('🔍 EMPTY MESSAGE DETECTED - might be survey!');
+              debugPrint('🔍 Message data: $messageData');
+              debugPrint('🔍 FULL CHAT OBJECT: ${chat.toString()}');
+              debugPrint('🔍 Chat ID: ${chat.id}');
+              debugPrint('🔍 Chat Type: ${chat.messageType}');
+              debugPrint('🔍 Chat Message: "${chat.message}"');
+              debugPrint('🔍 Chat Survey ID: ${chat.surveyId}');
+              debugPrint('🔍 Chat Survey: ${chat.survey}');
+            }
+            
+            // Survey mesajları için özel log
+            if (chat.messageType == 'survey') {
+              debugPrint('🔍 SURVEY MESSAGE DETECTED!');
+              debugPrint('🔍 Message data: $messageData');
+            }
+            
+                            final message = GroupMessageModel(
+                  id: chat.id.toString(),
+                  senderId: userId,
+                  receiverId: chat.groupId.toString(),
+                  name: user['name'] ?? '',
+                  surname: user['surname'] ?? '',
+                  username: user['username'] ?? user['name'] ?? '',
+                  profileImage: user['avatar_url'] ?? '',
+                  content: messageData['content'],
+                  messageType: messageData['type'],
+                  timestamp: DateTime.parse(chat.createdAt),
+                  isSentByMe: isSentByMe,
+                  pollOptions: messageData['pollOptions'],
+                  additionalText: messageData['additionalText'],
+                  links: messageData['links'],
+                  isMultipleChoice: messageData['isMultipleChoice'],
+                  surveyId: messageData['surveyId'],
+                  choiceIds: messageData['choiceIds'],
+                );
             
             processedMessages.add(message);
           } catch (e) {
@@ -527,13 +590,54 @@ class GroupChatDetailController extends GetxController {
     String content = chat.message ?? '';
     List<String>? links;
     List<String>? pollOptions;
-    String? additionalText;
+                  String? additionalText;
+              bool? isMultipleChoice;
+              int? surveyId;
+              List<int>? choiceIds;
     
-    try {
-      if (chat.messageType == 'poll') {
-        messageType = GroupMessageType.poll;
-        content = chat.message ?? '';
-        pollOptions = ['Seçenek 1', 'Seçenek 2']; 
+    // Debug: Mesaj tipini kontrol et
+    debugPrint('🔍 _determineMessageType called for message: ${chat.id}');
+    debugPrint('🔍 chat.messageType: ${chat.messageType}');
+    debugPrint('🔍 chat.message: ${chat.message}');
+    
+                  try {
+                if (chat.messageType == 'poll') {
+                  messageType = GroupMessageType.poll;
+                  content = chat.message ?? '';
+                  pollOptions = ['Seçenek 1', 'Seçenek 2']; 
+                } else if (chat.messageType == 'survey' || chat.surveyId != null || chat.survey != null) {
+                  messageType = GroupMessageType.survey;
+                  
+                  debugPrint('🔍 Survey mesajı tespit edildi');
+                  debugPrint('🔍 chat.survey: ${chat.survey}');
+                  debugPrint('🔍 chat.message: ${chat.message}');
+                  debugPrint('🔍 chat.surveyId: ${chat.surveyId}');
+                  
+                  // Survey verisi survey objesi içinde geliyor
+                  if (chat.survey != null) {
+                    content = chat.survey['title'] ?? '';
+                    isMultipleChoice = chat.survey['multiple_choice'] ?? false;
+                    surveyId = chat.survey['id'];
+                    
+                    debugPrint('🔍 Survey title: $content');
+                    debugPrint('🔍 Survey multiple_choice: $isMultipleChoice');
+                    debugPrint('🔍 Survey ID: $surveyId');
+                    
+                    // Survey seçeneklerini al
+                    if (chat.survey['choices'] != null) {
+                      final choices = chat.survey['choices'] as List<dynamic>;
+                      pollOptions = choices.map((choice) => choice['title'] ?? '').cast<String>().toList();
+                      choiceIds = choices.map((choice) => choice['id'] ?? 0).cast<int>().toList();
+                      debugPrint('🔍 Survey choices: $pollOptions');
+                      debugPrint('🔍 Survey choice IDs: $choiceIds');
+                    }
+                  } else {
+                    // Fallback
+                    content = chat.message ?? '';
+                    isMultipleChoice = false;
+                    surveyId = chat.surveyId;
+                    debugPrint('🔍 Fallback - content: $content');
+                  }
       } else if (chat.media != null && chat.media.isNotEmpty) {
         final media = chat.media.first;
         if (media.type != null && media.type.toString().startsWith('image/')) {
@@ -572,13 +676,16 @@ class GroupChatDetailController extends GetxController {
       content = chat.message?.toString() ?? '';
     }
     
-    return {
-      'type': messageType,
-      'content': content,
-      'links': links,
-      'pollOptions': pollOptions,
-      'additionalText': additionalText,
-    };
+                  return {
+                'type': messageType,
+                'content': content,
+                'links': links,
+                'pollOptions': pollOptions,
+                'additionalText': additionalText,
+                'isMultipleChoice': isMultipleChoice,
+                'surveyId': surveyId,
+                'choiceIds': choiceIds,
+              };
   }
 
   /// FIXED: Proper scroll to bottom with timing
@@ -915,6 +1022,229 @@ class GroupChatDetailController extends GetxController {
       );
     } finally {
       isSendingMessage.value = false;
+    }
+  }
+
+  // Survey functions
+  void openSurveyBottomSheet() {
+    surveyTitle.value = '';
+    surveyChoices.assignAll(['', '']);
+    isMultipleChoice.value = false;
+    surveyTitleController.clear();
+    
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+              TextField(
+                style: TextStyle(fontSize: 12),
+                controller: surveyTitleController,
+                decoration: InputDecoration(
+                  hintText: _languageService.tr("chat.survey.title"),
+                  filled: true,
+                  fillColor: const Color(0xfff5f5f5),
+                  hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onChanged: (val) => surveyTitle.value = val,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Checkbox(
+                    value: isMultipleChoice.value,
+                    onChanged: (value) => isMultipleChoice.value = value ?? false,
+                    activeColor: Color(0xffED7474),
+                  ),
+                  Text(
+                    _languageService.tr("chat.survey.multipleChoice"),
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+              Obx(() => Column(
+                children: List.generate(surveyChoices.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            style: TextStyle(fontSize: 12),
+                            decoration: InputDecoration(
+                              hintText: _languageService.tr("chat.survey.addChoice"),
+                              filled: true,
+                              fillColor: const Color(0xfff5f5f5),
+                              hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            onChanged: (val) => surveyChoices[index] = val,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        if (surveyChoices.length > 2)
+                          IconButton(
+                            icon: const Icon(Icons.remove_circle),
+                            onPressed: () => surveyChoices.removeAt(index),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+              )),
+              TextButton.icon(
+                onPressed: () => surveyChoices.add(''),
+                icon: const Icon(
+                  Icons.add,
+                  color: Color(0xffED7474),
+                  size: 15,
+                ),
+                label: Text(
+                  _languageService.tr("chat.survey.addChoice"),
+                  style: TextStyle(color: Color(0xffED7474), fontSize: 12),
+                ),
+              ),
+              const SizedBox(height: 30),
+              CustomButton(
+                text: _languageService.tr("chat.survey.send"),
+                height: 45,
+                borderRadius: 15,
+                onPressed: () {
+                  final filledChoices = surveyChoices.where((e) => e.trim().isNotEmpty).toList();
+                  if (surveyTitleController.text.trim().isNotEmpty && filledChoices.length >= 2) {
+                    sendSurvey(surveyTitleController.text, filledChoices);
+                    Get.back();
+                  }
+                },
+                isLoading: isSendingMessage,
+                backgroundColor: Color(0xffFFF6F6),
+                textColor: Color(0xffED7474),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void sendSurvey(String title, List<String> choices) async {
+    if (isSendingMessage.value) return;
+    
+    isSendingMessage.value = true;
+    
+    try {
+      debugPrint('📊 Survey gönderme başlatılıyor...');
+      debugPrint('📊 Group ID: ${currentGroupId.value}');
+      debugPrint('📊 Title: $title');
+      debugPrint('📊 Choices: $choices');
+      debugPrint('📊 Multiple Choice: ${isMultipleChoice.value}');
+      
+      final success = await SurveyService.createSurvey(
+        receiverId: int.parse(currentGroupId.value),
+        isGroup: true,
+        title: title,
+        multipleChoice: isMultipleChoice.value,
+        choices: choices,
+      );
+      
+      if (success) {
+        // Başarılı ise mesajları yeniden yükle
+        await refreshMessagesOnly();
+        
+        // Survey gönderildikten sonra en alta git
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          scrollToBottom(animated: true);
+        });
+        
+        Get.snackbar(
+          'Başarılı',
+          'Anket başarıyla gönderildi',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          'Hata',
+          'Anket gönderilemedi',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      debugPrint('Survey gönderme hatası: $e');
+      Get.snackbar(
+        'Hata',
+        'Anket gönderilemedi',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isSendingMessage.value = false;
+    }
+  }
+
+  void answerSurvey(int surveyId, List<String> selectedChoices) async {
+    try {
+      // Seçilen choice'ların ID'lerini bul
+      List<int> answerIds = [];
+      
+      // String olarak gelen choice ID'lerini int'e çevir
+      for (String choice in selectedChoices) {
+        final choiceId = int.tryParse(choice);
+        if (choiceId != null) {
+          answerIds.add(choiceId);
+        }
+      }
+      
+      final success = await SurveyService.answerSurvey(
+        surveyId: surveyId,
+        answerIds: answerIds,
+      );
+      
+      if (success) {
+        // Başarılı ise mesajları yeniden yükle
+        await refreshMessagesOnly();
+        
+        Get.snackbar(
+          'Başarılı',
+          'Anket cevabınız kaydedildi',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          'Hata',
+          'Anket cevabı kaydedilemedi',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      debugPrint('Survey cevaplama hatası: $e');
+      Get.snackbar(
+        'Hata',
+        'Anket cevabı kaydedilemedi',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 

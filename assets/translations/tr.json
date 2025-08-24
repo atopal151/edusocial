@@ -431,6 +431,12 @@
       "addOption": "Seçenek Ekle",
       "send": "Anket Gönder"
     },
+    "survey": {
+      "title": "Anket başlığı yazın",
+      "addChoice": "Seçenek ekleyin",
+      "multipleChoice": "Çoktan seçmeli",
+      "send": "Anket Gönder"
+    },
     "dateSeparator": {
       "today": "Bugün",
       "yesterday": "Dün"

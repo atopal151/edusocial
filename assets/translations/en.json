@@ -414,6 +414,12 @@
       "addOption": "Add Option",
       "send": "Send Poll"
     },
+    "survey": {
+      "title": "Write survey title",
+      "addChoice": "Add choice",
+      "multipleChoice": "Multiple choice",
+      "send": "Send Survey"
+    },
     "dateSeparator": {
       "today": "Today",
       "yesterday": "Yesterday"

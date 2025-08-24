@@ -91,12 +91,14 @@ Widget buildGroupMessageInputField() {
                     : () {
                         controller.pickDocument();
                       },
-                child: Icon(
-                  Icons.description,
-                  color: controller.isSendingMessage.value 
-                      ? Color(0xffe5e5e5) 
-                      : Color(0xffc9c9c9),
-                  size: 24,
+                child: SvgPicture.asset(
+                  "images/icons/selected_document.svg",
+                  colorFilter: ColorFilter.mode(
+                    controller.isSendingMessage.value 
+                        ? Color(0xffe5e5e5) 
+                        : Color(0xffc9c9c9),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -145,22 +147,26 @@ Widget buildGroupMessageInputField() {
             
             // Poll butonu
             Padding(
-              padding: const EdgeInsets.all(8.0),
+             padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                                    onTap: controller.isSendingMessage.value
-                        ? null
-                        : () {
-                            controller.openPollBottomSheet();
-                          },
-                child: Icon(
-                  Icons.poll,
-                  color: controller.isSendingMessage.value 
-                      ? Color(0xffe5e5e5) 
-                      : Color(0xffc9c9c9),
-                  size: 24,
+                onTap: controller.isSendingMessage.value
+                    ? null
+                    : () {
+                        controller.openSurveyBottomSheet();
+                      },
+                child: SvgPicture.asset(
+                  "images/icons/poll_icon.svg",
+                  colorFilter: ColorFilter.mode(
+                    controller.isSendingMessage.value 
+                        ? Color(0xffe5e5e5) 
+                        : Color(0xffc9c9c9),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
+            
+           
             
             // Send butonu
             Obx(() => IconButton(

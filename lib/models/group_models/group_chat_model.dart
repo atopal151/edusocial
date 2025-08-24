@@ -11,6 +11,8 @@ class GroupChatModel {
   final Map<String, dynamic> user;
   final List<GroupChatMediaModel> media;
   final List<GroupChatLinkModel> groupChatLink;
+  final int? surveyId;
+  final Map<String, dynamic>? survey;
 
   GroupChatModel({
     required this.id,
@@ -25,6 +27,8 @@ class GroupChatModel {
     required this.user,
     required this.media,
     required this.groupChatLink,
+    this.surveyId,
+    this.survey,
   });
 
   factory GroupChatModel.fromJson(Map<String, dynamic> json) {
@@ -47,6 +51,8 @@ class GroupChatModel {
               ?.map((link) => GroupChatLinkModel.fromJson(link))
               .toList() ??
           [],
+      surveyId: json['survey_id'],
+      survey: json['survey'] as Map<String, dynamic>?,
     );
   }
 }

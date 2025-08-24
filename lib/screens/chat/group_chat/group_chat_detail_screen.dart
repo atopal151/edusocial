@@ -6,6 +6,7 @@ import '../../../components/widgets/group_chat_widget/group_document_message_wid
 import '../../../components/widgets/group_chat_widget/group_image_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_link_messaje_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_survey_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_text_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_text_with_links_message_widget.dart';
 import '../../../components/widgets/tree_point_bottom_sheet.dart';
@@ -463,6 +464,8 @@ class OptimizedMessageListView extends StatelessWidget {
         return GroupTextWithLinksMessageWidget(message: message);
       case GroupMessageType.poll:
         return GroupPollMessageWidget(message: message);
+      case GroupMessageType.survey:
+        return GroupSurveyMessageWidget(message: message, controller: controller);
       case GroupMessageType.text:
         return GroupTextMessageWidget(message: message);
     }

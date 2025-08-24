@@ -1,4 +1,4 @@
-enum GroupMessageType { text, image, link, poll, document, textWithLinks }
+enum GroupMessageType { text, image, link, poll, document, textWithLinks, survey }
 
 class GroupMessageModel {
   final String id;
@@ -15,6 +15,9 @@ class GroupMessageModel {
   final String username;
   final String profileImage;
   final List<String>? links;
+  final bool? isMultipleChoice;
+  final int? surveyId;
+  final List<int>? choiceIds;
 
   GroupMessageModel({
     required this.id,
@@ -31,5 +34,8 @@ class GroupMessageModel {
     this.pollOptions,
     this.additionalText,
     this.links,
+    this.isMultipleChoice,
+    this.surveyId,
+    this.choiceIds,
   });
 }
