@@ -1750,7 +1750,14 @@
       "replyTo": "Yanıtla:",
       "replyPlaceholder": "Yanıtınızı yazın...",
       "replyButton": "Yanıtla",
-      "cancelReply": "Yanıtlamayı iptal et"
+      "cancelReply": "Yanıtlamayı iptal et",
+      "replySent": "Yanıt başarıyla gönderildi",
+      "replyFailed": "Yanıt gönderilemedi",
+      "replyError": "Yanıt gönderilirken bir hata oluştu",
+      "showReplies": "Yanıtları gör",
+      "hideReplies": "Daha az göster",
+      "replyCount": "yanıt",
+      "replyCountPlural": "yanıt"
     },
     "edit": {
       "editButton": "Düzenle",

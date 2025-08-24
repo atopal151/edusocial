@@ -1,5 +1,6 @@
 import 'package:edusocial/services/comment_services.dart';
 import 'package:edusocial/services/socket_services.dart';
+import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/comment_model.dart';
@@ -177,6 +178,76 @@ class CommentController extends GetxController {
       return false;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Yorum yanıtlama fonksiyonu
+  Future<bool> addReply(String postId, String commentId, String content) async {
+    isLoading.value = true;
+    
+    try {
+      debugPrint('🔄 Yanıt gönderiliyor... Post ID: $postId, Comment ID: $commentId');
+      final newReply = await CommentService.postCommentReply(postId, commentId, content);
+      
+      if (newReply != null) {
+        debugPrint('✅ Yanıt başarıyla gönderildi');
+        
+        // Socket'e yanıt bildirimi gönder
+        _sendReplyNotification(postId, content);
+        
+        // Yorumları yeniden yükle
+        await fetchComments(postId);
+        
+        CustomSnackbar.show(
+          title: "Başarılı",
+          message: Get.find<LanguageService>().tr("comments.reply.replySent"),
+          type: SnackbarType.success,
+        );
+        
+        return true;
+      } else {
+        debugPrint('❌ Yanıt gönderilemedi');
+        CustomSnackbar.show(
+          title: "Hata",
+          message: Get.find<LanguageService>().tr("comments.reply.replyFailed"),
+          type: SnackbarType.error,
+        );
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Yanıt gönderilirken hata: $e');
+      CustomSnackbar.show(
+        title: "Hata",
+        message: Get.find<LanguageService>().tr("comments.reply.replyError"),
+        type: SnackbarType.error,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Socket'e yanıt bildirimi gönder
+  void _sendReplyNotification(String postId, String content) {
+    try {
+      debugPrint('📤 Socket\'e yanıt bildirimi gönderiliyor...');
+      
+      final notificationData = {
+        'type': 'post_comment_reply',
+        'post_id': postId,
+        'content': content,
+        'timestamp': DateTime.now().toIso8601String(),
+        'message': 'Post\'unuza yeni yanıt geldi',
+      };
+      
+      // Farklı event isimlerini dene
+      _socketService.sendMessage('post:comment:reply', notificationData);
+      _socketService.sendMessage('comment:reply', notificationData);
+      _socketService.sendMessage('post:activity', notificationData);
+      
+      debugPrint('✅ Yanıt bildirimi socket\'e gönderildi');
+    } catch (e) {
+      debugPrint('❌ Socket bildirimi gönderilemedi: $e');
     }
   }
 }

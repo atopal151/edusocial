@@ -123,4 +123,36 @@ static Future<List<CommentModel>> fetchComments(String postId) async {
       return false;
     }
   }
+
+  /// Yorum yanıtlama servisi
+  static Future<CommentModel?> postCommentReply(String postId, String commentId, String content) async {
+    final token = _box.read('token');
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/post-comment-reply'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'post_id': postId,
+          'post_comment_id': commentId,
+          'content': content,
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final body = jsonDecode(response.body);
+        // Eğer API yeni yanıtı döndürüyorsa
+        if (body['data'] != null) {
+          return CommentModel.fromJson(body['data']);
+        }
+        return null;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }

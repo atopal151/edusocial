@@ -1639,7 +1639,14 @@
       "replyTo": "Reply to:",
       "replyPlaceholder": "Type your reply...",
       "replyButton": "Reply",
-      "cancelReply": "Cancel reply"
+      "cancelReply": "Cancel reply",
+      "replySent": "Reply sent successfully",
+      "replyFailed": "Failed to send reply",
+      "replyError": "An error occurred while sending reply",
+      "showReplies": "Show replies",
+      "hideReplies": "Show less",
+      "replyCount": "reply",
+      "replyCountPlural": "replies"
     },
     "edit": {
       "editButton": "Edit",

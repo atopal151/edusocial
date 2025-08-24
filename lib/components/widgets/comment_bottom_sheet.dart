@@ -30,6 +30,9 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
   // Düzenleme state'i
   CommentModel? editingComment;
   String? currentUsername;
+  
+  // Yanıtları gizle/göster state'i
+  Set<int> expandedComments = {};
 
   @override
   void initState() {
@@ -130,9 +133,16 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
         debugPrint('🔄 Yanıt gönderiliyor: $text');
         debugPrint('🔄 Yanıtlanan yorum: ${replyingTo!.userName}');
         
-        // await controller.addReply(widget.postId, replyingTo!.id, text);
+        final success = await controller.addReply(widget.postId, replyingTo!.id.toString(), text);
         
-        _cancelReply();
+        if (success) {
+          // Yanıt gönderildikten sonra yanıtları göster
+          if (replyingTo != null) {
+            expandedComments.add(replyingTo!.id);
+          }
+          _cancelReply();
+          widget.onCommentAdded?.call();
+        }
       } else {
         // Normal yorum gönder
         await controller.addComment(widget.postId, text);
@@ -145,6 +155,32 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
   /// Kullanıcının kendi yorumu mu kontrol et
   bool _isOwnComment(CommentModel comment) {
     return currentUsername != null && comment.userName == currentUsername;
+  }
+
+  /// Yanıtları göster/gizle
+  void _toggleReplies(int commentId) {
+    setState(() {
+      if (expandedComments.contains(commentId)) {
+        expandedComments.remove(commentId);
+      } else {
+        expandedComments.add(commentId);
+      }
+    });
+  }
+
+  /// Yanıtların gösterilip gösterilmediğini kontrol et
+  bool _isRepliesExpanded(int commentId) {
+    return expandedComments.contains(commentId);
+  }
+
+  /// Yanıt sayısını formatla
+  String _formatReplyCount(int count) {
+    final languageService = Get.find<LanguageService>();
+    if (count == 1) {
+      return languageService.tr("comments.reply.replyCount");
+    } else {
+      return languageService.tr("comments.reply.replyCountPlural");
+    }
   }
 
   // Yorum silme onay dialogu
@@ -480,7 +516,35 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                 // Alt yorumlar varsa göster
                 if (comment.replies.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  ...comment.replies.map((reply) => _buildReplyItem(reply)),
+                  // Yanıtları gizle/göster butonu
+                  GestureDetector(
+                    onTap: () => _toggleReplies(comment.id),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 2,
+                          height: 20,
+                          color: Color(0xffe9ecef),
+                        ),
+                        const SizedBox(width: 8),
+                                                 Text(
+                           _isRepliesExpanded(comment.id)
+                               ? Get.find<LanguageService>().tr("comments.reply.hideReplies")
+                               : "${comment.replies.length} ${_formatReplyCount(comment.replies.length)} • ${Get.find<LanguageService>().tr("comments.reply.showReplies")}",
+                           style: GoogleFonts.inter(
+                             fontSize: 11,
+                             color: Color(0xff6c757d),
+                             fontWeight: FontWeight.w500,
+                           ),
+                         ),
+                      ],
+                    ),
+                  ),
+                  // Yanıtları göster/gizle
+                  if (_isRepliesExpanded(comment.id)) ...[
+                    const SizedBox(height: 8),
+                    ...comment.replies.map((reply) => _buildReplyItem(reply)),
+                  ],
                 ],
               ],
             ),
