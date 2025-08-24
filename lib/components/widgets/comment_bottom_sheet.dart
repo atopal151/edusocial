@@ -2,11 +2,13 @@ import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/comment_controller.dart';
 import '../../services/language_service.dart';
 import '../../models/comment_model.dart';
+import '../../services/auth_service.dart';
 
 class CommentBottomSheet extends StatefulWidget {
   final String postId;
@@ -20,9 +22,14 @@ class CommentBottomSheet extends StatefulWidget {
 class _CommentBottomSheetState extends State<CommentBottomSheet> {
   late final CommentController controller;
   final TextEditingController messageController = TextEditingController();
+  final AuthService _authService = AuthService();
   
   // Yanıtlama state'i
   CommentModel? replyingTo;
+  
+  // Düzenleme state'i
+  CommentModel? editingComment;
+  String? currentUsername;
 
   @override
   void initState() {
@@ -43,6 +50,23 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     if (controller.commentList.isEmpty) {
       controller.fetchComments(widget.postId);
     }
+    
+    // Mevcut kullanıcının username'ini al
+    _getCurrentUsername();
+  }
+
+  /// Mevcut kullanıcının username'ini al
+  Future<void> _getCurrentUsername() async {
+    try {
+      final userData = await _authService.getCurrentUser();
+      if (userData != null) {
+        setState(() {
+          currentUsername = userData['username'];
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Kullanıcı bilgisi alınamadı: $e');
+    }
   }
 
   @override
@@ -55,6 +79,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
   void _startReply(CommentModel comment) {
     setState(() {
       replyingTo = comment;
+      editingComment = null; // Düzenleme modunu iptal et
     });
     messageController.clear();
   }
@@ -67,11 +92,40 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     messageController.clear();
   }
 
+  // Düzenleme modunu başlat
+  void _startEdit(CommentModel comment) {
+    setState(() {
+      editingComment = comment;
+      replyingTo = null; // Yanıtlama modunu iptal et
+      messageController.text = comment.content;
+    });
+  }
+
+  // Düzenleme modunu iptal et
+  void _cancelEdit() {
+    setState(() {
+      editingComment = null;
+    });
+    messageController.clear();
+  }
+
   // Yorum veya yanıt gönder
   void _sendMessage() async {
     final text = messageController.text.trim();
     if (text.isNotEmpty) {
-      if (replyingTo != null) {
+      if (editingComment != null) {
+        // Yorum düzenle
+        debugPrint('🔄 Yorum düzenleniyor: $text');
+        final success = await controller.editComment(
+          editingComment!.id.toString(), 
+          widget.postId, 
+          text
+        );
+        
+        if (success) {
+          _cancelEdit();
+        }
+      } else if (replyingTo != null) {
         // Yanıt gönder
         debugPrint('🔄 Yanıt gönderiliyor: $text');
         debugPrint('🔄 Yanıtlanan yorum: ${replyingTo!.userName}');
@@ -85,6 +139,135 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
         messageController.clear();
         widget.onCommentAdded?.call();
       }
+    }
+  }
+
+  /// Kullanıcının kendi yorumu mu kontrol et
+  bool _isOwnComment(CommentModel comment) {
+    return currentUsername != null && comment.userName == currentUsername;
+  }
+
+  // Yorum silme onay dialogu
+  void _showDeleteConfirmDialog(CommentModel comment) {
+    final languageService = Get.find<LanguageService>();
+    
+    Get.dialog(
+      Center(
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            width: Get.width * 0.8,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset(
+                    "images/icons/delete.svg",
+                    colorFilter: ColorFilter.mode(
+                      Color(0xffef5050),
+                      BlendMode.srcIn,
+                    ),
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  languageService.tr("comments.delete.deleteConfirmTitle"),
+                  style: GoogleFonts.inter(
+                    fontSize: 17.28,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF414751),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  languageService.tr("comments.delete.deleteConfirmMessage"),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xff9ca3ae),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          margin: EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            color: Color(0xfffff6f6),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Text(
+                            languageService.tr("comments.delete.cancelButton"),
+                            style: GoogleFonts.inter(
+                              fontSize: 13.28,
+                              color: Color(0xffed7474),
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          Get.back();
+                          await _deleteComment(comment);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          margin: EdgeInsets.only(left: 8),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFEF5050),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Text(
+                            languageService.tr("comments.delete.deleteConfirmButton"),
+                            style: TextStyle(
+                              fontSize: 13.28,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  // Yorum silme işlemi
+  Future<void> _deleteComment(CommentModel comment) async {
+    final success = await controller.deleteComment(
+      comment.id.toString(),
+      widget.postId,
+    );
+    
+    if (success) {
+      widget.onCommentAdded?.call();
     }
   }
 
@@ -186,6 +369,9 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               // Yanıtlama alanı (Instagram tarzı)
               if (replyingTo != null) _buildReplyArea(),
 
+              // Düzenleme alanı
+              if (editingComment != null) _buildEditArea(),
+
               // Yorum Yazma Alanı
               Padding(
                   padding: const EdgeInsets.all(5),
@@ -248,17 +434,48 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
                 ),
                 const SizedBox(height: 8),
-                // Yanıtla butonu
-                GestureDetector(
-                  onTap: () => _startReply(comment),
-                  child: Text(
-                    Get.find<LanguageService>().tr("comments.reply.replyButton"),
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: Color(0xff414751),
-                      fontWeight: FontWeight.w500,
+                // Yanıtla, Düzenle ve Sil butonları
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _startReply(comment),
+                      child: Text(
+                        Get.find<LanguageService>().tr("comments.reply.replyButton"),
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: Color(0xff414751),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
-                  ),
+                    // Kullanıcının kendi yorumu ise düzenle ve sil butonları göster
+                    if (_isOwnComment(comment)) ...[
+                      const SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: () => _startEdit(comment),
+                        child: Text(
+                          Get.find<LanguageService>().tr("comments.edit.editButton"),
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: Color(0xFF9ca3ae),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: () => _showDeleteConfirmDialog(comment),
+                        child: Text(
+                          Get.find<LanguageService>().tr("comments.delete.deleteButton"),
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: Color(0xFFEF5050),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 // Alt yorumlar varsa göster
                 if (comment.replies.isNotEmpty) ...[
@@ -324,16 +541,47 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   style: GoogleFonts.inter(fontSize: 11, color: Color(0xff9ca3ae)),
                 ),
                 const SizedBox(height: 6),
-                GestureDetector(
-                  onTap: () => _startReply(reply),
-                  child: Text(
-                    Get.find<LanguageService>().tr("comments.reply.replyButton"),
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      color: Color(0xff9ca3ae),
-                      fontWeight: FontWeight.w500,
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => _startReply(reply),
+                      child: Text(
+                        Get.find<LanguageService>().tr("comments.reply.replyButton"),
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          color: Color(0xff414751),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
-                  ),
+                    // Kullanıcının kendi yanıtı ise düzenle ve sil butonları göster
+                    if (_isOwnComment(reply)) ...[
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: () => _startEdit(reply),
+                        child: Text(
+                          Get.find<LanguageService>().tr("comments.edit.editButton"),
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            color: Color(0xFF9ca3ae),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: () => _showDeleteConfirmDialog(reply),
+                        child: Text(
+                          Get.find<LanguageService>().tr("comments.delete.deleteButton"),
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            color: Color(0xFFEF5050),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
@@ -379,10 +627,89 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     const Spacer(),
                     GestureDetector(
                       onTap: _cancelReply,
-                      child: Icon(
-                        Icons.close,
-                        size: 16,
-                        color: Color(0xff6c757d),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            Get.find<LanguageService>().tr("comments.reply.cancelReply"),
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: Color(0xff6c757d),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.close,
+                            size: 16,
+                            color: Color(0xff6c757d),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Düzenleme alanı
+  Widget _buildEditArea() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Color(0xFFFFF3E0), // Turuncu tonu
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFFFFB74D), width: 1),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.edit,
+                      size: 16,
+                      color: Color(0xFFEF6C00),
+                    ),
+                    const SizedBox(width: 8),
+                                         Text(
+                       Get.find<LanguageService>().tr("comments.edit.editingComment"),
+                       style: GoogleFonts.inter(
+                         fontSize: 12,
+                         color: Color(0xFF9ca3ae),
+                         fontWeight: FontWeight.w500,
+                       ),
+                     ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: _cancelEdit,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            Get.find<LanguageService>().tr("comments.edit.cancelEdit"),
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: Color(0xFFEF6C00),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.close,
+                            size: 16,
+                            color: Color(0xFFEF6C00),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -413,9 +740,11 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               enableSuggestions: true,
               autocorrect: true,
                              decoration: InputDecoration(
-                 hintText: replyingTo != null 
-                     ? languageService.tr("comments.reply.replyPlaceholder")
-                     : languageService.tr("comments.input.placeholder"),
+                                      hintText: editingComment != null
+                         ? languageService.tr("comments.edit.editPlaceholder")
+                         : replyingTo != null 
+                             ? languageService.tr("comments.reply.replyPlaceholder")
+                             : languageService.tr("comments.input.placeholder"),
                 hintStyle: TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -446,7 +775,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                       ),
                     )
                   : Icon(
-                      Icons.send,
+                      editingComment != null ? Icons.check : Icons.send,
                       size: 16,
                       color: Colors.white,
                     ),

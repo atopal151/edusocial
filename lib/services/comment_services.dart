@@ -72,4 +72,55 @@ static Future<List<CommentModel>> fetchComments(String postId) async {
       return null;
     }
   }
+
+  /// Yorum düzenleme servisi
+  static Future<bool> editComment(String commentId, String postId, String content) async {
+    final token = _box.read('token');
+    try {
+      final response = await http.put(
+        Uri.parse('${AppConstants.baseUrl}/post-comment/$commentId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'post_id': postId,
+          'content': content,
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Yorum silme servisi
+  static Future<bool> deleteComment(String commentId, String postId) async {
+    final token = _box.read('token');
+    try {
+      final response = await http.delete(
+        Uri.parse('${AppConstants.baseUrl}/post-comment/$commentId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'post_id': postId,
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }

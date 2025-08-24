@@ -244,7 +244,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  widget.userName.isNotEmpty ? widget.userName : '${widget.name} ${widget.surname}',
+                                  widget.userName.isNotEmpty ? '@${widget.userName}' : '${widget.name} ${widget.surname}',
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,

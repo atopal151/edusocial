@@ -3,6 +3,7 @@ import 'package:edusocial/services/socket_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/comment_model.dart';
+import '../components/snackbars/custom_snackbar.dart';
 
 class CommentController extends GetxController {
   var commentList = <CommentModel>[].obs;
@@ -51,11 +52,19 @@ class CommentController extends GetxController {
         await fetchComments(postId);
       } else {
         debugPrint('❌ Yorum eklenemedi');
-        Get.snackbar("Hata", "Yorum eklenemedi");
+        CustomSnackbar.show(
+          title: "Hata",
+          message: "Yorum eklenemedi",
+          type: SnackbarType.error,
+        );
       }
     } catch (e) {
       debugPrint('❌ Yorum eklenirken hata: $e');
-      Get.snackbar("Hata", "Yorum eklenirken bir hata oluştu");
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Yorum eklenirken bir hata oluştu",
+        type: SnackbarType.error,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -82,6 +91,92 @@ class CommentController extends GetxController {
       debugPrint('✅ Yorum bildirimi socket\'e gönderildi');
     } catch (e) {
       debugPrint('❌ Socket bildirimi gönderilemedi: $e');
+    }
+  }
+
+  /// Yorum düzenleme fonksiyonu
+  Future<bool> editComment(String commentId, String postId, String content) async {
+    isLoading.value = true;
+    
+    try {
+      debugPrint('🔄 Yorum düzenleniyor... Comment ID: $commentId, Post ID: $postId');
+      final success = await CommentService.editComment(commentId, postId, content);
+      
+      if (success) {
+        debugPrint('✅ Yorum başarıyla düzenlendi');
+        
+        // Yorumları yeniden yükle
+        await fetchComments(postId);
+        
+        CustomSnackbar.show(
+          title: "Başarılı",
+          message: "Yorum başarıyla düzenlendi",
+          type: SnackbarType.success,
+        );
+        
+        return true;
+      } else {
+        debugPrint('❌ Yorum düzenlenemedi');
+        CustomSnackbar.show(
+          title: "Hata",
+          message: "Yorum düzenlenemedi",
+          type: SnackbarType.error,
+        );
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Yorum düzenlenirken hata: $e');
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Yorum düzenlenirken bir hata oluştu",
+        type: SnackbarType.error,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Yorum silme fonksiyonu
+  Future<bool> deleteComment(String commentId, String postId) async {
+    isLoading.value = true;
+    
+    try {
+      debugPrint('🔄 Yorum siliniyor... Comment ID: $commentId, Post ID: $postId');
+      final success = await CommentService.deleteComment(commentId, postId);
+      
+      if (success) {
+        debugPrint('✅ Yorum başarıyla silindi');
+        
+        // Yorumları yeniden yükle
+        await fetchComments(postId);
+        
+        CustomSnackbar.show(
+          title: "Başarılı",
+          message: "Yorum başarıyla silindi",
+          type: SnackbarType.success,
+        );
+        
+        return true;
+      } else {
+        debugPrint('❌ Yorum silinemedi');
+        CustomSnackbar.show(
+          title: "Hata",
+          message: "Yorum silinemedi",
+          type: SnackbarType.error,
+        );
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Yorum silinirken hata: $e');
+      CustomSnackbar.show(
+        title: "Hata",
+        message: "Yorum silinirken bir hata oluştu",
+        type: SnackbarType.error,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
     }
   }
 }

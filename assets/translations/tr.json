@@ -1751,6 +1751,19 @@
       "replyPlaceholder": "Yanıtınızı yazın...",
       "replyButton": "Yanıtla",
       "cancelReply": "Yanıtlamayı iptal et"
+    },
+    "edit": {
+      "editButton": "Düzenle",
+      "editPlaceholder": "Yorumu düzenleyin...",
+      "editingComment": "Yorumu düzenliyorsunuz",
+      "cancelEdit": "Düzenlemeyi iptal et"
+    },
+    "delete": {
+      "deleteButton": "Sil",
+      "deleteConfirmTitle": "Yorumu Sil",
+      "deleteConfirmMessage": "Bu yorumu silmek istediğinizden emin misiniz?",
+      "deleteConfirmButton": "Sil",
+      "cancelButton": "İptal"
     }
   },
   "share": {
