@@ -155,6 +155,7 @@ class LoginController extends GetxController {
   }
 
   void loginPasswordUpgrade() {
+    Get.toNamed('/forgot-password');
   }
 
   @override

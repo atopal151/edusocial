@@ -42,11 +42,15 @@ import 'package:get/get.dart';
 import '../bindings/signup_binding.dart';
 import '../bindings/login_binding.dart';
 import '../bindings/onboarding_binding.dart';
+import '../bindings/forgot_password_binding.dart';
+import '../bindings/reset_password_binding.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/auth/step1_screen.dart';
 import '../screens/auth/step2_screen.dart';
 import '../screens/auth/step3_screen.dart';
+import '../screens/auth/forgot_password_screen.dart';
+import '../screens/auth/reset_password_screen.dart';
 import '../screens/chat/user_chat/user_chat_detail_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/home/story/add_story_screen.dart';
@@ -91,6 +95,8 @@ class Routes {
   static const String notificationSettings = '/notification_settings';
   static const String verification = '/verification';
   static const String verificationUpload = '/verification_upload';
+  static const String forgotPassword = '/forgot-password';
+  static const String resetPassword = '/reset-password';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -264,6 +270,19 @@ class Routes {
     GetPage(
       name: verificationUpload,
       page: () => VerificationUploadScreen(),
+    ),
+    GetPage(
+      name: forgotPassword,
+      page: () => ForgotPasswordScreen(),
+      binding: ForgotPasswordBinding(),
+    ),
+    GetPage(
+      name: resetPassword,
+      page: () => ResetPasswordScreen(
+        token: Get.arguments?['token'],
+        email: Get.arguments?['email'],
+      ),
+      binding: ResetPasswordBinding(),
     ),
     GetPage(
       name: main,

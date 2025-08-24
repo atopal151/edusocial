@@ -75,6 +75,53 @@
       "welcomeBack": "Welcome back!"
     }
   },
+  "forgotPassword": {
+    "title": "Forgot Password?",
+    "subtitle": "Enter your email address and we'll send you a link to reset your password.",
+    "form": {
+      "title": "Reset Password",
+      "email": "Email address",
+      "sendButton": "Send Reset Link"
+    },
+    "validation": {
+      "emailRequired": "Email address is required",
+      "validEmailRequired": "Please enter a valid email address"
+    },
+    "success": {
+      "title": "Email Sent!",
+      "message": "We've sent a password reset link to your email address."
+    },
+    "errors": {
+      "sendFailed": "Failed to send reset email",
+      "networkError": "Network connection error"
+    },
+    "backToLogin": "Back to Login"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "subtitle": "Enter your new password below.",
+    "form": {
+      "title": "New Password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "resetButton": "Reset Password"
+    },
+    "validation": {
+      "newPasswordRequired": "New password is required",
+      "confirmPasswordRequired": "Password confirmation is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsDoNotMatch": "Passwords do not match"
+    },
+    "success": {
+      "title": "Password Reset!",
+      "message": "Your password has been successfully reset."
+    },
+    "errors": {
+      "resetFailed": "Failed to reset password",
+      "networkError": "Network connection error",
+      "invalidRequest": "Invalid reset request"
+    }
+  },
   "step1": {
     "header": {
       "title": "Complete Your School Information",

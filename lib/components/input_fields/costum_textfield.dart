@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final Color backgroundColor;
   final Color textColor;
+  final TextInputType? keyboardType;
 
   const CustomTextField({super.key, 
     required this.hintText,
@@ -15,6 +16,7 @@ class CustomTextField extends StatelessWidget {
     required this.controller, 
     required this.backgroundColor, 
     required this.textColor,
+    this.keyboardType,
   });
 
   @override
@@ -42,6 +44,7 @@ class CustomTextField extends StatelessWidget {
             obscureText: isPassword,
             enableSuggestions: !isPassword,
             autocorrect: !isPassword,
+            keyboardType: keyboardType,
             textInputAction: isPassword ? TextInputAction.done : TextInputAction.next,
             decoration: InputDecoration(
               border: InputBorder.none,

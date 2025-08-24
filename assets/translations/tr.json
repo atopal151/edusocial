@@ -75,6 +75,53 @@
       "welcomeBack": "Tekrar hoş geldiniz!"
     }
   },
+  "forgotPassword": {
+    "title": "Şifrenizi mi Unuttunuz?",
+    "subtitle": "E-posta adresinizi girin ve şifrenizi sıfırlamak için bir bağlantı gönderelim.",
+    "form": {
+      "title": "Şifre Sıfırlama",
+      "email": "E-posta adresi",
+      "sendButton": "Sıfırlama Bağlantısı Gönder"
+    },
+    "validation": {
+      "emailRequired": "E-posta adresi zorunludur",
+      "validEmailRequired": "Lütfen geçerli bir e-posta adresi girin"
+    },
+    "success": {
+      "title": "E-posta Gönderildi!",
+      "message": "E-posta adresinize şifre sıfırlama bağlantısı gönderdik."
+    },
+    "errors": {
+      "sendFailed": "Sıfırlama e-postası gönderilemedi",
+      "networkError": "Ağ bağlantısı hatası"
+    },
+    "backToLogin": "Giriş'e Dön"
+  },
+  "resetPassword": {
+    "title": "Şifre Sıfırlama",
+    "subtitle": "Yeni şifrenizi aşağıya girin.",
+    "form": {
+      "title": "Yeni Şifre",
+      "newPassword": "Yeni şifre",
+      "confirmPassword": "Şifre onayı",
+      "resetButton": "Şifreyi Sıfırla"
+    },
+    "validation": {
+      "newPasswordRequired": "Yeni şifre zorunludur",
+      "confirmPasswordRequired": "Şifre onayı zorunludur",
+      "passwordMinLength": "Şifre en az 6 karakter olmalıdır",
+      "passwordsDoNotMatch": "Şifreler eşleşmiyor"
+    },
+    "success": {
+      "title": "Şifre Sıfırlandı!",
+      "message": "Şifreniz başarıyla sıfırlandı."
+    },
+    "errors": {
+      "resetFailed": "Şifre sıfırlama başarısız",
+      "networkError": "Ağ bağlantısı hatası",
+      "invalidRequest": "Geçersiz sıfırlama isteği"
+    }
+  },
   "step1": {
     "header": {
       "title": "Okul Bilgilerinizi Tamamlayın",
