@@ -1114,7 +1114,15 @@
       "departmentSelection": "Department Selection",
       "saveProfile": "Save Profile",
       "profileUpdated": "Profile updated successfully",
-      "profileUpdateFailed": "Profile update failed"
+      "profileUpdateFailed": "Profile update failed",
+      "addLesson": "Add Lesson",
+      "enterLessonName": "Enter lesson name...",
+      "lessonAdded": "Lesson added successfully",
+      "lessonRemoved": "Lesson removed from list",
+      "lessonNameEmpty": "Lesson name cannot be empty",
+      "lessonAlreadyExists": "This lesson already exists",
+      "lessonAddError": "Error adding lesson",
+      "lessonRemoveError": "Error removing lesson"
     },
     "peopleProfile": {
       "loading": "Loading user profile...",
@@ -1432,6 +1440,7 @@
       "success": "Success",
       "error": "Error",
       "warning": "Warning",
+      "info": "Info",
       "info": "Info",
       "copySuccess": "Text copied to clipboard",
       "linkOpenFailed": "Link could not be opened. Please try again.",

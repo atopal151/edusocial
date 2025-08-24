@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
+import '../../components/input_fields/custom_textfield_step2.dart';
 import '../../controllers/profile_update_controller.dart';
 import '../../services/language_service.dart';
 
@@ -122,17 +123,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                   /* CustomTextFieldStep2(
+                    CustomTextFieldStep2(
                       controller: controller.lessonController,
                       onAdd: () {
-                        if (controller.lessonController.text.isNotEmpty) {
-                          controller.addLesson(
-                              controller.lessonController.text.trim());
+                        if (controller.lessonController.text.trim().isNotEmpty) {
+                          controller.addLesson(controller.lessonController.text.trim());
                           controller.lessonController.clear();
                         }
                       },
                     ),
-                    const SizedBox(height: 10),*/
+                    const SizedBox(height: 10),
                     _buildLessonChips(),
                     const SizedBox(height: 20),
                     _sectionTitle(languageService.tr("profile.editProfile.notificationSettings")),
@@ -558,6 +558,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ));
   }
 
+
+
   Widget _buildLessonChips() {
     return Obx(() => Wrap(
           spacing: 8,
@@ -582,11 +584,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   const SizedBox(width: 6),
                   GestureDetector(
-                    onTap: () => controller.removeLesson(lesson),
+                    onTap: () => controller.removeLessonFromUI(lesson),
                     child: const Icon(
                       Icons.close,
                       size: 14,
-                    color: Color(0xff414751),
+                      color: Color(0xff414751),
                     ),
                   ),
                 ],

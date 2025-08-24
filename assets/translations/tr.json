@@ -1207,7 +1207,15 @@
       "departmentSelection": "Bölüm Seçimi",
       "saveProfile": "Profili Kaydet",
       "profileUpdated": "Profil başarıyla güncellendi",
-      "profileUpdateFailed": "Profil güncellenemedi"
+      "profileUpdateFailed": "Profil güncellenemedi",
+      "addLesson": "Ders Ekle",
+      "enterLessonName": "Ders adı girin...",
+      "lessonAdded": "Ders başarıyla eklendi",
+      "lessonRemoved": "Ders listeden kaldırıldı",
+      "lessonNameEmpty": "Ders adı boş olamaz",
+      "lessonAlreadyExists": "Bu ders zaten eklenmiş",
+      "lessonAddError": "Ders eklenirken hata oluştu",
+      "lessonRemoveError": "Ders silinirken hata oluştu"
     },
     "mainProfile": {
       "editProfile": "Profili Düzenle",
@@ -1494,6 +1502,7 @@
       "success": "Başarılı",
       "error": "Hata",
       "warning": "Uyarı",
+      "info": "Bilgi",
       "info": "Bilgi",
       "copySuccess": "Metin panoya kopyalandı",
       "linkOpenFailed": "Link açılamadı. Lütfen tekrar deneyin.",

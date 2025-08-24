@@ -8,6 +8,7 @@ import 'package:edusocial/services/onboarding_service.dart';
 import 'package:edusocial/services/profile_service.dart';
 import 'package:edusocial/services/profile_update_services.dart';
 import 'package:edusocial/services/language_service.dart';
+import 'package:edusocial/services/lesson_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -274,6 +275,8 @@ class ProfileUpdateController extends GetxController {
     emailNotification.value = data.notificationEmail;
     mobileNotification.value = data.notificationMobile;
     selectedLessons.value = data.lessons;
+    
+    debugPrint("📚 Profil verilerinden dersler yüklendi: ${data.lessons}");
     descriptionController.text = data.description ?? '';
     tiktokController.text = data.tiktok ?? '';
     languageIdController.text = data.languageId ?? '';
@@ -309,15 +312,99 @@ class ProfileUpdateController extends GetxController {
   }
 
   /// 📚 Ders işlemleri
-  void addLesson(String lesson) {
-    if (!selectedLessons.contains(lesson)) {
-      selectedLessons.add(lesson);
+  
+  /// Dersi sadece UI'dan kaldır (backend'den silme)
+  void removeLessonFromUI(String lesson) {
+    debugPrint("🔄 ProfileUpdateController: Ders UI'dan kaldırılıyor...");
+    debugPrint("📚 Kaldırılacak ders: $lesson");
+    debugPrint("📊 Mevcut ders listesi: ${selectedLessons.toList()}");
+    
+    if (selectedLessons.contains(lesson)) {
+      selectedLessons.remove(lesson);
+      debugPrint("✅ Ders UI'dan kaldırıldı: $lesson");
+      debugPrint("📊 Güncel ders listesi: ${selectedLessons.toList()}");
+      
+      CustomSnackbar.show(
+        title: _languageService.tr("common.success"),
+        message: "'$lesson' dersi listeden kaldırıldı",
+        type: SnackbarType.success,
+      );
+    } else {
+      debugPrint("❌ Ders listede bulunamadı: $lesson");
     }
   }
+  
+  Future<void> addLesson(String lesson) async {
+    debugPrint("🔄 ProfileUpdateController: Ders ekleme işlemi başlatılıyor...");
+    debugPrint("📚 Ders adı: ${lesson.trim()}");
+    
+    if (lesson.trim().isEmpty) {
+      debugPrint("❌ Validation hatası: Ders adı boş");
+      CustomSnackbar.show(
+        title: _languageService.tr("common.warning"),
+        message: _languageService.tr("profile.editProfile.lessonNameEmpty"),
+        type: SnackbarType.warning,
+      );
+      return;
+    }
 
-  void removeLesson(String lesson) {
-    selectedLessons.remove(lesson);
+    if (selectedLessons.contains(lesson.trim())) {
+      debugPrint("❌ Validation hatası: Ders zaten mevcut");
+      CustomSnackbar.show(
+        title: _languageService.tr("common.warning"),
+        message: _languageService.tr("profile.editProfile.lessonAlreadyExists"),
+        type: SnackbarType.warning,
+      );
+      return;
+    }
+
+    debugPrint("✅ Validation başarılı, API çağrısı yapılıyor...");
+    
+    try {
+      debugPrint("📤 LessonService.addLessonWithId() çağrılıyor...");
+      final result = await LessonService.addLessonWithId(lesson.trim());
+      
+      debugPrint("📥 LessonService'den dönen sonuç: $result");
+      
+      if (result['success'] as bool) {
+        debugPrint("✅ Ders başarıyla eklendi: ${lesson.trim()}");
+        
+        debugPrint("📝 selectedLessons listesine ekleniyor...");
+        selectedLessons.add(lesson.trim());
+        debugPrint("📊 Güncel ders listesi: ${selectedLessons.toList()}");
+        
+        CustomSnackbar.show(
+          title: _languageService.tr("common.success"),
+          message: _languageService.tr("profile.editProfile.lessonAdded"),
+          type: SnackbarType.success,
+        );
+        
+        debugPrint("🔄 Profil verileri yenileniyor...");
+        await fetchUserProfile();
+        debugPrint("✅ Profil verileri yenilendi");
+      } else {
+        debugPrint("❌ Ders eklenemedi: ${lesson.trim()}");
+        debugPrint("❌ API'den başarısız sonuç döndü");
+        CustomSnackbar.show(
+          title: _languageService.tr("common.error"),
+          message: _languageService.tr("profile.editProfile.lessonAddError"),
+          type: SnackbarType.error,
+        );
+      }
+    } catch (e, stackTrace) {
+      debugPrint("💥 Ders ekleme hatası: $e");
+      debugPrint("💥 Stack trace: $stackTrace");
+      CustomSnackbar.show(
+        title: _languageService.tr("common.error"),
+        message: _languageService.tr("profile.editProfile.lessonAddError"),
+        type: SnackbarType.error,
+      );
+    }
+    
+    debugPrint("🏁 Ders ekleme işlemi tamamlandı");
   }
+
+
 
   /// ⬅️ Geri dön
   void goBack() {
