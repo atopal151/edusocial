@@ -538,6 +538,7 @@ class GroupChatDetailController extends GetxController {
                   isMultipleChoice: messageData['isMultipleChoice'],
                   surveyId: messageData['surveyId'],
                   choiceIds: messageData['choiceIds'],
+                  surveyData: messageData['surveyData'],
                 );
             
             processedMessages.add(message);
@@ -594,6 +595,7 @@ class GroupChatDetailController extends GetxController {
               bool? isMultipleChoice;
               int? surveyId;
               List<int>? choiceIds;
+              Map<String, dynamic>? surveyData;
     
     // Debug: Mesaj tipini kontrol et
     debugPrint('🔍 _determineMessageType called for message: ${chat.id}');
@@ -618,6 +620,7 @@ class GroupChatDetailController extends GetxController {
                     content = chat.survey['title'] ?? '';
                     isMultipleChoice = chat.survey['multiple_choice'] ?? false;
                     surveyId = chat.survey['id'];
+                    surveyData = chat.survey; // Tüm survey verisini sakla
                     
                     debugPrint('🔍 Survey title: $content');
                     debugPrint('🔍 Survey multiple_choice: $isMultipleChoice');
@@ -685,6 +688,7 @@ class GroupChatDetailController extends GetxController {
                 'isMultipleChoice': isMultipleChoice,
                 'surveyId': surveyId,
                 'choiceIds': choiceIds,
+                'surveyData': surveyData,
               };
   }
 
@@ -1062,7 +1066,7 @@ class GroupChatDetailController extends GetxController {
                 onChanged: (val) => surveyTitle.value = val,
               ),
               const SizedBox(height: 20),
-              Row(
+              Obx(() => Row(
                 children: [
                   Checkbox(
                     value: isMultipleChoice.value,
@@ -1074,7 +1078,7 @@ class GroupChatDetailController extends GetxController {
                     style: TextStyle(fontSize: 12),
                   ),
                 ],
-              ),
+              )),
               const SizedBox(height: 30),
               Obx(() => Column(
                 children: List.generate(surveyChoices.length, (index) {
@@ -1223,14 +1227,6 @@ class GroupChatDetailController extends GetxController {
       if (success) {
         // Başarılı ise mesajları yeniden yükle
         await refreshMessagesOnly();
-        
-        Get.snackbar(
-          'Başarılı',
-          'Anket cevabınız kaydedildi',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
       } else {
         Get.snackbar(
           'Hata',

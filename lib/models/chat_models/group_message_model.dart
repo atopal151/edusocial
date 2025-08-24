@@ -18,6 +18,7 @@ class GroupMessageModel {
   final bool? isMultipleChoice;
   final int? surveyId;
   final List<int>? choiceIds;
+  final Map<String, dynamic>? surveyData;
 
   GroupMessageModel({
     required this.id,
@@ -37,5 +38,6 @@ class GroupMessageModel {
     this.isMultipleChoice,
     this.surveyId,
     this.choiceIds,
+    this.surveyData,
   });
 }
