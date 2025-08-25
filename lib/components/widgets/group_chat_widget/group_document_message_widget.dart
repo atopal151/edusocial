@@ -4,11 +4,50 @@ import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../services/language_service.dart';
+import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
 
 class GroupDocumentMessageWidget extends StatelessWidget {
   final GroupMessageModel message;
+  final GroupChatDetailController controller;
 
-  const GroupDocumentMessageWidget({super.key, required this.message});
+  const GroupDocumentMessageWidget({
+    super.key, 
+    required this.message,
+    required this.controller,
+  });
+
+  void _showPinOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(
+                  message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  color: message.isPinned ? const Color(0xff414751) : const Color(0xff9ca3ae),
+                ),
+                title: Text(
+                  message.isPinned ? 'Pin Kaldır' : 'Mesajı Sabitle',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  controller.pinMessage(message.id);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   // Document URL'sini al
   String? getDocumentUrl() {
@@ -35,7 +74,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
           ? CrossAxisAlignment.end
           : CrossAxisAlignment.start,
       children: [
-        // 🔹 Kullanıcı Bilgileri (Saat kaldırıldı)
+        // 🔹 Kullanıcı Bilgileri ve Pin İkonu
         Row(
           mainAxisAlignment: message.isSentByMe
               ? MainAxisAlignment.end
@@ -62,6 +101,27 @@ class GroupDocumentMessageWidget extends StatelessWidget {
               '@${message.username}',
               style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
+            
+            // Pin ikonu - sadece admin'ler için
+            if (controller.isCurrentUserAdmin) ...[
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () {
+                  controller.pinMessage(message.id);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  child: Icon(
+                    Icons.push_pin,
+                    size: 12,
+                    color: message.isPinned
+                        ? const Color(0xff414751)
+                        : const Color(0xff9ca3ae),
+                  ),
+                ),
+              ),
+            ],
+            
             if (message.isSentByMe)
               Padding(
                 padding: const EdgeInsets.only(left: 6.0, right: 8.0),
@@ -90,7 +150,11 @@ class GroupDocumentMessageWidget extends StatelessWidget {
           ),
           child: Align(
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
+            child: GestureDetector(
+              onLongPress: () {
+                _showPinOptions(context);
+              },
+              child: Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.7,
               ),
@@ -180,6 +244,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
             ),
           ),
         ),

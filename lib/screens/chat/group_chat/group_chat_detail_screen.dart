@@ -3,14 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../components/input_fields/group_message_input_field.dart';
 import '../../../components/widgets/group_chat_widget/group_document_message_widget.dart';
-import '../../../components/widgets/group_chat_widget/group_image_message_widget.dart';
-import '../../../components/widgets/group_chat_widget/group_link_messaje_widget.dart';
+import '../../../components/widgets/group_chat_widget/group_universal_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_survey_message_widget.dart';
-import '../../../components/widgets/group_chat_widget/group_text_message_widget.dart';
-import '../../../components/widgets/group_chat_widget/group_text_with_links_message_widget.dart';
 import '../../../components/widgets/tree_point_bottom_sheet.dart';
 import '../../../components/widgets/chat_widget/date_separator_widget.dart';
+import '../../../components/widgets/pinned_messages_widget.dart';
 import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../services/language_service.dart';
@@ -184,6 +182,10 @@ class GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
           children: [
             Column(
               children: [
+                // Pinlenen mesajları göster
+                PinnedMessagesWidget(
+                  isGroupChat: true,
+                ),
                 Expanded(
                   child: Obx(() {
                     final isGroupLoading = controller.isGroupDataLoading.value;
@@ -454,20 +456,18 @@ class OptimizedMessageListView extends StatelessWidget {
 
   Widget _buildMessageWidget(GroupMessageModel message) {
     switch (message.messageType) {
-      case GroupMessageType.image:
-        return GroupImageMessageWidget(message: message);
       case GroupMessageType.document:
-        return GroupDocumentMessageWidget(message: message);
-      case GroupMessageType.link:
-        return GroupLinkMessageWidget(message: message);
-      case GroupMessageType.textWithLinks:
-        return GroupTextWithLinksMessageWidget(message: message);
+        return GroupDocumentMessageWidget(message: message, controller: controller);
       case GroupMessageType.poll:
-        return GroupPollMessageWidget(message: message);
+        return GroupPollMessageWidget(message: message, controller: controller);
       case GroupMessageType.survey:
         return GroupSurveyMessageWidget(message: message, controller: controller);
+      case GroupMessageType.image:
+      case GroupMessageType.link:
+      case GroupMessageType.textWithLinks:
       case GroupMessageType.text:
-        return GroupTextMessageWidget(message: message);
+      default:
+        return GroupUniversalMessageWidget(message: message, controller: controller);
     }
   }
 }

@@ -1114,7 +1114,11 @@
       "typeMessage": "Mesaj yazın...",
       "sending": "Gönderiliyor...",
       "sent": "Gönderildi",
-      "failed": "Gönderilemedi"
+      "failed": "Gönderilemedi",
+      "messagePinned": "Mesaj başarıyla sabitlendi",
+      "messageUnpinned": "Mesaj sabitleme kaldırıldı",
+      "pinError": "Mesaj sabitleme/sabitleme kaldırma başarısız",
+      "tryAgain": "Lütfen tekrar deneyin"
     },
     "actions": {
       "joinGroup": "Gruba Katıl",

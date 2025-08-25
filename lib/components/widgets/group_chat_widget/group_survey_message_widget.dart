@@ -37,6 +37,7 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
     return Padding(
       padding: const EdgeInsets.only(top:8.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: message.isSentByMe
             ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
@@ -90,54 +91,102 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
           const SizedBox(height: 4),
           
           // 🔹 Survey Container
-          Container(
-            margin: EdgeInsets.only(
-              left: message.isSentByMe ? 50 : 0,
-              right: message.isSentByMe ? 0 : 50,
-            ),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-             
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-               
-                
-                const SizedBox(height: 12),
-                
-                // Survey sorusu
-                Text(
-                  message.content,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff414751),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (widget.controller.isCurrentUserAdmin) ...[
+                GestureDetector(
+                  onTap: () {
+                    widget.controller.pinMessage(message.id);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.push_pin,
+                      size: 16,
+                      color: message.isPinned 
+                          ? const Color(0xff414751)
+                          : const Color(0xff9ca3ae),
+                    ),
                   ),
                 ),
-                
-                const SizedBox(height: 16),
-                
-                // Survey seçenekleri
-                if (message.pollOptions != null)
-                  ...message.pollOptions!.map((option) => 
-                    _buildSurveyOption(option)
-                  ).toList(),
-                
-                const SizedBox(height: 8),
-                
-                // Survey zamanı
-                Text(
-                  DateFormat('HH:mm').format(message.timestamp),
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    color: Color(0xff9CA3AF),
+                const SizedBox(width: 4),
+              ],
+              GestureDetector(
+                onLongPress: () {
+                  _showPinOptions(context);
+                },
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.7,
+                  ),
+                  margin: EdgeInsets.only(
+                    left: message.isSentByMe ? 50 : 0,
+                    right: message.isSentByMe ? 0 : 50,
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 12),
+                      
+                      // Survey sorusu
+                      Text(
+                        message.content,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xff414751),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Survey seçenekleri
+                      if (message.pollOptions != null)
+                        ...message.pollOptions!.map((option) => 
+                          _buildSurveyOption(option)
+                        ).toList(),
+                      
+                      const SizedBox(height: 8),
+                      
+                      // Survey zamanı
+                      Text(
+                        DateFormat('HH:mm').format(message.timestamp),
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          color: Color(0xff9CA3AF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (widget.controller.isCurrentUserAdmin) ...[
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: () {
+                    widget.controller.pinMessage(message.id);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      Icons.push_pin,
+                      size: 16,
+                      color: message.isPinned 
+                          ? const Color(0xff414751)
+                          : const Color(0xff9ca3ae),
+                    ),
                   ),
                 ),
               ],
-            ),
+            ],
           ),
         ],
       ),
@@ -200,6 +249,7 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
             ),
           ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 isMultipleChoice 
@@ -209,7 +259,7 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
                 size: 16,
               ),
               const SizedBox(width: 8),
-              Expanded(
+              Flexible(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -224,8 +274,9 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
                     if (percentage > 0) ...[
                       const SizedBox(height: 4),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
+                          Flexible(
                             child: LinearProgressIndicator(
                               value: percentage / 100,
                               backgroundColor: Color(0xffe0e0e0),
@@ -253,5 +304,46 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
     );
   }
 
-
+  void _showPinOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(
+                  widget.message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                  color: Colors.amber,
+                ),
+                title: Text(
+                  widget.message.isPinned ? 'Unpin Message' : 'Pin Message',
+                  style: GoogleFonts.inter(fontSize: 16),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  widget.controller.pinMessage(widget.message.id);
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.copy, color: Colors.blue),
+                title: Text(
+                  'Copy Message',
+                  style: GoogleFonts.inter(fontSize: 16),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  // Copy message to clipboard
+                  // You can implement clipboard functionality here
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

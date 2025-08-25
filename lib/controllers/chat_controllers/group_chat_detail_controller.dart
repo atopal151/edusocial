@@ -13,6 +13,7 @@ import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../../services/survey_service.dart';
+import '../../services/pin_message_service.dart';
 import '../profile_controller.dart';
 import 'chat_controller.dart'; // Added import for ChatController
 import '../../components/snackbars/custom_snackbar.dart';
@@ -21,6 +22,7 @@ class GroupChatDetailController extends GetxController {
   // Services
   final GroupServices _groupServices = GroupServices();
   final LanguageService _languageService = Get.find<LanguageService>();
+  final PinMessageService _pinMessageService = Get.find<PinMessageService>();
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isGroupDataLoading = false.obs; // Grup verisi için ayrı loading
@@ -78,6 +80,16 @@ class GroupChatDetailController extends GetxController {
     r'(https?://[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]{2,})',
     caseSensitive: false,
   );
+
+  // Admin kontrolü
+  bool get isCurrentUserAdmin {
+    final group = groupData.value;
+    
+    if (group == null) return false;
+    
+    // isFounder alanı admin kontrolü için kullanılır
+    return group.isFounder;
+  }
 
   // Link algılama fonksiyonu
   List<String> extractUrlsFromText(String text) {
@@ -361,6 +373,8 @@ class GroupChatDetailController extends GetxController {
       List<String>? pollOptions;
       bool? isMultipleChoice;
       int? surveyId;
+      List<String>? links;
+      List<String>? media;
       
       // Survey mesajları için özel işlem
       if (messageData['type'] == 'survey' && messageData['survey'] != null) {
@@ -383,6 +397,17 @@ class GroupChatDetailController extends GetxController {
         }
       }
       
+      // Media ve link bilgilerini al
+      if (messageData['media'] != null) {
+        final mediaList = messageData['media'] as List<dynamic>;
+        media = mediaList.map((m) => m['full_path'] ?? m['path'] ?? '').cast<String>().toList();
+      }
+      
+      if (messageData['group_chat_link'] != null) {
+        final linkList = messageData['group_chat_link'] as List<dynamic>;
+        links = linkList.map((l) => l['link'] ?? '').cast<String>().toList();
+      }
+      
       final newMessage = GroupMessageModel(
         id: messageId,
         senderId: messageData['user_id']?.toString() ?? '',
@@ -398,6 +423,8 @@ class GroupChatDetailController extends GetxController {
         pollOptions: pollOptions,
         isMultipleChoice: isMultipleChoice,
         surveyId: surveyId,
+        links: links,
+        media: media,
       );
       
       messages.add(newMessage);
@@ -497,11 +524,13 @@ class GroupChatDetailController extends GetxController {
             // FIXED: Safe message type determination
             final messageData = _determineMessageType(chat);
             
+            // Media dosyalarını al
+            List<String>? mediaUrls;
+            if (chat.media != null && chat.media.isNotEmpty) {
+              mediaUrls = chat.media.map((media) => media.fullPath).toList();
+            }
             
-            
-
-            
-                            final message = GroupMessageModel(
+            final message = GroupMessageModel(
                   id: chat.id.toString(),
                   senderId: userId,
                   receiverId: chat.groupId.toString(),
@@ -516,6 +545,7 @@ class GroupChatDetailController extends GetxController {
                   pollOptions: messageData['pollOptions'],
                   additionalText: messageData['additionalText'],
                   links: messageData['links'],
+                  media: mediaUrls,
                   isMultipleChoice: messageData['isMultipleChoice'],
                   surveyId: messageData['surveyId'],
                   choiceIds: messageData['choiceIds'],
@@ -622,13 +652,22 @@ class GroupChatDetailController extends GetxController {
       } else if (chat.media != null && chat.media.isNotEmpty) {
         final media = chat.media.first;
         if (media.type != null && media.type.toString().startsWith('image/')) {
-          messageType = GroupMessageType.image;
-          content = media.fullPath ?? '';
+          // Eğer hem text hem image varsa, textWithLinks tipini kullan (universal widget için)
+          if (chat.message != null && chat.message.toString().isNotEmpty) {
+            messageType = GroupMessageType.textWithLinks;
+            content = chat.message.toString();
+          } else {
+            messageType = GroupMessageType.image;
+            content = media.fullPath ?? '';
+          }
         } else {
           messageType = GroupMessageType.document;
           content = media.fullPath ?? '';
         }
-      } else if (chat.groupChatLink != null && chat.groupChatLink.isNotEmpty) {
+      }
+      
+      // Link kontrolü - media kontrolünden sonra yapılmalı
+      if (chat.groupChatLink != null && chat.groupChatLink.isNotEmpty) {
         // FIXED: Safe type casting for links
         final chatLinks = <String>[];
         
@@ -646,8 +685,15 @@ class GroupChatDetailController extends GetxController {
           content = chat.message.toString();
           links = chatLinks.isNotEmpty ? chatLinks : null;
         } else if (chatLinks.isNotEmpty) {
-          messageType = GroupMessageType.link;
-          content = chatLinks.first;
+          // Eğer sadece link varsa ve media da varsa, textWithLinks kullan
+          if (chat.media != null && chat.media.isNotEmpty) {
+            messageType = GroupMessageType.textWithLinks;
+            content = ''; // Boş text
+            links = chatLinks.isNotEmpty ? chatLinks : null;
+          } else {
+            messageType = GroupMessageType.link;
+            content = chatLinks.first;
+          }
         }
       }
     } catch (e) {
@@ -1455,6 +1501,51 @@ class GroupChatDetailController extends GetxController {
   // Keep backwards compatibility
   Future<void> refreshMessagesOnly() async {
     await refreshMessagesOptimized();
+  }
+
+  /// Pin or unpin a message
+  Future<void> pinMessage(String messageId) async {
+    try {
+      final messageIdInt = int.tryParse(messageId);
+      if (messageIdInt == null) {
+        debugPrint('❌ Invalid message ID: $messageId');
+        return;
+      }
+
+      final success = await _pinMessageService.pinMessage(messageIdInt);
+      
+      if (success) {
+        // Update the message in the list
+        final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+        if (messageIndex != -1) {
+          final message = messages[messageIndex];
+          final updatedMessage = message.copyWith(isPinned: !message.isPinned);
+          messages[messageIndex] = updatedMessage;
+          
+          // Update UI
+          update();
+          
+          // Success - no snackbar needed
+        }
+      } else {
+        Get.snackbar(
+          _languageService.tr('messages.pinError'),
+          _languageService.tr('messages.tryAgain'),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ Pin message error: $e');
+      Get.snackbar(
+        _languageService.tr('messages.pinError'),
+        _languageService.tr('messages.tryAgain'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   @override

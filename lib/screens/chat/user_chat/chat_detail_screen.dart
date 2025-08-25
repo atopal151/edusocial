@@ -1,6 +1,7 @@
 import 'package:edusocial/components/widgets/chat_widget/date_separator_widget.dart';
 import 'package:edusocial/components/widgets/chat_widget/message_widget_factory.dart';
 import 'package:edusocial/components/widgets/general_loading_indicator.dart';
+import 'package:edusocial/components/widgets/pinned_messages_widget.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -49,7 +50,7 @@ class ChatDetailScreen extends StatelessWidget {
           }
 
           // Mesaj widget'ı
-          widgets.add(MessageWidgetFactory.buildMessageWidget(message));
+          widgets.add(MessageWidgetFactory.buildMessageWidget(message, controller));
 
           return Column(
             children: widgets,
@@ -209,6 +210,10 @@ class ChatDetailScreen extends StatelessWidget {
             children: [
               Column(
                 children: [
+                  // Pinlenen mesajları göster
+                  PinnedMessagesWidget(
+                    isGroupChat: false,
+                  ),
                   Expanded(
                     child: (isLoading && controller.messages.isEmpty)
                         ? Center(

@@ -4,6 +4,7 @@ import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/models/chat_models/detail_document_model.dart';
 import 'package:edusocial/services/chat_service.dart';
 import 'package:edusocial/services/socket_services.dart';
+import 'package:edusocial/services/pin_message_service.dart';
 import 'package:edusocial/utils/network_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ import 'package:edusocial/controllers/chat_controllers/chat_controller.dart';
 
 class ChatDetailController extends GetxController {
   final LanguageService languageService = Get.find<LanguageService>();
+  final PinMessageService _pinMessageService = Get.find<PinMessageService>();
   final isLoading = false.obs;
   final messages = <MessageModel>[].obs;
   final documents = <String>[].obs;
@@ -682,5 +684,44 @@ class ChatDetailController extends GetxController {
     
     debugPrint('📡 Private Message Subscription Aktif: ${!_privateMessageSubscription.isPaused}');
     debugPrint('📡 =======================================');
+  }
+
+  /// Pin or unpin a message
+  Future<void> pinMessage(int messageId) async {
+    try {
+      final success = await _pinMessageService.pinMessage(messageId);
+      
+      if (success) {
+        // Update the message in the list
+        final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+        if (messageIndex != -1) {
+          final message = messages[messageIndex];
+          final updatedMessage = message.copyWith(isPinned: !message.isPinned);
+          messages[messageIndex] = updatedMessage;
+          
+          // Update UI
+          update();
+          
+          // Success - no snackbar needed
+        }
+      } else {
+        Get.snackbar(
+          languageService.tr('messages.pinError'),
+          languageService.tr('messages.tryAgain'),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ Pin message error: $e');
+      Get.snackbar(
+        languageService.tr('messages.pinError'),
+        languageService.tr('messages.tryAgain'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }

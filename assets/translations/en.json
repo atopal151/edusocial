@@ -1728,7 +1728,11 @@
       "typeMessage": "Type a message...",
       "sending": "Sending...",
       "sent": "Sent",
-      "failed": "Failed to send"
+      "failed": "Failed to send",
+      "messagePinned": "Message pinned successfully",
+      "messageUnpinned": "Message unpinned successfully",
+      "pinError": "Failed to pin/unpin message",
+      "tryAgain": "Please try again"
     },
     "actions": {
       "joinGroup": "Join Group",

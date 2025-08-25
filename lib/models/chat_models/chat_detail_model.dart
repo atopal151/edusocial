@@ -20,6 +20,7 @@ class MessageModel {
   final List<MessageLinkModel> messageLink;
   final List<DetailDocumentModel>? messageDocument;
   final String? senderAvatarUrl;
+  final bool isPinned; // New field for pin status
 
   MessageModel({
     required this.id,
@@ -36,6 +37,7 @@ class MessageModel {
     required this.messageLink,
     this.messageDocument,
     this.senderAvatarUrl,
+    this.isPinned = false, // Default to false
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json, {int? currentUserId}) {
@@ -52,6 +54,9 @@ class MessageModel {
     // DEBUG: Okundu alanını kontrol et
     final rawIsRead = json['is_read'];
     final isReadValue = rawIsRead == true || (rawIsRead is int && rawIsRead == 1);
+
+    // Check if message is pinned
+    final isPinned = json['is_pinned'] == true || (json['is_pinned'] is int && json['is_pinned'] == 1);
 
     return MessageModel(
       id: json['id'] is int
@@ -86,6 +91,44 @@ class MessageModel {
       senderAvatarUrl: senderJson != null
           ? senderJson['avatar_url'] ?? ""
           : "",
+      isPinned: isPinned,
+    );
+  }
+
+  // Create a copy with updated pin status
+  MessageModel copyWith({
+    int? id,
+    int? conversationId,
+    int? senderId,
+    String? message,
+    bool? isRead,
+    bool? isMe,
+    String? createdAt,
+    String? updatedAt,
+    SenderModel? sender,
+    ConversationModel? conversation,
+    List<MessageMediaModel>? messageMedia,
+    List<MessageLinkModel>? messageLink,
+    List<DetailDocumentModel>? messageDocument,
+    String? senderAvatarUrl,
+    bool? isPinned,
+  }) {
+    return MessageModel(
+      id: id ?? this.id,
+      conversationId: conversationId ?? this.conversationId,
+      senderId: senderId ?? this.senderId,
+      message: message ?? this.message,
+      isRead: isRead ?? this.isRead,
+      isMe: isMe ?? this.isMe,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      sender: sender ?? this.sender,
+      conversation: conversation ?? this.conversation,
+      messageMedia: messageMedia ?? this.messageMedia,
+      messageLink: messageLink ?? this.messageLink,
+      messageDocument: messageDocument ?? this.messageDocument,
+      senderAvatarUrl: senderAvatarUrl ?? this.senderAvatarUrl,
+      isPinned: isPinned ?? this.isPinned,
     );
   }
 }

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 import '../../../models/chat_models/group_message_model.dart';
+import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
 
 class GroupPollMessageWidget extends StatelessWidget {
   final GroupMessageModel message;
+  final GroupChatDetailController controller;
 
-  const GroupPollMessageWidget({super.key, required this.message});
+  const GroupPollMessageWidget({
+    super.key, 
+    required this.message,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
