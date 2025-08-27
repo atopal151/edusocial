@@ -66,10 +66,12 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
             if (data is Map<String, dynamic>) {
               final isPinned = data['is_pinned'] ?? false;
               final messageId = data['message_id']?.toString();
+              final source = data['source'];
+              final action = data['action'];
               
-              print('📌 [PinnedMessagesWidget] Pin status change detected: Message ID=$messageId, isPinned=$isPinned');
+              print('📌 [PinnedMessagesWidget] Pin status change detected: Message ID=$messageId, isPinned=$isPinned, Source=$source, Action=$action');
               
-              if (!isPinned) {
+              if (!isPinned || source == 'group:unpin_message' || action == 'unpin') {
                 print('📌 [PinnedMessagesWidget] UNPIN detected - Forcing widget refresh');
                 // Unpin durumunda widget'ı zorla yenile
                 _forceWidgetRefresh();
@@ -88,7 +90,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         });
         
         // Group message events'ini de dinle
-        final groupMessageSubscription = socketService.onGroupMessage.listen((data) {
+        _groupMessageSubscription = socketService.onGroupMessage.listen((data) {
           if (mounted) {
             print('📌 [PinnedMessagesWidget] Group message event received: $data');
             

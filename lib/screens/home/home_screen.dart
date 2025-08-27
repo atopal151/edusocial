@@ -48,45 +48,25 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: UserAppBar(),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          // Test butonu
-          Container(
-            margin: EdgeInsets.only(right: 16),
-            child: FloatingActionButton(
-              heroTag: "test_button", // Benzersiz hero tag
-              onPressed: () {
-                Get.toNamed("/socket-pin-test");
-              },
-              backgroundColor: Colors.blue,
-              elevation: 2,
-              child: Icon(Icons.bug_report, color: Colors.white, size: 20),
-            ),
+      floatingActionButton: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: [Color(0xFFEF5050), Color(0xFFFF7743)],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topRight,
           ),
-          // Ana buton
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [Color(0xFFEF5050), Color(0xFFFF7743)],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topRight,
-              ),
-            ),
-            child: FloatingActionButton(
-              heroTag: "main_button", // Benzersiz hero tag
-              onPressed: () {
-                Get.toNamed("/create_post");
-              },
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              child: Icon(Icons.add, color: Color(0xffffffff), size: 25),
-            ),
-          ),
-        ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            Get.toNamed("/create_post");
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Icon(Icons.add, color: Color(0xffffffff), size: 25),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
   

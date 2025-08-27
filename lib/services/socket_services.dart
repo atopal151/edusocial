@@ -915,6 +915,57 @@ class SocketService extends GetxService {
       debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
+    // Yeni: group:unpin_message event listener'ı
+    _socket!.on('group:unpin_message', (data) {
+      debugPrint('📌 Group unpin message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group:unpin_message - Data type: ${data.runtimeType}');
+      debugPrint('📡 [SocketService] group:unpin_message - Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      // Unpin event'ini hem group message hem de pin message controller'a gönder
+      debugPrint('📡 [SocketService] group:unpin_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group:unpin_message - _groupMessageController.add() tamamlandı');
+      
+      // Pin message controller'a da gönder (unpin işlemi için)
+      debugPrint('📡 [SocketService] group:unpin_message - _pinMessageController.add() çağrılıyor');
+      _pinMessageController.add(data);
+      debugPrint('📡 [SocketService] group:unpin_message - _pinMessageController.add() tamamlandı');
+      
+      if (data is Map<String, dynamic>) {
+        // Message data'yı parse et
+        Map<String, dynamic> messageData;
+        if (data.containsKey('message')) {
+          messageData = data['message'] as Map<String, dynamic>;
+        } else {
+          messageData = data;
+        }
+        
+        final messageId = messageData['id']?.toString();
+        final groupId = messageData['group_id']?.toString();
+        
+        debugPrint('📌 [SocketService] group:unpin_message - Message ID: $messageId, Group ID: $groupId');
+        
+        // Özel unpin event'i oluştur
+        final unpinEvent = {
+          'message_id': messageId,
+          'group_id': groupId,
+          'is_pinned': false, // Unpin durumu
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'source': 'group:unpin_message',
+          'message_data': messageData,
+          'action': 'unpin',
+        };
+        
+        debugPrint('📌 [SocketService] Unpin event\'i gönderiliyor: $unpinEvent');
+        _pinMessageController.add(unpinEvent);
+      }
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
     _socket!.on('user:group_chat', (data) {
       debugPrint('👥 User group chat geldi (SocketService): $data');
       debugPrint('📡 [SocketService] user:group_chat - _groupMessageController.add() çağrılıyor');
@@ -1288,71 +1339,7 @@ class SocketService extends GetxService {
 
   // Socket durumunu kontrol etme
   void checkSocketStatus() {
-    /*debugPrint('🔍 === SOCKET DURUM RAPORU ===');
-    debugPrint('🔍 Socket nesnesi: ${_socket != null ? "✅ Var" : "❌ Yok"}');
-    debugPrint('🔍 Bağlantı durumu: ${_socket?.connected ?? false ? "✅ Bağlı" : "❌ Bağlı değil"}');
-    debugPrint('🔍 Socket ID: ${_socket?.id ?? "Yok"}');
-    debugPrint('🔍 isConnected observable: ${isConnected.value}');
-    debugPrint('🔍 Dinlenen event\'ler:');
-    debugPrint('  - conversation:new_message (private mesajlar için)');
-    debugPrint('  - user:group_message (group mesajlar için)');
-    debugPrint('  - group:message (group mesajlar için)');
-    debugPrint('  - group_conversation:new_message (group mesajlar için)');
-    debugPrint('  - conversation:group_message (group mesajlar için)');
-    debugPrint('  - group:new_message (group mesajlar için)');
-    debugPrint('  - group_chat:message (group mesajlar için)');
-    debugPrint('  - group_chat:new_message (group mesajlar için)');
-    debugPrint('  - chat:group_message (group mesajlar için)');
-    debugPrint('  - message:group (group mesajlar için)');
-    debugPrint('  - new:group_message (group mesajlar için)');
-    debugPrint('  - group:chat_message (group mesajlar için)');
-    debugPrint('  - user:group_chat (group mesajlar için)');
-    debugPrint('  - user:group_chat_message (group mesajlar için)');
-    debugPrint('  - user:new_group_message (group mesajlar için)');
-    debugPrint('  - user:chat_message (group mesajlar için)');
-    debugPrint('  - user:message_group (group mesajlar için)');
-    debugPrint('  - user:group_message_new (group mesajlar için)');
-    debugPrint('  - user:new_message (group mesajlar için)');
-    debugPrint('  - user:message_new (group mesajlar için)');
-    debugPrint('  - user:chat (group mesajlar için)');
-    debugPrint('  - user:group (group mesajlar için)');
-    debugPrint('  - conversation:un_read_message_count');
-    debugPrint('  - notification:new');
-    debugPrint('  - notification:event');
-    debugPrint('  - comment:event');
-    debugPrint('  - like:event');
-    debugPrint('  - follow:event');
-    debugPrint('  - post:event');
-    debugPrint('  - group:join_request');
-    debugPrint('  - group:join_accepted');
-    debugPrint('  - group:join_declined');
-    debugPrint('  - follow:request');
-    debugPrint('  - follow:accepted');
-    debugPrint('  - follow:declined');
-    debugPrint('  - event:invitation');
-    debugPrint('  - event:reminder');
-    debugPrint('  - post:mention');
-    debugPrint('  - comment:mention');
-    debugPrint('  - system:notification');
-    debugPrint('  - user:notification');
-    debugPrint('  - user:*');
-    debugPrint('  - private:notification');
-    debugPrint('  - user:message');
-    debugPrint('  - direct:notification');
-    debugPrint('  - personal:notification');
-    debugPrint('  - post:comment');
-    debugPrint('  - comment:new');
-    debugPrint('  - post:activity');
-    debugPrint('  - timeline:notification');
-    debugPrint('  - follow:notification');
-    debugPrint('  - like:notification');
-    debugPrint('  - group:notification');
-    debugPrint('  - event:notification');
-    debugPrint('  - activity:notification');
-    debugPrint('  - realtime:notification');
-    debugPrint('  - * (wildcard)');
-    debugPrint('  - onAny (tüm event\'ler)');
-    debugPrint('🔍 ===========================');*/
+   
   }
 
   /// User kanalına join ol
@@ -1964,4 +1951,5 @@ class SocketService extends GetxService {
     //debugPrint('👤  - Tüm diğer event\'ler');
     //debugPrint('👤 ===========================================');
   }
+
 }

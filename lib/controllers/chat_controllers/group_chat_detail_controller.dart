@@ -1743,6 +1743,18 @@ class GroupChatDetailController extends GetxController {
           return;
         }
         
+        // Yeni: group:unpin_message event kontrolü
+        if (data.containsKey('source') && data['source'] == 'group:unpin_message') {
+          _handleSocketUnpinUpdate(data);
+          return;
+        }
+        
+        // Action kontrolü (unpin işlemi için)
+        if (data.containsKey('action') && data['action'] == 'unpin') {
+          _handleSocketUnpinUpdate(data);
+          return;
+        }
+        
         // Event yapısını kontrol et - message objesi içinde olabilir
         Map<String, dynamic> messageData;
         if (data.containsKey('message')) {
@@ -1769,6 +1781,40 @@ class GroupChatDetailController extends GetxController {
       }
     } catch (e) {
       debugPrint('❌ [GroupChatDetailController] Pin message update error: $e');
+    }
+  }
+
+  /// Socket'ten gelen unpin güncellemelerini işle
+  void _handleSocketUnpinUpdate(Map<String, dynamic> data) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Socket unpin update handling...');
+      
+      final messageId = data['message_id']?.toString();
+      final groupId = data['group_id']?.toString();
+      final isPinned = data['is_pinned'] ?? false;
+      final timestamp = data['timestamp'];
+      final source = data['source'];
+      final action = data['action'];
+      
+      debugPrint('📌 [GroupChatDetailController] Socket unpin update - Message ID: $messageId, Group ID: $groupId, Is Pinned: $isPinned');
+      debugPrint('📌 [GroupChatDetailController] Socket unpin update - Source: $source, Action: $action, Timestamp: $timestamp');
+      
+      // Sadece bu grup için gelen unpin event'lerini işle
+      if (groupId != null && groupId == currentGroupId.value && messageId != null) {
+        debugPrint('📌 [GroupChatDetailController] Processing unpin for message $messageId');
+        _updateMessagePinStatus(messageId, isPinned);
+        
+        // Unpin işlemi için özel işlem
+        debugPrint('📌 [GroupChatDetailController] Unpin operation detected - Forcing PinnedMessagesWidget refresh');
+        Future.delayed(Duration(milliseconds: 200), () {
+          update();
+          debugPrint('📌 [GroupChatDetailController] PinnedMessagesWidget forced refresh after unpin');
+        });
+      } else {
+        debugPrint('📌 [GroupChatDetailController] Socket unpin event not for this group. Group ID: $groupId, Current: ${currentGroupId.value}');
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Socket unpin update error: $e');
     }
   }
 
