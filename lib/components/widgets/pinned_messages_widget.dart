@@ -27,12 +27,20 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   bool _isListening = false;
   Timer? _refreshTimer;
   bool _isExpanded = false; // Show more/less state
+  double? _screenHeight; // Store screen height safely
 
   @override
   void initState() {
     super.initState();
     _setupPinUpdateListener();
     _startRefreshTimer();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Safely get screen height when dependencies change
+    _screenHeight = MediaQuery.of(context).size.height;
   }
 
   @override
@@ -530,8 +538,8 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         
         // ScrollController varsa o mesaja git
         if (controller.scrollController != null) {
-          // Ekran yüksekliğini al
-          final screenHeight = MediaQuery.of(Get.context!).size.height;
+          // Güvenli şekilde ekran yüksekliğini al
+          final screenHeight = _screenHeight ?? 800.0; // Default fallback
           
           // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 100px)
           final messagePosition = messageIndex * 100.0;
@@ -575,8 +583,8 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         
         // ScrollController varsa o mesaja git
         if (controller.scrollController != null) {
-          // Ekran yüksekliğini al
-          final screenHeight = MediaQuery.of(Get.context!).size.height;
+          // Güvenli şekilde ekran yüksekliğini al
+          final screenHeight = _screenHeight ?? 800.0; // Default fallback
           
           // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 120px)
           final messagePosition = messageIndex * 120.0;
