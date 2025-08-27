@@ -55,6 +55,7 @@ import '../screens/chat/user_chat/user_chat_detail_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/home/story/add_story_screen.dart';
 import '../screens/main_screen.dart';
+import '../test_socket_pin.dart';
 
 class Routes {
   static const String login = '/login';
@@ -97,6 +98,7 @@ class Routes {
   static const String verificationUpload = '/verification_upload';
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';
+  static const String socketPinTest = '/socket-pin-test';
 
   static final List<GetPage> pages = [
     GetPage(
@@ -290,5 +292,6 @@ class Routes {
       middlewares: [AuthGuard()]
     ),
     GetPage(name: addStory, page: () => AddStoryScreen()),
+    GetPage(name: socketPinTest, page: () => const SocketPinTest()),
   ];
 }

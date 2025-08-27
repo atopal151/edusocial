@@ -16,38 +16,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
     required this.controller,
   });
 
-  void _showPinOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(
-                  message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  color: message.isPinned ? const Color(0xff414751) : const Color(0xff9ca3ae),
-                ),
-                title: Text(
-                  message.isPinned ? 'Pin Kaldır' : 'Mesajı Sabitle',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.pinMessage(message.id);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+
 
   // Document URL'sini al
   String? getDocumentUrl() {
@@ -102,25 +71,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
               style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
             
-            // Pin ikonu - sadece admin'ler için
-            if (controller.isCurrentUserAdmin) ...[
-              const SizedBox(width: 4),
-              GestureDetector(
-                onTap: () {
-                  controller.pinMessage(message.id);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  child: Icon(
-                    Icons.push_pin,
-                    size: 12,
-                    color: message.isPinned
-                        ? const Color(0xff414751)
-                        : const Color(0xff9ca3ae),
-                  ),
-                ),
-              ),
-            ],
+
             
             if (message.isSentByMe)
               Padding(
@@ -150,10 +101,7 @@ class GroupDocumentMessageWidget extends StatelessWidget {
           ),
           child: Align(
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: GestureDetector(
-              onLongPress: () {
-                _showPinOptions(context);
-              },
+            child: Container(
               child: Container(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.7,

@@ -2,7 +2,6 @@
 
 
 
-import 'package:flutter/foundation.dart';
 
 class NotificationModel {
   final String id;
@@ -289,12 +288,12 @@ class NotificationModel {
     final isReadValue = rawIsRead == true || rawIsRead == 1;
     
     // Debug için is_read değerini logla
-    debugPrint('🔍 === NOTIFICATION MODEL IS_READ DEBUG ===');
-    debugPrint('🔍 Raw is_read value: $rawIsRead (type: ${rawIsRead.runtimeType})');
-    debugPrint('🔍 Parsed isRead: $isReadValue');
-    debugPrint('🔍 Notification ID: ${json['id']}');
-    debugPrint('🔍 Notification Type: ${json['type']}');
-    debugPrint('🔍 ==========================================');
+    //debugPrint('🔍 === NOTIFICATION MODEL IS_READ DEBUG ===');
+    //debugPrint('🔍 Raw is_read value: $rawIsRead (type: ${rawIsRead.runtimeType})');
+    //debugPrint('🔍 Parsed isRead: $isReadValue');
+    //debugPrint('🔍 Notification ID: ${json['id']}');
+    //debugPrint('🔍 Notification Type: ${json['type']}');
+    //debugPrint('🔍 ==========================================');
 
     return NotificationModel(
       id: json['id'].toString(),

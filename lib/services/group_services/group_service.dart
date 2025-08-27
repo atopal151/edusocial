@@ -352,6 +352,23 @@ class GroupServices {
           //debugPrint('Users: ${users.length} adet');
           //debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
+          // Sadece pin durumlarını kontrol et
+          final groupData = jsonBody['data']['group'];
+          final groupChats = groupData['group_chats'] as List? ?? [];
+          
+          printFullText('🔍 [GroupService] === PIN DURUMU KONTROLÜ ===');
+          printFullText('🔍 [GroupService] Toplam mesaj sayısı: ${groupChats.length}');
+          
+          for (int i = 0; i < groupChats.length; i++) {
+            final chat = groupChats[i];
+            final messageId = chat['id'];
+            final isPinned = chat['is_pinned'];
+            final messageContent = chat['message'];
+            
+            printFullText('🔍 [GroupService] Mesaj $i: ID=$messageId, is_pinned=$isPinned, content="$messageContent"');
+          }
+          printFullText('🔍 [GroupService] === PIN DURUMU KONTROLÜ TAMAMLANDI ===');
+          
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
         throw Exception('No group data found');

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../services/language_service.dart';
+import '../../../services/pin_message_service.dart';
 import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../dialogs/image_preview_dialog.dart';
 
@@ -27,15 +28,68 @@ class GroupUniversalMessageWidget extends StatelessWidget {
     return urlRegex.allMatches(text).map((match) => match.group(0)!).toList();
   }
 
+  // Pin/Unpin mesaj işlemi
+  void _handlePinMessage() async {
+    try {
+      debugPrint('📌 [GroupUniversalMessageWidget] Pin/Unpin işlemi başlatıldı');
+      debugPrint('📌 [GroupUniversalMessageWidget] Message ID: ${message.id}');
+      debugPrint('📌 [GroupUniversalMessageWidget] Current Pin Status: ${message.isPinned}');
+      
+      final messageId = int.tryParse(message.id);
+      if (messageId == null) {
+        debugPrint('❌ [GroupUniversalMessageWidget] Invalid message ID: ${message.id}');
+        return;
+      }
+      
+      final groupId = controller.currentGroupId.value;
+      if (groupId.isEmpty) {
+        debugPrint('❌ [GroupUniversalMessageWidget] Group ID is empty');
+        return;
+      }
+      
+      // PinMessageService'i kullan
+      final pinMessageService = Get.find<PinMessageService>();
+      final success = await pinMessageService.pinGroupMessage(messageId, groupId);
+      
+      if (success) {
+        debugPrint('✅ [GroupUniversalMessageWidget] Pin/Unpin işlemi başarılı');
+      } else {
+        debugPrint('❌ [GroupUniversalMessageWidget] Pin/Unpin işlemi başarısız');
+        
+        // Hata bildirimi göster
+        Get.snackbar(
+          '❌ Hata',
+          'Pin/Unpin işlemi başarısız oldu',
+          snackPosition: SnackPosition.TOP,
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red.shade100,
+          colorText: Colors.red.shade800,
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupUniversalMessageWidget] Pin/Unpin işlemi hatası: $e');
+      
+      // Hata bildirimi göster
+      Get.snackbar(
+        '❌ Hata',
+        'Pin/Unpin işlemi sırasında hata oluştu: $e',
+        snackPosition: SnackPosition.TOP,
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade800,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageService = Get.find<LanguageService>();
     
     // Debug bilgisi
-    debugPrint('GroupUniversalMessageWidget - Content: ${message.content}');
-    debugPrint('GroupUniversalMessageWidget - MessageType: ${message.messageType}');
-    debugPrint('GroupUniversalMessageWidget - IsPinned: ${message.isPinned}');
-    debugPrint('GroupUniversalMessageWidget - Links: ${message.links}');
+    //debugPrint('GroupUniversalMessageWidget - Content: ${message.content}');
+    //debugPrint('GroupUniversalMessageWidget - MessageType: ${message.messageType}');
+    //debugPrint('GroupUniversalMessageWidget - IsPinned: ${message.isPinned}');
+    //debugPrint('GroupUniversalMessageWidget - Links: ${message.links}');
     
     // Mesaj içeriğini analiz et
     final hasText = message.content.isNotEmpty && !_isImageUrl(message.content);
@@ -43,14 +97,14 @@ class GroupUniversalMessageWidget extends StatelessWidget {
     final hasLinks = message.links?.isNotEmpty ?? false;
     
     // Debug bilgisi
-    debugPrint('🔍 GroupUniversalMessageWidget Analysis:');
-    debugPrint('🔍 Content: "${message.content}"');
-    debugPrint('🔍 MessageType: ${message.messageType}');
-    debugPrint('🔍 HasText: $hasText');
-    debugPrint('🔍 HasImage: $hasImage');
-    debugPrint('🔍 HasLinks: $hasLinks');
-    debugPrint('🔍 Links: ${message.links}');
-    debugPrint('🔍 Media: ${message.media}');
+    //debugPrint('🔍 GroupUniversalMessageWidget Analysis:');
+    //debugPrint('🔍 Content: "${message.content}"');
+    //debugPrint('🔍 MessageType: ${message.messageType}');
+    //debugPrint('🔍 HasText: $hasText');
+    //debugPrint('🔍 HasImage: $hasImage');
+    //debugPrint('🔍 HasLinks: $hasLinks');
+    //debugPrint('🔍 Links: ${message.links}');
+    //debugPrint('🔍 Media: ${message.media}');
     
     // Text içindeki URL'leri çıkar (eğer ayrı links alanı varsa)
     String displayText = message.content;
@@ -108,25 +162,19 @@ class GroupUniversalMessageWidget extends StatelessWidget {
               style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
             
-            // Pin ikonu - sadece admin'ler için
-            if (controller.isCurrentUserAdmin) ...[
-              const SizedBox(width: 4),
+            // Pin iconu - sadece admin için göster (tüm mesajlar için)
+            if (controller.isCurrentUserAdmin)
               GestureDetector(
-                onTap: () {
-                  controller.pinMessage(message.id);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(4),
+                onTap: () => _handlePinMessage(),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
                   child: Icon(
-                    Icons.push_pin,
-                    size: 16,
-                    color: message.isPinned
-                        ? const Color(0xff414751)
-                        : const Color(0xff9ca3ae),
+                    message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                    size: 14,
+                    color: message.isPinned ? Colors.orange : Colors.grey[400],
                   ),
                 ),
               ),
-            ],
             
             if (message.isSentByMe)
               Padding(
@@ -156,10 +204,7 @@ class GroupUniversalMessageWidget extends StatelessWidget {
           ),
           child: Align(
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: GestureDetector(
-              onLongPress: () {
-                _showPinOptions(context);
-              },
+            child: Container(
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -557,36 +602,5 @@ class GroupUniversalMessageWidget extends StatelessWidget {
     }
   }
 
-  void _showPinOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(
-                  message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-                  color: message.isPinned ? const Color(0xff414751) : const Color(0xff9ca3ae),
-                ),
-                title: Text(
-                  message.isPinned ? 'Pin Kaldır' : 'Mesajı Sabitle',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.pinMessage(message.id);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:image_picker/image_picker.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../models/chat_models/group_message_model.dart';
@@ -13,7 +14,7 @@ import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../../services/survey_service.dart';
-import '../../services/pin_message_service.dart';
+
 import '../profile_controller.dart';
 import 'chat_controller.dart'; // Added import for ChatController
 import '../../components/snackbars/custom_snackbar.dart';
@@ -22,7 +23,7 @@ class GroupChatDetailController extends GetxController {
   // Services
   final GroupServices _groupServices = GroupServices();
   final LanguageService _languageService = Get.find<LanguageService>();
-  final PinMessageService _pinMessageService = Get.find<PinMessageService>();
+
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isGroupDataLoading = false.obs; // Grup verisi için ayrı loading
@@ -34,6 +35,8 @@ class GroupChatDetailController extends GetxController {
   // Socket service ile ilgili değişkenler
   late SocketService _socketService;
   late StreamSubscription _groupMessageSubscription;
+  late StreamSubscription _pinMessageSubscription; // Pin message subscription eklendi
+
   bool _isSocketListenerSetup = false; // Multiple subscription guard
   final ScrollController scrollController = ScrollController();
 
@@ -85,10 +88,15 @@ class GroupChatDetailController extends GetxController {
   bool get isCurrentUserAdmin {
     final group = groupData.value;
     
-    if (group == null) return false;
+    if (group == null) {
+      debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: Group data null');
+      return false;
+    }
     
     // isFounder alanı admin kontrolü için kullanılır
-    return group.isFounder;
+    final isAdmin = group.isFounder;
+    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isFounder=$isAdmin');
+    return isAdmin;
   }
 
   // Link algılama fonksiyonu
@@ -139,6 +147,11 @@ class GroupChatDetailController extends GetxController {
       // Group chat'e girdiğinde socket durumunu kontrol et
       onGroupChatEntered();
       
+      // İlk yükleme sonrası pin durumlarını kontrol et
+      Future.delayed(Duration(milliseconds: 1000), () {
+        _updatePinStatusFromAPI();
+      });
+      
       // Cache'i temizle (Android'de güncel olmayan veri sorunu için)
       GroupServices.clearGroupCache();
     } else {
@@ -184,6 +197,12 @@ class GroupChatDetailController extends GetxController {
       
       // STEP 1: Quick message loading (önce sadece mesajları al)
       await fetchGroupDetailsOptimized();
+      
+      // STEP 2: API'den gelen pin durumlarını kontrol et ve UI'ı güncelle
+      _updatePinStatusFromAPI();
+      
+      // STEP 3: Socket üzerinden güncel pin durumlarını kontrol et
+      await _checkPinStatusFromSocket();
       
       isGroupDataLoading.value = false;
       
@@ -263,6 +282,12 @@ class GroupChatDetailController extends GetxController {
     _groupMessageSubscription = _socketService.onGroupMessage.listen((data) {
       _onNewGroupMessage(data);
     });
+
+    // Pin message dinleyicisi - pin/unpin event'leri için
+    _pinMessageSubscription = _socketService.onPinMessage.listen((data) {
+      _onPinMessageUpdate(data);
+    });
+
     
     _isSocketListenerSetup = true;
     debugPrint('✅ GroupChatDetailController socket listeners setup completed');
@@ -314,16 +339,75 @@ class GroupChatDetailController extends GetxController {
   void _onNewGroupMessage(dynamic data) {
     try {
       debugPrint('📡 GroupChatDetailController - Yeni grup mesajı geldi: $data');
+      debugPrint('📡 [GroupChatDetailController] Data type: ${data.runtimeType}');
+      debugPrint('📡 [GroupChatDetailController] Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
       
       if (data is Map<String, dynamic>) {
         // Socket'ten gelen data yapısı: {message: {group_id: 2, ...}}
         final messageData = data['message'] as Map<String, dynamic>?;
         final incomingGroupId = messageData?['group_id']?.toString();
         
+        debugPrint('📡 [GroupChatDetailController] Message data: $messageData');
+        debugPrint('📡 [GroupChatDetailController] Incoming Group ID: $incomingGroupId');
+        debugPrint('📡 [GroupChatDetailController] Current Group ID: ${currentGroupId.value}');
+        
         // Sadece bu grup için gelen mesajları işle
         if (incomingGroupId != null && incomingGroupId == currentGroupId.value) {
           debugPrint('✅ Yeni grup mesajı bu gruba ait, mesaj listesine ekleniyor');
           debugPrint('✅ Gelen Group ID: $incomingGroupId, Mevcut: ${currentGroupId.value}');
+          
+          // Pin durumu kontrolü - eğer mesaj zaten varsa ve pin durumu değiştiyse
+          final messageId = messageData?['id']?.toString();
+          final isPinned = messageData?['is_pinned'] ?? false;
+          
+          debugPrint('🔍 [GroupChatDetailController] Pin durumu kontrolü: Message ID=$messageId, isPinned=$isPinned');
+          debugPrint('🔍 [GroupChatDetailController] Message contains is_pinned: ${messageData?.containsKey('is_pinned')}');
+          
+          // Pin durumu değişikliği varsa özel işlem yap
+          if (messageId != null && messageData?.containsKey('is_pinned') == true) {
+            debugPrint('🔍 [GroupChatDetailController] Pin durumu değişikliği tespit edildi, özel işlem yapılıyor');
+            
+            final existingMessageIndex = messages.indexWhere((msg) => msg.id == messageId);
+            debugPrint('🔍 [GroupChatDetailController] Existing message index: $existingMessageIndex');
+            
+            if (existingMessageIndex != -1) {
+              // Mesaj zaten var - pin durumu güncellemesi
+              final existingMessage = messages[existingMessageIndex];
+              debugPrint('🔍 [GroupChatDetailController] Mevcut mesaj bulundu: ID=${existingMessage.id}, Mevcut Pin=${existingMessage.isPinned}, Yeni Pin=$isPinned');
+              
+              if (existingMessage.isPinned != isPinned) {
+                debugPrint('📌 Pin durumu değişikliği tespit edildi: Message ID=$messageId, isPinned=$isPinned');
+                
+                // Mesajın pin durumunu güncelle
+                messages[existingMessageIndex] = existingMessage.copyWith(isPinned: isPinned);
+                
+                // PinnedMessagesWidget'ı güncelle
+                update();
+                
+                debugPrint('📌 Pin durumu güncellendi ve PinnedMessagesWidget yenilendi');
+                debugPrint('📌 Toplam mesaj sayısı: ${messages.length}');
+                debugPrint('📌 Pinlenmiş mesaj sayısı: ${messages.where((m) => m.isPinned).length}');
+                
+                // Pin durumu değişikliği için özel bildirim gönder
+                _notifyPinStatusChange(messageId, isPinned);
+                
+                // Pin/Unpin işlemi için özel log
+                if (isPinned) {
+                  debugPrint('📌 [GroupChatDetailController] Message $messageId PINNED - PinnedMessagesWidget güncellenmeli');
+                } else {
+                  debugPrint('📌 [GroupChatDetailController] Message $messageId UNPINNED - PinnedMessagesWidget\'dan kaldırılmalı');
+                }
+                
+                return; // Yeni mesaj ekleme işlemini yapma
+              } else {
+                debugPrint('🔍 [GroupChatDetailController] Pin durumu değişmedi, normal mesaj işlemi devam ediyor');
+              }
+            } else {
+              debugPrint('🔍 [GroupChatDetailController] Mesaj henüz listede yok, yeni mesaj olarak ekleniyor');
+            }
+          } else {
+            debugPrint('🔍 [GroupChatDetailController] Pin durumu kontrolü yapılmadı - messageId: $messageId, contains is_pinned: ${messageData?.containsKey('is_pinned')}');
+          }
           
           // OPTIMIZE: Tüm grup detayını tekrar çekme, sadece yeni mesajı ekle
           _addNewMessageFromSocket(data);
@@ -336,6 +420,110 @@ class GroupChatDetailController extends GetxController {
       }
     } catch (e) {
       debugPrint('❌ _onNewGroupMessage error: $e');
+    }
+  }
+
+  /// Pin durumu değişikliği için özel bildirim gönder
+  void _notifyPinStatusChange(String messageId, bool isPinned) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Pin durumu değişikliği bildirimi gönderiliyor');
+      debugPrint('📌 Message ID: $messageId, Is Pinned: $isPinned');
+      
+      // PinnedMessagesWidget'ın anlık güncellenmesi için özel event gönder
+      final pinUpdateData = {
+        'message_id': messageId,
+        'is_pinned': isPinned,
+        'group_id': currentGroupId.value,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
+      
+      // Pin event'ini tetikle - bu zaten _onPinMessageUpdate metodunda işlenecek
+      _onPinMessageUpdate(pinUpdateData);
+      
+      debugPrint('📌 [GroupChatDetailController] Pin durumu değişikliği bildirimi gönderildi');
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Pin durumu bildirimi hatası: $e');
+    }
+  }
+
+  /// Test için manuel pin durumu güncelleme
+  void updateMessagePinStatus(String messageId, bool isPinned) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Manual pin status update requested');
+      debugPrint('📌 Message ID: $messageId, Is Pinned: $isPinned');
+      
+      final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+      if (messageIndex != -1) {
+        final existingMessage = messages[messageIndex];
+        debugPrint('📌 [GroupChatDetailController] Found message at index $messageIndex');
+        debugPrint('📌 [GroupChatDetailController] Current pin status: ${existingMessage.isPinned}');
+        
+        if (existingMessage.isPinned != isPinned) {
+          final updatedMessage = existingMessage.copyWith(isPinned: isPinned);
+          messages[messageIndex] = updatedMessage;
+          debugPrint('📌 [GroupChatDetailController] Message pin status updated manually');
+          
+          // PinnedMessagesWidget'ı güncelle
+          update();
+          
+          debugPrint('📌 [GroupChatDetailController] Manual pin update completed');
+          debugPrint('📌 [GroupChatDetailController] Pinned messages count: ${messages.where((m) => m.isPinned).length}');
+        } else {
+          debugPrint('📌 [GroupChatDetailController] Pin status already matches, no update needed');
+        }
+      } else {
+        debugPrint('⚠️ [GroupChatDetailController] Message with ID $messageId not found for manual update');
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Manual pin status update error: $e');
+    }
+  }
+
+  /// Test için socket event'ini manuel olarak işle
+  void processSocketEvent(dynamic data) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Manual socket event processing requested');
+      debugPrint('📌 Event data: $data');
+      
+      // Socket event'ini manuel olarak işle
+      _onNewGroupMessage(data);
+      
+      debugPrint('📌 [GroupChatDetailController] Manual socket event processing completed');
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Manual socket event processing error: $e');
+    }
+  }
+
+  /// PinnedMessagesWidget'ı zorla yenile
+  void forceRefreshPinnedWidget() {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Force refresh PinnedMessagesWidget requested');
+      
+      // Widget'ı zorla yenile
+      update();
+      
+      debugPrint('📌 [GroupChatDetailController] PinnedMessagesWidget force refresh completed');
+      debugPrint('📌 [GroupChatDetailController] Current pinned messages count: ${messages.where((m) => m.isPinned).length}');
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Force refresh error: $e');
+    }
+  }
+
+  /// Debug: Pinlenmiş mesajları listele
+  void debugPinnedMessages() {
+    try {
+      debugPrint('🔍 [GroupChatDetailController] Debug: Pinned messages check');
+      debugPrint('🔍 [GroupChatDetailController] Total messages: ${messages.length}');
+      
+      final pinnedMessages = messages.where((m) => m.isPinned).toList();
+      debugPrint('🔍 [GroupChatDetailController] Pinned messages count: ${pinnedMessages.length}');
+      
+      for (int i = 0; i < pinnedMessages.length; i++) {
+        final msg = pinnedMessages[i];
+        debugPrint('🔍 [GroupChatDetailController] Pinned message $i: ID=${msg.id}, Content="${msg.content}", Username=${msg.username}');
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Debug error: $e');
     }
   }
 
@@ -408,6 +596,8 @@ class GroupChatDetailController extends GetxController {
         links = linkList.map((l) => l['link'] ?? '').cast<String>().toList();
       }
       
+
+      
       final newMessage = GroupMessageModel(
         id: messageId,
         senderId: messageData['user_id']?.toString() ?? '',
@@ -442,6 +632,8 @@ class GroupChatDetailController extends GetxController {
       refreshMessagesOnly();
     }
   }
+
+
 
   /// Group chat socket durumunu kontrol et
   void checkGroupChatSocketConnection() {
@@ -484,6 +676,8 @@ class GroupChatDetailController extends GetxController {
       debugPrint('🔍 Socket durumu: ${_socketService.isConnected.value}');
     }
   }
+
+
 
   /// OPTIMIZE: Background message conversion with pagination support
   Future<void> convertGroupChatsToMessagesOptimized() async {
@@ -530,6 +724,8 @@ class GroupChatDetailController extends GetxController {
               mediaUrls = chat.media.map((media) => media.fullPath).toList();
             }
             
+
+            
             final message = GroupMessageModel(
                   id: chat.id.toString(),
                   senderId: userId,
@@ -550,6 +746,7 @@ class GroupChatDetailController extends GetxController {
                   surveyId: messageData['surveyId'],
                   choiceIds: messageData['choiceIds'],
                   surveyData: messageData['surveyData'],
+                  isPinned: chat.isPinned ?? false, // Pin durumunu ekle
                 );
             
             processedMessages.add(message);
@@ -578,10 +775,30 @@ class GroupChatDetailController extends GetxController {
         
         isFirstLoad.value = false;
         debugPrint('✅ Initial ${processedMessages.length} group messages loaded (proper chronological order)');
-      debugPrint('📊 Mesaj sayısı kontrolü: ${messages.length} mesaj yüklendi');
+        debugPrint('📊 Mesaj sayısı kontrolü: ${messages.length} mesaj yüklendi');
+        
+        // Pin durumu debug log'ları
+        final pinnedCount = messages.where((msg) => msg.isPinned).length;
+        debugPrint('📌 Pin durumu kontrolü: ${pinnedCount} pinlenmiş mesaj bulundu');
+        for (int i = 0; i < messages.length; i++) {
+          final msg = messages[i];
+          if (msg.isPinned) {
+            debugPrint('📌 Pinlenmiş mesaj $i: ID=${msg.id}, Content="${msg.content}"');
+          }
+        }
+        
+        // Pinlenmiş mesajlar varsa UI'ı güncelle
+        if (pinnedCount > 0) {
+          update();
+          debugPrint('📌 UI güncellendi - pinlenmiş mesajlar gösteriliyor');
+        }
       } else {
         messages.assignAll(processedMessages);
         debugPrint('📊 Mesaj sayısı güncellendi: ${messages.length} mesaj');
+        
+        // Pin durumu debug log'ları
+        final pinnedCount = messages.where((msg) => msg.isPinned).length;
+        debugPrint('📌 Pin durumu kontrolü: ${pinnedCount} pinlenmiş mesaj bulundu');
       }
       
       // Extract media in background
@@ -1492,6 +1709,9 @@ class GroupChatDetailController extends GetxController {
       groupData.value = group;
       convertGroupChatsToMessagesOptimized();
       
+      // Socket üzerinden pin durumlarını kontrol et
+      await _checkPinStatusFromSocket();
+      
       debugPrint('✅ Messages refreshed successfully');
     } catch (e) {
       debugPrint('❌ Error refreshing messages: $e');
@@ -1503,49 +1723,292 @@ class GroupChatDetailController extends GetxController {
     await refreshMessagesOptimized();
   }
 
-  /// Pin or unpin a message
-  Future<void> pinMessage(String messageId) async {
+  /// Pin message update handler - socket'ten gelen pin/unpin event'lerini işle
+  void _onPinMessageUpdate(dynamic data) {
     try {
-      final messageIdInt = int.tryParse(messageId);
-      if (messageIdInt == null) {
-        debugPrint('❌ Invalid message ID: $messageId');
-        return;
-      }
-
-      final success = await _pinMessageService.pinMessage(messageIdInt);
+      debugPrint('📌 [GroupChatDetailController] Pin message update received: $data');
+      debugPrint('📌 [GroupChatDetailController] Data type: ${data.runtimeType}');
+      debugPrint('📌 [GroupChatDetailController] Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
       
-      if (success) {
-        // Update the message in the list
-        final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
-        if (messageIndex != -1) {
-          final message = messages[messageIndex];
-          final updatedMessage = message.copyWith(isPinned: !message.isPinned);
-          messages[messageIndex] = updatedMessage;
-          
-          // Update UI
-          update();
-          
-          // Success - no snackbar needed
+      if (data is Map<String, dynamic>) {
+        // Pin durumu kontrolü response'u mu kontrol et
+        if (data.containsKey('pinned_messages') || data.containsKey('pin_status')) {
+          _handlePinStatusResponse(data);
+          return;
         }
-      } else {
-        Get.snackbar(
-          _languageService.tr('messages.pinError'),
-          _languageService.tr('messages.tryAgain'),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        
+        // Yeni pin event yapısı kontrolü (SocketService'den gelen)
+        if (data.containsKey('source') && data['source'] == 'group:chat_message') {
+          _handleSocketPinUpdate(data);
+          return;
+        }
+        
+        // Event yapısını kontrol et - message objesi içinde olabilir
+        Map<String, dynamic> messageData;
+        if (data.containsKey('message')) {
+          messageData = data['message'] as Map<String, dynamic>;
+          debugPrint('📌 [GroupChatDetailController] Message data found in nested structure');
+        } else {
+          messageData = data;
+          debugPrint('📌 [GroupChatDetailController] Message data found in direct structure');
+        }
+        
+        final messageId = messageData['id']?.toString();
+        final isPinned = messageData['is_pinned'] ?? false;
+        final groupId = messageData['group_id']?.toString();
+        
+        debugPrint('📌 [GroupChatDetailController] Parsed data - Message ID: $messageId, Group ID: $groupId, Is Pinned: $isPinned');
+        debugPrint('📌 [GroupChatDetailController] Current Group ID: ${currentGroupId.value}');
+        
+        // Sadece bu grup için gelen pin event'lerini işle
+        if (groupId != null && groupId == currentGroupId.value && messageId != null) {
+          _updateMessagePinStatus(messageId, isPinned);
+        } else {
+          debugPrint('📌 [GroupChatDetailController] Pin event not for this group. Group ID: $groupId, Current: ${currentGroupId.value}');
+        }
       }
     } catch (e) {
-      debugPrint('❌ Pin message error: $e');
-      Get.snackbar(
-        _languageService.tr('messages.pinError'),
-        _languageService.tr('messages.tryAgain'),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      debugPrint('❌ [GroupChatDetailController] Pin message update error: $e');
     }
+  }
+
+  /// Socket'ten gelen pin güncellemelerini işle
+  void _handleSocketPinUpdate(Map<String, dynamic> data) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Socket pin update handling...');
+      
+      final messageId = data['message_id']?.toString();
+      final groupId = data['group_id']?.toString();
+      final isPinned = data['is_pinned'] ?? false;
+      final timestamp = data['timestamp'];
+      final source = data['source'];
+      
+      debugPrint('📌 [GroupChatDetailController] Socket pin update - Message ID: $messageId, Group ID: $groupId, Is Pinned: $isPinned');
+      debugPrint('📌 [GroupChatDetailController] Socket pin update - Source: $source, Timestamp: $timestamp');
+      
+      // Sadece bu grup için gelen pin event'lerini işle
+      if (groupId != null && groupId == currentGroupId.value && messageId != null) {
+        _updateMessagePinStatus(messageId, isPinned);
+      } else {
+        debugPrint('📌 [GroupChatDetailController] Socket pin event not for this group. Group ID: $groupId, Current: ${currentGroupId.value}');
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Socket pin update error: $e');
+    }
+  }
+
+  /// Mesaj pin durumunu güncelle (ortak metod)
+  void _updateMessagePinStatus(String messageId, bool isPinned) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Updating message pin status...');
+      debugPrint('📌 [GroupChatDetailController] Message ID: $messageId, Is Pinned: $isPinned');
+      debugPrint('📌 [GroupChatDetailController] Current messages count: ${messages.length}');
+      
+      // Mesajı bul ve pin durumunu güncelle
+      final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+      if (messageIndex != -1) {
+        final existingMessage = messages[messageIndex];
+        debugPrint('📌 [GroupChatDetailController] Found message at index $messageIndex');
+        debugPrint('📌 [GroupChatDetailController] Current pin status: ${existingMessage.isPinned}');
+        debugPrint('📌 [GroupChatDetailController] New pin status: $isPinned');
+        
+        if (existingMessage.isPinned != isPinned) {
+          final updatedMessage = existingMessage.copyWith(isPinned: isPinned);
+          messages[messageIndex] = updatedMessage;
+          debugPrint('📌 [GroupChatDetailController] Message pin status updated successfully');
+          
+          // PinnedMessagesWidget'ı güncellemek için update() çağır
+          update();
+          
+          debugPrint('📌 [GroupChatDetailController] PinnedMessagesWidget update() called');
+          debugPrint('📌 [GroupChatDetailController] Updated messages count: ${messages.length}');
+          debugPrint('📌 [GroupChatDetailController] Pinned messages count: ${messages.where((m) => m.isPinned).length}');
+          
+          // Pin durumu değişikliği için özel log
+          if (isPinned) {
+            debugPrint('📌 [GroupChatDetailController] Message $messageId PINNED successfully');
+          } else {
+            debugPrint('📌 [GroupChatDetailController] Message $messageId UNPINNED successfully');
+          }
+          
+          // PinnedMessagesWidget'ın anlık güncellenmesi için ek bildirim
+          _notifyPinnedMessagesUpdate();
+          
+          // Unpin işlemi için özel işlem
+          if (!isPinned) {
+            debugPrint('📌 [GroupChatDetailController] UNPIN detected - Forcing PinnedMessagesWidget refresh');
+            // Unpin durumunda widget'ı zorla yenile
+            Future.delayed(Duration(milliseconds: 100), () {
+              update();
+              debugPrint('📌 [GroupChatDetailController] PinnedMessagesWidget forced refresh after unpin');
+            });
+          }
+        } else {
+          debugPrint('📌 [GroupChatDetailController] Pin status unchanged, no update needed');
+        }
+      } else {
+        debugPrint('⚠️ [GroupChatDetailController] Message with ID $messageId not found in current messages');
+        debugPrint('⚠️ [GroupChatDetailController] Available message IDs: ${messages.map((m) => m.id).join(', ')}');
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Update message pin status error: $e');
+    }
+  }
+
+  /// PinnedMessagesWidget güncellemesi için bildirim gönder
+  void _notifyPinnedMessagesUpdate() {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Notifying PinnedMessagesWidget update...');
+      
+      // PinnedMessagesWidget'ın anlık güncellenmesi için özel event
+      final pinnedUpdateEvent = {
+        'type': 'pinned_messages_update',
+        'group_id': currentGroupId.value,
+        'pinned_count': messages.where((m) => m.isPinned).length,
+        'total_messages': messages.length,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
+      
+      debugPrint('📌 [GroupChatDetailController] Pinned messages update event: $pinnedUpdateEvent');
+      
+      // Widget'ın güncellenmesi için update() çağır
+      update();
+      
+      debugPrint('📌 [GroupChatDetailController] PinnedMessagesWidget update notification sent');
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Pinned messages update notification error: $e');
+    }
+  }
+
+  /// Pin durumu response'larını işle
+  void _handlePinStatusResponse(Map<String, dynamic> data) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Handling pin status response: $data');
+      
+      // Pinned messages listesi varsa
+      if (data.containsKey('pinned_messages')) {
+        final pinnedMessages = data['pinned_messages'] as List<dynamic>? ?? [];
+        debugPrint('📌 [GroupChatDetailController] Received ${pinnedMessages.length} pinned messages from socket');
+        
+        // Tüm mesajları önce unpin yap
+        for (int i = 0; i < messages.length; i++) {
+          if (messages[i].isPinned) {
+            messages[i] = messages[i].copyWith(isPinned: false);
+          }
+        }
+        
+        // Socket'ten gelen pinlenmiş mesajları pin yap
+        for (final pinnedMsg in pinnedMessages) {
+          if (pinnedMsg is Map<String, dynamic>) {
+            final messageId = pinnedMsg['id']?.toString();
+            if (messageId != null) {
+              final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+              if (messageIndex != -1) {
+                messages[messageIndex] = messages[messageIndex].copyWith(isPinned: true);
+                debugPrint('📌 [GroupChatDetailController] Message $messageId pinned from socket response');
+              }
+            }
+          }
+        }
+        
+        // UI'ı güncelle
+        update();
+        debugPrint('📌 [GroupChatDetailController] Pin status updated from socket response');
+      }
+      
+      // Pin status update varsa
+      if (data.containsKey('pin_status')) {
+        final pinStatus = data['pin_status'] as Map<String, dynamic>?;
+        if (pinStatus != null) {
+          final messageId = pinStatus['message_id']?.toString();
+          final isPinned = pinStatus['is_pinned'] ?? false;
+          
+          if (messageId != null) {
+            final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+            if (messageIndex != -1) {
+              messages[messageIndex] = messages[messageIndex].copyWith(isPinned: isPinned);
+              update();
+              debugPrint('📌 [GroupChatDetailController] Message $messageId pin status updated: $isPinned');
+            }
+          }
+        }
+      }
+      
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Pin status response error: $e');
+    }
+  }
+
+  /// API'den gelen pin durumlarini kontrol et ve UI'i guncelle
+  void _updatePinStatusFromAPI() {
+    try {
+      debugPrint('🔍 [GroupChatDetailController] API\'den gelen pin durumlari kontrol ediliyor...');
+      
+      final allMessages = messages;
+      int pinnedCount = 0;
+      
+      for (int i = 0; i < allMessages.length; i++) {
+        final message = allMessages[i];
+        if (message.isPinned) {
+          pinnedCount++;
+          debugPrint('🔍 [GroupChatDetailController] Pinlenmis mesaj bulundu: ID=${message.id}, Content="${message.content}"');
+        }
+      }
+      
+      debugPrint('🔍 [GroupChatDetailController] API\'den gelen toplam pinlenmis mesaj sayisi: $pinnedCount');
+      
+      // UI'i guncelle
+      if (pinnedCount > 0) {
+        update();
+        debugPrint('🔍 [GroupChatDetailController] UI guncellendi - pinlenmis mesajlar gosteriliyor');
+      }
+      
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] API pin durumu kontrolu hatasi: $e');
+    }
+  }
+
+  /// Socket üzerinden pin durumlarını kontrol et
+  Future<void> _checkPinStatusFromSocket() async {
+    try {
+      debugPrint('🔍 [GroupChatDetailController] Socket üzerinden pin durumları kontrol ediliyor...');
+      
+      // Socket üzerinden pin durumlarını iste
+      _socketService.sendMessage('group:get_pinned_messages', {
+        'group_id': currentGroupId.value,
+      });
+      
+      debugPrint('🔍 [GroupChatDetailController] Pin durumu isteği gönderildi: group_id=${currentGroupId.value}');
+      
+      // Kısa bir bekleme süresi (socket response için)
+      await Future.delayed(Duration(milliseconds: 500));
+      
+      debugPrint('🔍 [GroupChatDetailController] Pin durumu kontrolü tamamlandı');
+      
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Pin durumu kontrolü hatası: $e');
+    }
+  }
+
+  /// Pin durumu değişikliği için bildirim göster
+  void _showPinStatusNotification(bool isPinned, String messageContent) {
+    final action = isPinned ? 'sabitleme' : 'sabitleme kaldırma';
+    final shortMessage = messageContent.length > 30 
+        ? '${messageContent.substring(0, 30)}...' 
+        : messageContent;
+    
+    Get.snackbar(
+      isPinned ? '📌 Mesaj Sabitlendi' : '📌 Sabitleme Kaldırıldı',
+      'Mesaj: $shortMessage',
+      snackPosition: SnackPosition.TOP,
+      duration: Duration(seconds: 2),
+      backgroundColor: isPinned ? Colors.green.shade100 : Colors.orange.shade100,
+      colorText: isPinned ? Colors.green.shade800 : Colors.orange.shade800,
+      icon: Icon(
+        isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+        color: isPinned ? Colors.green : Colors.orange,
+      ),
+    );
   }
 
   @override
@@ -1560,6 +2023,8 @@ class GroupChatDetailController extends GetxController {
     pollTitleController.dispose();
     scrollController.dispose();
     _groupMessageSubscription.cancel();
+    _pinMessageSubscription.cancel(); // Pin message subscription'ı temizle
+
     _userCache.clear(); // Clear cache
     _lastMessageCount = 0; // Reset message count tracker
     super.onClose();

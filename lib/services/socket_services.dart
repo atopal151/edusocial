@@ -30,6 +30,7 @@ class SocketService extends GetxService {
   final _postNotificationController = StreamController<dynamic>.broadcast();
   final _userNotificationController = StreamController<dynamic>.broadcast();
   final _commentNotificationController = StreamController<dynamic>.broadcast();
+  final _pinMessageController = StreamController<dynamic>.broadcast();
 
   // Public streams that other parts of the app can listen to
   Stream<dynamic> get onPrivateMessage => _privateMessageController.stream;
@@ -39,6 +40,7 @@ class SocketService extends GetxService {
   Stream<dynamic> get onPostNotification => _postNotificationController.stream;
   Stream<dynamic> get onUserNotification => _userNotificationController.stream;
   Stream<dynamic> get onCommentNotification => _commentNotificationController.stream;
+  Stream<dynamic> get onPinMessage => _pinMessageController.stream;
 
   // Bağlantı adresi - farklı endpoint'leri deneyeceğiz
   static const String _socketUrl = 'https://stageapi.edusocial.pl';
@@ -238,6 +240,94 @@ class SocketService extends GetxService {
     _socket!.on('chat:unread_count', (data) {
       debugPrint('📨 Chat bazında unread count (chat:unread_count): $data');
       _handlePerChatUnreadCount(data);
+    });
+
+    // Pin/Unpin message events
+    _socket!.on('conversation:message_pinned', (data) {
+      debugPrint('📌 Message pinned event (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      _pinMessageController.add(data);
+    });
+
+    _socket!.on('conversation:message_unpinned', (data) {
+      debugPrint('📌 Message unpinned event (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      _pinMessageController.add(data);
+    });
+
+    // Group pin/unpin events
+    _socket!.on('group:message_pinned', (data) {
+      debugPrint('📌 Group message pinned event (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      _pinMessageController.add(data);
+    });
+
+    _socket!.on('group:message_unpinned', (data) {
+      debugPrint('📌 Group message unpinned event (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      _pinMessageController.add(data);
+    });
+
+    // Alternative event names for pin/unpin
+    _socket!.on('message:pinned', (data) {
+      debugPrint('📌 Message pinned event (alternative) (SocketService): $data');
+      _pinMessageController.add(data);
+    });
+
+    _socket!.on('message:unpinned', (data) {
+      debugPrint('📌 Message unpinned event (alternative) (SocketService): $data');
+      _pinMessageController.add(data);
+    });
+
+    // Custom pin/unpin events that we send
+    _socket!.on('conversation:pin_message', (data) {
+      debugPrint('📌 Conversation pin message event (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      debugPrint('📌 Broadcasting to all listeners...');
+      _pinMessageController.add(data);
+      debugPrint('📌 Broadcast completed');
+    });
+
+    // Handle pin/unpin events from onAny listener
+    _socket!.onAny((event, data) {
+      // Check if this is a pin/unpin related event
+      if (data is Map<String, dynamic> && 
+          data.containsKey('is_pinned') && 
+          (data.containsKey('conversation_id') || data.containsKey('group_id'))) {
+        
+        debugPrint('📌 Pin/Unpin event detected in onAny: $event');
+        debugPrint('📌 Event data: $data');
+        
+        // Broadcast to pin message listeners
+        _pinMessageController.add(data);
+      }
+    });
+
+    _socket!.on('group:pin_message', (data) {
+      debugPrint('📌 Group pin message event (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      _pinMessageController.add(data);
+    });
+
+    // Pin durumu kontrolü için event'ler
+    _socket!.on('group:pinned_messages', (data) {
+      debugPrint('📌 Group pinned messages response (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      _pinMessageController.add(data);
+    });
+
+    _socket!.on('group:pin_status_update', (data) {
+      debugPrint('📌 Group pin status update (SocketService): $data');
+      debugPrint('📌 Data type: ${data.runtimeType}');
+      debugPrint('📌 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      _pinMessageController.add(data);
     });
 
     _socket!.on('conversation:unread', (data) {
@@ -751,9 +841,73 @@ class SocketService extends GetxService {
 
     _socket!.on('group:chat_message', (data) {
       debugPrint('👥 Group chat message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group:chat_message - Data type: ${data.runtimeType}');
+      debugPrint('📡 [SocketService] group:chat_message - Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
       debugPrint('📡 [SocketService] group:chat_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] group:chat_message - _groupMessageController.add() tamamlandı');
+      
+      // Pin durumu kontrolü - eğer mesaj pin durumu değiştiyse pin event'ini de tetikle
+      bool pinStatusDetected = false;
+      
+      if (data is Map<String, dynamic>) {
+        // Önce message objesi içinde kontrol et
+        if (data.containsKey('message')) {
+          final messageData = data['message'] as Map<String, dynamic>?;
+          if (messageData != null && messageData.containsKey('is_pinned')) {
+            final messageId = messageData['id']?.toString();
+            final isPinned = messageData['is_pinned'] ?? false;
+            final groupId = messageData['group_id']?.toString();
+            debugPrint('📌 [SocketService] group:chat_message içinde pin durumu tespit edildi (message objesi): Message ID=$messageId, Group ID=$groupId, isPinned=$isPinned');
+            pinStatusDetected = true;
+            
+            // Pin durumu değişikliği için özel event gönder
+            if (messageId != null && groupId != null) {
+              final pinUpdateEvent = {
+                'message_id': messageId,
+                'group_id': groupId,
+                'is_pinned': isPinned,
+                'timestamp': DateTime.now().millisecondsSinceEpoch,
+                'source': 'group:chat_message',
+                'message_data': messageData,
+              };
+              
+              debugPrint('📌 [SocketService] Pin durumu değişikliği event\'i gönderiliyor: $pinUpdateEvent');
+              _pinMessageController.add(pinUpdateEvent);
+            }
+          }
+        }
+        
+        // Eğer message objesi içinde yoksa, direkt data içinde kontrol et
+        if (!pinStatusDetected && data.containsKey('is_pinned')) {
+          final messageId = data['id']?.toString();
+          final isPinned = data['is_pinned'] ?? false;
+          final groupId = data['group_id']?.toString();
+          debugPrint('📌 [SocketService] group:chat_message içinde pin durumu tespit edildi (direkt data): Message ID=$messageId, Group ID=$groupId, isPinned=$isPinned');
+          pinStatusDetected = true;
+          
+          // Pin durumu değişikliği için özel event gönder
+          if (messageId != null && groupId != null) {
+            final pinUpdateEvent = {
+              'message_id': messageId,
+              'group_id': groupId,
+              'is_pinned': isPinned,
+              'timestamp': DateTime.now().millisecondsSinceEpoch,
+              'source': 'group:chat_message',
+              'message_data': data,
+            };
+            
+            debugPrint('📌 [SocketService] Pin durumu değişikliği event\'i gönderiliyor: $pinUpdateEvent');
+            _pinMessageController.add(pinUpdateEvent);
+          }
+        }
+        
+        if (pinStatusDetected) {
+          debugPrint('📌 [SocketService] Pin event\'i tetiklendi ve PinnedMessagesWidget güncellenmeli');
+        } else {
+          debugPrint('📌 [SocketService] Pin durumu tespit edilmedi - normal mesaj event\'i');
+        }
+      }
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -1019,6 +1173,18 @@ class SocketService extends GetxService {
         _userNotificationController.add(data);
         
         // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+      }
+      
+      // Pin/Unpin event'lerini yakala
+      if (data is Map<String, dynamic> && 
+          data.containsKey('is_pinned') && 
+          (data.containsKey('conversation_id') || data.containsKey('group_id'))) {
+        
+        debugPrint('📌 Pin/Unpin event detected in onAny: $event');
+        debugPrint('📌 Event data: $data');
+        
+        // Broadcast to pin message listeners
+        _pinMessageController.add(data);
       }
     });
 
@@ -1771,6 +1937,7 @@ class SocketService extends GetxService {
     _postNotificationController.close();
     _userNotificationController.close();
     _commentNotificationController.close();
+    _pinMessageController.close();
     disconnect();
     super.onClose();
   }

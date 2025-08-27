@@ -60,6 +60,7 @@ class ChatDetailController extends GetxController {
 
   late SocketService _socketService;
   late StreamSubscription _privateMessageSubscription;
+  late StreamSubscription _pinMessageSubscription;
   bool _isSocketListenerSetup = false; // Multiple subscription guard
 
   // URL algılama için regex pattern
@@ -176,6 +177,12 @@ class ChatDetailController extends GetxController {
     _privateMessageSubscription = _socketService.onPrivateMessage.listen((data) {
       _onNewPrivateMessage(data);
     });
+
+    // Pin/Unpin message listener
+    _pinMessageSubscription = _socketService.onPinMessage.listen((data) {
+      debugPrint('🔔 [ChatDetailController] Pin message event received from socket: $data');
+      _onPinMessageUpdate(data);
+    });
     
     _isSocketListenerSetup = true;
     debugPrint('✅ ChatDetailController socket listeners setup completed');
@@ -202,6 +209,7 @@ class ChatDetailController extends GetxController {
     linksScrollController.dispose();
     photosScrollController.dispose();
     _privateMessageSubscription.cancel();
+    _pinMessageSubscription.cancel();
     super.onClose();
   }
 
@@ -250,6 +258,63 @@ class ChatDetailController extends GetxController {
       }
     } catch (e) {
       debugPrint('❌ [ChatDetailController] _onNewPrivateMessage error: $e');
+    }
+  }
+
+  void _onPinMessageUpdate(dynamic data) {
+    try {
+      debugPrint('📌 [ChatDetailController] Pin message update received: $data');
+      debugPrint('📌 [ChatDetailController] Data type: ${data.runtimeType}');
+      debugPrint('📌 [ChatDetailController] Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      if (data is Map<String, dynamic>) {
+        // Try different possible field names for message ID
+        final messageId = data['message_id'] ?? data['id'] ?? data['messageId'];
+        final isPinned = data['is_pinned'] ?? data['pinned'] ?? data['isPinned'] ?? false;
+        final conversationId = data['conversation_id']?.toString() ?? data['conversationId']?.toString();
+        
+        debugPrint('📌 [ChatDetailController] Message ID: $messageId');
+        debugPrint('📌 [ChatDetailController] Is Pinned: $isPinned');
+        debugPrint('📌 [ChatDetailController] Conversation ID: $conversationId');
+        debugPrint('📌 [ChatDetailController] Current Conversation ID: ${currentConversationId.value}');
+        
+        // Check if this pin update is for the current conversation
+        if (conversationId != null && conversationId == currentConversationId.value) {
+          // Find the message in the current conversation and update its pin status
+          final messageIndex = messages.indexWhere((msg) => msg.id.toString() == messageId.toString());
+          
+          if (messageIndex != -1) {
+            // Update the message's pin status
+            final updatedMessage = messages[messageIndex].copyWith(isPinned: isPinned);
+            messages[messageIndex] = updatedMessage;
+            
+            debugPrint('✅ [ChatDetailController] Message pin status updated: ID $messageId, Pinned: $isPinned');
+            debugPrint('✅ [ChatDetailController] Messages list length: ${messages.length}');
+            debugPrint('✅ [ChatDetailController] Updated message at index: $messageIndex');
+            
+            // Force UI update by refreshing the messages list
+            messages.refresh();
+            
+            // Also trigger controller update
+            update();
+            
+            // Force GetBuilder to rebuild
+            Get.find<ChatDetailController>().update();
+            
+            debugPrint('✅ [ChatDetailController] UI update triggered');
+          } else {
+            debugPrint('⚠️ [ChatDetailController] Message not found in current conversation: ID $messageId');
+            debugPrint('⚠️ [ChatDetailController] Available message IDs: ${messages.map((m) => m.id).toList()}');
+          }
+        } else {
+          debugPrint('📨 [ChatDetailController] Pin update is not for current conversation. Gelen: $conversationId, Mevcut: ${currentConversationId.value}');
+        }
+      } else {
+        debugPrint('❌ [ChatDetailController] Data is not a Map: ${data.runtimeType}');
+      }
+    } catch (e) {
+      debugPrint('❌ [ChatDetailController] _onPinMessageUpdate error: $e');
+      debugPrint('❌ [ChatDetailController] Error stack trace: ${e.toString()}');
     }
   }
 

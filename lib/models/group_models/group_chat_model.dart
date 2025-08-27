@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class GroupChatModel {
   final int id;
   final int groupId;
@@ -13,6 +15,7 @@ class GroupChatModel {
   final List<GroupChatLinkModel> groupChatLink;
   final int? surveyId;
   final Map<String, dynamic>? survey;
+  final bool isPinned; // Pin status field
 
   GroupChatModel({
     required this.id,
@@ -29,9 +32,15 @@ class GroupChatModel {
     required this.groupChatLink,
     this.surveyId,
     this.survey,
+    this.isPinned = false, // Default to false
   });
 
   factory GroupChatModel.fromJson(Map<String, dynamic> json) {
+    // Parse pin status
+    final isPinned = json['is_pinned'] == true || (json['is_pinned'] is int && json['is_pinned'] == 1);
+    
+
+    
     return GroupChatModel(
       id: json['id'] ?? 0,
       groupId: json['group_id'] ?? 0,
@@ -53,6 +62,7 @@ class GroupChatModel {
           [],
       surveyId: json['survey_id'],
       survey: json['survey'] as Map<String, dynamic>?,
+      isPinned: isPinned,
     );
   }
 }

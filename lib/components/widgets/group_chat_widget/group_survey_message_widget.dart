@@ -95,28 +95,9 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (widget.controller.isCurrentUserAdmin) ...[
-                GestureDetector(
-                  onTap: () {
-                    widget.controller.pinMessage(message.id);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.push_pin,
-                      size: 16,
-                      color: message.isPinned 
-                          ? const Color(0xff414751)
-                          : const Color(0xff9ca3ae),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-              ],
+
               GestureDetector(
-                onLongPress: () {
-                  _showPinOptions(context);
-                },
+
                 child: Container(
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -168,24 +149,7 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
                   ),
                 ),
               ),
-              if (widget.controller.isCurrentUserAdmin) ...[
-                const SizedBox(width: 4),
-                GestureDetector(
-                  onTap: () {
-                    widget.controller.pinMessage(message.id);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.push_pin,
-                      size: 16,
-                      color: message.isPinned 
-                          ? const Color(0xff414751)
-                          : const Color(0xff9ca3ae),
-                    ),
-                  ),
-                ),
-              ],
+
             ],
           ),
         ],
@@ -304,46 +268,5 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
     );
   }
 
-  void _showPinOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(
-                  widget.message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-                  color: Colors.amber,
-                ),
-                title: Text(
-                  widget.message.isPinned ? 'Unpin Message' : 'Pin Message',
-                  style: GoogleFonts.inter(fontSize: 16),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.controller.pinMessage(widget.message.id);
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.copy, color: Colors.blue),
-                title: Text(
-                  'Copy Message',
-                  style: GoogleFonts.inter(fontSize: 16),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Copy message to clipboard
-                  // You can implement clipboard functionality here
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+
 }

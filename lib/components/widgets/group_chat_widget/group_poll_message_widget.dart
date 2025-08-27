@@ -49,6 +49,8 @@ class GroupPollMessageWidget extends StatelessWidget {
               '@${message.username}',
               style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
+            
+
             if (message.isSentByMe)
               Padding(
                 padding: const EdgeInsets.only(left: 6.0, right: 8.0),
@@ -78,10 +80,10 @@ class GroupPollMessageWidget extends StatelessWidget {
           child: Align(
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
             child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.7,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: message.isSentByMe 
                     ? const Color(0xFFff7c7c) // Kırmızı

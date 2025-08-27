@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:get_storage/get_storage.dart';   
 import 'bindings/initial_bindings.dart';
 import 'routes/app_routes.dart';
 import 'services/language_service.dart';
@@ -43,7 +43,7 @@ void main() async {
   
   // PinMessageService'i başlat
   Get.put(PinMessageService());
-  
+
   // SocketService'i al ve bağlantı kur
   final socketService = Get.find<SocketService>();
   final token = GetStorage().read('token');
@@ -95,7 +95,7 @@ class GetTranslations extends Translations {
       // Varsayılan boş çeviriler döndür
       return {
         'en': {},
-        'tr': {},
+        'tr': {},  
       };
     }
   }
