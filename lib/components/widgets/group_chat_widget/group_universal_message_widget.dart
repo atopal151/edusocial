@@ -162,7 +162,18 @@ class GroupUniversalMessageWidget extends StatelessWidget {
               style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
             
-            // Pin iconu - sadece admin için göster (tüm mesajlar için)
+            // Pin iconu - mesaj pinlendiğinde göster (tüm kullanıcılar için)
+            if (message.isPinned)
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Icon(
+                  Icons.push_pin,
+                  size: 14,
+                  color: Color(0xFFff7c7c),
+                ),
+              ),
+            
+            // Admin pin/unpin butonu - sadece admin için göster
             if (controller.isCurrentUserAdmin)
               GestureDetector(
                 onTap: () => _handlePinMessage(),
@@ -204,75 +215,77 @@ class GroupUniversalMessageWidget extends StatelessWidget {
           ),
           child: Align(
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.7,
-                ),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: message.isSentByMe 
-                      ? const Color(0xFFff7c7c) // Kırmızı
-                      : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: const Radius.circular(18),
-                    bottomRight: const Radius.circular(18),
-                    topLeft: message.isSentByMe 
-                        ? const Radius.circular(18) 
-                        : const Radius.circular(4),
-                    topRight: message.isSentByMe 
-                        ? const Radius.circular(4) 
-                        : const Radius.circular(18),
+            child: Stack(
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.7,
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Text içeriği (varsa)
-                    if (hasText && displayText.isNotEmpty) ...[
-                      Text(
-                        displayText,
-                        style: GoogleFonts.inter(
-                          color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    
-                    // Image içeriği (varsa)
-                    if (hasImage) ...[
-                      _buildImageContent(),
-                      const SizedBox(height: 8),
-                    ],
-                    
-                    // Link içeriği (varsa)
-                    if (allLinks.isNotEmpty) ...[
-                      _buildLinkContent(allLinks),
-                    ],
-                    
-                    const SizedBox(height: 4),
-                    // Saat bilgisi mesaj balonunun içinde sağ altta
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: message.isSentByMe 
+                        ? const Color(0xFFff7c7c) // Kırmızı
+                        : Colors.white,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: const Radius.circular(18),
+                      bottomRight: const Radius.circular(18),
+                      topLeft: message.isSentByMe 
+                          ? const Radius.circular(18) 
+                          : const Radius.circular(4),
+                      topRight: message.isSentByMe 
+                          ? const Radius.circular(4) 
+                          : const Radius.circular(18),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Text içeriği (varsa)
+                      if (hasText && displayText.isNotEmpty) ...[
                         Text(
-                          _formatTime(message.timestamp),
+                          displayText,
                           style: GoogleFonts.inter(
-                            fontSize: 8,
-                            color: message.isSentByMe 
-                                ? Colors.white.withValues(alpha: 0.8)
-                                : const Color(0xff8E8E93),
+                            color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                            fontSize: 14,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
+                        const SizedBox(height: 8),
                       ],
-                    ),
-                  ],
+                      
+                      // Image içeriği (varsa)
+                      if (hasImage) ...[
+                        _buildImageContent(),
+                        const SizedBox(height: 8),
+                      ],
+                      
+                      // Link içeriği (varsa)
+                      if (allLinks.isNotEmpty) ...[
+                        _buildLinkContent(allLinks),
+                      ],
+                      
+                      const SizedBox(height: 4),
+                      // Saat bilgisi mesaj balonunun içinde sağ altta
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            _formatTime(message.timestamp),
+                            style: GoogleFonts.inter(
+                              fontSize: 8,
+                              color: message.isSentByMe 
+                                  ? Colors.white.withOpacity(0.8)
+                                  : const Color(0xff8E8E93),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),

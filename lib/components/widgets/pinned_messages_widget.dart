@@ -26,6 +26,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   late StreamSubscription _groupMessageSubscription;
   bool _isListening = false;
   Timer? _refreshTimer;
+  bool _isExpanded = false; // Show more/less state
 
   @override
   void initState() {
@@ -61,22 +62,27 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         _pinUpdateSubscription = socketService.onPinMessage.listen((data) {
           if (mounted) {
             print('📌 [PinnedMessagesWidget] Pin update event received: $data');
-            
+
             // Pin durumu değişikliği kontrolü
             if (data is Map<String, dynamic>) {
               final isPinned = data['is_pinned'] ?? false;
               final messageId = data['message_id']?.toString();
               final source = data['source'];
               final action = data['action'];
-              
-              print('📌 [PinnedMessagesWidget] Pin status change detected: Message ID=$messageId, isPinned=$isPinned, Source=$source, Action=$action');
-              
-              if (!isPinned || source == 'group:unpin_message' || action == 'unpin') {
-                print('📌 [PinnedMessagesWidget] UNPIN detected - Forcing widget refresh');
+
+              print(
+                  '📌 [PinnedMessagesWidget] Pin status change detected: Message ID=$messageId, isPinned=$isPinned, Source=$source, Action=$action');
+
+              if (!isPinned ||
+                  source == 'group:unpin_message' ||
+                  action == 'unpin') {
+                print(
+                    '📌 [PinnedMessagesWidget] UNPIN detected - Forcing widget refresh');
                 // Unpin durumunda widget'ı zorla yenile
                 _forceWidgetRefresh();
               } else {
-                print('📌 [PinnedMessagesWidget] PIN detected - Updating widget');
+                print(
+                    '📌 [PinnedMessagesWidget] PIN detected - Updating widget');
                 setState(() {
                   // Widget'ı yeniden oluştur
                 });
@@ -88,21 +94,23 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
             }
           }
         });
-        
+
         // Group message events'ini de dinle
         _groupMessageSubscription = socketService.onGroupMessage.listen((data) {
           if (mounted) {
-            print('📌 [PinnedMessagesWidget] Group message event received: $data');
-            
+            print(
+                '📌 [PinnedMessagesWidget] Group message event received: $data');
+
             // Pin durumu kontrolü
             if (data is Map<String, dynamic> && data.containsKey('message')) {
               final messageData = data['message'] as Map<String, dynamic>?;
               if (messageData != null && messageData.containsKey('is_pinned')) {
                 final isPinned = messageData['is_pinned'] ?? false;
                 final messageId = messageData['id']?.toString();
-                
-                print('📌 [PinnedMessagesWidget] Group message pin status: Message ID=$messageId, isPinned=$isPinned');
-                
+
+                print(
+                    '📌 [PinnedMessagesWidget] Group message pin status: Message ID=$messageId, isPinned=$isPinned');
+
                 // Widget'ı yenile
                 setState(() {
                   // Widget'ı yeniden oluştur
@@ -111,7 +119,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
             }
           }
         });
-        
+
         _isListening = true;
         print('📌 [PinnedMessagesWidget] Pin update listener setup completed');
       } catch (e) {
@@ -123,12 +131,12 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Widget'ı zorla yenile (unpin işlemleri için)
   void _forceWidgetRefresh() {
     print('📌 [PinnedMessagesWidget] Force refresh called');
-    
+
     // Önce setState ile yenile
     setState(() {
       // Widget'ı yeniden oluştur
     });
-    
+
     // Sonra kısa bir gecikme ile tekrar yenile (unpin işlemi için)
     Future.delayed(Duration(milliseconds: 50), () {
       if (mounted) {
@@ -152,9 +160,8 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   Widget _buildPrivatePinnedMessages() {
     return Obx(() {
       final controller = Get.find<ChatDetailController>();
-      final pinnedMessages = controller.messages
-          .where((msg) => msg.isPinned)
-          .toList();
+      final pinnedMessages =
+          controller.messages.where((msg) => msg.isPinned).toList();
 
       if (pinnedMessages.isEmpty) {
         return const SizedBox.shrink();
@@ -170,12 +177,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.push_pin,
-                  size: 16,
-                  color: const Color(0xff414751),
-                ),
-                const SizedBox(width: 8),
                 Text(
                   'Sabitlenen Mesajlar',
                   style: GoogleFonts.inter(
@@ -195,15 +196,62 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
               ],
             ),
             const SizedBox(height: 8),
-            ...pinnedMessages.take(3).map((message) => _buildPinnedMessageItem(message)),
-            if (pinnedMessages.length > 3)
+            // Show first message or all messages based on expanded state
+            if (_isExpanded && pinnedMessages.length > 5)
+              // Scrollable container for more than 5 messages
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 350, // Maximum height for scrollable area
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ...pinnedMessages.map((message) => _buildPinnedMessageItem(message)),
+                    ],
+                  ),
+                ),
+              )
+            else if (_isExpanded)
+              // Show all messages without scroll for 5 or fewer messages
+              ...pinnedMessages.map((message) => _buildPinnedMessageItem(message))
+            else
+              // Show only first message when collapsed
+              ...pinnedMessages.take(1).map((message) => _buildPinnedMessageItem(message)),
+            
+            // Show more/less button if there are more than 1 message
+            if (pinnedMessages.length > 1)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  've ${pinnedMessages.length - 3} mesaj daha...',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: const Color(0xff9ca3ae),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                   
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          size: 16,
+                          color: const Color(0xff6b7280),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _isExpanded 
+                              ? 'Daha az göster' 
+                              : '${pinnedMessages.length - 1} mesaj daha göster',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xff6b7280),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -219,26 +267,17 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final allMessages = controller.messages;
       final pinnedMessages = allMessages.where((msg) => msg.isPinned).toList();
 
-      // Debug log'ları ekle
-      print('🔍 [PinnedMessagesWidget] Total messages: ${allMessages.length}');
-      print('🔍 [PinnedMessagesWidget] Pinned messages: ${pinnedMessages.length}');
-      print('🔍 [PinnedMessagesWidget] Widget rebuild triggered at: ${DateTime.now()}');
       
       // Pinlenmiş mesajların detaylarını logla
       for (int i = 0; i < allMessages.length; i++) {
         final msg = allMessages[i];
         if (msg.isPinned) {
-          print('🔍 [PinnedMessagesWidget] Pinned message $i: ID=${msg.id}, Content="${msg.content}", Username=${msg.username}');
+         
         }
       }
-      
+
       // Pinlenmiş mesajlar varsa widget'ı göster
-      if (pinnedMessages.isNotEmpty) {
-        print('🔍 [PinnedMessagesWidget] Widget gösteriliyor - ${pinnedMessages.length} pinlenmiş mesaj');
-        print('🔍 [PinnedMessagesWidget] İlk 3 pinlenmiş mesaj: ${pinnedMessages.take(3).map((m) => 'ID=${m.id}').join(', ')}');
-      } else {
-        print('🔍 [PinnedMessagesWidget] Widget gizleniyor - pinlenmiş mesaj yok');
-      }
+     
 
       if (pinnedMessages.isEmpty) {
         return const SizedBox.shrink();
@@ -254,12 +293,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.push_pin,
-                  size: 16,
-                  color: const Color(0xff414751),
-                ),
-                const SizedBox(width: 8),
                 Text(
                   'Sabitlenen Mesajlar',
                   style: GoogleFonts.inter(
@@ -279,15 +312,62 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
               ],
             ),
             const SizedBox(height: 8),
-            ...pinnedMessages.take(3).map((message) => _buildGroupPinnedMessageItem(message)),
-            if (pinnedMessages.length > 3)
+            // Show first message or all messages based on expanded state
+            if (_isExpanded && pinnedMessages.length > 5)
+              // Scrollable container for more than 5 messages
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 350, // Maximum height for scrollable area
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ...pinnedMessages.map((message) => _buildGroupPinnedMessageItem(message)),
+                    ],
+                  ),
+                ),
+              )
+            else if (_isExpanded)
+              // Show all messages without scroll for 5 or fewer messages
+              ...pinnedMessages.map((message) => _buildGroupPinnedMessageItem(message))
+            else
+              // Show only first message when collapsed
+              ...pinnedMessages.take(1).map((message) => _buildGroupPinnedMessageItem(message)),
+            
+            // Show more/less button if there are more than 1 message
+            if (pinnedMessages.length > 1)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  've ${pinnedMessages.length - 3} mesaj daha...',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: const Color(0xff9ca3ae),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          size: 16,
+                          color: const Color(0xff6b7280),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _isExpanded 
+                              ? 'Daha az göster' 
+                              : '${pinnedMessages.length - 1} mesaj daha göster',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xff6b7280),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -302,60 +382,65 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     final content = message.message;
     final timestamp = DateTime.tryParse(message.createdAt) ?? DateTime.now();
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: const Color(0xfff9fafb),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 12,
-            backgroundColor: Colors.grey[300],
-            child: Text(
-              username.isNotEmpty ? username[0].toUpperCase() : '?',
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+    return GestureDetector(
+      onTap: () => _navigateToMessage(message.id),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xfff9fafb),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 12,
+              backgroundColor: Colors.grey[300],
+              child: Text(
+                username.isNotEmpty ? username[0].toUpperCase() : '?',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '@$username',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xff414751),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '@$username',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xff414751),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  content.length > 50 ? '${content.substring(0, 50)}...' : content,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: const Color(0xff6b7280),
+                  const SizedBox(height: 2),
+                  Text(
+                    content.length > 50
+                        ? '${content.substring(0, 50)}...'
+                        : content,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: const Color(0xff6b7280),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}',
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              color: const Color(0xff9ca3ae),
+            const SizedBox(width: 8),
+            Text(
+              '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}',
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: const Color(0xff9ca3ae),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -365,61 +450,158 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     final content = message.content;
     final timestamp = message.timestamp;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: const Color(0xfff9fafb),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 12,
-            backgroundColor: Colors.grey[300],
-            child: Text(
-              username.isNotEmpty ? username[0].toUpperCase() : '?',
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+    return GestureDetector(
+      onTap: () => _navigateToGroupMessage(message.id),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xfff9fafb),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+           
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 12,
+              backgroundColor: Colors.grey[300],
+              child: Text(
+                username.isNotEmpty ? username[0].toUpperCase() : '?',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '@$username',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xff414751),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '@$username',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xff414751),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  content.length > 50 ? '${content.substring(0, 50)}...' : content,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: const Color(0xff6b7280),
+                  const SizedBox(height: 2),
+                  Text(
+                    content.length > 50
+                        ? '${content.substring(0, 50)}...'
+                        : content,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: const Color(0xff6b7280),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}',
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              color: const Color(0xff9ca3ae),
+            const SizedBox(width: 8),
+            Text(
+              '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}',
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: const Color(0xff9ca3ae),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  /// Private chat mesajına git
+  void _navigateToMessage(int messageId) {
+    try {
+      print('📌 [PinnedMessagesWidget] Navigating to private message: $messageId');
+      
+      final controller = Get.find<ChatDetailController>();
+      
+      // Mesajın index'ini bul
+      final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
+      
+      if (messageIndex != -1) {
+        print('📌 [PinnedMessagesWidget] Message found at index: $messageIndex');
+        
+        // ScrollController varsa o mesaja git
+        if (controller.scrollController != null) {
+          // Ekran yüksekliğini al
+          final screenHeight = MediaQuery.of(Get.context!).size.height;
+          
+          // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 100px)
+          final messagePosition = messageIndex * 100.0;
+          
+          // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
+          final targetPosition = messagePosition - (screenHeight / 2) + 50; // 50px offset for better centering
+          
+          // Negatif pozisyon olmaması için kontrol et
+          final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
+          
+          controller.scrollController!.animateTo(
+            finalPosition,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+          
+          print('📌 [PinnedMessagesWidget] Scrolled to center position: $finalPosition');
+        } else {
+          print('❌ [PinnedMessagesWidget] ScrollController not found');
+        }
+      } else {
+        print('❌ [PinnedMessagesWidget] Message not found with ID: $messageId');
+      }
+    } catch (e) {
+      print('❌ [PinnedMessagesWidget] Navigation error: $e');
+    }
+  }
+
+  /// Group chat mesajına git
+  void _navigateToGroupMessage(String messageId) {
+    try {
+      print('📌 [PinnedMessagesWidget] Navigating to group message: $messageId');
+      
+      final controller = Get.find<GroupChatDetailController>();
+      
+      // Mesajın index'ini bul
+      final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
+      
+      if (messageIndex != -1) {
+        print('📌 [PinnedMessagesWidget] Group message found at index: $messageIndex');
+        
+        // ScrollController varsa o mesaja git
+        if (controller.scrollController != null) {
+          // Ekran yüksekliğini al
+          final screenHeight = MediaQuery.of(Get.context!).size.height;
+          
+          // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 120px)
+          final messagePosition = messageIndex * 120.0;
+          
+          // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
+          final targetPosition = messagePosition - (screenHeight / 2) + 60; // 60px offset for better centering
+          
+          // Negatif pozisyon olmaması için kontrol et
+          final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
+          
+          controller.scrollController!.animateTo(
+            finalPosition,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+          
+          print('📌 [PinnedMessagesWidget] Scrolled to group message center position: $finalPosition');
+        } else {
+          print('❌ [PinnedMessagesWidget] Group ScrollController not found');
+        }
+      } else {
+        print('❌ [PinnedMessagesWidget] Group message not found with ID: $messageId');
+      }
+    } catch (e) {
+      print('❌ [PinnedMessagesWidget] Group navigation error: $e');
+    }
   }
 }
