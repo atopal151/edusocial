@@ -162,8 +162,8 @@ class GroupUniversalMessageWidget extends StatelessWidget {
               style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
             ),
             
-            // Pin iconu - mesaj pinlendiğinde göster (tüm kullanıcılar için)
-            if (message.isPinned)
+            // Pin iconu - mesaj pinlendiğinde göster (admin olmayan kullanıcılar için)
+            if (message.isPinned && !controller.isCurrentUserAdmin)
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Icon(

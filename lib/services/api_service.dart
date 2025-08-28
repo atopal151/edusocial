@@ -49,4 +49,18 @@ class ApiService extends GetxService {
       rethrow;
     }
   }
+
+  // Pin/Unpin message endpoint
+  Future<dio.Response> pinUnpinMessage(int messageId, {Map<String, dynamic>? headers}) async {
+    try {
+      final response = await _dio.post(
+        '/conversation-pin',
+        data: {'message_id': messageId},
+        options: dio.Options(headers: headers),
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

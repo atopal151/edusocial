@@ -21,6 +21,7 @@ class GroupDetailModel {
   final String? avatarUrl;
   final String? bannerUrl;
   final String humanCreatedAt;
+  final String? conversationId; // Group chat için conversation ID
   final List<DocumentModel> documents;
   final List<LinkModel> links;
   final List<String> photoUrls;
@@ -47,6 +48,7 @@ class GroupDetailModel {
     this.avatarUrl,
     this.bannerUrl,
     required this.humanCreatedAt,
+    this.conversationId,
     required this.documents,
     required this.links,
     required this.photoUrls,
@@ -78,6 +80,7 @@ class GroupDetailModel {
       avatarUrl: group['avatar_url'],
       bannerUrl: group['banner_url'],
       humanCreatedAt: group['human_created_at'] ?? '',
+      conversationId: group['conversation_id']?.toString(),
       documents: (group['documents'] as List<dynamic>?)
               ?.map((doc) => DocumentModel.fromJson(doc))
               .toList() ??

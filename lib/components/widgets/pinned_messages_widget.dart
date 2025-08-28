@@ -457,6 +457,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     final username = message.username;
     final content = message.content;
     final timestamp = message.timestamp;
+    final controller = Get.find<GroupChatDetailController>();
 
     return GestureDetector(
       onTap: () => _navigateToGroupMessage(message.id),
@@ -469,8 +470,17 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         ),
         child: Row(
           children: [
-           
-            const SizedBox(width: 8),
+            // Pin icon - admin olmayan kullanıcılar için kırmızı pin
+            if (!controller.isCurrentUserAdmin)
+              Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: Icon(
+                  Icons.push_pin,
+                  size: 12,
+                  color: const Color(0xFFff7c7c),
+                ),
+              ),
+            
             CircleAvatar(
               radius: 12,
               backgroundColor: Colors.grey[300],

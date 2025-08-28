@@ -16,7 +16,6 @@ import '../../services/socket_services.dart';
 import '../../services/survey_service.dart';
 
 import '../profile_controller.dart';
-import 'chat_controller.dart'; // Added import for ChatController
 import '../../components/snackbars/custom_snackbar.dart';
 
 class GroupChatDetailController extends GetxController {
@@ -31,6 +30,9 @@ class GroupChatDetailController extends GetxController {
   final RxString currentGroupId = ''.obs;
   final groupData = Rx<GroupDetailModel?>(null);
   final TextEditingController messageController = TextEditingController();
+  
+  // Group chat için conversation ID mapping
+  final RxString currentConversationId = ''.obs;
 
   // Socket service ile ilgili değişkenler
   late SocketService _socketService;
@@ -246,6 +248,12 @@ class GroupChatDetailController extends GetxController {
       }
       
       groupData.value = group;
+      
+      // Group chat için conversation_id'yi güncelle
+      if (group.conversationId != null) {
+        currentConversationId.value = group.conversationId!;
+        print('📌 [GroupChatDetailController] Updated conversation ID from group data: ${group.conversationId}');
+      }
       
       // OPTIMIZE: Process messages in background
       Future.microtask(() {
