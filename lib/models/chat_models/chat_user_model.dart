@@ -5,6 +5,7 @@ class ChatUserModel {
   final String profileImage;
   final bool isOnline;
   final bool isRecent;
+  final bool? isVerified; // Hesap doğrulama durumu
 
   ChatUserModel({
     required this.id,
@@ -13,6 +14,7 @@ class ChatUserModel {
     required this.profileImage,
     this.isOnline = false,
     this.isRecent = false,
+    this.isVerified,
   });
 
   factory ChatUserModel.fromJson(Map<String, dynamic>? json) {
@@ -31,6 +33,7 @@ class ChatUserModel {
       profileImage: json['avatar'] ?? '',
       isOnline: json['is_online'] ?? false,
       isRecent: json['is_recent'] ?? false,
+      isVerified: json['is_verified'],
     );
   }
 
@@ -42,6 +45,7 @@ class ChatUserModel {
       'avatar': profileImage,
       'is_online': isOnline,
       'is_recent': isRecent,
+      'is_verified': isVerified,
     };
   }
 }

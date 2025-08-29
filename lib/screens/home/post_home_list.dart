@@ -57,6 +57,7 @@ class PostHomeList extends StatelessWidget {
               isLiked: post.isLiked,
               isOwner: post.isOwner,
               slug: post.slug,
+              isVerified: post.isVerified,
             ),
           );
         }).toList(),

@@ -8,6 +8,7 @@ class GroupChatModel {
   String lastMessageTime;
   int unreadCount;
   bool hasUnreadMessages; // Okunmamış mesaj var mı?
+  bool isAdmin; // Admin mi?
 
   GroupChatModel({
     required this.groupId,
@@ -17,13 +18,12 @@ class GroupChatModel {
     required this.lastMessageTime,
     this.unreadCount = 0,
     this.hasUnreadMessages = false, // Başlangıçta false
+    this.isAdmin = false, // Başlangıçta false
   });
 
   factory GroupChatModel.fromJson(Map<String, dynamic> json) {
     // Önce unread_messages_total_count'u dene, yoksa unread_count'u kullan
     final unreadCount = json['unread_messages_total_count'] ?? json['unread_count'] ?? 0;
-    
-   
     
     return GroupChatModel(
       groupId: json['group_id'] ?? 0,
@@ -32,6 +32,7 @@ class GroupChatModel {
       lastMessage: json['last_message'] ?? '',
       lastMessageTime: json['last_message_time'] ?? '',
       unreadCount: unreadCount,
+      isAdmin: json['is_founder'] ?? false, // is_founder field'ını isAdmin olarak kullan
     );
   }
 

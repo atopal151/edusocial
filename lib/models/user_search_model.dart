@@ -7,6 +7,7 @@ class UserSearchModel {
   final bool isOnline;
   final bool isFollowing;
   final bool isFollowingPending;
+  final bool? isVerified; // Hesap doğrulama durumu
 
   UserSearchModel({
     required this.id,
@@ -17,6 +18,7 @@ class UserSearchModel {
     required this.isOnline,
     required this.isFollowing,
     required this.isFollowingPending,
+    this.isVerified,
   });
 
   factory UserSearchModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class UserSearchModel {
       isOnline: json['is_online'],
       isFollowing: json['is_following'],
       isFollowingPending: json['is_following_pending'],
+      isVerified: json['is_verified'],
     );
   }
 }

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../components/user_appbar/back_appbar.dart';
 import '../../services/language_service.dart';
+import '../../controllers/verification_controller.dart';
 
 class VerificationUploadScreen extends StatefulWidget {
   const VerificationUploadScreen({super.key});
@@ -18,13 +18,11 @@ class VerificationUploadScreen extends StatefulWidget {
 }
 
 class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
-  String? uploadedFileName;
-  File? uploadedFile;
-  final ImagePicker _picker = ImagePicker();
+  final VerificationController controller = Get.put(VerificationController());
   final Map<String, String> documentTypeNames = {
     'passport': 'passport',
     'id_card': 'id_card',
-    'driverLicense': 'driverLicense',
+    'driver_license': 'driverLicense',
   };
 
   @override
@@ -33,7 +31,6 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
     final String documentType = Get.arguments['documentType'] ?? 'passport';
     final String documentTypeKey =
         documentTypeNames[documentType] ?? 'passport';
-    final bool hasFile = uploadedFileName != null;
 
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
@@ -97,10 +94,9 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                       child: Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(16),
-                       
-                        child: hasFile
+                        child: Obx(() => controller.hasFile
                             ? _buildFileUploaded()
-                            : _buildUploadPrompt(),
+                            : _buildUploadPrompt()),
                       ),
                     ),
                   ],
@@ -144,28 +140,20 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
               right: 0,
               child: Container(
                 padding: EdgeInsets.all(20),
-                child: SizedBox(
+                child: Obx(() => SizedBox(
                   width: double.infinity,
                   child: CustomButton(
                     text: languageService.tr("verification.actions.verify"),
                     height: 50,
                     borderRadius: 16,
-                    isLoading: false.obs,
+                    isLoading: controller.isLoading,
                     backgroundColor: Color(0xfffb535c),
                     textColor: Colors.white,
-                    onPressed: uploadedFileName != null
-                        ? () {
-                            CustomSnackbar.show(
-                              title: languageService
-                                  .tr("verification.snackbar.success"),
-                              message: languageService.tr(
-                                  "verification.messages.verificationSuccess"),
-                              type: SnackbarType.success,
-                            );
-                          }
+                    onPressed: controller.canSendVerification
+                        ? () => controller.sendVerification()
                         : () {},
                   ),
-                ),
+                )),
               ),
             ),
           ],
@@ -241,9 +229,9 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(7),
-            child: uploadedFile != null
+            child: Obx(() => controller.uploadedFile.value != null
                 ? Image.file(
-                    uploadedFile!,
+                    controller.uploadedFile.value!,
                     width: 48,
                     height: 48,
                     fit: BoxFit.cover,
@@ -265,7 +253,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                       color: Color(0xff9ca3ae),
                       size: 24,
                     ),
-                  ),
+                  )),
           ),
         ),
         SizedBox(width: 12),
@@ -273,8 +261,10 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                uploadedFileName ?? "image.jpg",
+              Obx(() => Text(
+                controller.uploadedFileName.value.isNotEmpty 
+                    ? controller.uploadedFileName.value 
+                    : "image.jpg",
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -282,7 +272,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-              ),
+              )),
               GestureDetector(
                 onTap: () => _showFileOptions(),
                 child: Text(
@@ -304,7 +294,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: GestureDetector(
-            onTap: () => _removeFile(),
+            onTap: () => controller.removeFile(),
             child: SvgPicture.asset(
               'images/icons/delete.svg',
               width: 18,
@@ -318,7 +308,6 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
 
   void _showFileOptions() {
     showModalBottomSheet(
-      
       backgroundColor: Color(0xffffffff),
       context: context,
       builder: (context) => Container(
@@ -327,7 +316,7 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading:  CircleAvatar(
+              leading: CircleAvatar(
                 radius: 18,
                 backgroundColor: Color(0xffffeded),
                 child: const Icon(Icons.camera_alt, color: Color(0xffef5050), size: 20),
@@ -335,11 +324,11 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
               title: Text('Camera'),
               onTap: () {
                 Navigator.pop(context);
-                _uploadFile('camera');
+                controller.uploadFile('camera');
               },
             ),
             ListTile(
-              leading:  CircleAvatar(
+              leading: CircleAvatar(
                 radius: 18,
                 backgroundColor: Color(0xffffeded),
                 child: const Icon(Icons.photo_library, color: Color(0xffef5050), size: 20),
@@ -347,72 +336,12 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
               title: Text('Gallery'),
               onTap: () {
                 Navigator.pop(context);
-                _uploadFile('gallery');
+                controller.uploadFile('gallery');
               },
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Future<void> _uploadFile(String source) async {
-    try {
-      XFile? pickedFile;
-      
-      if (source == 'camera') {
-        pickedFile = await _picker.pickImage(
-          source: ImageSource.camera,
-          maxWidth: 1920,
-          maxHeight: 1080,
-          imageQuality: 85,
-        );
-      } else if (source == 'gallery') {
-        pickedFile = await _picker.pickImage(
-          source: ImageSource.gallery,
-          maxWidth: 1920,
-          maxHeight: 1080,
-          imageQuality: 85,
-        );
-      }
-
-      if (pickedFile != null) {
-        final file = File(pickedFile.path);
-        final fileName = pickedFile.name;
-        setState(() {
-          uploadedFile = file;
-          uploadedFileName = fileName;
-        });
-
-        final LanguageService languageService = Get.find<LanguageService>();
-        CustomSnackbar.show(
-          title: languageService.tr("verification.snackbar.success"),
-          message: languageService.tr("verification.messages.fileUploadSuccess"),
-          type: SnackbarType.success,
-        );
-      }
-    } catch (e) {
-      debugPrint("❌ Dosya yükleme hatası: $e");
-      final LanguageService languageService = Get.find<LanguageService>();
-      CustomSnackbar.show(
-        title: languageService.tr("verification.snackbar.error"),
-        message: languageService.tr("verification.messages.fileUploadError"),
-        type: SnackbarType.error,
-      );
-    }
-  }
-
-  void _removeFile() {
-    setState(() {
-      uploadedFileName = null;
-      uploadedFile = null;
-    });
-
-    final LanguageService languageService = Get.find<LanguageService>();
-    CustomSnackbar.show(
-      title: languageService.tr("verification.snackbar.success"),
-      message: languageService.tr("verification.messages.fileRemoved"),
-      type: SnackbarType.success,
     );
   }
 }

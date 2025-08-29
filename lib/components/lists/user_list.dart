@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../models/user_search_model.dart';
+import '../widgets/verification_badge.dart';
 
 class UserListItem extends StatelessWidget {
   final UserSearchModel user;
@@ -73,11 +74,22 @@ class UserListItem extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${user.name} ${user.surname}',
-                        style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff414751))),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text('${user.name} ${user.surname}',
+                              style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xff414751))),
+                        ),
+                        VerificationBadge(
+                          isVerified: user.isVerified ?? false,
+                          size: 14.0,
+                        ),
+                      ],
+                    ),
                     Text('@${user.username}',
                         style:
                             TextStyle(fontSize: 12, color: Color(0xff9CA3AE))),

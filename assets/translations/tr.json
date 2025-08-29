@@ -1865,6 +1865,7 @@
       "verificationFailed": "Doğrulama başarısız",
       "fileUploadSuccess": "Dosya başarıyla yüklendi",
       "fileUploadFailed": "Dosya yükleme başarısız",
+      "fileUploadError": "Dosya yükleme hatası",
       "fileRemoved": "Dosya başarıyla kaldırıldı"
     },
             "validation": {

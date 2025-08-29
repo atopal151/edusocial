@@ -37,6 +37,7 @@ import 'package:edusocial/screens/settings/settings_screen.dart';
 import 'package:edusocial/screens/settings/notification_settings.dart';
 import 'package:edusocial/screens/verification/verification_screen.dart';
 import 'package:edusocial/screens/verification/verification_upload_screen.dart';
+import 'package:edusocial/bindings/verification_binding.dart';
 import 'package:edusocial/utils/auth_guard.dart';
 import 'package:get/get.dart';
 import '../bindings/signup_binding.dart';
@@ -268,10 +269,12 @@ class Routes {
     GetPage(
       name: verification,
       page: () => VerificationScreen(),
+      binding: VerificationBinding(),
     ),
     GetPage(
       name: verificationUpload,
       page: () => VerificationUploadScreen(),
+      binding: VerificationBinding(),
     ),
     GetPage(
       name: forgotPassword,

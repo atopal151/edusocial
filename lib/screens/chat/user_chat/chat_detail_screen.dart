@@ -10,6 +10,7 @@ import '../../../components/input_fields/message_input_field.dart';
 import '../../../controllers/chat_controllers/chat_detail_controller.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
 import '../../../services/language_service.dart';
+import '../../../components/widgets/verification_badge.dart';
 
 class ChatDetailScreen extends StatelessWidget {
   ChatDetailScreen({super.key});
@@ -175,12 +176,23 @@ class ChatDetailScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      controller.name.value,
-                      style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff272727)),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            controller.username.value,
+                            style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff272727)),
+                          ),
+                        ),
+                        VerificationBadge(
+                          isVerified: controller.isVerified.value,
+                          size: 14.0,
+                        ),
+                      ],
                     ),
                     Text(
                       controller.isOnline.value ? languageService.tr("chat.chatDetail.onlineStatus.online") : languageService.tr("chat.chatDetail.onlineStatus.offline"),

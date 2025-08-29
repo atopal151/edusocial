@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/group_controller/group_controller.dart';
 import '../../controllers/chat_controllers/chat_controller.dart';
 import '../../services/language_service.dart';
+import '../../components/widgets/verification_badge.dart';
 
 class GroupParticipantsScreen extends StatefulWidget {
   const GroupParticipantsScreen({super.key});
@@ -101,13 +102,24 @@ class _GroupParticipantsScreenState extends State<GroupParticipantsScreen> {
                       ? Icon(Icons.person, color: Color(0xff9ca3ae))
                       : null,
                 ),
-                title: Text(
-                  '${user["name"] ?? ''} ${user["surname"] ?? ''}',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xff414751),
-                  ),
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        '${user["name"] ?? ''} ${user["surname"] ?? ''}',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751),
+                        ),
+                      ),
+                    ),
+                    VerificationBadge(
+                      isVerified: user['is_verified'] ?? false,
+                      size: 14.0,
+                    ),
+                  ],
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

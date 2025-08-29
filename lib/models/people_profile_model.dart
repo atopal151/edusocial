@@ -53,6 +53,18 @@ class PeopleProfileModel {
   final List<dynamic> approvedFollowers;
   final List<dynamic> stories;
   final List<dynamic> followingStories;
+  
+  // Hesap doğrulama alanları
+  final bool? isVerified;
+  final bool? verified;
+  final String? verificationStatus;
+  final bool? accountVerified;
+  final bool? emailVerified;
+  final bool? phoneVerified;
+  final bool? documentVerified;
+  final bool? identityVerified;
+  final String? verificationLevel;
+  final String? verificationType;
 
   PeopleProfileModel({
     required this.id,
@@ -103,6 +115,16 @@ class PeopleProfileModel {
     required this.approvedFollowers,
     required this.stories,
     required this.followingStories,
+    this.isVerified,
+    this.verified,
+    this.verificationStatus,
+    this.accountVerified,
+    this.emailVerified,
+    this.phoneVerified,
+    this.documentVerified,
+    this.identityVerified,
+    this.verificationLevel,
+    this.verificationType,
   });
 
   factory PeopleProfileModel.fromJson(Map<String, dynamic> json) {
@@ -176,6 +198,17 @@ class PeopleProfileModel {
       approvedFollowers: json['approved_followers'] ?? [],
       stories: json['stories'] ?? [],
       followingStories: json['following_stories'] ?? [],
+      // Hesap doğrulama alanları
+      isVerified: json['is_verified'],
+      verified: json['verified'],
+      verificationStatus: json['verification_status'],
+      accountVerified: json['account_verified'],
+      emailVerified: json['email_verified'],
+      phoneVerified: json['phone_verified'],
+      documentVerified: json['document_verified'],
+      identityVerified: json['identity_verified'],
+      verificationLevel: json['verification_level'],
+      verificationType: json['verification_type'],
     );
   }
 

@@ -10,6 +10,7 @@ import 'services/api_service.dart';
 import 'services/onesignal_service.dart';
 import 'services/socket_services.dart';
 import 'services/pin_message_service.dart';
+import 'services/verification_service.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -43,6 +44,9 @@ void main() async {
   
   // PinMessageService'i başlat
   Get.put(PinMessageService());
+  
+  // VerificationService'i başlat
+  Get.put(VerificationService());
 
   // SocketService'i al ve bağlantı kur
   final socketService = Get.find<SocketService>();

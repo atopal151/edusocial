@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../models/profile_model.dart';
 import '../models/people_profile_model.dart';
+import '../components/print_full_text.dart';
 
 class ProfileService {
   final box = GetStorage();
@@ -30,9 +31,41 @@ class ProfileService {
       // Gelen verinin tamamını JSON formatında yazdır
       try {
         final jsonBody = json.decode(response.body);
-       // final formattedJson = const JsonEncoder.withIndent('  ').convert(jsonBody);
-        //debugPrint("🔍 ProfileService - Tam JSON Response:");
-        //debugPrint(formattedJson);
+        
+        // PrintFullText ile tam JSON response'u yazdır
+      
+        
+        // Hesap doğrulama durumunu kontrol et
+        if (jsonBody['data'] != null) {
+          final data = jsonBody['data'];
+          
+          // Olası doğrulama alanlarını kontrol et
+          final verificationFields = [
+            'is_verified',
+            'verified',
+            'verification_status',
+            'account_verified',
+            'email_verified',
+            'phone_verified',
+            'document_verified',
+            'identity_verified',
+            'verification_level',
+            'verification_type'
+          ];
+          
+          printFullText("🔍 HESAP DOĞRULAMA ALANLARI KONTROLÜ:");
+          for (String field in verificationFields) {
+            if (data.containsKey(field)) {
+              printFullText("✅ $field: ${data[field]}");
+            }
+          }
+          
+          // Tüm data alanlarını listele
+          printFullText("📊 DATA ALANLARI:");
+          data.forEach((key, value) {
+            printFullText("  $key: $value");
+          });
+        }
         
         // Data alanını ayrıca yazdır
         if (jsonBody['data'] != null) {
@@ -67,7 +100,20 @@ class ProfileService {
           //adebugPrint("🔍 ProfileService - Account Type: $accountType");
         }
         
-        return ProfileModel.fromJson(jsonBody['data']);
+        final profileModel = ProfileModel.fromJson(jsonBody['data']);
+        
+        // Doğrulama durumunu yazdır
+        printFullText("🔍 HESAP DOĞRULAMA DURUMU:");
+        printFullText("  Doğrulanmış mı: ${isUserVerified(profileModel)}");
+        printFullText("  Durum: ${getVerificationStatus(profileModel)}");
+        
+        final verificationDetails = getVerificationDetails(profileModel);
+        printFullText("  Detaylar:");
+        verificationDetails.forEach((key, value) {
+          printFullText("    $key: $value");
+        });
+        
+        return profileModel;
       } catch (e) {
         debugPrint("❌ ProfileService - JSON parse hatası: $e");
         throw Exception("❗ Profil verisi alınamadı: ${response.body}");
@@ -98,9 +144,42 @@ class ProfileService {
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         
-        //debugPrint("✅ ProfileService - fetchUserByUsername başarılı");
-        //debugPrint("📊 ProfileService - Entries sayısı: ${body['data']['entries']?.length ?? 0}");
-        //debugPrint("🔍 ProfileService - Account type: ${body['data']['account_type'] ?? 'unknown'}");
+        // PrintFullText ile tam JSON response'u yazdır
+        final formattedJson = const JsonEncoder.withIndent('  ').convert(body);
+        printFullText("🔍 USER BY USERNAME API - TAM JSON RESPONSE:");
+        printFullText(formattedJson);
+        
+        // Hesap doğrulama durumunu kontrol et
+        if (body['data'] != null) {
+          final data = body['data'];
+          
+          // Olası doğrulama alanlarını kontrol et
+          final verificationFields = [
+            'is_verified',
+            'verified',
+            'verification_status',
+            'account_verified',
+            'email_verified',
+            'phone_verified',
+            'document_verified',
+            'identity_verified',
+            'verification_level',
+            'verification_type'
+          ];
+          
+          printFullText("🔍 USER BY USERNAME - HESAP DOĞRULAMA ALANLARI KONTROLÜ:");
+          for (String field in verificationFields) {
+            if (data.containsKey(field)) {
+              printFullText("✅ $field: ${data[field]}");
+            }
+          }
+          
+          // Tüm data alanlarını listele
+          printFullText("📊 USER BY USERNAME - DATA ALANLARI:");
+          data.forEach((key, value) {
+            printFullText("  $key: $value");
+          });
+        }
 
         final model = PeopleProfileModel.fromJson(body['data']);
         return model;
@@ -112,5 +191,47 @@ class ProfileService {
       debugPrint("❌ ProfileService - fetchUserByUsername error: $e");
       return null;
     }
+  }
+
+  /// Kullanıcının hesap doğrulama durumunu kontrol et
+  bool isUserVerified(ProfileModel profile) {
+    // Olası doğrulama alanlarını kontrol et
+    if (profile.isVerified == true) return true;
+    if (profile.verified == true) return true;
+    if (profile.accountVerified == true) return true;
+    if (profile.documentVerified == true) return true;
+    if (profile.identityVerified == true) return true;
+    
+    // String alanları kontrol et
+    if (profile.verificationStatus == 'verified') return true;
+    if (profile.verificationLevel == 'verified') return true;
+    if (profile.verificationType == 'verified') return true;
+    
+    return false;
+  }
+
+  /// Kullanıcının hesap doğrulama durumunu string olarak getir
+  String getVerificationStatus(ProfileModel profile) {
+    if (isUserVerified(profile)) {
+      return "Doğrulanmış";
+    } else {
+      return "Doğrulanmamış";
+    }
+  }
+
+  /// Kullanıcının hesap doğrulama detaylarını getir
+  Map<String, dynamic> getVerificationDetails(ProfileModel profile) {
+    return {
+      'isVerified': profile.isVerified,
+      'verified': profile.verified,
+      'verificationStatus': profile.verificationStatus,
+      'accountVerified': profile.accountVerified,
+      'emailVerified': profile.emailVerified,
+      'phoneVerified': profile.phoneVerified,
+      'documentVerified': profile.documentVerified,
+      'identityVerified': profile.identityVerified,
+      'verificationLevel': profile.verificationLevel,
+      'verificationType': profile.verificationType,
+    };
   }
 }

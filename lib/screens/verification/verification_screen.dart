@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../components/user_appbar/back_appbar.dart';
 import '../../services/language_service.dart';
+import '../../controllers/verification_controller.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -15,7 +16,7 @@ class VerificationScreen extends StatefulWidget {
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
-  String? selectedDocumentType;
+  final VerificationController controller = Get.put(VerificationController());
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
               languageService.tr("verification.documentSelection.passport"),
               languageService
                   .tr("verification.documentSelection.passportSubtitle"),
-              
               "passport",
             ),
             SizedBox(height: 12),
@@ -46,7 +46,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
               languageService.tr("verification.documentSelection.idCard"),
               languageService
                   .tr("verification.documentSelection.idCardSubtitle"),
-       
               "id_card",
             ),
             SizedBox(height: 12),
@@ -56,8 +55,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   .tr("verification.documentSelection.driverLicense"),
               languageService
                   .tr("verification.documentSelection.driverLicenseSubtitle"),
-             
-              "driverLicense",
+              "driver_license",
             ),
 
             SizedBox(height: 20),
@@ -73,9 +71,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 backgroundColor: Color(0xfffb535c),
                 textColor: Colors.white,
                 onPressed: () {
-                  if (selectedDocumentType != null) {
+                  if (controller.selectedDocumentType.value.isNotEmpty) {
                     Get.toNamed('/verification_upload', arguments: {
-                      'documentType': selectedDocumentType,
+                      'documentType': controller.selectedDocumentType.value,
                     });
                   } else {
                     final LanguageService languageService = Get.find<LanguageService>();
@@ -86,7 +84,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     );
                   }
                 },
-                               
               ),
             ),
           ],
@@ -96,71 +93,71 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   Widget _buildDocumentOption(
-      String title, String subtitle,  String documentType) {
-    final isSelected = selectedDocumentType == documentType;
+      String title, String subtitle, String documentType) {
+    return Obx(() {
+      final isSelected = controller.selectedDocumentType.value == documentType;
 
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedDocumentType = documentType;
-        });
-      },
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? Color(0xffef5050) : Color(0xffe5e7eb),
-            width: isSelected ? 1 : 1,
+      return GestureDetector(
+        onTap: () {
+          controller.selectDocumentType(documentType);
+        },
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected ? Color(0xffef5050) : Color(0xffe5e7eb),
+              width: isSelected ? 1 : 1,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: Color(0xffffffff),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SvgPicture.asset(
-                'images/icons/$documentType.svg',
-                width: 25,
-                height: 25,
-                colorFilter: ColorFilter.mode(
-                  Color(0xffef5050),
-                  BlendMode.srcIn,
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: Color(0xffffffff),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SvgPicture.asset(
+                  'images/icons/$documentType.svg',
+                  width: 25,
+                  height: 25,
+                  colorFilter: ColorFilter.mode(
+                    Color(0xffef5050),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff414751),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff414751),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: Color(0xff9ca3ae),
+                    SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Color(0xff9ca3ae),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

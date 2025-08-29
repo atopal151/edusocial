@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../services/language_service.dart';
-import '../../../services/pin_message_service.dart';
 import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../dialogs/image_preview_dialog.dart';
 
@@ -41,31 +40,9 @@ class GroupUniversalMessageWidget extends StatelessWidget {
         return;
       }
       
-      final groupId = controller.currentGroupId.value;
-      if (groupId.isEmpty) {
-        debugPrint('❌ [GroupUniversalMessageWidget] Group ID is empty');
-        return;
-      }
+      // Controller üzerinden pin message metodunu çağır
+      await controller.pinMessage(messageId);
       
-      // PinMessageService'i kullan
-      final pinMessageService = Get.find<PinMessageService>();
-      final success = await pinMessageService.pinGroupMessage(messageId, groupId);
-      
-      if (success) {
-        debugPrint('✅ [GroupUniversalMessageWidget] Pin/Unpin işlemi başarılı');
-      } else {
-        debugPrint('❌ [GroupUniversalMessageWidget] Pin/Unpin işlemi başarısız');
-        
-        // Hata bildirimi göster
-        Get.snackbar(
-          '❌ Hata',
-          'Pin/Unpin işlemi başarısız oldu',
-          snackPosition: SnackPosition.TOP,
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.red.shade100,
-          colorText: Colors.red.shade800,
-        );
-      }
     } catch (e) {
       debugPrint('❌ [GroupUniversalMessageWidget] Pin/Unpin işlemi hatası: $e');
       

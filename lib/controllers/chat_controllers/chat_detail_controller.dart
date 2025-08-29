@@ -41,6 +41,7 @@ class ChatDetailController extends GetxController {
   final RxString username = ''.obs;
   final RxString avatarUrl = ''.obs;
   final RxBool isOnline = false.obs;
+  final RxBool isVerified = false.obs; // Hesap doğrulama durumu
 
   // Media seçimi için yeni değişkenler
   final RxList<File> selectedFiles = <File>[].obs;
@@ -109,6 +110,7 @@ class ChatDetailController extends GetxController {
       final usernameArg = arguments['username'] as String?;
       final avatarUrlArg = arguments['avatarUrl'] as String? ?? arguments['userAvatar'] as String?;
       final isOnlineArg = arguments['isOnline'] as bool?;
+      final isVerifiedArg = arguments['isVerified'] as bool?;
       
       // conversationId can be int or String, convert to String
       String? conversationIdString;
@@ -124,6 +126,7 @@ class ChatDetailController extends GetxController {
       username.value = usernameArg ?? '';
       avatarUrl.value = avatarUrlArg ?? '';
       isOnline.value = isOnlineArg ?? false;
+      isVerified.value = isVerifiedArg ?? false;
       
       debugPrint('ChatDetailController initialized:');
       debugPrint('  - User ID: ${currentChatId.value}');

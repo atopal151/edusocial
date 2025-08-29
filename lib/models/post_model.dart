@@ -16,6 +16,7 @@ class PostModel {
   final bool isOwner;
   final bool isLiked;
   final List<String> links;
+  final bool? isVerified; // Hesap doğrulama durumu
 
   PostModel({
     required this.id,
@@ -33,6 +34,7 @@ class PostModel {
     required this.isOwner,
     required this.isLiked,
     required this.links,
+    this.isVerified,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
@@ -74,10 +76,11 @@ class PostModel {
       likeCount: json['likes_count'] ?? 0,
       commentCount: json['comments_count'] ?? 0,
       isOwner: json['is_owner'] ?? false,
-      isLiked: json['is_liked_by_user'] ?? false,  links: (json['links'] as List?)
+          isLiked: json['is_liked_by_user'] ?? false,  links: (json['links'] as List?)
               ?.map((e) => e['link']?.toString() ?? '')
               .toList() ??
           [],
+    isVerified: user['is_verified'],
     );
     
     //debugPrint("✅ PostModel oluşturuldu: ID=${postModel.id}, Username=${postModel.username}, isOwner=${postModel.isOwner}, Content=${postModel.postDescription}");

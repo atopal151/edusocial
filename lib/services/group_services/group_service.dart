@@ -137,6 +137,32 @@ class GroupServices {
       printFullText("📥 USER GROUPS API RESPONSE:");
       printFullText("Status Code: ${response.statusCode}");
       printFullText("Response Body: ${response.body}");
+      
+      // Her grubun detayını ayrı ayrı yazdır
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        final List<dynamic> data = jsonBody['data'] ?? [];
+        
+        printFullText("🔍 USER GROUPS - TOPLAM ${data.length} GRUP:");
+        for (int i = 0; i < data.length; i++) {
+          final group = data[i];
+          printFullText("""
+📋 USER GROUP ${i + 1}:
+  - ID: ${group['id']}
+  - Name: ${group['name']}
+  - Description: ${group['description']}
+  - Is Private: ${group['is_private']}
+  - Is Founder: ${group['is_founder']}
+  - Is Member: ${group['is_member']}
+  - Is Pending: ${group['is_pending']}
+  - User Count: ${group['user_count_with_admin']}
+  - Message Count: ${group['message_count']}
+  - Created At: ${group['created_at']}
+  - Updated At: ${group['updated_at']}
+  ---
+""");
+        }
+      }
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -202,6 +228,32 @@ class GroupServices {
       printFullText("📥 ALL GROUPS API RESPONSE:");
       printFullText("Status Code: ${response.statusCode}");
       printFullText("Response Body: ${response.body}");
+      
+      // Her grubun detayını ayrı ayrı yazdır
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        final List<dynamic> data = jsonBody['data'] ?? [];
+        
+        printFullText("🔍 ALL GROUPS - TOPLAM ${data.length} GRUP:");
+        for (int i = 0; i < data.length; i++) {
+          final group = data[i];
+          printFullText("""
+📋 ALL GROUP ${i + 1}:
+  - ID: ${group['id']}
+  - Name: ${group['name']}
+  - Description: ${group['description']}
+  - Is Private: ${group['is_private']}
+  - Is Founder: ${group['is_founder']}
+  - Is Member: ${group['is_member']}
+  - Is Pending: ${group['is_pending']}
+  - User Count: ${group['user_count_with_admin']}
+  - Message Count: ${group['message_count']}
+  - Created At: ${group['created_at']}
+  - Updated At: ${group['updated_at']}
+  ---
+""");
+        }
+      }
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -335,10 +387,22 @@ class GroupServices {
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
+        
+        // API'den gelen ham veriyi debug et
+        printFullText('🔍 =======================================');
+        printFullText('🔍 GROUP DETAIL API RAW RESPONSE');
+        printFullText('🔍 =======================================');
+        printFullText('🔍 URL: ${uri.toString()}');
+        printFullText('🔍 Status Code: ${response.statusCode}');
+        printFullText('🔍 Response Headers: ${response.headers}');
+        printFullText('🔍 Raw Response Body:');
+        printFullText(response.body);
+        printFullText('🔍 =======================================');
+        
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
           //final groupData = jsonBody['data']['group'];
 
-          //debugPrint('�� GRUP DETAY VERİLERİ (OPTIMIZED):');
+          //debugPrint('📊 GRUP DETAY VERİLERİ (OPTIMIZED):');
           //debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           //debugPrint('ID: ${groupData['id']}');
 

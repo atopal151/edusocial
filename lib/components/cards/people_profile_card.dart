@@ -5,6 +5,7 @@ import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:edusocial/services/language_service.dart';
 import 'package:edusocial/components/dialogs/profile_image_preview_dialog.dart';
+import 'package:edusocial/components/widgets/verification_badge.dart';
 
 Widget buildPeopleProfileHeader(PeopleProfileController controller) {
   final LanguageService languageService = Get.find<LanguageService>();
@@ -121,17 +122,18 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
         ),
         const SizedBox(height: 50),
 
-        /// İsim ve Kullanıcı Adı
-        Text(
-          "${profile.name} ${profile.surname}",
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          "@${profile.username}",
-          style: GoogleFonts.inter(
-              fontSize: 12.78,
-              fontWeight: FontWeight.w400,
-              color: const Color(0xff9ca3ae)),
+        /// İsim ve Kullanıcı Adı ile Doğrulama Rozeti
+        VerifiedNameDisplay(
+          name: "${profile.name} ${profile.surname}",
+          username: "@${profile.username}",
+          isVerified: profile.isVerified ?? false,
+          nameStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          usernameStyle: GoogleFonts.inter(
+            fontSize: 12.78,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xff9ca3ae),
+          ),
+          badgeSize: 20.0,
         ),
 
         /// Açıklama

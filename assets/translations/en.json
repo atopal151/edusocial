@@ -1840,6 +1840,7 @@
       "verificationFailed": "Verification failed",
       "fileUploadSuccess": "File uploaded successfully",
       "fileUploadFailed": "File upload failed",
+      "fileUploadError": "File upload error",
       "fileRemoved": "File removed successfully"
     },
             "validation": {

@@ -10,6 +10,7 @@ class GroupCard extends StatelessWidget {
   final int memberCount;
   final int? chatNotification;
   final List<String>? category; // opsiyonel olsun
+  final bool isFounder; // Kullanıcının oluşturduğu grup mu?
 
   final VoidCallback onJoinPressed;
   final String action;
@@ -24,6 +25,7 @@ class GroupCard extends StatelessWidget {
     required this.onJoinPressed,
     required this.action,
     this.category,
+    this.isFounder = false,
   });
 
   @override
@@ -151,13 +153,37 @@ class GroupCard extends StatelessWidget {
                             .toList(),
                       ),
                     ),
-                  Text(
-                    groupName,
-                    style: GoogleFonts.inter(
-                      fontSize: 13.28,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xff414751),
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          groupName,
+                          style: GoogleFonts.inter(
+                            fontSize: 13.28,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff414751),
+                          ),
+                        ),
+                      ),
+                      if (isFounder)
+                        Container(
+                          margin: EdgeInsets.only(left: 4),
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Color(0xffEF5050),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            "Kurucu",
+                            style: GoogleFonts.inter(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   SizedBox(height: 5),
                   Text(

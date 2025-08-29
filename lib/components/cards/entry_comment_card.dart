@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
 import '../../services/language_service.dart';
 import 'package:get/get.dart';
+import '../widgets/verification_badge.dart';
 
 class EntryCommentCard extends StatelessWidget {
   final EntryModel entry;
@@ -148,11 +149,22 @@ class EntryCommentCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              entry.user.name,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xff414751)),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    '@${entry.user.username}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xff414751)),
+                                  ),
+                                ),
+                                VerificationBadge(
+                                  isVerified: entry.user.isVerified ?? false,
+                                  size: 12.0,
+                                ),
+                              ],
                             ),
                             Row(
                               mainAxisSize: MainAxisSize.min,

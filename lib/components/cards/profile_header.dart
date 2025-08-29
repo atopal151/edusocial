@@ -5,6 +5,7 @@ import '../../components/dialogs/profile_image_preview_dialog.dart';
 import '../../controllers/profile_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../services/language_service.dart';
+import '../../components/widgets/verification_badge.dart';
 
 final ProfileController controller = Get.find();
 
@@ -94,22 +95,23 @@ Widget buildProfileHeader() {
       ),
       const SizedBox(height: 50),
 
-      /// Kullanıcı Adı
-      Obx(() => Text(
-            controller.fullName.value,
-            style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xff272727)),
-          )),
-
-      Obx(() => Text(
-            controller.username.value,
-            style: GoogleFonts.inter(
-                fontSize: 13.28,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff9ca3ae)),
-          )),
+      /// Kullanıcı Adı ve Doğrulama Rozeti
+      Obx(() => VerifiedNameDisplay(
+        name: controller.fullName.value,
+        username: controller.username.value,
+        isVerified: controller.profile.value?.isVerified ?? false,
+        nameStyle: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Color(0xff272727),
+        ),
+        usernameStyle: GoogleFonts.inter(
+          fontSize: 13.28,
+          fontWeight: FontWeight.w500,
+          color: Color(0xff9ca3ae),
+        ),
+        badgeSize: 18.0,
+      )),
 
       const SizedBox(height: 10),
 

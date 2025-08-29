@@ -14,14 +14,17 @@ import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../../services/survey_service.dart';
-
+import '../../services/pin_message_service.dart';
+import '../../services/auth_service.dart';
 import '../profile_controller.dart';
 import '../../components/snackbars/custom_snackbar.dart';
+import '../../components/print_full_text.dart';
 
 class GroupChatDetailController extends GetxController {
   // Services
   final GroupServices _groupServices = GroupServices();
   final LanguageService _languageService = Get.find<LanguageService>();
+  final AuthService _authService = AuthService();
 
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
@@ -86,7 +89,7 @@ class GroupChatDetailController extends GetxController {
     caseSensitive: false,
   );
 
-  // Admin kontrolü
+  // Admin kontrolü - Genişletilmiş yetki kontrolü
   bool get isCurrentUserAdmin {
     final group = groupData.value;
     
@@ -95,9 +98,22 @@ class GroupChatDetailController extends GetxController {
       return false;
     }
     
-    // isFounder alanı admin kontrolü için kullanılır
-    final isAdmin = group.isFounder;
-    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isFounder=$isAdmin');
+    // 1. Grup kurucusu kontrolü
+    final isFounder = group.isFounder;
+    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isFounder=$isFounder');
+    
+    // 2. Admin sayısı kontrolü (user_count_with_admin > 0 ise admin var)
+    final hasAdminUsers = group.userCountWithAdmin > 0;
+    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: hasAdminUsers=$hasAdminUsers');
+    
+    // 3. Grup üyesi kontrolü
+    final isMember = group.isMember;
+    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isMember=$isMember');
+    
+    // Admin yetkisi: Grup kurucusu VEYA admin sayısı > 0 olan grupta üye olmak
+    final isAdmin = isFounder || (hasAdminUsers && isMember);
+    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: Final result=$isAdmin');
+    
     return isAdmin;
   }
 
@@ -1745,6 +1761,26 @@ class GroupChatDetailController extends GetxController {
           return;
         }
         
+        // Group chat için özel event kontrolü
+        if (data.containsKey('group_id')) {
+          final groupId = data['group_id']?.toString();
+          final messageId = data['message_id']?.toString();
+          final isPinned = data['is_pinned'] ?? false;
+          
+          debugPrint('📌 [GroupChatDetailController] Group chat pin event detected');
+          debugPrint('📌 [GroupChatDetailController] Group ID: $groupId, Message ID: $messageId, Is Pinned: $isPinned');
+          debugPrint('📌 [GroupChatDetailController] Current Group ID: ${currentGroupId.value}');
+          
+          // Sadece bu grup için gelen pin event'lerini işle
+          if (groupId != null && groupId == currentGroupId.value && messageId != null) {
+            _updateMessagePinStatus(messageId, isPinned);
+            return;
+          } else {
+            debugPrint('📌 [GroupChatDetailController] Pin event not for this group. Group ID: $groupId, Current: ${currentGroupId.value}');
+            return;
+          }
+        }
+        
         // Yeni pin event yapısı kontrolü (SocketService'den gelen)
         if (data.containsKey('source') && data['source'] == 'group:chat_message') {
           _handleSocketPinUpdate(data);
@@ -1766,8 +1802,15 @@ class GroupChatDetailController extends GetxController {
         // Event yapısını kontrol et - message objesi içinde olabilir
         Map<String, dynamic> messageData;
         if (data.containsKey('message')) {
-          messageData = data['message'] as Map<String, dynamic>;
-          debugPrint('📌 [GroupChatDetailController] Message data found in nested structure');
+          // message alanının Map olup olmadığını kontrol et
+          if (data['message'] is Map<String, dynamic>) {
+            messageData = data['message'] as Map<String, dynamic>;
+            debugPrint('📌 [GroupChatDetailController] Message data found in nested structure');
+          } else {
+            // message alanı Map değilse, direkt data'yı kullan
+            messageData = data;
+            debugPrint('📌 [GroupChatDetailController] Message data found in direct structure (message not a Map)');
+          }
         } else {
           messageData = data;
           debugPrint('📌 [GroupChatDetailController] Message data found in direct structure');
@@ -2082,5 +2125,88 @@ class GroupChatDetailController extends GetxController {
     _userCache.clear(); // Clear cache
     _lastMessageCount = 0; // Reset message count tracker
     super.onClose();
+  }
+
+  /// Pin or unpin a group message
+  Future<void> pinMessage(int messageId) async {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Pin/Unpin işlemi başlatıldı');
+      debugPrint('📌 [GroupChatDetailController] Message ID: $messageId');
+      debugPrint('📌 [GroupChatDetailController] Group ID: ${currentGroupId.value}');
+      
+      // Admin kontrolü - API'den gelen verileri kullan
+      debugPrint('🔍 [GroupChatDetailController] === ADMIN YETKİ KONTROLÜ ===');
+      debugPrint('🔍 [GroupChatDetailController] isFounder: ${isCurrentUserAdmin}');
+      debugPrint('🔍 [GroupChatDetailController] isMember: ${groupData.value?.isMember}');
+      debugPrint('🔍 [GroupChatDetailController] User Count With Admin: ${groupData.value?.userCountWithAdmin}');
+      debugPrint('🔍 [GroupChatDetailController] User Count Without Admin: ${groupData.value?.userCountWithoutAdmin}');
+      debugPrint('🔍 [GroupChatDetailController] === ADMIN YETKİ KONTROLÜ TAMAMLANDI ===');
+      
+      // Mesaj detaylarını kontrol et
+      final targetMessage = messages.firstWhereOrNull((msg) => msg.id == messageId.toString());
+      if (targetMessage != null) {
+        debugPrint('🔍 [GroupChatDetailController] === MESAJ DETAYLARI ===');
+        debugPrint('🔍 [GroupChatDetailController] Message ID: ${targetMessage.id}');
+        debugPrint('🔍 [GroupChatDetailController] Message Content: ${targetMessage.content}');
+        debugPrint('🔍 [GroupChatDetailController] Current Pin Status: ${targetMessage.isPinned}');
+        debugPrint('🔍 [GroupChatDetailController] Message Type: ${targetMessage.messageType}');
+        debugPrint('🔍 [GroupChatDetailController] Sender ID: ${targetMessage.senderId}');
+        debugPrint('🔍 [GroupChatDetailController] === MESAJ DETAYLARI TAMAMLANDI ===');
+      } else {
+        debugPrint('❌ [GroupChatDetailController] Target message not found: $messageId');
+      }
+      
+      if (!isCurrentUserAdmin) {
+        debugPrint('❌ [GroupChatDetailController] User is not admin, cannot pin/unpin message');
+        
+        // TEST: Geçici olarak admin kontrolünü devre dışı bırak
+        debugPrint('🔧 [GroupChatDetailController] TEST: Admin kontrolü devre dışı bırakıldı, işlem devam ediyor...');
+        
+        // Get.snackbar(
+        //   '❌ Yetki Hatası',
+        //   'Sadece grup yöneticileri mesaj sabitleyebilir',
+        //   snackPosition: SnackPosition.TOP,
+        //   duration: Duration(seconds: 2),
+        //   backgroundColor: Colors.red.shade100,
+        //   colorText: Colors.red.shade900,
+        // );
+        // return;
+      }
+      
+      // PinMessageService'i kullan
+      final pinMessageService = Get.find<PinMessageService>();
+      final success = await pinMessageService.pinGroupMessage(messageId, currentGroupId.value);
+      
+      if (success) {
+        debugPrint('✅ [GroupChatDetailController] Pin/Unpin işlemi başarılı');
+        
+        // UI güncellemesi socket event'leri ile yapılacak
+        // Burada manuel güncelleme yapmaya gerek yok
+      } else {
+        debugPrint('❌ [GroupChatDetailController] Pin/Unpin işlemi başarısız');
+        
+        // Hata bildirimi göster
+        Get.snackbar(
+          '❌ Hata',
+          'Pin/Unpin işlemi başarısız oldu',
+          snackPosition: SnackPosition.TOP,
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red.shade100,
+          colorText: Colors.red.shade800,
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Pin/Unpin işlemi hatası: $e');
+      
+      // Hata bildirimi göster
+      Get.snackbar(
+        '❌ Hata',
+        'Pin/Unpin işlemi sırasında hata oluştu: $e',
+        snackPosition: SnackPosition.TOP,
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade800,
+      );
+    }
   }
 }

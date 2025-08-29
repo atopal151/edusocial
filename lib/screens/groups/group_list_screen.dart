@@ -61,13 +61,18 @@ class GroupListScreen extends StatelessWidget {
                   child: Text(languageService.tr("groups.groupList.myGroups"),
                       style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                SizedBox(
-                  height: 210,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.userGroups.length,
-                    itemBuilder: (context, index) {
+                Obx(() {
+                  debugPrint("🔍 GroupListScreen - Obx widget triggered, userGroups.length: ${controller.userGroups.length}");
+                  return SizedBox(
+                    height: 210,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: controller.userGroups.length,
+                      itemBuilder: (context, index) {
+                      // DEBUG: Print userGroups length and current group
+                      debugPrint("🔍 GroupListScreen - userGroups.length: ${controller.userGroups.length}, building index: $index");
                       final group = controller.userGroups[index];
+                      debugPrint("🔍 GroupListScreen - building group: ${group.name} (ID: ${group.id})");
                       return InkWell(
                         onTap: () {
                           controller.getToGroupChatDetail(group.id);
@@ -82,12 +87,14 @@ class GroupListScreen extends StatelessWidget {
                             memberCount: group.userCountWithAdmin,
                             action: languageService.tr("groups.groupList.joined"),
                             onJoinPressed: () {},
+                            isFounder: group.isFounder,
                           ),
                         ),
                       );
                     },
                   ),
-                ),
+                );
+                }),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(

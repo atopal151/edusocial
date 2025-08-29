@@ -53,6 +53,18 @@ class ProfileModel {
   final List<dynamic> stories;
   final List<dynamic> followingStories;
   final List<EntryModel> entries;
+  
+  // Hesap doğrulama alanları
+  final bool? isVerified;
+  final bool? verified;
+  final String? verificationStatus;
+  final bool? accountVerified;
+  final bool? emailVerified;
+  final bool? phoneVerified;
+  final bool? documentVerified;
+  final bool? identityVerified;
+  final String? verificationLevel;
+  final String? verificationType;
 
   ProfileModel({
     required this.id,
@@ -103,6 +115,16 @@ class ProfileModel {
     required this.stories,
     required this.followingStories,
     required this.entries,
+    this.isVerified,
+    this.verified,
+    this.verificationStatus,
+    this.accountVerified,
+    this.emailVerified,
+    this.phoneVerified,
+    this.documentVerified,
+    this.identityVerified,
+    this.verificationLevel,
+    this.verificationType,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -179,6 +201,17 @@ class ProfileModel {
             ?.map((e) => EntryModel.fromJson(e))
             .toList() ??
         [],
+    // Hesap doğrulama alanları
+    isVerified: json['is_verified'],
+    verified: json['verified'],
+    verificationStatus: json['verification_status'],
+    accountVerified: json['account_verified'],
+    emailVerified: json['email_verified'],
+    phoneVerified: json['phone_verified'],
+    documentVerified: json['document_verified'],
+    identityVerified: json['identity_verified'],
+    verificationLevel: json['verification_level'],
+    verificationType: json['verification_type'],
   );
 }
 

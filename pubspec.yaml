@@ -137,6 +137,7 @@ flutter:
     - images/icons/subjects.svg
     - images/icons/logonew.png
     - images/icons/driverLicense.svg
+    - images/icons/driver_license.svg
     - images/icons/id_card.svg 
     - images/icons/passport.svg
     - images/icons/passportimage.svg

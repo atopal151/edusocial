@@ -505,6 +505,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     required String avatarUrl,
     required bool isOnline,
     required String username,
+    bool? isVerified,
   }) async {
     // Chat açıldığında o chat'in hasUnreadMessages'ını false yap
     await markChatAsRead(userId, conversationId);
@@ -517,6 +518,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       'avatarUrl': avatarUrl,
       'isOnline': isOnline,
       'username': username,
+      'isVerified': isVerified,
     });
     
     // Chat detail sayfasından döndüğünde socket'ten güncel unread count'u kontrol et

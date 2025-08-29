@@ -58,30 +58,71 @@ class GroupController extends GetxController {
     debugPrint("🔄 GroupController.fetchUserGroups() çağrıldı");
     
     try {
-      final groups = await _groupServices.fetchUserGroups();
-      debugPrint("📥 API'den gelen user groups verisi (${groups.length} grup):");
+      // Hem kullanıcının gruplarını hem de tüm grupları al
+      final userGroups = await _groupServices.fetchUserGroups();
+      final allGroups = await _groupServices.fetchAllGroups();
       
-      // Private gruplar için filtreleme: sadece üye olan ve bekleyen olmayan gruplar
-      final filteredGroups = groups.where((group) {
-        // Eğer grup private değilse, her zaman göster
+      debugPrint("📥 API'den gelen user groups verisi (${userGroups.length} grup):");
+      debugPrint("📥 API'den gelen all groups verisi (${allGroups.length} grup):");
+      
+      // Basit yaklaşım: Tüm gruplardan kullanıcının oluşturduğu veya üye olduğu olanları filtrele
+      final accessibleGroups = allGroups.where((group) {
+        // Kullanıcının oluşturduğu gruplar - her zaman göster
+        if (group.isFounder) {
+          debugPrint("✅ Group '${group.name}' gösteriliyor (kullanıcının oluşturduğu grup)");
+          return true;
+        }
+        
+        // Kullanıcının üye olduğu gruplar - her zaman göster
+        if (group.isMember) {
+          debugPrint("✅ Group '${group.name}' gösteriliyor (kullanıcının üye olduğu grup)");
+          return true;
+        }
+        
+        // Public gruplar - her zaman göster
         if (!group.isPrivate) {
           debugPrint("✅ Group '${group.name}' gösteriliyor (public grup)");
           return true;
         }
         
-        // Eğer grup private ise, sadece üye olan ve bekleyen olmayan kullanıcılar görebilir
-        if (group.isPrivate && group.isMember && !group.isPending) {
+        // Private gruplar - sadece üye olan kullanıcılar görebilir
+        if (group.isPrivate && group.isMember) {
           debugPrint("✅ Group '${group.name}' gösteriliyor (private grup, üye)");
           return true;
         } else {
-          debugPrint("❌ Group '${group.name}' gizlendi (private grup, üye değil veya bekleyen)");
+          debugPrint("❌ Group '${group.name}' gizlendi (private grup, üye değil)");
           return false;
         }
-              }).toList();
+      }).toList();
+      
+      debugPrint("🔍 Filtreleme sonucu: ${allGroups.length} gruptan ${accessibleGroups.length} grup gösteriliyor");
+      
+      // Filtreleme sonuçlarını detaylı yazdır
+      printFullText("""
+🎯 FİLTRELEME SONUÇLARI:
+📊 Toplam grup sayısı: ${allGroups.length}
+📊 Filtrelenmiş grup sayısı: ${accessibleGroups.length}
+📊 Gizlenen grup sayısı: ${allGroups.length - accessibleGroups.length}
+""");
+      
+      // Filtrelenmiş grupları listele
+      for (int i = 0; i < accessibleGroups.length; i++) {
+        final group = accessibleGroups[i];
+        printFullText("""
+✅ FİLTRELENMİŞ GRUP ${i + 1}:
+  - ID: ${group.id}
+  - Name: ${group.name}
+  - Is Founder: ${group.isFounder}
+  - Is Member: ${group.isMember}
+  - Is Private: ${group.isPrivate}
+  - Is Pending: ${group.isPending}
+  ---
+""");
+      }
         
         // Her grubun JSON formatında tam verisini yazdır
-        for (int i = 0; i < groups.length; i++) {
-          final group = groups[i];
+        for (int i = 0; i < accessibleGroups.length; i++) {
+          final group = accessibleGroups[i];
           final groupJson = {
             'id': group.id,
             'name': group.name,
@@ -103,11 +144,11 @@ class GroupController extends GetxController {
           printFullText('GROUP ${i + 1} FULL JSON DATA: ${groupJson}');
         }
         
-        debugPrint("🔍 Filtreleme sonucu: ${groups.length} gruptan ${filteredGroups.length} grup gösteriliyor");
+        debugPrint("🔍 Filtreleme sonucu: ${allGroups.length} gruptan ${accessibleGroups.length} grup gösteriliyor");
       
       // printFullText kullanarak her grubun detaylı bilgilerini yazdır
-      for (int i = 0; i < filteredGroups.length; i++) {
-        final group = filteredGroups[i];
+      for (int i = 0; i < accessibleGroups.length; i++) {
+        final group = accessibleGroups[i];
         final groupInfo = '''
 🏷️ Group ${i + 1} - ${group.name}:
   - ID: ${group.id}
@@ -131,10 +172,14 @@ class GroupController extends GetxController {
         printFullText(groupInfo);
       }
       
-      userGroups.value = filteredGroups;
-      
-      // ChatController ile grup listesini senkronize et
-      syncGroupListWithChatController();
+                debugPrint("🔍 GroupController - userGroups.assignAll() çağrılıyor, accessibleGroups.length: ${accessibleGroups.length}");
+          userGroups.assignAll(accessibleGroups);
+          debugPrint("🔍 GroupController - userGroups.assignAll() tamamlandı, userGroups.length: ${userGroups.length}");
+          
+          // ChatController ile grup listesini senkronize et
+          // Önce userGroups'ın güncellenmesini bekle
+          await Future.delayed(Duration(milliseconds: 100));
+          syncGroupListWithChatController();
       
       debugPrint("✅ User groups başarıyla yüklendi: ${filteredGroups.length} grup");
     } catch (e) {
@@ -326,10 +371,17 @@ class GroupController extends GetxController {
   /// 🔄 ChatController'daki grup listesini GroupController'daki verilerle senkronize et
   void syncGroupListWithChatController() {
     try {
+      debugPrint("🔄 syncGroupListWithChatController() başladı - userGroups.length: ${userGroups.length}");
       final chatController = Get.find<ChatController>();
       
+      // userGroups boşsa, allGroups'dan filtrele
+      final groupsToSync = userGroups.isEmpty ? allGroups.where((group) => 
+        group.isFounder || group.isMember || !group.isPrivate || (group.isPrivate && group.isMember)
+      ).toList() : userGroups;
+      debugPrint("🔄 Senkronize edilecek grup sayısı: ${groupsToSync.length}");
+      
       // GroupController'daki userGroups'u ChatController'daki groupChatList ile senkronize et
-      for (final userGroup in userGroups) {
+      for (final userGroup in groupsToSync) {
         final chatGroupIndex = chatController.groupChatList.indexWhere((g) => g.groupId == int.parse(userGroup.id));
         
         if (chatGroupIndex != -1) {
@@ -352,6 +404,7 @@ class GroupController extends GetxController {
             lastMessage: userGroup.description,
             lastMessageTime: userGroup.humanCreatedAt,
             hasUnreadMessages: false, // Başlangıçta false
+            isAdmin: userGroup.isFounder, // Kurucu bilgisini admin olarak aktar
           );
           
           chatController.groupChatList.add(newChatGroup);
@@ -361,7 +414,7 @@ class GroupController extends GetxController {
       
       // GroupController'ı güncelle
       userGroups.refresh();
-      debugPrint("🔄 GroupController userGroups listesi güncellendi");
+      debugPrint("🔄 GroupController userGroups listesi güncellendi - userGroups.length: ${userGroups.length}");
       
       // ChatController'ı güncelle
       chatController.groupChatList.refresh();

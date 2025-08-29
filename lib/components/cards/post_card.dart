@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../widgets/verification_badge.dart';
 
 import 'package:share_plus/share_plus.dart';
 
@@ -29,6 +30,7 @@ class PostCard extends StatefulWidget {
   final bool isOwner;
   final List<String> links; // ✅ Yeni ekledik!
   final String slug;
+  final bool? isVerified; // Hesap doğrulama durumu
 
   const PostCard(
       {super.key,
@@ -45,7 +47,8 @@ class PostCard extends StatefulWidget {
       required this.isLiked,
       required this.isOwner,
     required this.links,
-    required this.slug,});
+    required this.slug,
+    this.isVerified,});
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -243,14 +246,25 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  widget.userName.isNotEmpty ? '@${widget.userName}' : '${widget.name} ${widget.surname}',
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: const Color(0xff414751),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        widget.userName.isNotEmpty ? '@${widget.userName}' : '${widget.name} ${widget.surname}',
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                          color: const Color(0xff414751),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    VerificationBadge(
+                                      isVerified: widget.isVerified ?? false,
+                                      size: 14.0,
+                                    ),
+                                  ],
                                 ),
                                 Text(
                                   _formatDate(widget.postDate),

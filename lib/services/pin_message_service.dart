@@ -4,8 +4,6 @@ import 'package:get/get.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
 import 'socket_services.dart';
-import '../controllers/chat_controllers/group_chat_detail_controller.dart';
-import '../models/chat_models/group_message_model.dart';
 
 class PinMessageService extends GetxService {
   final ApiService _apiService = Get.find<ApiService>();
@@ -63,81 +61,101 @@ class PinMessageService extends GetxService {
     }
   }
 
-  /// Pin or unpin a group message using socket events
+  /// Pin or unpin a group message using API endpoint
   /// Returns true if successful, false otherwise
   Future<bool> pinGroupMessage(int messageId, String groupId) async {
     try {
       print('📌 [PinMessageService] Starting pin/unpin operation for message: $messageId, group: $groupId');
       
-      // Get current message to determine if it's pinned or not
-      // This will help us decide whether to pin or unpin
-      final currentMessage = await _getCurrentMessageStatus(messageId, groupId);
-      final isCurrentlyPinned = currentMessage?['is_pinned'] ?? false;
-      
-      print('📌 [PinMessageService] Current pin status: $isCurrentlyPinned');
-      
-      // Send appropriate socket event based on current status
-      if (isCurrentlyPinned) {
-        // Message is currently pinned, so unpin it
-        print('📌 [PinMessageService] Sending group:unpin_message event');
-        _socketService.sendMessage('group:unpin_message', {
-          'message_id': messageId,
-          'group_id': groupId,
-          'is_pinned': false,
-          'action': 'unpin',
-        });
-      } else {
-        // Message is not pinned, so pin it
-        print('📌 [PinMessageService] Sending group:pin_message event');
-        _socketService.sendMessage('group:pin_message', {
-          'message_id': messageId,
-          'group_id': groupId,
-          'is_pinned': true,
-          'action': 'pin',
-        });
+      final token = await _authService.getToken();
+      if (token == null) {
+        print('❌ Pin Group Message Error: No token available');
+        return false;
       }
-      
-      print('✅ [PinMessageService] Socket event sent successfully');
-      return true;
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      // Web'den gelen başarılı request'i analiz etmek için farklı data yapıları deneyelim
+      List<Map<String, dynamic>> testDataList = [
+        // Test 1: Sadece message_id (private chat gibi)
+        {'message_id': messageId},
+        
+        // Test 2: message_id + group_id
+        {'message_id': messageId, 'group_id': groupId},
+        
+        // Test 3: message_id + conversation_id (group_id'yi conversation_id olarak)
+        {'message_id': messageId, 'conversation_id': groupId},
+        
+        // Test 4: message_id + group_id + conversation_id
+        {'message_id': messageId, 'group_id': groupId, 'conversation_id': groupId},
+      ];
+
+      List<String> testEndpoints = [
+        '/conversation-pin',
+        '/group-pin', 
+        '/group-conversation-pin',
+        '/pin-message',
+        '/message-pin'
+      ];
+
+      // Her endpoint ve data kombinasyonunu dene
+      for (String endpoint in testEndpoints) {
+        for (Map<String, dynamic> data in testDataList) {
+          try {
+            print('🔍 [PinMessageService] Testing endpoint: $endpoint with data: $data');
+            
+            final response = await _apiService.post(endpoint, data, headers: headers);
+            
+            print('✅ [PinMessageService] SUCCESS! Endpoint: $endpoint, Data: $data');
+            print('📌 [PinMessageService] API Response Status: ${response.statusCode}');
+            print('📌 [PinMessageService] API Response Body: ${response.data}');
+
+            if (response.statusCode == 200 || response.statusCode == 201) {
+              final responseData = response.data;
+              
+              // API response'undan pin durumunu al
+              bool isPinned = false;
+              if (responseData is Map<String, dynamic>) {
+                if (responseData.containsKey('is_pinned')) {
+                  isPinned = responseData['is_pinned'] ?? false;
+                } else if (responseData.containsKey('data') && responseData['data'] is Map<String, dynamic>) {
+                  isPinned = responseData['data']['is_pinned'] ?? false;
+                }
+              }
+              
+              print('✅ [PinMessageService] Group message pinned/unpinned successfully');
+              print('📌 [PinMessageService] Final pin status: $isPinned');
+              print('📌 [PinMessageService] Working endpoint: $endpoint');
+              print('📌 [PinMessageService] Working data: $data');
+
+              // Send socket event for real-time updates
+              _socketService.sendMessage('group:pin_message', {
+                'message_id': messageId,
+                'group_id': groupId,
+                'is_pinned': isPinned,
+                'action': isPinned ? 'pin' : 'unpin',
+              });
+
+              return true;
+            }
+          } catch (e) {
+            print('❌ [PinMessageService] Failed - Endpoint: $endpoint, Data: $data, Error: $e');
+            continue; // Sonraki kombinasyonu dene
+          }
+        }
+      }
+
+      print('❌ [PinMessageService] All endpoint and data combinations failed');
+      return false;
       
     } catch (e) {
       print('❌ [PinMessageService] Pin Group Message Error: $e');
       return false;
     }
   }
-
-  /// Get current message status to determine if it's pinned
-  Future<Map<String, dynamic>?> _getCurrentMessageStatus(int messageId, String groupId) async {
-    try {
-      // Try to get the message from the group chat controller
-      final controller = Get.find<GroupChatDetailController>();
-      
-      // Find the message with the given ID
-      GroupMessageModel? foundMessage;
-      try {
-        foundMessage = controller.messages.firstWhere(
-          (msg) => msg.id == messageId.toString(),
-        );
-      } catch (e) {
-        // Message not found
-        foundMessage = null;
-      }
-      
-      if (foundMessage != null) {
-        return {
-          'is_pinned': foundMessage.isPinned,
-          'id': foundMessage.id,
-        };
-      }
-      
-      return null;
-    } catch (e) {
-      print('❌ [PinMessageService] Error getting current message status: $e');
-      return null;
-    }
-  }
-
-
 
   /// Get pinned messages for a conversation
   Future<List<Map<String, dynamic>>?> getPinnedMessages(int conversationId) async {

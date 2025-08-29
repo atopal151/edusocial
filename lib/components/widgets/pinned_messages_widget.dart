@@ -22,8 +22,8 @@ class PinnedMessagesWidget extends StatefulWidget {
 }
 
 class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
-  late StreamSubscription _pinUpdateSubscription;
-  late StreamSubscription _groupMessageSubscription;
+  StreamSubscription? _pinUpdateSubscription;
+  StreamSubscription? _groupMessageSubscription;
   bool _isListening = false;
   Timer? _refreshTimer;
   bool _isExpanded = false; // Show more/less state
@@ -45,8 +45,8 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
 
   @override
   void dispose() {
-    _pinUpdateSubscription.cancel();
-    _groupMessageSubscription.cancel();
+    _pinUpdateSubscription?.cancel();
+    _groupMessageSubscription?.cancel();
     _refreshTimer?.cancel();
     super.dispose();
   }

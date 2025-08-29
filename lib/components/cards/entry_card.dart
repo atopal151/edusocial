@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
 import 'package:get/get.dart';
 import '../../services/language_service.dart';
+import '../widgets/verification_badge.dart';
 
 class EntryCard extends StatelessWidget {
   final EntryModel entry;
@@ -92,12 +93,23 @@ class EntryCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "${entry.user.name} ${entry.user.surname}",
-                      style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Color(0xff414751)),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            "@${entry.user.username}",
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                                color: Color(0xff414751)),
+                          ),
+                        ),
+                        VerificationBadge(
+                          isVerified: entry.user.isVerified ?? false,
+                          size: 12.0,
+                        ),
+                      ],
                     ),
                     Text(
                       formatSimpleDateClock(entry.createdat.toString()),

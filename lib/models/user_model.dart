@@ -28,6 +28,7 @@ class UserModel {
   final bool isFollowing;
   final bool isFollowingPending;
   final bool isSelf;
+  final bool? isVerified; // Hesap doğrulama durumu
 
   UserModel({
     required this.id,
@@ -58,6 +59,7 @@ class UserModel {
     required this.isFollowing,
     required this.isFollowingPending,
     required this.isSelf,
+    this.isVerified,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -90,6 +92,7 @@ class UserModel {
       isFollowing: json['is_following'] ?? false,
       isFollowingPending: json['is_following_pending'] ?? false,
       isSelf: json['is_self'] ?? false,
+      isVerified: json['is_verified'],
     );
   }
 

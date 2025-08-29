@@ -6,6 +6,7 @@ import '../../models/entry_model.dart';
 import '../../models/user_model.dart';
 import '../../services/language_service.dart';
 import 'package:get/get.dart';
+import '../widgets/verification_badge.dart';
 
 /// PersonEntryCard - Profil ekranları için özel entry kartı
 /// 
@@ -123,12 +124,23 @@ class PersonEntryCard extends StatelessWidget {
                   children: [
                     InkWell(
                       onTap: onPressedProfile,
-                      child: Text(
-                        "${user.name} ${user.surname}",
-                        style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: Color(0xff414751)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              "${user.name} ${user.surname}",
+                              style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  color: Color(0xff414751)),
+                            ),
+                          ),
+                          VerificationBadge(
+                            isVerified: user.isVerified ?? false,
+                            size: 12.0,
+                          ),
+                        ],
                       ),
                     ),
                     Text(

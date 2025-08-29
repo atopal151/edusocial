@@ -8,6 +8,7 @@ import '../../../components/user_appbar/user_appbar.dart';
 import '../../../controllers/chat_controllers/chat_controller.dart';
 import '../../../controllers/group_controller/group_controller.dart';
 import '../../../services/language_service.dart';
+import '../../../components/widgets/verification_badge.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -356,6 +357,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                     avatarUrl: chat.avatar,
                     isOnline: chat.isOnline,
                     username: chat.username,
+                    isVerified: chat.isVerified,
                   );
                 },
                 child: Padding(
@@ -399,12 +401,23 @@ class _ChatListScreenState extends State<ChatListScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                chat.name,
-                                style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: Color(0xff414751)),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      '@${chat.username}',
+                                      style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                          color: Color(0xff414751)),
+                                    ),
+                                  ),
+                                  VerificationBadge(
+                                    isVerified: chat.isVerified ?? false,
+                                    size: 12.0,
+                                  ),
+                                ],
                               ),
                               Text(
                                 chat.lastMessage?.message ?? '',
@@ -467,18 +480,18 @@ class _ChatListScreenState extends State<ChatListScreen>
       elevation: 0,
       strokeWidth: 2.0,
       displacement: 40.0,
-      child: Obx(() => ListView.builder(
+                child: Obx(() => ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: groupController.userGroups.length,
+            itemCount: chatController.groupChatList.length,
             itemBuilder: (context, index) {
-              final group = groupController.userGroups[index];
+              final group = chatController.groupChatList[index];
               
               // DEBUG: Print individual group data when building
               //debugPrint('🏗️ Building group item ${index + 1}: ${group.name} (ID: ${group.id})');
               
               return GestureDetector(
                 onTap: () {
-                  chatController.getGroupChatPage(group.id);
+                  chatController.getGroupChatPage(group.groupId.toString());
                 },
                 child: Padding(
                   padding:
@@ -494,20 +507,42 @@ class _ChatListScreenState extends State<ChatListScreen>
                         CircleAvatar(
                           radius: 25,
                           backgroundColor: Color(0xfffafafa),
-                          child: _buildAvatarWidget(group.avatarUrl),
+                          child: _buildAvatarWidget(group.groupImage),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                group.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 13),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      group.groupName,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600, fontSize: 13),
+                                    ),
+                                  ),
+                                  if (group.isAdmin)
+                                    Container(
+                                      margin: EdgeInsets.only(left: 4),
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xffEF5050),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        Icons.admin_panel_settings,
+                                        size: 10,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                ],
                               ),
                               Text(
-                                group.description,
+                                group.lastMessage,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -519,7 +554,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                         Column(
                           children: [
                             Text(
-                              group.humanCreatedAt,
+                              group.lastMessageTime,
                               style: const TextStyle(
                                   fontSize: 10, color: Colors.grey),
                             ),

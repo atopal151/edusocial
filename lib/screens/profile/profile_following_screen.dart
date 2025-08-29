@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../routes/app_routes.dart';
 import '../../services/language_service.dart';
+import '../../components/widgets/verification_badge.dart';
 
 class ProfileFollowingScreen extends StatefulWidget {
   final List<Map<String, dynamic>> followings;
@@ -160,12 +161,23 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
                           backgroundColor: Color(0xffffffff),
                           backgroundImage: NetworkImage(user["avatar_url"] ?? ''),
                         ),
-                        title: Text(
-                          '${user["name"]} ${user["surname"]} ',
-                          style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff414751)),
+                        title: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                '${user["name"]} ${user["surname"]} ',
+                                style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff414751)),
+                              ),
+                            ),
+                            VerificationBadge(
+                              isVerified: user['is_verified'] ?? false,
+                              size: 12.0,
+                            ),
+                          ],
                         ),
                         subtitle: Text(
                           '@${user["username"]}',
