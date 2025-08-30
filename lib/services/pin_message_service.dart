@@ -1,4 +1,5 @@
-import 'package:dio/dio.dart';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'api_service.dart';
@@ -14,9 +15,9 @@ class PinMessageService extends GetxService {
   /// Returns true if successful, false otherwise
   Future<bool> pinMessage(int messageId) async {
     try {
-      final token = await _authService.getToken();
+      final token = _authService.getToken();
       if (token == null) {
-        print('❌ Pin Message Error: No token available');
+        debugPrint('❌ Pin Message Error: No token available');
         return false;
       }
 
@@ -36,8 +37,8 @@ class PinMessageService extends GetxService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('✅ Message pinned/unpinned successfully');
-        print('✅ API Response: ${response.data}');
+        debugPrint('✅ Message pinned/unpinned successfully');
+        debugPrint('✅ API Response: ${response.data}');
         
         // Determine if message was pinned or unpinned based on response
         final isPinned = response.data['is_pinned'] ?? response.data['isPinned'] ?? false;
@@ -52,11 +53,11 @@ class PinMessageService extends GetxService {
         
         return true;
       } else {
-        print('❌ Pin Message Error: ${response.statusCode} - ${response.data}');
+        debugPrint('❌ Pin Message Error: ${response.statusCode} - ${response.data}');
         return false;
       }
     } catch (e) {
-      print('❌ Pin Message Error: $e');
+      debugPrint('❌ Pin Message Error: $e');
       return false;
     }
   }
@@ -65,11 +66,11 @@ class PinMessageService extends GetxService {
   /// Returns true if successful, false otherwise
   Future<bool> pinGroupMessage(int messageId, String groupId) async {
     try {
-      print('📌 [PinMessageService] Starting pin/unpin operation for message: $messageId, group: $groupId');
+      debugPrint('📌 [PinMessageService] Starting pin/unpin operation for message: $messageId, group: $groupId');
       
-      final token = await _authService.getToken();
+      final token = _authService.getToken();
       if (token == null) {
-        print('❌ Pin Group Message Error: No token available');
+        debugPrint('❌ Pin Group Message Error: No token available');
         return false;
       }
 
@@ -84,7 +85,7 @@ class PinMessageService extends GetxService {
         'group_id': int.tryParse(groupId) ?? groupId,
       };
 
-      print('🔍 [PinMessageService] Using successful endpoint: /group-message-pin, format: $data');
+      debugPrint('🔍 [PinMessageService] Using successful endpoint: /group-message-pin, format: $data');
 
       final response = await _apiService.post(
         '/group-message-pin',
@@ -93,8 +94,8 @@ class PinMessageService extends GetxService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('✅ [PinMessageService] Group message pinned/unpinned successfully');
-        print('✅ [PinMessageService] API Response: ${response.data}');
+        debugPrint('✅ [PinMessageService] Group message pinned/unpinned successfully');
+        debugPrint('✅ [PinMessageService] API Response: ${response.data}');
         
         // API response'undan pin durumunu al
         bool isPinned = false;
@@ -106,7 +107,7 @@ class PinMessageService extends GetxService {
           }
         }
         
-        print('📌 [PinMessageService] Final pin status: $isPinned');
+        debugPrint('📌 [PinMessageService] Final pin status: $isPinned');
 
         // Send socket event for real-time updates
         _socketService.sendMessage('group:pin_message', {
@@ -118,12 +119,12 @@ class PinMessageService extends GetxService {
 
         return true;
       } else {
-        print('❌ [PinMessageService] Group message pin/unpin failed: ${response.statusCode} - ${response.data}');
+        debugPrint('❌ [PinMessageService] Group message pin/unpin failed: ${response.statusCode} - ${response.data}');
         return false;
       }
       
     } catch (e) {
-      print('❌ [PinMessageService] Pin Group Message Error: $e');
+      debugPrint('❌ [PinMessageService] Pin Group Message Error: $e');
       return false;
     }
   }
@@ -131,9 +132,9 @@ class PinMessageService extends GetxService {
   /// Get pinned messages for a conversation
   Future<List<Map<String, dynamic>>?> getPinnedMessages(int conversationId) async {
     try {
-      final token = await _authService.getToken();
+      final token = _authService.getToken();
       if (token == null) {
-        print('❌ Get Pinned Messages Error: No token available');
+        debugPrint('❌ Get Pinned Messages Error: No token available');
         return null;
       }
 
@@ -153,11 +154,11 @@ class PinMessageService extends GetxService {
         }
         return [];
       } else {
-        print('❌ Get Pinned Messages Error: ${response.statusCode} - ${response.data}');
+          debugPrint('❌ Get Pinned Messages Error: ${response.statusCode} - ${response.data}');
         return null;
       }
     } catch (e) {
-      print('❌ Get Pinned Messages Error: $e');
+      debugPrint('❌ Get Pinned Messages Error: $e');
       return null;
     }
   }
