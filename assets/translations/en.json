@@ -761,7 +761,15 @@
       "deleteGroup": "Delete Group",
       "editGroup": "Edit Group",
       "viewParticipants": "View Participants",
-      "sendMessage": "Send Message"
+      "sendMessage": "Send Message",
+      "groupInfo": "Group Info",
+      "viewMembers": "View Members",
+      "muteGroup": {
+        "muted": "Group Muted",
+        "unmuted": "Group Notifications On",
+        "mutedDesc": "You won't receive notifications from this group",
+        "unmutedDesc": "You will receive notifications from this group"
+      }
     },
     "notifications": {
       "error": "Error",
@@ -778,6 +786,15 @@
       "redirectingToGroup": "redirecting to group.",
       "join": "Join",
       "pendingApproval": "Pending Approval"
+    },
+    "pinnedMessages": {
+      "title": "Pinned Messages",
+      "showMore": "more messages",
+      "showLess": "Show less",
+      "noPinnedMessages": "No pinned messages",
+      "unpinMessage": "Unpin message",
+      "navigateToMessage": "Go to message",
+      "emptyState": "No pinned messages yet"
     }
   },
   "home": {
@@ -1447,7 +1464,6 @@
       "error": "Error",
       "warning": "Warning",
       "info": "Info",
-      "info": "Info",
       "copySuccess": "Text copied to clipboard",
       "linkOpenFailed": "Link could not be opened. Please try again.",
       "linkNotSupported": "This link cannot be opened",
@@ -1739,7 +1755,29 @@
       "leaveGroup": "Leave Group",
       "viewMembers": "View Members",
       "groupInfo": "Group Info",
-      "shareGroup": "Share Group"
+      "shareGroup": "Share Group",
+      "muteGroup": {
+        "muted": "Group Muted",
+        "unmuted": "Group Notifications On",
+        "mutedDesc": "You won't receive notifications from this group",
+        "unmutedDesc": "You will receive notifications from this group"
+      },
+      "dialogs": {
+        "leaveGroup": {
+          "title": "Leave Group",
+          "message": "Are you sure you want to leave this group? This action cannot be undone.",
+          "confirm": "Leave"
+        }
+      },
+      "pinnedMessages": {
+        "title": "Pinned Messages",
+        "showMore": "more messages",
+        "showLess": "Show less",
+        "noPinnedMessages": "No pinned messages",
+        "unpinMessage": "Unpin message",
+        "navigateToMessage": "Go to message",
+        "emptyState": "No pinned messages yet"
+      }
     }
   },
   "notificationSettings": {

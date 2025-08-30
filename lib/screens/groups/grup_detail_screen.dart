@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/language_service.dart';
+import '../../services/onesignal_service.dart';
 
 import '../../components/cards/members_avatar.dart';
 import '../../components/widgets/group_detail_tree_point_bottom_sheet.dart'
@@ -730,4 +731,6 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
       ),
     );
   }
+
+
 }

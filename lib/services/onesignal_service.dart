@@ -228,6 +228,18 @@ class OneSignalService extends GetxService {
         case 'group':
           shouldShow = prefs.getBool('message_notifications') ?? true; // Group chat mesajları
           debugPrint('🔍 Grup bildirimleri kontrol edildi: $shouldShow');
+          
+          // Grup bazlı mute kontrolü ekle
+          if (shouldShow) {
+            final groupId = data['group_id']?.toString();
+            if (groupId != null) {
+              final isGroupMuted = prefs.getBool('group_muted_$groupId') ?? false;
+              if (isGroupMuted) {
+                shouldShow = false;
+                debugPrint('🔇 Grup sessize alınmış: $groupId');
+              }
+            }
+          }
           break;
         case 'group_join_request':
         case 'group_join_accepted':
@@ -367,12 +379,115 @@ class OneSignalService extends GetxService {
     }
   }
 
+  // Uygulama kapalıyken sunucudan gelen bildirimler için OneSignal kullan
+  Future<void> sendServerNotification({
+    required String title,
+    required String message,
+    required String type,
+    Map<String, dynamic>? data,
+    List<String>? playerIds,
+  }) async {
+    try {
+      debugPrint('📱 =======================================');
+      debugPrint('📱 Sunucu bildirimi OneSignal ile gönderiliyor...');
+      debugPrint('📱 Title: $title');
+      debugPrint('📱 Message: $message');
+      debugPrint('📱 Type: $type');
+      debugPrint('📱 Data: $data');
+      
+      // Player ID'leri al
+      List<String> targetPlayerIds = [];
+      
+      if (playerIds != null && playerIds.isNotEmpty) {
+        // Belirli kullanıcılara gönder
+        targetPlayerIds = playerIds;
+        debugPrint('📱 Belirli kullanıcılara gönderiliyor: $targetPlayerIds');
+      } else {
+        // Tüm kullanıcılara gönder
+        final currentPlayerId = await getPlayerId();
+        if (currentPlayerId != null) {
+          targetPlayerIds = [currentPlayerId];
+          debugPrint('📱 Mevcut kullanıcıya gönderiliyor: $currentPlayerId');
+        } else {
+          debugPrint('❌ Player ID bulunamadı');
+          return;
+        }
+      }
+      
+      // Bildirim verilerini hazırla
+      final notificationData = {
+        'app_id': _appId,
+        'include_player_ids': targetPlayerIds,
+        'contents': {'en': message},
+        'headings': {'en': title},
+        'data': {
+          'type': type,
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          ...?data,
+        },
+        'android_channel_id': 'default',
+        'priority': 10,
+        'android_accent_color': 'FFEF5050',
+        'android_led_color': 'FFEF5050',
+        'android_sound': 'default',
+        'ios_sound': 'default',
+      };
+      
+      debugPrint('📱 OneSignal API\'ye gönderilecek veri: $notificationData');
+      
+      // OneSignal REST API ile bildirim gönder
+      final response = await _apiService.post(
+        'https://onesignal.com/api/v1/notifications',
+        notificationData,
+        headers: {
+          'Authorization': 'Basic $_apiKey',
+          'Content-Type': 'application/json'
+        },
+      );
+      
+      debugPrint('📱 OneSignal API Response: ${response.statusCode}');
+      debugPrint('📱 Response Data: ${response.data}');
+      
+      if (response.statusCode == 200) {
+        debugPrint('✅ Sunucu bildirimi başarıyla gönderildi');
+        
+        // Eğer invalid_player_ids hatası varsa
+        if (response.data['errors'] != null && 
+            response.data['errors']['invalid_player_ids'] != null) {
+          debugPrint('⚠️ OneSignal Dashboard konfigürasyonu eksik!');
+          debugPrint('🔧 Lütfen OneSignal Dashboard\'da şunları kontrol edin:');
+          debugPrint('   1. App Settings → Android Configuration');
+          debugPrint('   2. Package Name: com.social.edusocial');
+          debugPrint('   3. App ID: $_appId');
+          debugPrint('   4. REST API Key: $_apiKey');
+          debugPrint('   5. Google Project Number (opsiyonel)');
+        }
+      } else {
+        debugPrint('❌ Sunucu bildirimi gönderilemedi: ${response.statusCode}');
+        debugPrint('❌ Hata detayı: ${response.data}');
+      }
+    } catch (e) {
+      debugPrint('❌ Sunucu bildirimi gönderilirken hata: $e');
+    }
+  }
+
   // Bildirim izinlerini iste
   Future<void> requestNotificationPermission() async {
     try {
+      debugPrint('🔐 Bildirim izni isteniyor...');
       await OneSignal.Notifications.requestPermission(true);
+      
+      // İzin durumunu kontrol et
+      final hasPermission = await hasNotificationPermission();
+      debugPrint('🔐 Bildirim izni durumu: $hasPermission');
+      
+      if (hasPermission) {
+        debugPrint('✅ Bildirim izni verildi');
+      } else {
+        debugPrint('❌ Bildirim izni reddedildi');
+      }
     } catch (e) {
-      debugPrint('Bildirim izni istenemedi: $e');
+      debugPrint('❌ Bildirim izni istenirken hata: $e');
     }
   }
 
@@ -765,6 +880,18 @@ class OneSignalService extends GetxService {
         _isShowingNotification = false;
         debugPrint('🔍 Flag false yapıldı (grup bildirimleri kapalı): $_isShowingNotification');
         return;
+      }
+      
+      // Grup bazlı mute kontrolü
+      final muteGroupId = data['group_id']?.toString();
+      if (muteGroupId != null) {
+        final isGroupMuted = prefs.getBool('group_muted_$muteGroupId') ?? false;
+        if (isGroupMuted) {
+          debugPrint('🔇 Grup sessize alınmış: $muteGroupId, bildirim gösterilmeyecek');
+          _isShowingNotification = false;
+          debugPrint('🔍 Flag false yapıldı (grup sessize alınmış): $_isShowingNotification');
+          return;
+        }
       }
       
       // Grup mesajı verilerini al
@@ -1212,6 +1339,54 @@ class OneSignalService extends GetxService {
       'follow_notifications': prefs.getBool('follow_notifications') ?? true,
       'system_notifications': prefs.getBool('system_notifications') ?? true,
     };
+  }
+
+  // Grup bazlı mute fonksiyonları
+  Future<void> muteGroup(String groupId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('group_muted_$groupId', true);
+    debugPrint('🔇 Grup sessize alındı: $groupId');
+  }
+
+  Future<void> unmuteGroup(String groupId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('group_muted_$groupId', false);
+    debugPrint('🔊 Grup sesi açıldı: $groupId');
+  }
+
+  Future<bool> isGroupMuted(String groupId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('group_muted_$groupId') ?? false;
+  }
+
+  // Tüm sessize alınmış grupları al
+  Future<List<String>> getMutedGroups() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+    final mutedGroups = <String>[];
+    
+    for (final key in keys) {
+      if (key.startsWith('group_muted_') && prefs.getBool(key) == true) {
+        final groupId = key.replaceFirst('group_muted_', '');
+        mutedGroups.add(groupId);
+      }
+    }
+    
+    return mutedGroups;
+  }
+
+  // Tüm grup mute ayarlarını temizle
+  Future<void> clearAllGroupMutes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+    
+    for (final key in keys) {
+      if (key.startsWith('group_muted_')) {
+        await prefs.remove(key);
+      }
+    }
+    
+    debugPrint('🗑️ Tüm grup mute ayarları temizlendi');
   }
 
   // OneSignal'ın kendi servisi ile test notification (Firebase gerektirmez)

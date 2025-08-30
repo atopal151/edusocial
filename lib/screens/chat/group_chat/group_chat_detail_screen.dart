@@ -6,7 +6,7 @@ import '../../../components/widgets/group_chat_widget/group_document_message_wid
 import '../../../components/widgets/group_chat_widget/group_universal_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_poll_message_widget.dart';
 import '../../../components/widgets/group_chat_widget/group_survey_message_widget.dart';
-import '../../../components/widgets/tree_point_bottom_sheet.dart';
+import '../../../components/widgets/group_chat_bottom_sheet.dart';
 import '../../../components/widgets/chat_widget/date_separator_widget.dart';
 import '../../../components/widgets/pinned_messages_widget.dart';
 import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
@@ -166,7 +166,7 @@ class GroupChatDetailScreenState extends State<GroupChatDetailScreen> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                 ),
-                builder: (context) =>  TreePointBottomSheet(),
+                builder: (context) =>  GroupChatBottomSheet(),
               );
             },
             child: Padding(

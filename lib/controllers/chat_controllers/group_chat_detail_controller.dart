@@ -2106,28 +2106,11 @@ class GroupChatDetailController extends GetxController {
   /// Pin or unpin a group message
   Future<void> pinMessage(int messageId) async {
     try {
-      debugPrint('📌 [GroupChatDetailController] Pin/Unpin işlemi başlatıldı');
-      debugPrint('📌 [GroupChatDetailController] Message ID: $messageId');
-      debugPrint('📌 [GroupChatDetailController] Group ID: ${currentGroupId.value}');
       
-      // Admin kontrolü - API'den gelen verileri kullan
-      debugPrint('🔍 [GroupChatDetailController] === ADMIN YETKİ KONTROLÜ ===');
-      debugPrint('🔍 [GroupChatDetailController] isFounder: $isCurrentUserAdmin');
-      debugPrint('🔍 [GroupChatDetailController] isMember: ${groupData.value?.isMember}');
-      debugPrint('🔍 [GroupChatDetailController] User Count With Admin: ${groupData.value?.userCountWithAdmin}');
-      debugPrint('🔍 [GroupChatDetailController] User Count Without Admin: ${groupData.value?.userCountWithoutAdmin}');
-      debugPrint('🔍 [GroupChatDetailController] === ADMIN YETKİ KONTROLÜ TAMAMLANDI ===');
       
       // Mesaj detaylarını kontrol et
       final targetMessage = messages.firstWhereOrNull((msg) => msg.id == messageId.toString());
       if (targetMessage != null) {
-        debugPrint('🔍 [GroupChatDetailController] === MESAJ DETAYLARI ===');
-        debugPrint('🔍 [GroupChatDetailController] Message ID: ${targetMessage.id}');
-        debugPrint('🔍 [GroupChatDetailController] Message Content: ${targetMessage.content}');
-        debugPrint('🔍 [GroupChatDetailController] Current Pin Status: ${targetMessage.isPinned}');
-        debugPrint('🔍 [GroupChatDetailController] Message Type: ${targetMessage.messageType}');
-        debugPrint('🔍 [GroupChatDetailController] Sender ID: ${targetMessage.senderId}');
-        debugPrint('🔍 [GroupChatDetailController] === MESAJ DETAYLARI TAMAMLANDI ===');
       } else {
         debugPrint('❌ [GroupChatDetailController] Target message not found: $messageId');
       }

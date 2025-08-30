@@ -388,7 +388,7 @@ class GroupServices {
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         
-        // API'den gelen ham veriyi debug et
+        /*// API'den gelen ham veriyi debug et
         printFullText('🔍 =======================================');
         printFullText('🔍 GROUP DETAIL API RAW RESPONSE');
         printFullText('🔍 =======================================');
@@ -397,7 +397,7 @@ class GroupServices {
         printFullText('🔍 Response Headers: ${response.headers}');
         printFullText('🔍 Raw Response Body:');
         printFullText(response.body);
-        printFullText('🔍 =======================================');
+        printFullText('🔍 =======================================');*/
         
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
           //final groupData = jsonBody['data']['group'];

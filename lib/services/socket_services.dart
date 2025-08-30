@@ -199,9 +199,16 @@ class SocketService extends GetxService {
       bool pinStatusDetected = false;
       
       if (data is Map<String, dynamic>) {
-        // Önce message objesi içinde kontrol et
+        // Önce message objesi içinde kontrol et - güvenli tip kontrolü
         if (data.containsKey('message')) {
-          final messageData = data['message'] as Map<String, dynamic>?;
+          Map<String, dynamic>? messageData;
+          if (data['message'] is Map<String, dynamic>) {
+            messageData = data['message'] as Map<String, dynamic>;
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+            messageData = null;
+          }
+          
           if (messageData != null && messageData.containsKey('is_pinned')) {
             final messageId = messageData['id']?.toString();
             final isPinned = messageData['is_pinned'] ?? false;
@@ -286,10 +293,15 @@ class SocketService extends GetxService {
       
       // Pin message controller'a da gönder (pin işlemi için)
       if (data is Map<String, dynamic>) {
-        // Message data'yı parse et
+        // Message data'yı parse et - güvenli tip kontrolü
         Map<String, dynamic> messageData;
         if (data.containsKey('message')) {
-          messageData = data['message'] as Map<String, dynamic>;
+          if (data['message'] is Map<String, dynamic>) {
+            messageData = data['message'] as Map<String, dynamic>;
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+            messageData = data;
+          }
         } else {
           messageData = data;
         }
@@ -321,10 +333,15 @@ class SocketService extends GetxService {
       
       // Pin message controller'a da gönder (unpin işlemi için)
       if (data is Map<String, dynamic>) {
-        // Message data'yı parse et
+        // Message data'yı parse et - güvenli tip kontrolü
         Map<String, dynamic> messageData;
         if (data.containsKey('message')) {
-          messageData = data['message'] as Map<String, dynamic>;
+          if (data['message'] is Map<String, dynamic>) {
+            messageData = data['message'] as Map<String, dynamic>;
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+            messageData = data;
+          }
         } else {
           messageData = data;
         }
@@ -357,10 +374,15 @@ class SocketService extends GetxService {
       
       // Pin message controller'a da gönder (pin işlemi için)
       if (data is Map<String, dynamic>) {
-        // Message data'yı parse et
+        // Message data'yı parse et - güvenli tip kontrolü
         Map<String, dynamic> messageData;
         if (data.containsKey('message')) {
-          messageData = data['message'] as Map<String, dynamic>;
+          if (data['message'] is Map<String, dynamic>) {
+            messageData = data['message'] as Map<String, dynamic>;
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+            messageData = data;
+          }
         } else {
           messageData = data;
         }
@@ -471,10 +493,15 @@ class SocketService extends GetxService {
       
       // Pin message controller'a da gönder (unpin işlemi için)
       if (data is Map<String, dynamic>) {
-        // Message data'yı parse et
+        // Message data'yı parse et - güvenli tip kontrolü
         Map<String, dynamic> messageData;
         if (data.containsKey('message')) {
-          messageData = data['message'] as Map<String, dynamic>;
+          if (data['message'] is Map<String, dynamic>) {
+            messageData = data['message'] as Map<String, dynamic>;
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+            messageData = data;
+          }
         } else {
           messageData = data;
         }
@@ -688,10 +715,17 @@ class SocketService extends GetxService {
       
       _userNotificationController.add(data);
       
-      // Bildirim tipini belirle
+      // Bildirim tipini belirle - güvenli tip kontrolü
       String notificationType = 'notification';
       if (data is Map<String, dynamic> && data.containsKey('notification_data')) {
-        final notificationData = data['notification_data'] as Map<String, dynamic>?;
+        Map<String, dynamic>? notificationData;
+        if (data['notification_data'] is Map<String, dynamic>) {
+          notificationData = data['notification_data'] as Map<String, dynamic>;
+        } else {
+          debugPrint('⚠️ Notification data is not a Map: ${data['notification_data']}');
+          notificationData = null;
+        }
+        
         final type = notificationData?['type']?.toString() ?? '';
         
         // Alt türe göre bildirim tipini belirle
@@ -974,11 +1008,15 @@ class SocketService extends GetxService {
       if (data is Map<String, dynamic>) {
         printFullText('👥 === GROUP MESSAGE DETAYLI ANALİZ ===');
         
-        // Grup ID'sini doğru yerden al
+        // Grup ID'sini doğru yerden al - güvenli tip kontrolü
         dynamic groupId = data['group_id'];
-        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
-          final messageData = data['message'] as Map<String, dynamic>;
-          groupId = messageData['group_id'] ?? data['group_id'];
+        if (data.containsKey('message')) {
+          if (data['message'] is Map<String, dynamic>) {
+            final messageData = data['message'] as Map<String, dynamic>;
+            groupId = messageData['group_id'] ?? data['group_id'];
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+          }
         }
         printFullText('👥 Group ID: $groupId');
       }
@@ -1085,11 +1123,15 @@ class SocketService extends GetxService {
       if (data is Map<String, dynamic>) {
         printFullText('👥 === GROUP MESSAGE EVENT DETAYLI ANALİZ ===');
         
-        // Grup ID'sini doğru yerden al
+        // Grup ID'sini doğru yerden al - güvenli tip kontrolü
         dynamic groupId = data['group_id'];
-        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
-          final messageData = data['message'] as Map<String, dynamic>;
-          groupId = messageData['group_id'] ?? data['group_id'];
+        if (data.containsKey('message')) {
+          if (data['message'] is Map<String, dynamic>) {
+            final messageData = data['message'] as Map<String, dynamic>;
+            groupId = messageData['group_id'] ?? data['group_id'];
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+          }
         }
         printFullText('👥 Group ID: $groupId');
       }
@@ -1144,24 +1186,32 @@ class SocketService extends GetxService {
         printFullText('👥 Created At: ${data['created_at']}');
         printFullText('👥 Message ID: ${data['id']}');
         
-        // Message alanını kontrol et
-        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
-          final messageData = data['message'] as Map<String, dynamic>;
-          printFullText('👥 📝 MESSAGE ALANı VAR: ${messageData.runtimeType}');
-          printFullText('👥 📝 Message data: $messageData');
-          printFullText('👥 📝 Message keys: ${messageData.keys.toList()}');
-          printFullText('👥 📝 Message text: ${messageData['message']}');
-          printFullText('👥 📝 Message is_read: ${messageData['is_read']}');
-          printFullText('👥 📝 Message is_me: ${messageData['is_me']}');
+        // Message alanını kontrol et - güvenli tip kontrolü
+        if (data.containsKey('message')) {
+          if (data['message'] is Map<String, dynamic>) {
+            final messageData = data['message'] as Map<String, dynamic>;
+            printFullText('👥 📝 MESSAGE ALANı VAR: ${messageData.runtimeType}');
+            printFullText('👥 📝 Message data: $messageData');
+            printFullText('👥 📝 Message keys: ${messageData.keys.toList()}');
+            printFullText('👥 📝 Message text: ${messageData['message']}');
+            printFullText('👥 📝 Message is_read: ${messageData['is_read']}');
+            printFullText('👥 📝 Message is_me: ${messageData['is_me']}');
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+          }
         }
         
-        // User alanını kontrol et
-        if (data.containsKey('user') && data['user'] is Map<String, dynamic>) {
-          final userData = data['user'] as Map<String, dynamic>;
-          printFullText('👥 👤 USER ALANı VAR: ${userData.runtimeType}');
-          printFullText('👥 👤 User keys: ${userData.keys.toList()}');
-          printFullText('👥 👤 User name: ${userData['name']}');
-          printFullText('👥 👤 User ID: ${userData['id']}');
+        // User alanını kontrol et - güvenli tip kontrolü
+        if (data.containsKey('user')) {
+          if (data['user'] is Map<String, dynamic>) {
+            final userData = data['user'] as Map<String, dynamic>;
+            printFullText('👥 👤 USER ALANı VAR: ${userData.runtimeType}');
+            printFullText('👥 👤 User keys: ${userData.keys.toList()}');
+            printFullText('👥 👤 User name: ${userData['name']}');
+            printFullText('👥 👤 User ID: ${userData['id']}');
+          } else {
+            debugPrint('⚠️ User data is not a Map: ${data['user']}');
+          }
         }
         
         printFullText('👥 === ANALİZ TAMAMLANDI ===');
@@ -1245,9 +1295,16 @@ class SocketService extends GetxService {
       bool pinStatusDetected = false;
       
       if (data is Map<String, dynamic>) {
-        // Önce message objesi içinde kontrol et
+        // Önce message objesi içinde kontrol et - güvenli tip kontrolü
         if (data.containsKey('message')) {
-          final messageData = data['message'] as Map<String, dynamic>?;
+          Map<String, dynamic>? messageData;
+          if (data['message'] is Map<String, dynamic>) {
+            messageData = data['message'] as Map<String, dynamic>;
+          } else {
+            debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+            messageData = null;
+          }
+          
           if (messageData != null && messageData.containsKey('is_pinned')) {
             final messageId = messageData['id']?.toString();
             final isPinned = messageData['is_pinned'] ?? false;
@@ -1598,7 +1655,15 @@ class SocketService extends GetxService {
           title = 'Yeni Mesaj';
           // Private mesaj data yapısı: {message: "text", sender: {name: "...", avatar_url: "..."}}
           if (data is Map<String, dynamic> && data.containsKey('sender')) {
-            final senderData = data['sender'] as Map<String, dynamic>?;
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? senderData;
+            if (data['sender'] is Map<String, dynamic>) {
+              senderData = data['sender'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ Sender data is not a Map: ${data['sender']}');
+              senderData = null;
+            }
+            socketr
             final senderName = senderData?['name'] ?? 'Bilinmeyen';
             final messageText = data['message'] ?? 'Yeni bir mesajınız var';
             message = '$senderName: $messageText';
@@ -1611,13 +1676,35 @@ class SocketService extends GetxService {
         case 'group':
           // Group mesaj data yapısı: {message: {message: "text", user: {name: "..."}}}
           if (data is Map<String, dynamic> && data.containsKey('message')) {
-            final messageData = data['message'] as Map<String, dynamic>?;
-            final userData = messageData?['user'] as Map<String, dynamic>?;
-            final senderName = userData?['name'] ?? 'Bilinmeyen';
-            final messageText = messageData?['message'] ?? 'Grup sohbetinde yeni mesaj';
-            title = 'Grup Mesajı';
-            message = '$senderName: $messageText';
-            avatar = userData?['avatar_url'] ?? '';
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? messageData;
+            if (data['message'] is Map<String, dynamic>) {
+              messageData = data['message'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+              messageData = null;
+            }
+            
+            if (messageData != null && messageData.containsKey('user')) {
+              // Güvenli tip kontrolü
+              Map<String, dynamic>? userData;
+              if (messageData['user'] is Map<String, dynamic>) {
+                userData = messageData['user'] as Map<String, dynamic>;
+              } else {
+                debugPrint('⚠️ User data is not a Map: ${messageData['user']}');
+                userData = null;
+              }
+              
+              final senderName = userData?['name'] ?? 'Bilinmeyen';
+              final messageText = messageData['message'] ?? 'Grup sohbetinde yeni mesaj';
+              title = 'Grup Mesajı';
+              message = '$senderName: $messageText';
+              avatar = userData?['avatar_url'] ?? '';
+            } else {
+              title = 'Grup Mesajı';
+              message = data['message'] ?? 'Grup sohbetinde yeni mesaj';
+              avatar = data['group_avatar'] ?? '';
+            }
           } else {
             title = 'Grup Mesajı';
             message = data['message'] ?? 'Grup sohbetinde yeni mesaj';
@@ -1628,45 +1715,89 @@ class SocketService extends GetxService {
           title = 'Yeni Bildirim';
           // Notification data yapısı: {notification_data: {notification_full_data: {user: {...}, post: {...}}, type: "post-like"}}
           if (data is Map<String, dynamic> && data.containsKey('notification_data')) {
-            final notificationData = data['notification_data'] as Map<String, dynamic>?;
-            final notificationFullData = notificationData?['notification_full_data'] as Map<String, dynamic>?;
-            final notificationType = notificationData?['type']?.toString() ?? '';
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? notificationData;
+            if (data['notification_data'] is Map<String, dynamic>) {
+              notificationData = data['notification_data'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ Notification data is not a Map: ${data['notification_data']}');
+              notificationData = null;
+            }
             
-            if (notificationFullData != null) {
-              final userData = notificationFullData['user'] as Map<String, dynamic>?;
-              final postData = notificationFullData['post'] as Map<String, dynamic>?;
-              
-              final userName = userData?['name'] ?? 'Bilinmeyen';
-              final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
-              
-              // Bildirim tipine göre mesaj oluştur
-              switch (notificationType) {
-                case 'post-like':
-                  final postContent = postData?['content'] ?? 'Post\'unuzu beğendi';
-                  message = '$userName: $postContent';
-                  title = 'Yeni Beğeni';
-                  break;
-                case 'post-comment':
-                  final postContent = postData?['content'] ?? 'Post\'unuza yorum geldi';
-                  message = '$userName: $postContent';
-                  title = 'Yeni Yorum';
-                  break;
-                case 'follow-request':
-                  message = '$userName sizi takip etmek istiyor';
-                  title = 'Takip İsteği';
-                  break;
-                case 'group-join-request':
-                  final groupData = notificationFullData['group'] as Map<String, dynamic>?;
-                  final groupName = groupData?['name'] ?? 'Grup';
-                  message = '$userName $groupName grubuna katılmak istiyor';
-                  title = 'Grup Katılma İsteği';
-                  break;
-                default:
-                  message = '$userName size bildirim gönderdi';
-                  title = 'Yeni Bildirim';
+            if (notificationData != null && notificationData.containsKey('notification_full_data')) {
+              // Güvenli tip kontrolü
+              Map<String, dynamic>? notificationFullData;
+              if (notificationData['notification_full_data'] is Map<String, dynamic>) {
+                notificationFullData = notificationData['notification_full_data'] as Map<String, dynamic>;
+              } else {
+                debugPrint('⚠️ Notification full data is not a Map: ${notificationData['notification_full_data']}');
+                notificationFullData = null;
               }
               
-              avatar = userAvatar;
+              final notificationType = notificationData['type']?.toString() ?? '';
+              
+              if (notificationFullData != null) {
+                // Güvenli tip kontrolü
+                Map<String, dynamic>? userData;
+                if (notificationFullData['user'] is Map<String, dynamic>) {
+                  userData = notificationFullData['user'] as Map<String, dynamic>;
+                } else {
+                  debugPrint('⚠️ User data is not a Map: ${notificationFullData['user']}');
+                  userData = null;
+                }
+                
+                // Güvenli tip kontrolü
+                Map<String, dynamic>? postData;
+                if (notificationFullData['post'] is Map<String, dynamic>) {
+                  postData = notificationFullData['post'] as Map<String, dynamic>;
+                } else {
+                  debugPrint('⚠️ Post data is not a Map: ${notificationFullData['post']}');
+                  postData = null;
+                }
+                
+                final userName = userData?['name'] ?? 'Bilinmeyen';
+                final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
+                
+                // Bildirim tipine göre mesaj oluştur
+                switch (notificationType) {
+                  case 'post-like':
+                    final postContent = postData?['content'] ?? 'Post\'unuzu beğendi';
+                    message = '$userName: $postContent';
+                    title = 'Yeni Beğeni';
+                    break;
+                  case 'post-comment':
+                    final postContent = postData?['content'] ?? 'Post\'unuza yorum geldi';
+                    message = '$userName: $postContent';
+                    title = 'Yeni Yorum';
+                    break;
+                  case 'follow-request':
+                    message = '$userName sizi takip etmek istiyor';
+                    title = 'Takip İsteği';
+                    break;
+                  case 'group-join-request':
+                    // Güvenli tip kontrolü
+                    Map<String, dynamic>? groupData;
+                    if (notificationFullData['group'] is Map<String, dynamic>) {
+                      groupData = notificationFullData['group'] as Map<String, dynamic>;
+                    } else {
+                      debugPrint('⚠️ Group data is not a Map: ${notificationFullData['group']}');
+                      groupData = null;
+                    }
+                    
+                    final groupName = groupData?['name'] ?? 'Grup';
+                    message = '$userName $groupName grubuna katılmak istiyor';
+                    title = 'Grup Katılma İsteği';
+                    break;
+                  default:
+                    message = '$userName size bildirim gönderdi';
+                    title = 'Yeni Bildirim';
+                }
+                
+                avatar = userAvatar;
+              } else {
+                message = data['message'] ?? data['content'] ?? 'Yeni bir bildiriminiz var';
+                avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
+              }
             } else {
               message = data['message'] ?? data['content'] ?? 'Yeni bir bildiriminiz var';
               avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
@@ -1680,7 +1811,15 @@ class SocketService extends GetxService {
           title = 'Yeni Yorum';
           // Comment data yapısı: {user: {name: "...", avatar_url: "..."}, content: "..."}
           if (data is Map<String, dynamic> && data.containsKey('user')) {
-            final userData = data['user'] as Map<String, dynamic>?;
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? userData;
+            if (data['user'] is Map<String, dynamic>) {
+              userData = data['user'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ User data is not a Map: ${data['user']}');
+              userData = null;
+            }
+            
             final userName = userData?['name'] ?? 'Bilinmeyen';
             final commentText = data['content'] ?? data['message'] ?? 'Post\'unuza yeni yorum geldi';
             message = '$userName: $commentText';
@@ -1694,7 +1833,15 @@ class SocketService extends GetxService {
           title = 'Yeni Beğeni';
           // Like data yapısı: {user: {name: "...", avatar_url: "..."}, post: {content: "..."}}
           if (data is Map<String, dynamic> && data.containsKey('user')) {
-            final userData = data['user'] as Map<String, dynamic>?;
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? userData;
+            if (data['user'] is Map<String, dynamic>) {
+              userData = data['user'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ User data is not a Map: ${data['user']}');
+              userData = null;
+            }
+            
             final userName = userData?['name'] ?? 'Bilinmeyen';
             final postContent = data['post']?['content'] ?? 'Post\'unuza yeni beğeni geldi';
             message = '$userName: $postContent';
@@ -1708,7 +1855,15 @@ class SocketService extends GetxService {
           title = 'Yeni Takipçi';
           // Follow data yapısı: {user: {name: "...", avatar_url: "..."}}
           if (data is Map<String, dynamic> && data.containsKey('user')) {
-            final userData = data['user'] as Map<String, dynamic>?;
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? userData;
+            if (data['user'] is Map<String, dynamic>) {
+              userData = data['user'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ User data is not a Map: ${data['user']}');
+              userData = null;
+            }
+            
             final userName = userData?['name'] ?? 'Bilinmeyen';
             message = '$userName sizi takip etmeye başladı';
             avatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
@@ -1726,8 +1881,24 @@ class SocketService extends GetxService {
           title = 'Grup Katılma İsteği';
           // Group join request data yapısı: {user: {name: "...", avatar_url: "..."}, group: {name: "..."}}
           if (data is Map<String, dynamic> && data.containsKey('user')) {
-            final userData = data['user'] as Map<String, dynamic>?;
-            final groupData = data['group'] as Map<String, dynamic>?;
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? userData;
+            if (data['user'] is Map<String, dynamic>) {
+              userData = data['user'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ User data is not a Map: ${data['user']}');
+              userData = null;
+            }
+            
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? groupData;
+            if (data['group'] is Map<String, dynamic>) {
+              groupData = data['group'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ Group data is not a Map: ${data['group']}');
+              groupData = null;
+            }
+            
             final userName = userData?['name'] ?? 'Bilinmeyen';
             final groupName = groupData?['name'] ?? 'Grup';
             message = '$userName $groupName grubuna katılmak istiyor';
@@ -1751,7 +1922,15 @@ class SocketService extends GetxService {
           title = 'Takip İsteği';
           // Follow request data yapısı: {user: {name: "...", avatar_url: "..."}}
           if (data is Map<String, dynamic> && data.containsKey('user')) {
-            final userData = data['user'] as Map<String, dynamic>?;
+            // Güvenli tip kontrolü
+            Map<String, dynamic>? userData;
+            if (data['user'] is Map<String, dynamic>) {
+              userData = data['user'] as Map<String, dynamic>;
+            } else {
+              debugPrint('⚠️ User data is not a Map: ${data['user']}');
+              userData = null;
+            }
+            
             final userName = userData?['name'] ?? 'Bilinmeyen';
             message = '$userName sizi takip etmek istiyor';
             avatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
@@ -1806,34 +1985,6 @@ class SocketService extends GetxService {
       debugPrint('❌ OneSignal bildirimi gönderilemedi: $e');
     }
   }
-/*
-  // Özel mesaj bildirimi gönder (profil resmi ve kullanıcı adı ile)
-  void _sendCustomMessageNotification(dynamic data) {
-    try {
-      debugPrint('💬 Özel mesaj bildirimi hazırlanıyor...');
-      
-      // Mesaj verilerini al
-      final message = data['message'] ?? '';
-      final senderName = data['sender_name'] ?? data['sender'] ?? 'Bilinmeyen';
-      final senderAvatar = data['sender_avatar'] ?? data['profile_image'] ?? '';
-      final conversationId = data['conversation_id'];
-      
-      debugPrint('💬 Mesaj detayları: sender=$senderName, message=$message');
-      
-      // Özel bildirim gönder
-      _oneSignalService.sendCustomMessageNotification(
-        senderName: senderName,
-        message: message,
-        senderAvatar: senderAvatar,
-        conversationId: conversationId,
-        data: data,
-      );
-      
-      debugPrint('✅ Özel mesaj bildirimi gönderildi');
-    } catch (e) {
-      debugPrint('❌ Özel mesaj bildirimi gönderilemedi: $e');
-    }
-  }*/
 
   // Özel grup mesaj bildirimi gönder (grup profil resmi, grup adı ve gönderen bilgisi ile)
   void _sendCustomGroupMessageNotification(dynamic data) async {
@@ -1841,13 +1992,27 @@ class SocketService extends GetxService {
       debugPrint('👥 Özel grup mesaj bildirimi hazırlanıyor...');
       
       // Group mesaj data yapısı: {message: {message: "text", user: {name: "...", avatar_url: "..."}}}
-      final messageData = data['message'] as Map<String, dynamic>?;
+      Map<String, dynamic>? messageData;
+      if (data['message'] is Map<String, dynamic>) {
+        messageData = data['message'] as Map<String, dynamic>;
+      } else {
+        debugPrint('⚠️ Message data is not a Map: ${data['message']}');
+        messageData = null;
+      }
+      
       if (messageData == null) {
         debugPrint('❌ Group message data is null');
         return;
       }
       
-      final userData = messageData['user'] as Map<String, dynamic>?;
+      // Güvenli tip kontrolü - user alanının Map olduğundan emin ol
+      Map<String, dynamic>? userData;
+      if (messageData['user'] is Map<String, dynamic>) {
+        userData = messageData['user'] as Map<String, dynamic>;
+      } else {
+        debugPrint('⚠️ User data is not a Map: ${messageData['user']}');
+        userData = null;
+      }
       final messageText = messageData['message'] ?? '';
       final senderName = userData?['name'] ?? 'Bilinmeyen';
       final senderUserId = messageData['user_id']?.toString() ?? '';

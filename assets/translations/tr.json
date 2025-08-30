@@ -813,13 +813,30 @@
       "deleteGroup": "Grubu Sil",
       "editGroup": "Grubu Düzenle",
       "viewParticipants": "Katılımcıları Görüntüle",
-      "sendMessage": "Mesaj Gönder"
+      "sendMessage": "Mesaj Gönder",
+      "groupInfo": "Grup Bilgisi",
+      "viewMembers": "Üyeleri Görüntüle",
+      "muteGroup": {
+        "muted": "Grup Sessize Alındı",
+        "unmuted": "Grup Bildirimleri Açık",
+        "mutedDesc": "Bu gruptan bildirim almayacaksınız",
+        "unmutedDesc": "Bu gruptan bildirim alacaksınız"
+      }
     },
     "list": {
       "groupSelected": "Grup Seçildi",
       "redirectingToGroup": "grubuna yönlendiriliyor.",
       "join": "Katıl",
       "pendingApproval": "Onay Bekliyor"
+    },
+    "pinnedMessages": {
+      "title": "Sabitlenen Mesajlar",
+      "showMore": "mesaj daha göster",
+      "showLess": "Daha az göster",
+      "noPinnedMessages": "Sabitlenen mesaj yok",
+      "unpinMessage": "Sabitlemeyi kaldır",
+      "navigateToMessage": "Mesaja git",
+      "emptyState": "Henüz sabitlenen mesaj yok"
     },
     "notifications": {
       "error": "Hata",
@@ -1125,7 +1142,29 @@
       "leaveGroup": "Gruptan Ayrıl",
       "viewMembers": "Üyeleri Görüntüle",
       "groupInfo": "Grup Bilgisi",
-      "shareGroup": "Grubu Paylaş"
+      "shareGroup": "Grubu Paylaş",
+      "muteGroup": {
+        "muted": "Grup Sessize Alındı",
+        "unmuted": "Grup Bildirimleri Açık",
+        "mutedDesc": "Bu gruptan bildirim almayacaksınız",
+        "unmutedDesc": "Bu gruptan bildirim alacaksınız"
+      },
+      "dialogs": {
+        "leaveGroup": {
+          "title": "Gruptan Ayrıl",
+          "message": "Bu gruptan ayrılmak istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+          "confirm": "Ayrıl"
+        }
+      },
+      "pinnedMessages": {
+        "title": "Sabitlenen Mesajlar",
+        "showMore": "mesaj daha göster",
+        "showLess": "Daha az göster",
+        "noPinnedMessages": "Sabitlenen mesaj yok",
+        "unpinMessage": "Sabitlemeyi kaldır",
+        "navigateToMessage": "Mesaja git",
+        "emptyState": "Henüz sabitlenen mesaj yok"
+      }
     }
   },
   "notificationSettings": {
@@ -1512,7 +1551,6 @@
       "success": "Başarılı",
       "error": "Hata",
       "warning": "Uyarı",
-      "info": "Bilgi",
       "info": "Bilgi",
       "copySuccess": "Metin panoya kopyalandı",
       "linkOpenFailed": "Link açılamadı. Lütfen tekrar deneyin.",
