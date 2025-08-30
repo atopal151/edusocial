@@ -38,10 +38,10 @@ String formatEventDate(String startDateString, String endDateString) {
     String cleanEndDate = endDateString;
     
     if (startDateString.contains('.')) {
-      cleanStartDate = startDateString.split('.').first + 'Z';
+      cleanStartDate = '${startDateString.split('.').first}Z';
     }
     if (endDateString.contains('.')) {
-      cleanEndDate = endDateString.split('.').first + 'Z';
+      cleanEndDate = '${endDateString.split('.').first}Z';
     }
     
     DateTime startDate = DateTime.parse(cleanStartDate);

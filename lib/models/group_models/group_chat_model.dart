@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 class GroupChatModel {
   final int id;

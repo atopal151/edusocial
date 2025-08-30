@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../../utils/constants.dart';
-import '../components/print_full_text.dart';
 
 class PeopleProfileService {
   static final box = GetStorage();

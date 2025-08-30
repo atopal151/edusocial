@@ -466,8 +466,7 @@ class OptimizedMessageListView extends StatelessWidget {
       case GroupMessageType.link:
       case GroupMessageType.textWithLinks:
       case GroupMessageType.text:
-      default:
-        return GroupUniversalMessageWidget(message: message, controller: controller);
+      return GroupUniversalMessageWidget(message: message, controller: controller);
     }
   }
 }

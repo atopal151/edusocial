@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class VerificationBadge extends StatelessWidget {
   final bool isVerified;
@@ -35,7 +34,7 @@ class VerificationBadge extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withAlpha(10),
               blurRadius: 2,
               offset: const Offset(0, 1),
             ),

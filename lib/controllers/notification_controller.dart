@@ -89,7 +89,7 @@ class NotificationController extends GetxController {
         
         // Ana alanları kontrol et
         for (String key in data.keys) {
-          printFullText('👤   ${key}: ${data[key]} (Type: ${data[key].runtimeType})');
+          printFullText('👤   $key: ${data[key]} (Type: ${data[key].runtimeType})');
         }
         
         // Nested objects'leri detaylı incele
@@ -97,7 +97,7 @@ class NotificationController extends GetxController {
           printFullText('👤 === NOTIFICATION_DATA DETAYLI ===');
           final notificationData = data['notification_data'] as Map;
           for (String key in notificationData.keys) {
-            printFullText('👤     ${key}: ${notificationData[key]} (Type: ${notificationData[key].runtimeType})');
+            printFullText('👤     $key: ${notificationData[key]} (Type: ${notificationData[key].runtimeType})');
           }
           
           // is_read alanını özel olarak kontrol et
@@ -122,7 +122,7 @@ class NotificationController extends GetxController {
           printFullText('👤 === USER DETAYLI ===');
           final user = data['user'] as Map;
           for (String key in user.keys) {
-            printFullText('👤     ${key}: ${user[key]} (Type: ${user[key].runtimeType})');
+            printFullText('👤     $key: ${user[key]} (Type: ${user[key].runtimeType})');
           }
         }
         

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
@@ -32,7 +33,7 @@ class SurveyService {
         requestBody['is_group'] = false;
       }
 
-      print('📊 Survey API Request Body: $requestBody');
+      debugPrint('📊 Survey API Request Body: $requestBody');
 
       final response = await http.post(
         Uri.parse('${AppConstants.baseUrl}/survey'),
@@ -47,11 +48,11 @@ class SurveyService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
-        print('❌ Survey creation failed: ${response.statusCode} - ${response.body}');
+        debugPrint('❌ Survey creation failed: ${response.statusCode} - ${response.body}');
         return false;
       }
     } catch (e) {
-      print('❌ Survey creation error: $e');
+      debugPrint('❌ Survey creation error: $e');
       return false;
     }
   }
@@ -69,7 +70,7 @@ class SurveyService {
         'answer_id': answerIds.isNotEmpty ? answerIds.first : 0,
       };
       
-      print('📊 Survey Answer API Request Body: $requestBody');
+      debugPrint('📊 Survey Answer API Request Body: $requestBody');
       
       final response = await http.post(
         Uri.parse('${AppConstants.baseUrl}/survey-answer'),
@@ -84,11 +85,11 @@ class SurveyService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
-        print('❌ Survey answer failed: ${response.statusCode} - ${response.body}');
+        debugPrint('❌ Survey answer failed: ${response.statusCode} - ${response.body}');
         return false;
       }
     } catch (e) {
-      print('❌ Survey answer error: $e');
+      debugPrint('❌ Survey answer error: $e');
       return false;
     }
   }
@@ -110,11 +111,11 @@ class SurveyService {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['data'] ?? []);
       } else {
-        print('❌ Get group surveys failed: ${response.statusCode}');
+        debugPrint('❌ Get group surveys failed: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('❌ Get group surveys error: $e');
+      debugPrint('❌ Get group surveys error: $e');
       return [];
     }
   }

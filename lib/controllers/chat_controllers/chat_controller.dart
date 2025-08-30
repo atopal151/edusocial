@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/chat_models/chat_model.dart';
 import '../../models/chat_models/group_chat_model.dart';
-import '../../services/chat_service.dart';
 import '../group_controller/group_controller.dart';
 
 class ChatController extends GetxController with WidgetsBindingObserver {
@@ -29,7 +28,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   late StreamSubscription _privateMessageSubscription;
   late StreamSubscription _groupMessageSubscription;
   late StreamSubscription _unreadCountSubscription;
-  late StreamSubscription _perChatUnreadCountSubscription;
   
   // Kalıcı kırmızı nokta durumları
   var unreadConversationIds = <int>[].obs;
@@ -663,32 +661,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  /// 🚀 Uygulama başlatıldığında chat listesini socket ile senkronize et
-  Future<void> _initializeChatListWithSocketSync() async {
-    try {
-      debugPrint("🚀 Uygulama başlatıldı, chat listesi socket ile senkronize ediliyor...");
-      
-      // Önce API'den chat listesini çek
-      await fetchChatList();
-      
-      // Socket bağlantısının hazır olmasını bekle
-      await Future.delayed(Duration(milliseconds: 500));
-      
-      // Socket count'u kontrol et ve gerekirse güncelle
-      _checkAndSyncWithSocketCount();
-      
-      // 5 saniye sonra tekrar kontrol et (socket bağlantısı gecikmeli olabilir)
-      Future.delayed(Duration(seconds: 5), () {
-        debugPrint("🔄 5 saniye sonra socket count tekrar kontrol ediliyor...");
-        _checkAndSyncWithSocketCount();
-      });
-      
-    } catch (e) {
-      debugPrint("❌ Chat listesi socket senkronizasyon hatası: $e");
-      // Hata durumunda normal fetchChatList'i çağır
-      await fetchChatList();
-    }
-  }
 
   /// 🔍 Socket count'u kontrol et ve gerekirse senkronize et
   void _checkAndSyncWithSocketCount() {
@@ -1063,7 +1035,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     
     // GroupController'ı da güncelle (tab bar'daki count için)
     try {
-      final groupController = Get.find<GroupController>();
+      Get.find<GroupController>();
       // GroupController'ın groupUnreadCount getter'ı artık ChatController'dan veri alacak
       debugPrint("🔄 GroupController tab bar count güncellendi");
     } catch (e) {

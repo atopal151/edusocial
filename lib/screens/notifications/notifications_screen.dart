@@ -11,7 +11,6 @@ import '../../services/language_service.dart';
 import 'dart:async';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/components/print_full_text.dart';
-import 'package:flutter/foundation.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -145,7 +144,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             printFullText('📱 Notification Data Keys: ${notificationData.keys.toList()}');
             
             for (String key in notificationData.keys) {
-              printFullText('📱   ${key}: ${notificationData[key]} (Type: ${notificationData[key].runtimeType})');
+              printFullText('📱   $key: ${notificationData[key]} (Type: ${notificationData[key].runtimeType})');
             }
           } else {
             printFullText('📱 Notification Data: $notificationData (Type: ${notificationData.runtimeType})');
@@ -159,7 +158,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             printFullText('📱 User Keys: ${user.keys.toList()}');
             
             for (String key in user.keys) {
-              printFullText('📱   ${key}: ${user[key]} (Type: ${user[key].runtimeType})');
+              printFullText('📱   $key: ${user[key]} (Type: ${user[key].runtimeType})');
             }
           } else {
             printFullText('📱 User: $user (Type: ${user.runtimeType})');
@@ -173,7 +172,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             printFullText('📱 Group Keys: ${group.keys.toList()}');
             
             for (String key in group.keys) {
-              printFullText('📱   ${key}: ${group[key]} (Type: ${group[key].runtimeType})');
+              printFullText('📱   $key: ${group[key]} (Type: ${group[key].runtimeType})');
             }
           } else {
             printFullText('📱 Group: $group (Type: ${group.runtimeType})');
@@ -187,7 +186,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             printFullText('📱 Data Keys: ${dataObj.keys.toList()}');
             
             for (String key in dataObj.keys) {
-              printFullText('📱   ${key}: ${dataObj[key]} (Type: ${dataObj[key].runtimeType})');
+              printFullText('📱   $key: ${dataObj[key]} (Type: ${dataObj[key].runtimeType})');
             }
           } else {
             printFullText('📱 Data: $dataObj (Type: ${dataObj.runtimeType})');
@@ -201,7 +200,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             printFullText('📱 Answer Keys: ${answer.keys.toList()}');
             
             for (String key in answer.keys) {
-              printFullText('📱   ${key}: ${answer[key]} (Type: ${answer[key].runtimeType})');
+              printFullText('📱   $key: ${answer[key]} (Type: ${answer[key].runtimeType})');
             }
           } else {
             printFullText('📱 Answer: $answer (Type: ${answer.runtimeType})');
@@ -215,7 +214,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             printFullText('📱 Full Data Keys: ${fullData.keys.toList()}');
             
             for (String key in fullData.keys) {
-              printFullText('📱   ${key}: ${fullData[key]} (Type: ${fullData[key].runtimeType})');
+              printFullText('📱   $key: ${fullData[key]} (Type: ${fullData[key].runtimeType})');
             }
           } else {
             printFullText('📱 Full Data: $fullData (Type: ${fullData.runtimeType})');
@@ -228,7 +227,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         if (otherKeys.isNotEmpty) {
           printFullText('📱 === DİĞER ALANLAR ===');
           for (String key in otherKeys) {
-            printFullText('📱   ${key}: ${data[key]} (Type: ${data[key].runtimeType})');
+            printFullText('📱   $key: ${data[key]} (Type: ${data[key].runtimeType})');
           }
         }
         
@@ -691,69 +690,4 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return "${(diff.inDays / 365).floor()}${languageService.tr("notifications.timeAgo.yearsAgo")}";
   }
   
-  /// Test method for notification logging - can be called manually for testing
-  void _testNotificationLogging() {
-    printFullText('🧪 === TEST NOTIFICATION LOGGING ===');
-    
-    // Simulate a sample notification data structure
-    final testData = {
-      'id': '12345',
-      'type': 'follow-request',
-      'user_id': '67890',
-      'sender_id': '11111',
-      'message': 'Test notification message',
-      'text': 'Test notification text',
-      'created_at': '2024-01-01T12:00:00Z',
-      'updated_at': '2024-01-01T12:00:00Z',
-      'is_read': false,
-      'group_id': 'group123',
-      'event_id': 'event456',
-      'conversation_id': 'conv789',
-      'notification_data': {
-        'id': '12345',
-        'type': 'follow-request',
-        'text': 'Test notification data text',
-        'user_id': '67890',
-        'created_at': '2024-01-01T12:00:00Z',
-      },
-      'user': {
-        'id': '11111',
-        'username': 'testuser',
-        'name': 'Test',
-        'surname': 'User',
-        'avatar_url': 'https://example.com/avatar.jpg',
-        'is_following': false,
-        'is_following_pending': true,
-        'is_self': false,
-      },
-      'group': {
-        'id': 'group123',
-        'name': 'Test Group',
-        'status': 'pending',
-      },
-      'data': {
-        'data': {
-          'user_id': '11111',
-          'group_id': 'group123',
-        }
-      },
-      'answer': {
-        'status': 'pending',
-        'created_at': '2024-01-01T12:00:00Z',
-      },
-      'notification_full_data': {
-        'text': 'Test full data text',
-        'user_id': '67890',
-        'group_id': 'group123',
-        'event_id': 'event456',
-        'group_name': 'Test Group',
-      },
-      'extra_field': 'extra_value',
-    };
-    
-    // Call the notification handler with test data
-    _handleNewNotification(testData);
-    
-    printFullText('🧪 === TEST COMPLETED ===');
-  }
 }

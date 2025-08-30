@@ -60,7 +60,7 @@ class GroupUniversalMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final languageService = Get.find<LanguageService>();
+    Get.find<LanguageService>();
     
     // Debug bilgisi
     //debugPrint('GroupUniversalMessageWidget - Content: ${message.content}');
@@ -252,7 +252,7 @@ class GroupUniversalMessageWidget extends StatelessWidget {
                             style: GoogleFonts.inter(
                               fontSize: 8,
                               color: message.isSentByMe 
-                                  ? Colors.white.withOpacity(0.8)
+                                  ? Colors.white.withAlpha(80)
                                   : const Color(0xff8E8E93),
                               fontWeight: FontWeight.w400,
                             ),

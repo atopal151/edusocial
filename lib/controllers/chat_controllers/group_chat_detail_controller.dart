@@ -15,16 +15,13 @@ import '../../services/language_service.dart';
 import '../../services/socket_services.dart';
 import '../../services/survey_service.dart';
 import '../../services/pin_message_service.dart';
-import '../../services/auth_service.dart';
 import '../profile_controller.dart';
 import '../../components/snackbars/custom_snackbar.dart';
-import '../../components/print_full_text.dart';
 
 class GroupChatDetailController extends GetxController {
   // Services
   final GroupServices _groupServices = GroupServices();
   final LanguageService _languageService = Get.find<LanguageService>();
-  final AuthService _authService = AuthService();
 
   final RxList<GroupMessageModel> messages = <GroupMessageModel>[].obs;
   final RxBool isLoading = false.obs;
@@ -268,7 +265,7 @@ class GroupChatDetailController extends GetxController {
       // Group chat için conversation_id'yi güncelle
       if (group.conversationId != null) {
         currentConversationId.value = group.conversationId!;
-        print('📌 [GroupChatDetailController] Updated conversation ID from group data: ${group.conversationId}');
+        debugPrint('📌 [GroupChatDetailController] Updated conversation ID from group data: ${group.conversationId}');
       }
       
       // OPTIMIZE: Process messages in background
@@ -744,7 +741,7 @@ class GroupChatDetailController extends GetxController {
             
             // Media dosyalarını al
             List<String>? mediaUrls;
-            if (chat.media != null && chat.media.isNotEmpty) {
+            if (chat.media.isNotEmpty) {
               mediaUrls = chat.media.map((media) => media.fullPath).toList();
             }
             
@@ -770,7 +767,7 @@ class GroupChatDetailController extends GetxController {
                   surveyId: messageData['surveyId'],
                   choiceIds: messageData['choiceIds'],
                   surveyData: messageData['surveyData'],
-                  isPinned: chat.isPinned ?? false, // Pin durumunu ekle
+                  isPinned: chat.isPinned, // Pin durumunu ekle
                 );
             
             processedMessages.add(message);
@@ -803,7 +800,7 @@ class GroupChatDetailController extends GetxController {
         
         // Pin durumu debug log'ları
         final pinnedCount = messages.where((msg) => msg.isPinned).length;
-        debugPrint('📌 Pin durumu kontrolü: ${pinnedCount} pinlenmiş mesaj bulundu');
+        debugPrint('📌 Pin durumu kontrolü: $pinnedCount pinlenmiş mesaj bulundu');
         for (int i = 0; i < messages.length; i++) {
           final msg = messages[i];
           if (msg.isPinned) {
@@ -822,7 +819,7 @@ class GroupChatDetailController extends GetxController {
         
         // Pin durumu debug log'ları
         final pinnedCount = messages.where((msg) => msg.isPinned).length;
-        debugPrint('📌 Pin durumu kontrolü: ${pinnedCount} pinlenmiş mesaj bulundu');
+        debugPrint('📌 Pin durumu kontrolü: $pinnedCount pinlenmiş mesaj bulundu');
       }
       
       // Extract media in background
@@ -2087,26 +2084,6 @@ class GroupChatDetailController extends GetxController {
     }
   }
 
-  /// Pin durumu değişikliği için bildirim göster
-  void _showPinStatusNotification(bool isPinned, String messageContent) {
-    final action = isPinned ? 'sabitleme' : 'sabitleme kaldırma';
-    final shortMessage = messageContent.length > 30 
-        ? '${messageContent.substring(0, 30)}...' 
-        : messageContent;
-    
-    Get.snackbar(
-      isPinned ? '📌 Mesaj Sabitlendi' : '📌 Sabitleme Kaldırıldı',
-      'Mesaj: $shortMessage',
-      snackPosition: SnackPosition.TOP,
-      duration: Duration(seconds: 2),
-      backgroundColor: isPinned ? Colors.green.shade100 : Colors.orange.shade100,
-      colorText: isPinned ? Colors.green.shade800 : Colors.orange.shade800,
-      icon: Icon(
-        isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-        color: isPinned ? Colors.green : Colors.orange,
-      ),
-    );
-  }
 
   @override
   void onClose() {
@@ -2136,7 +2113,7 @@ class GroupChatDetailController extends GetxController {
       
       // Admin kontrolü - API'den gelen verileri kullan
       debugPrint('🔍 [GroupChatDetailController] === ADMIN YETKİ KONTROLÜ ===');
-      debugPrint('🔍 [GroupChatDetailController] isFounder: ${isCurrentUserAdmin}');
+      debugPrint('🔍 [GroupChatDetailController] isFounder: $isCurrentUserAdmin');
       debugPrint('🔍 [GroupChatDetailController] isMember: ${groupData.value?.isMember}');
       debugPrint('🔍 [GroupChatDetailController] User Count With Admin: ${groupData.value?.userCountWithAdmin}');
       debugPrint('🔍 [GroupChatDetailController] User Count Without Admin: ${groupData.value?.userCountWithoutAdmin}');

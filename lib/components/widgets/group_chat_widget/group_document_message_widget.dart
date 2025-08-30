@@ -102,98 +102,96 @@ class GroupDocumentMessageWidget extends StatelessWidget {
           child: Align(
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
             child: Container(
-              child: Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.7,
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.7,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: message.isSentByMe 
+                  ? const Color(0xFFff7c7c) // Kırmızı
+                  : Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: const Radius.circular(18),
+                bottomRight: const Radius.circular(18),
+                topLeft: message.isSentByMe 
+                    ? const Radius.circular(18) 
+                    : const Radius.circular(4),
+                topRight: message.isSentByMe 
+                    ? const Radius.circular(4) 
+                    : const Radius.circular(18),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: message.isSentByMe 
-                    ? const Color(0xFFff7c7c) // Kırmızı
-                    : Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: const Radius.circular(18),
-                  bottomRight: const Radius.circular(18),
-                  topLeft: message.isSentByMe 
-                      ? const Radius.circular(18) 
-                      : const Radius.circular(4),
-                  topRight: message.isSentByMe 
-                      ? const Radius.circular(4) 
-                      : const Radius.circular(18),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.insert_drive_file, 
-                        color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                        size: 24,
-                      ),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              documentName,
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
-                                color: message.isSentByMe ? Colors.white : const Color(0xff000000),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.insert_drive_file, 
+                      color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            documentName,
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: message.isSentByMe ? Colors.white : const Color(0xff000000),
+                              fontWeight: FontWeight.w500,
                             ),
-                            if (documentUrl != null)
-                                                                   Text(
-                                     languageService.tr("chat.document.clickToDownload"),
-                                     style: GoogleFonts.inter(
-                                       fontSize: 12,
-                                       color: message.isSentByMe 
-                                           ? Colors.white.withValues(alpha: 0.8)
-                                           : const Color(0xff8E8E93),
-                                     ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (documentUrl != null)
+                                                                 Text(
+                                   languageService.tr("chat.document.clickToDownload"),
+                                   style: GoogleFonts.inter(
+                                     fontSize: 12,
+                                     color: message.isSentByMe 
+                                         ? Colors.white.withValues(alpha: 0.8)
+                                         : const Color(0xff8E8E93),
                                    ),
-                          ],
-                        ),
+                                 ),
+                        ],
                       ),
-                      if (documentUrl != null) ...[
-                        const SizedBox(width: 8),
-                                                           Icon(
-                             Icons.download,
+                    ),
+                    if (documentUrl != null) ...[
+                      const SizedBox(width: 8),
+                                                         Icon(
+                           Icons.download,
+                           color: message.isSentByMe 
+                               ? Colors.white.withValues(alpha: 0.8)
+                               : const Color(0xff8E8E93),
+                           size: 16,
+                         ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 4),
+                // Saat bilgisi mesaj balonunun içinde sağ altta
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                                                 Text(
+                           _formatTime(message.timestamp),
+                           style: GoogleFonts.inter(
+                             fontSize: 8,
                              color: message.isSentByMe 
                                  ? Colors.white.withValues(alpha: 0.8)
                                  : const Color(0xff8E8E93),
-                             size: 16,
+                             fontWeight: FontWeight.w400,
                            ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  // Saat bilgisi mesaj balonunun içinde sağ altta
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                                                   Text(
-                             _formatTime(message.timestamp),
-                             style: GoogleFonts.inter(
-                               fontSize: 8,
-                               color: message.isSentByMe 
-                                   ? Colors.white.withValues(alpha: 0.8)
-                                   : const Color(0xff8E8E93),
-                               fontWeight: FontWeight.w400,
-                             ),
-                           ),
-                    ],
-                  ),
-                ],
-              ),
+                         ),
+                  ],
+                ),
+              ],
             ),
-            ),
+                        ),
           ),
         ),
       ],

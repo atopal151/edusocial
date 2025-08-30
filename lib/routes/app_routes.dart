@@ -56,7 +56,6 @@ import '../screens/chat/user_chat/user_chat_detail_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/home/story/add_story_screen.dart';
 import '../screens/main_screen.dart';
-import '../test_socket_pin.dart';
 
 class Routes {
   static const String login = '/login';
@@ -295,6 +294,5 @@ class Routes {
       middlewares: [AuthGuard()]
     ),
     GetPage(name: addStory, page: () => AddStoryScreen()),
-    GetPage(name: socketPinTest, page: () => const SocketPinTest()),
   ];
 }

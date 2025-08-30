@@ -85,7 +85,7 @@ class ResetPasswordScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha(90),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -100,7 +100,7 @@ class ResetPasswordScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withAlpha(10),
                       blurRadius: 10,
                       offset: Offset(0, 5),
                     ),

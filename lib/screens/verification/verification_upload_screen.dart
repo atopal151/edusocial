@@ -1,10 +1,8 @@
 import 'package:edusocial/components/buttons/custom_button.dart';
-import 'package:edusocial/components/snackbars/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:io';
 import '../../components/user_appbar/back_appbar.dart';
 import '../../services/language_service.dart';
 import '../../controllers/verification_controller.dart';

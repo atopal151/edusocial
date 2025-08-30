@@ -13,7 +13,6 @@ import '../models/chat_models/chat_model.dart';
 import '../models/user_chat_detail_model.dart';
 import '../components/print_full_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/chat_models/group_chat_model.dart';
 import '../utils/api_helper.dart';
 
 class ChatServices {

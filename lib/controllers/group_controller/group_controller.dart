@@ -141,7 +141,7 @@ class GroupController extends GetxController {
             'createdAt': group.createdAt,
             'updatedAt': group.updatedAt,
           };
-          printFullText('GROUP ${i + 1} FULL JSON DATA: ${groupJson}');
+          printFullText('GROUP ${i + 1} FULL JSON DATA: $groupJson');
         }
         
         debugPrint("🔍 Filtreleme sonucu: ${allGroups.length} gruptan ${accessibleGroups.length} grup gösteriliyor");

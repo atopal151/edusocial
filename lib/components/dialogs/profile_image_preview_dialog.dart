@@ -185,7 +185,7 @@ class _ProfileImagePreviewDialogState extends State<ProfileImagePreviewDialog>
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withAlpha(20),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

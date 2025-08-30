@@ -452,7 +452,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                   )
-                                : Container(
+                                : SizedBox(
                                     width: 8,
                                     height: 8,
                                     // Boş container (görünmez)
@@ -569,7 +569,7 @@ class _ChatListScreenState extends State<ChatListScreen>
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                   )
-                                : Container(
+                                : SizedBox(
                                     width: 8,
                                     height: 8,
                                     // Boş container (görünmez)

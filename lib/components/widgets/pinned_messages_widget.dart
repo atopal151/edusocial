@@ -24,7 +24,6 @@ class PinnedMessagesWidget extends StatefulWidget {
 class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   StreamSubscription? _pinUpdateSubscription;
   StreamSubscription? _groupMessageSubscription;
-  bool _isListening = false;
   Timer? _refreshTimer;
   bool _isExpanded = false; // Show more/less state
   double? _screenHeight; // Store screen height safely
@@ -55,7 +54,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     // Her 2 saniyede bir widget'ı yenile
     _refreshTimer = Timer.periodic(Duration(seconds: 2), (timer) {
       if (mounted) {
-        print('📌 [PinnedMessagesWidget] Periodic refresh triggered');
+        debugPrint('📌 [PinnedMessagesWidget] Periodic refresh triggered');
         setState(() {
           // Widget'ı yeniden oluştur
         });
@@ -69,7 +68,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         final socketService = Get.find<SocketService>();
         _pinUpdateSubscription = socketService.onPinMessage.listen((data) {
           if (mounted) {
-            print('📌 [PinnedMessagesWidget] Pin update event received: $data');
+            debugPrint('📌 [PinnedMessagesWidget] Pin update event received: $data');
 
             // Pin durumu değişikliği kontrolü
             if (data is Map<String, dynamic>) {
@@ -78,18 +77,18 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
               final source = data['source'];
               final action = data['action'];
 
-              print(
+              debugPrint(
                   '📌 [PinnedMessagesWidget] Pin status change detected: Message ID=$messageId, isPinned=$isPinned, Source=$source, Action=$action');
 
               if (!isPinned ||
                   source == 'group:unpin_message' ||
                   action == 'unpin') {
-                print(
+                  debugPrint(
                     '📌 [PinnedMessagesWidget] UNPIN detected - Forcing widget refresh');
                 // Unpin durumunda widget'ı zorla yenile
                 _forceWidgetRefresh();
               } else {
-                print(
+                debugPrint(
                     '📌 [PinnedMessagesWidget] PIN detected - Updating widget');
                 setState(() {
                   // Widget'ı yeniden oluştur
@@ -106,7 +105,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         // Group message events'ini de dinle
         _groupMessageSubscription = socketService.onGroupMessage.listen((data) {
           if (mounted) {
-            print(
+            debugPrint(
                 '📌 [PinnedMessagesWidget] Group message event received: $data');
 
             // Pin durumu kontrolü
@@ -116,7 +115,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                 final isPinned = messageData['is_pinned'] ?? false;
                 final messageId = messageData['id']?.toString();
 
-                print(
+                debugPrint(
                     '📌 [PinnedMessagesWidget] Group message pin status: Message ID=$messageId, isPinned=$isPinned');
 
                 // Widget'ı yenile
@@ -128,17 +127,16 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
           }
         });
 
-        _isListening = true;
-        print('📌 [PinnedMessagesWidget] Pin update listener setup completed');
+        debugPrint('📌 [PinnedMessagesWidget] Pin update listener setup completed');
       } catch (e) {
-        print('❌ [PinnedMessagesWidget] Pin update listener setup error: $e');
+        debugPrint('❌ [PinnedMessagesWidget] Pin update listener setup error: $e');
       }
     }
   }
 
   /// Widget'ı zorla yenile (unpin işlemleri için)
   void _forceWidgetRefresh() {
-    print('📌 [PinnedMessagesWidget] Force refresh called');
+    debugPrint('📌 [PinnedMessagesWidget] Force refresh called');
 
     // Önce setState ile yenile
     setState(() {
@@ -148,7 +146,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     // Sonra kısa bir gecikme ile tekrar yenile (unpin işlemi için)
     Future.delayed(Duration(milliseconds: 50), () {
       if (mounted) {
-        print('📌 [PinnedMessagesWidget] Force refresh delayed call');
+        debugPrint('📌 [PinnedMessagesWidget] Force refresh delayed call');
         setState(() {
           // Widget'ı tekrar yeniden oluştur
         });
@@ -572,7 +570,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Private chat mesajına git
   void _navigateToMessage(int messageId) {
     try {
-      print('📌 [PinnedMessagesWidget] Navigating to private message: $messageId');
+      debugPrint('📌 [PinnedMessagesWidget] Navigating to private message: $messageId');
       
       final controller = Get.find<ChatDetailController>();
       
@@ -580,44 +578,40 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
       
       if (messageIndex != -1) {
-        print('📌 [PinnedMessagesWidget] Message found at index: $messageIndex');
+        debugPrint('📌 [PinnedMessagesWidget] Message found at index: $messageIndex');
         
         // ScrollController varsa o mesaja git
-        if (controller.scrollController != null) {
-          // Güvenli şekilde ekran yüksekliğini al
-          final screenHeight = _screenHeight ?? 800.0; // Default fallback
-          
-          // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 100px)
-          final messagePosition = messageIndex * 100.0;
-          
-          // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
-          final targetPosition = messagePosition - (screenHeight / 2) + 50; // 50px offset for better centering
-          
-          // Negatif pozisyon olmaması için kontrol et
-          final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
-          
-          controller.scrollController!.animateTo(
-            finalPosition,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-          
-          print('📌 [PinnedMessagesWidget] Scrolled to center position: $finalPosition');
-        } else {
-          print('❌ [PinnedMessagesWidget] ScrollController not found');
-        }
-      } else {
-        print('❌ [PinnedMessagesWidget] Message not found with ID: $messageId');
+        // Güvenli şekilde ekran yüksekliğini al
+        final screenHeight = _screenHeight ?? 800.0; // Default fallback
+        
+        // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 100px)
+        final messagePosition = messageIndex * 100.0;
+        
+        // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
+        final targetPosition = messagePosition - (screenHeight / 2) + 50; // 50px offset for better centering
+        
+        // Negatif pozisyon olmaması için kontrol et
+        final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
+        
+        controller.scrollController.animateTo(
+          finalPosition,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+        
+        debugPrint('📌 [PinnedMessagesWidget] Scrolled to center position: $finalPosition');
+            } else {
+        debugPrint('❌ [PinnedMessagesWidget] Message not found with ID: $messageId');
       }
     } catch (e) {
-      print('❌ [PinnedMessagesWidget] Navigation error: $e');
+      debugPrint('❌ [PinnedMessagesWidget] Navigation error: $e');
     }
   }
 
   /// Group chat mesajına git
   void _navigateToGroupMessage(String messageId) {
     try {
-      print('📌 [PinnedMessagesWidget] Navigating to group message: $messageId');
+      debugPrint('📌 [PinnedMessagesWidget] Navigating to group message: $messageId');
       
       final controller = Get.find<GroupChatDetailController>();
       
@@ -625,58 +619,54 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
       
       if (messageIndex != -1) {
-        print('📌 [PinnedMessagesWidget] Group message found at index: $messageIndex');
+        debugPrint('📌 [PinnedMessagesWidget] Group message found at index: $messageIndex');
         
         // ScrollController varsa o mesaja git
-        if (controller.scrollController != null) {
-          // Güvenli şekilde ekran yüksekliğini al
-          final screenHeight = _screenHeight ?? 800.0; // Default fallback
-          
-          // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 120px)
-          final messagePosition = messageIndex * 120.0;
-          
-          // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
-          final targetPosition = messagePosition - (screenHeight / 2) + 60; // 60px offset for better centering
-          
-          // Negatif pozisyon olmaması için kontrol et
-          final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
-          
-          controller.scrollController!.animateTo(
-            finalPosition,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-          
-          print('📌 [PinnedMessagesWidget] Scrolled to group message center position: $finalPosition');
-        } else {
-          print('❌ [PinnedMessagesWidget] Group ScrollController not found');
-        }
-      } else {
-        print('❌ [PinnedMessagesWidget] Group message not found with ID: $messageId');
+        // Güvenli şekilde ekran yüksekliğini al
+        final screenHeight = _screenHeight ?? 800.0; // Default fallback
+        
+        // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 120px)
+        final messagePosition = messageIndex * 120.0;
+        
+        // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
+        final targetPosition = messagePosition - (screenHeight / 2) + 60; // 60px offset for better centering
+        
+        // Negatif pozisyon olmaması için kontrol et
+        final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
+        
+        controller.scrollController.animateTo(
+          finalPosition,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+        
+        debugPrint('📌 [PinnedMessagesWidget] Scrolled to group message center position: $finalPosition');
+            } else {
+        debugPrint('❌ [PinnedMessagesWidget] Group message not found with ID: $messageId');
       }
     } catch (e) {
-      print('❌ [PinnedMessagesWidget] Group navigation error: $e');
+      debugPrint('❌ [PinnedMessagesWidget] Group navigation error: $e');
     }
   }
 
   /// Private chat mesajının pinini kaldır
   void _unpinMessage(int messageId) async {
     try {
-      print('📌 [PinnedMessagesWidget] Unpinning private message: $messageId');
+      debugPrint('📌 [PinnedMessagesWidget] Unpinning private message: $messageId');
       
       final pinMessageService = Get.find<PinMessageService>();
       await pinMessageService.pinMessage(messageId);
       
-      print('✅ [PinnedMessagesWidget] Private message unpinned successfully');
+      debugPrint('✅ [PinnedMessagesWidget] Private message unpinned successfully');
     } catch (e) {
-      print('❌ [PinnedMessagesWidget] Unpin private message error: $e');
+      debugPrint('❌ [PinnedMessagesWidget] Unpin private message error: $e');
     }
   }
 
   /// Group chat mesajının pinini kaldır
   void _unpinGroupMessage(String messageId) async {
     try {
-      print('📌 [PinnedMessagesWidget] Unpinning group message: $messageId');
+      debugPrint('📌 [PinnedMessagesWidget] Unpinning group message: $messageId');
       
       final controller = Get.find<GroupChatDetailController>();
       final pinMessageService = Get.find<PinMessageService>();
@@ -684,15 +674,15 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       // Message ID'yi integer'a çevir
       final messageIdInt = int.tryParse(messageId);
       if (messageIdInt == null) {
-        print('❌ [PinnedMessagesWidget] Invalid message ID: $messageId');
+        debugPrint('❌ [PinnedMessagesWidget] Invalid message ID: $messageId');
         return;
       }
       
       await pinMessageService.pinGroupMessage(messageIdInt, controller.currentGroupId.value);
       
-      print('✅ [PinnedMessagesWidget] Group message unpinned successfully');
-    } catch (e) {
-      print('❌ [PinnedMessagesWidget] Unpin group message error: $e');
+      debugPrint('✅ [PinnedMessagesWidget] Group message unpinned successfully');
+      } catch (e) {
+      debugPrint('❌ [PinnedMessagesWidget] Unpin group message error: $e');
     }
   }
 }
