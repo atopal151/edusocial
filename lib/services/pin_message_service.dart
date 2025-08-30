@@ -38,8 +38,6 @@ class PinMessageService extends GetxService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('✅ Message pinned/unpinned successfully');
-        debugPrint('✅ API Response: ${response.data}');
-        
         // Determine if message was pinned or unpinned based on response
         final isPinned = response.data['is_pinned'] ?? response.data['isPinned'] ?? false;
         
@@ -95,8 +93,6 @@ class PinMessageService extends GetxService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('✅ [PinMessageService] Group message pinned/unpinned successfully');
-        debugPrint('✅ [PinMessageService] API Response: ${response.data}');
-        
         // API response'undan pin durumunu al
         bool isPinned = false;
         if (response.data is Map<String, dynamic>) {

@@ -18,9 +18,6 @@ class LessonService {
 
       final url = Uri.parse('${AppConstants.baseUrl}/schools/lesson');
       
-      debugPrint("📤 Ders ekleme isteği gönderiliyor...");
-      debugPrint("📍 URL: $url");
-      debugPrint("📚 Ders adı: $lessonName");
 
       final response = await http.post(
         url,
@@ -34,17 +31,12 @@ class LessonService {
         }),
       );
 
-      debugPrint("📥 HTTP Status Code: ${response.statusCode}");
-      debugPrint("📥 Response Headers: ${response.headers}");
-      debugPrint("📥 Raw Response Body: ${response.body}");
 
       final data = jsonDecode(response.body);
       debugPrint("📥 Parsed Response Data: $data");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Ders başarıyla eklendi");
-        debugPrint("✅ Response Status: ${data["status"]}");
-        debugPrint("✅ Response Message: ${data["message"] ?? "No message"}");
         
         // Ders ID'sini response'dan al
         int? lessonId;
@@ -62,9 +54,6 @@ class LessonService {
       } else {
         debugPrint("❌ Ders ekleme başarısız");
         debugPrint("❌ Status Code: ${response.statusCode}");
-        debugPrint("❌ Response Status: ${data["status"]}");
-        debugPrint("❌ Error Message: ${data["message"] ?? "No error message"}");
-        debugPrint("❌ Full Error Response: $data");
         return {'success': false, 'id': null};
       }
     } catch (e, stackTrace) {

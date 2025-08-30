@@ -29,21 +29,12 @@ class NotificationService {
         final invitationNotifs = jsonBody['data']?['invitation_notifications'] ?? [];
         final followerNotifs = jsonBody['data']?['follower_notifications'] ?? [];
 
-        //debugPrint("📥 notifications Body: ${response.body}", wrapWidth: 1024);
 
         final allNotifs = [
           ...postNotifs,
           ...invitationNotifs,
           ...followerNotifs
         ];
-
-        //debugPrint("📥 === NOTIFICATION SERVICE DEBUG ===");
-        //debugPrint("📥 Raw API Response: ${response.body}");
-        //debugPrint("📥 Post Notifications Count: ${postNotifs.length}");
-        //debugPrint("📥 Invitation Notifications Count: ${invitationNotifs.length}");
-        //debugPrint("📥 Follower Notifications Count: ${followerNotifs.length}");
-        // debugPrint("📥 Total Notifications Count: ${allNotifs.length}");
-        //debugPrint("📥 =================================");
 
         // Bildirimleri created_at tarihine göre sırala (en yeni en üstte)
         allNotifs.sort((a, b) {
@@ -97,8 +88,6 @@ class NotificationService {
         }),
       );
 
-      //debugPrint("📤 Follow request response: ${response.statusCode}");
-      //debugPrint("📤 Follow request body: ${response.body}");
 
       final jsonResponse = jsonDecode(response.body);
       
@@ -146,8 +135,6 @@ class NotificationService {
         }),
       );
 
-      //debugPrint("📤 Follow user response: ${response.statusCode}");
-      //debugPrint("📤 Follow user body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
@@ -181,8 +168,6 @@ class NotificationService {
         }),
       );
 
-      //debugPrint("📤 Unfollow user response: ${response.statusCode}");
-      //debugPrint("📤 Unfollow user body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
@@ -220,8 +205,6 @@ class NotificationService {
         }),
       );
 
-      //debugPrint("📤 Group join request response: ${response.statusCode}");
-      //debugPrint("📤 Group join request body: ${response.body}");
 
       final jsonResponse = jsonDecode(response.body);
       

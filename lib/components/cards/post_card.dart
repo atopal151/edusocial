@@ -341,7 +341,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                 (link) => InkWell(
                                   onTap: () async {
                                     try {
-                                      debugPrint("🔗 Link açma deneniyor: $link");
                                       
                                       // URL'yi temizle ve kontrol et
                                       String cleanLink = link.trim();
@@ -349,22 +348,17 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                         cleanLink = 'https://$cleanLink';
                                       }
                                       
-                                      debugPrint("🔗 Temizlenmiş link: $cleanLink");
                                       
                                       final Uri url = Uri.parse(cleanLink);
-                                      debugPrint("🔗 Parsed URL: $url");
                                       
                                       // URL'nin açılabilir olup olmadığını kontrol et
                                       final canLaunch = await canLaunchUrl(url);
-                                      debugPrint("🔗 canLaunchUrl sonucu: $canLaunch");
                                       
                                       if (canLaunch) {
-                                        debugPrint("🔗 URL açılıyor...");
                                         final result = await launchUrl(
                                           url, 
                                           mode: LaunchMode.externalApplication
                                         );
-                                        debugPrint("🔗 launchUrl sonucu: $result");
                                         
                                         if (!result && mounted) {
                                           CustomSnackbar.show(
@@ -374,7 +368,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                           );
                                         }
                                       } else {
-                                        debugPrint("🔗 URL açılamıyor: $url");
                                         if (mounted) {
                                           CustomSnackbar.show(
                                             title: "Hata",
@@ -384,7 +377,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                         }
                                       }
                                     } catch (e) {
-                                      debugPrint("🔗 Link açma hatası: $e");
                                       if (mounted) {
                                         CustomSnackbar.show(
                                           title: "Hata",
@@ -502,7 +494,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                 });
                                 
                                 // Badge sayısı otomatik güncellenir - fetchNotifications() kaldırıldı
-                                debugPrint('✅ Yorum eklendiğinde badge otomatik güncellenir');
                               },
                             ),
                           ),

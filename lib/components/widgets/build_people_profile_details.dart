@@ -191,7 +191,6 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                               // Group ID'yi al ve group chat'e yönlendir
                               final groupId = group['id']?.toString();
                               if (groupId != null && groupId.isNotEmpty) {
-                                debugPrint('🚀 Navigating to group chat with ID: $groupId');
                                 Get.toNamed('/group_chat_detail', arguments: {
                                   'groupId': groupId,
                                 });

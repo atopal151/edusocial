@@ -43,10 +43,6 @@ class GroupController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // fetchUserGroups(); // Login sırasında manuel olarak çağrılacak
-    // fetchAllGroups(); // Login sırasında manuel olarak çağrılacak
-    // fetchSuggestionGroups(); // Login sırasında manuel olarak çağrılacak
-    // fetchGroupAreas(); // Login sırasında manuel olarak çağrılacak
     categoryGroup.value = [];
 
     ever(selectedCategory, (_) => updateFilteredGroups());
@@ -97,80 +93,11 @@ class GroupController extends GetxController {
       
       debugPrint("🔍 Filtreleme sonucu: ${allGroups.length} gruptan ${accessibleGroups.length} grup gösteriliyor");
       
-      // Filtreleme sonuçlarını detaylı yazdır
-      printFullText("""
-🎯 FİLTRELEME SONUÇLARI:
-📊 Toplam grup sayısı: ${allGroups.length}
-📊 Filtrelenmiş grup sayısı: ${accessibleGroups.length}
-📊 Gizlenen grup sayısı: ${allGroups.length - accessibleGroups.length}
-""");
+  
       
-      // Filtrelenmiş grupları listele
-      for (int i = 0; i < accessibleGroups.length; i++) {
-        final group = accessibleGroups[i];
-        printFullText("""
-✅ FİLTRELENMİŞ GRUP ${i + 1}:
-  - ID: ${group.id}
-  - Name: ${group.name}
-  - Is Founder: ${group.isFounder}
-  - Is Member: ${group.isMember}
-  - Is Private: ${group.isPrivate}
-  - Is Pending: ${group.isPending}
-  ---
-""");
-      }
+
         
-        // Her grubun JSON formatında tam verisini yazdır
-        for (int i = 0; i < accessibleGroups.length; i++) {
-          final group = accessibleGroups[i];
-          final groupJson = {
-            'id': group.id,
-            'name': group.name,
-            'description': group.description,
-            'messageCount': group.messageCount,
-            'humanCreatedAt': group.humanCreatedAt,
-            'avatarUrl': group.avatarUrl,
-            'bannerUrl': group.bannerUrl,
-            'status': group.status,
-            'isPrivate': group.isPrivate,
-            'userCountWithAdmin': group.userCountWithAdmin,
-            'userCountWithoutAdmin': group.userCountWithoutAdmin,
-            'isFounder': group.isFounder,
-            'isMember': group.isMember,
-            'isPending': group.isPending,
-            'createdAt': group.createdAt,
-            'updatedAt': group.updatedAt,
-          };
-          printFullText('GROUP ${i + 1} FULL JSON DATA: $groupJson');
-        }
-        
-        debugPrint("🔍 Filtreleme sonucu: ${allGroups.length} gruptan ${accessibleGroups.length} grup gösteriliyor");
-      
-      // printFullText kullanarak her grubun detaylı bilgilerini yazdır
-      for (int i = 0; i < accessibleGroups.length; i++) {
-        final group = accessibleGroups[i];
-        final groupInfo = '''
-🏷️ Group ${i + 1} - ${group.name}:
-  - ID: ${group.id}
-  - Name: ${group.name}
-  - Description: ${group.description}
-  - Message Count: ${group.messageCount}
-  - Human Created At: ${group.humanCreatedAt}
-  - Avatar URL: ${group.avatarUrl}
-  - Banner URL: ${group.bannerUrl}
-  - Status: ${group.status}
-  - Is Private: ${group.isPrivate}
-  - User Count With Admin: ${group.userCountWithAdmin}
-  - User Count Without Admin: ${group.userCountWithoutAdmin}
-  - Is Founder: ${group.isFounder}
-  - Is Member: ${group.isMember}
-  - Is Pending: ${group.isPending}
-  - Created At: ${group.createdAt}
-  - Updated At: ${group.updatedAt}
-  ---
-''';
-        printFullText(groupInfo);
-      }
+
       
                 debugPrint("🔍 GroupController - userGroups.assignAll() çağrılıyor, accessibleGroups.length: ${accessibleGroups.length}");
           userGroups.assignAll(accessibleGroups);

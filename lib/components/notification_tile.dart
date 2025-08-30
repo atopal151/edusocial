@@ -9,13 +9,6 @@ Widget buildNotificationTile(NotificationModel n) {
   final NotificationController controller = Get.find();
   final LanguageService languageService = Get.find<LanguageService>();
   
-  // Her bildirim satırı için is_read değerini debug et
-  debugPrint('🔔 === NOTIFICATION TILE COMPONENT DEBUG ===');
-  debugPrint('🔔 Notification ID: ${n.id}');
-  debugPrint('🔔 Notification Type: ${n.type}');
-  debugPrint('🔔 isRead: ${n.isRead}');
-  debugPrint('🔔 Message: ${n.message}');
-  debugPrint('🔔 ========================================');
   return ListTile(
     leading: Stack(
       children: [
@@ -69,14 +62,9 @@ Widget buildNotificationTile(NotificationModel n) {
 }
 
 Widget _buildFollowRequestAction(NotificationModel n, NotificationController controller, LanguageService languageService) {
-  debugPrint('🔔 [Button] Bildirim tipi: ${n.type}');
-  debugPrint('🔍   - isFollowing: ${n.isFollowing}');
-  debugPrint('🔍   - isFollowingPending: ${n.isFollowingPending}');
-  debugPrint('🔍   - isAccepted: ${n.isAccepted}');
-  debugPrint('🔍   - isRejected: ${n.isRejected}');
+ 
   if (n.type == 'follow-request' || n.type == 'follow-join-request') {
     if (n.isAccepted) {
-      debugPrint('🔍   - Durum: Onaylandı');
       return Text(
         languageService.tr("notification.accepted"),
         style: TextStyle(
@@ -85,7 +73,6 @@ Widget _buildFollowRequestAction(NotificationModel n, NotificationController con
         ),
       );
     } else if (n.isRejected) {
-      debugPrint('🔍   - Durum: Reddedildi');
       return Text(
         languageService.tr("notification.rejected"),
         style: TextStyle(
@@ -94,7 +81,6 @@ Widget _buildFollowRequestAction(NotificationModel n, NotificationController con
         ),
       );
     } else {
-      debugPrint('🔍   - Durum: Onayla ve X gösteriliyor');
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -30,9 +30,6 @@ class GroupUniversalMessageWidget extends StatelessWidget {
   // Pin/Unpin mesaj işlemi
   void _handlePinMessage() async {
     try {
-      debugPrint('📌 [GroupUniversalMessageWidget] Pin/Unpin işlemi başlatıldı');
-      debugPrint('📌 [GroupUniversalMessageWidget] Message ID: ${message.id}');
-      debugPrint('📌 [GroupUniversalMessageWidget] Current Pin Status: ${message.isPinned}');
       
       final messageId = int.tryParse(message.id);
       if (messageId == null) {
@@ -62,26 +59,13 @@ class GroupUniversalMessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.find<LanguageService>();
     
-    // Debug bilgisi
-    //debugPrint('GroupUniversalMessageWidget - Content: ${message.content}');
-    //debugPrint('GroupUniversalMessageWidget - MessageType: ${message.messageType}');
-    //debugPrint('GroupUniversalMessageWidget - IsPinned: ${message.isPinned}');
-    //debugPrint('GroupUniversalMessageWidget - Links: ${message.links}');
     
     // Mesaj içeriğini analiz et
     final hasText = message.content.isNotEmpty && !_isImageUrl(message.content);
     final hasImage = _isImageUrl(message.content) || (message.media?.isNotEmpty ?? false);
     final hasLinks = message.links?.isNotEmpty ?? false;
     
-    // Debug bilgisi
-    //debugPrint('🔍 GroupUniversalMessageWidget Analysis:');
-    //debugPrint('🔍 Content: "${message.content}"');
-    //debugPrint('🔍 MessageType: ${message.messageType}');
-    //debugPrint('🔍 HasText: $hasText');
-    //debugPrint('🔍 HasImage: $hasImage');
-    //debugPrint('🔍 HasLinks: $hasLinks');
-    //debugPrint('🔍 Links: ${message.links}');
-    //debugPrint('🔍 Media: ${message.media}');
+    
     
     // Text içindeki URL'leri çıkar (eğer ayrı links alanı varsa)
     String displayText = message.content;
@@ -98,13 +82,6 @@ class GroupUniversalMessageWidget extends StatelessWidget {
       displayText = displayText.trim();
     }
     
-    // Debug: Final analysis
-    debugPrint('🔍 Final Analysis:');
-    debugPrint('🔍 DisplayText: "$displayText"');
-    debugPrint('🔍 AllLinks: $allLinks');
-    debugPrint('🔍 HasText: $hasText');
-    debugPrint('🔍 HasImage: $hasImage');
-    debugPrint('🔍 HasLinks: $hasLinks');
     
     return Column(
       crossAxisAlignment: message.isSentByMe

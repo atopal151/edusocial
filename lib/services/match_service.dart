@@ -62,8 +62,6 @@ class MatchServices {
         },
       );
 
-     // debugPrint("🟢 Fetch matches response status: ${response.statusCode}");
-      //debugPrint("🟢 Fetch matches response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final dynamic data = jsonDecode(response.body)['data'];
@@ -101,8 +99,6 @@ class MatchServices {
         },
       );
 
-     // debugPrint("🟢 Match response status: ${response.statusCode}");
-      //debugPrint("🟢 Match response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body)['data'];

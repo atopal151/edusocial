@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:edusocial/models/language_model.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import 'package:http_parser/http_parser.dart';
@@ -19,8 +20,6 @@ static Future<List<LanguageModel>> fetchLanguages() async {
     },
   );
 
-  // debugPrint('🌐 Status Code: ${response.statusCode}');
-  // debugPrint('📩 Response Body: ${response.body}');
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -87,9 +86,6 @@ static Future<List<LanguageModel>> fetchLanguages() async {
       'tiktok': tiktok,
       'language_id': languageId,
     });
-// 📚 Ders bilgileri (array formatı)
-    // debugPrint('🎯 Lessons gönderilen: ${lessons.toString()}');
-    // 📚 Ders bilgileri (array formatı)
     for (int i = 0; i < lessons.length; i++) {
       request.fields['lessons[$i]'] = lessons[i];
     }
@@ -100,8 +96,6 @@ static Future<List<LanguageModel>> fetchLanguages() async {
       final mediaType =
           mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
 
-      // debugPrint('📤 Avatar dosyası yolu: ${avatarFile.path}');
-      // debugPrint('📤 Avatar mime türü: $mime');
 
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -111,7 +105,7 @@ static Future<List<LanguageModel>> fetchLanguages() async {
         ),
       );
     } else {
-      // debugPrint('⚠️ Avatar dosyası null, yüklenmedi.');
+      debugPrint('⚠️ Avatar dosyası null, yüklenmedi.');
     }
 
 // 🖼️ Banner resmi eklenmişse
@@ -120,8 +114,6 @@ static Future<List<LanguageModel>> fetchLanguages() async {
       final mediaType =
           mime != null ? MediaType.parse(mime) : MediaType('image', 'jpeg');
 
-      // debugPrint('📤 Banner dosyası yolu: ${coverFile.path}');
-      // debugPrint('📤 Banner mime türü: $mime');
 
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -131,15 +123,13 @@ static Future<List<LanguageModel>> fetchLanguages() async {
         ),
       );
     } else {
-      // debugPrint('⚠️ Banner dosyası null, yüklenmedi.');
+      debugPrint('⚠️ Banner dosyası null, yüklenmedi.');
     }
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      // debugPrint('🔄 Profil Güncelleme Status Code: ${response.statusCode}');
-      // debugPrint('📩 Güncelleme Yanıtı:\n${response.body}', wrapWidth: 1024);
 
       if (response.statusCode == 200) {
         // debugPrint("✅ Profil başarıyla güncellendi.");
@@ -147,7 +137,7 @@ static Future<List<LanguageModel>> fetchLanguages() async {
         throw Exception('❗ Sunucu hatası: ${response.body}');
       }
     } catch (e) {
-      // debugPrint('❗ Profil güncelleme isteği başarısız: $e');
+       debugPrint('❗ Profil güncelleme isteği başarısız: $e');
       rethrow;
     }
   }

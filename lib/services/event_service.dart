@@ -41,7 +41,6 @@ class EventServices {
         },
       );
 
-      debugPrint("📥 Events Response: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -51,7 +50,7 @@ class EventServices {
         return [];
       }
     } catch (e) {
-      /*debugPrint("❗ Events çekilirken hata: $e", wrapWidth: 1024);*/
+      debugPrint("❗ Events çekilirken hata: $e", wrapWidth: 1024);
       return [];
     }
   }
@@ -68,14 +67,6 @@ class EventServices {
     try {
       final token = GetStorage().read("token");
       
-      debugPrint("🚀 Creating event with:");
-      debugPrint("  - Title: $title");
-      debugPrint("  - Description: $description");
-      debugPrint("  - Location: $location");
-      debugPrint("  - Start Time: $startTime");
-      debugPrint("  - End Time: $endTime");
-      debugPrint("  - Group ID: $groupId");
-      debugPrint("  - Banner: ${banner?.path ?? 'No banner'}");
 
       var request = http.MultipartRequest(
         'POST',
@@ -108,13 +99,10 @@ class EventServices {
         );
       }
 
-      debugPrint("📤 Sending event creation request...");
       
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint("📥 Create Event Response: ${response.statusCode}");
-      debugPrint("📥 Create Event Body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Event created successfully");
@@ -143,8 +131,6 @@ class EventServices {
         },
       );
 
-      debugPrint("📥 Top Events Response: ${response.statusCode}");
-      _printLongString("📥 Top Events Body", response.body);
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -175,7 +161,6 @@ class EventServices {
         body: jsonEncode({}),
       );
 
-      debugPrint("📥 Event Detail Response (POST /events/$eventId): ${response.statusCode}");
 
       // Eğer 405 (Method Not Allowed) alırsan GET dene
       if (response.statusCode == 405) {
@@ -187,7 +172,6 @@ class EventServices {
             "Accept": "application/json",
           },
         );
-        debugPrint("📥 Event Detail Response (GET /events/$eventId): ${response.statusCode}");
       }
 
       // Eğer hala başarısız ise /event/{id} dene
@@ -200,18 +184,12 @@ class EventServices {
             "Accept": "application/json",
           },
         );
-        debugPrint("📥 Event Detail Response (GET /event/$eventId): ${response.statusCode}");
       }
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        _printLongString("📥 Event Detail Body", response.body);
         
-        // Alternative: Use dart:developer log for better viewing
-        if (kDebugMode) {
-          print("=== FULL EVENT DETAIL JSON START ===");
-          print("=== FULL EVENT DETAIL JSON END ===");
-        }
+      
 
         return EventModel.fromJson(body['data']);
       } else {
@@ -239,14 +217,6 @@ class EventServices {
     try {
       final token = GetStorage().read("token");
       
-      debugPrint("🔄 Updating event $eventId with:");
-      debugPrint("  - Title: $title");
-      debugPrint("  - Description: $description");
-      debugPrint("  - Location: $location");
-      debugPrint("  - Start Time: $startTime");
-      debugPrint("  - End Time: $endTime");
-      debugPrint("  - Group ID: $groupId");
-      debugPrint("  - Banner: ${banner?.path ?? 'No banner'}");
 
       // Try multiple endpoints since server returns 405
       String updateUrl = "${AppConstants.baseUrl}/event/$eventId";
@@ -256,8 +226,6 @@ class EventServices {
         Uri.parse(updateUrl),
       );
       
-      debugPrint("🔄 Update Request URL: $updateUrl");
-      debugPrint("🔄 Update Request Method: POST with _method=PUT");
 
       // Headers
       request.headers.addAll({
@@ -285,13 +253,10 @@ class EventServices {
         );
       }
 
-      debugPrint("📤 Sending event update request...");
       
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint("📥 Update Event Response: ${response.statusCode}");
-      debugPrint("📥 Update Event Body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Event updated successfully");
@@ -330,10 +295,7 @@ class EventServices {
         }
         
         var alternativeResponse = await alternativeRequest.send();
-        var alternativeResponseBody = await alternativeResponse.stream.bytesToString();
-        
-        debugPrint("📥 Alternative Update Response: ${alternativeResponse.statusCode}");
-        debugPrint("📥 Alternative Update Body: $alternativeResponseBody");
+   
         
         if (alternativeResponse.statusCode == 200 || alternativeResponse.statusCode == 201) {
           debugPrint("✅ Event updated successfully via alternative endpoint");
@@ -370,8 +332,6 @@ class EventServices {
         }),
       );
 
-      debugPrint("📥 Event Reminder Response: ${response.statusCode}");
-      debugPrint("📥 Event Reminder Body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Event reminder set successfully");
@@ -414,8 +374,6 @@ class EventServices {
         }),
       );
 
-      debugPrint("📥 Event Invitation Response: ${response.statusCode}");
-      debugPrint("📥 Event Invitation Body: ${response.body}");
 
       if (response.statusCode == 422) {
         final body = jsonDecode(response.body);

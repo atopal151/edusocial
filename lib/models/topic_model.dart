@@ -39,8 +39,6 @@ class TopicModel {
   });
 
   factory TopicModel.fromJson(Map<String, dynamic> json) {
-    // debugPrint('📦 Topic JSON: $json');
-    // debugPrint('📦 Last Entry JSON: ${json['last_entry']}');
     
     return TopicModel(
       id: json['id'],

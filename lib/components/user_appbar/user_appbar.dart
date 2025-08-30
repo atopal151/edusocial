@@ -21,43 +21,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Color(0xffFAFAFA),
       surfaceTintColor: Color(0xffFAFAFA),
       elevation: 0,
-      /*leading: GestureDetector(
-        onTap: controller.navigateToProfile,
-        child: Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
-            child: Obx(() {
-              final imagePath = controller.profileImagePath.value;
-              final isNetworkImage = imagePath.startsWith('http');
-
-              return CircleAvatar(
-                radius: 20,
-                backgroundColor: Color(0xffffffff),
-                child: (imagePath.isEmpty || imagePath == 'null')
-                    ? null
-                    : ClipOval(
-                        child: isNetworkImage
-                            ? Image.network(
-                                imagePath,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  debugPrint("⚠️ Görsel yüklenemedi: $error",
-                                      wrapWidth: 1024);
-                                  return const SizedBox.shrink();
-                                  // Yüklenemediğinde de sadece gri daire kalır
-                                },
-                              )
-                            : Image.asset(
-                                imagePath,
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
-                              ),
-                      ),
-              );
-            })),
-      ),*/
+   
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

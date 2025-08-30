@@ -8,23 +8,7 @@ import '../../services/language_service.dart';
 import 'package:get/get.dart';
 import '../widgets/verification_badge.dart';
 
-/// PersonEntryCard - Profil ekranları için özel entry kartı
-/// 
-/// Bu component, kullanıcı bilgilerini dışarıdan alır ve profil ekranlarında
-/// kullanılmak üzere tasarlanmıştır. Normal EntryCard'dan farklı olarak,
-/// kullanıcı bilgileri (UserModel) zorunlu parametre olarak alınır.
-/// 
-/// Kullanım örneği:
-/// ```dart
-/// PersonEntryCard(
-///   entry: entryModel,
-///   user: userModel, // Kullanıcı bilgileri dışarıdan verilir
-///   onPressed: () => print('Entry tıklandı'),
-///   onUpvote: () => print('Beğenildi'),
-///   onDownvote: () => print('Beğenilmedi'),
-///   onShare: () => print('Paylaşıldı'),
-/// )
-/// ```
+
 
 class PersonEntryCard extends StatelessWidget {
   final EntryModel entry;
@@ -52,13 +36,6 @@ class PersonEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Debug: Avatar bilgilerini kontrol et
-    //debugPrint("🖼️ PersonEntryCard - Avatar Debug:");
-    //debugPrint("  - User ID: ${user.id}");
-    //debugPrint("  - User Name: ${user.name} ${user.surname}");
-    //debugPrint("  - Avatar URL: '${user.avatarUrl}'");
-    //debugPrint("  - Avatar URL boş mu: ${user.avatarUrl.isEmpty}");
-    //debugPrint("  - Avatar URL uzunluğu: ${user.avatarUrl.length}");
     
     return InkWell(
       onTap: () {

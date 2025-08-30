@@ -54,7 +54,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     // Her 2 saniyede bir widget'ı yenile
     _refreshTimer = Timer.periodic(Duration(seconds: 2), (timer) {
       if (mounted) {
-        debugPrint('📌 [PinnedMessagesWidget] Periodic refresh triggered');
         setState(() {
           // Widget'ı yeniden oluştur
         });
@@ -68,28 +67,20 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         final socketService = Get.find<SocketService>();
         _pinUpdateSubscription = socketService.onPinMessage.listen((data) {
           if (mounted) {
-            debugPrint('📌 [PinnedMessagesWidget] Pin update event received: $data');
 
             // Pin durumu değişikliği kontrolü
             if (data is Map<String, dynamic>) {
               final isPinned = data['is_pinned'] ?? false;
-              final messageId = data['message_id']?.toString();
               final source = data['source'];
               final action = data['action'];
 
-              debugPrint(
-                  '📌 [PinnedMessagesWidget] Pin status change detected: Message ID=$messageId, isPinned=$isPinned, Source=$source, Action=$action');
 
               if (!isPinned ||
                   source == 'group:unpin_message' ||
                   action == 'unpin') {
-                  debugPrint(
-                    '📌 [PinnedMessagesWidget] UNPIN detected - Forcing widget refresh');
                 // Unpin durumunda widget'ı zorla yenile
                 _forceWidgetRefresh();
               } else {
-                debugPrint(
-                    '📌 [PinnedMessagesWidget] PIN detected - Updating widget');
                 setState(() {
                   // Widget'ı yeniden oluştur
                 });
@@ -105,18 +96,12 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         // Group message events'ini de dinle
         _groupMessageSubscription = socketService.onGroupMessage.listen((data) {
           if (mounted) {
-            debugPrint(
-                '📌 [PinnedMessagesWidget] Group message event received: $data');
 
             // Pin durumu kontrolü
             if (data is Map<String, dynamic> && data.containsKey('message')) {
               final messageData = data['message'] as Map<String, dynamic>?;
               if (messageData != null && messageData.containsKey('is_pinned')) {
-                final isPinned = messageData['is_pinned'] ?? false;
-                final messageId = messageData['id']?.toString();
 
-                debugPrint(
-                    '📌 [PinnedMessagesWidget] Group message pin status: Message ID=$messageId, isPinned=$isPinned');
 
                 // Widget'ı yenile
                 setState(() {
@@ -127,7 +112,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
           }
         });
 
-        debugPrint('📌 [PinnedMessagesWidget] Pin update listener setup completed');
       } catch (e) {
         debugPrint('❌ [PinnedMessagesWidget] Pin update listener setup error: $e');
       }
@@ -136,7 +120,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
 
   /// Widget'ı zorla yenile (unpin işlemleri için)
   void _forceWidgetRefresh() {
-    debugPrint('📌 [PinnedMessagesWidget] Force refresh called');
 
     // Önce setState ile yenile
     setState(() {
@@ -146,7 +129,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     // Sonra kısa bir gecikme ile tekrar yenile (unpin işlemi için)
     Future.delayed(Duration(milliseconds: 50), () {
       if (mounted) {
-        debugPrint('📌 [PinnedMessagesWidget] Force refresh delayed call');
         setState(() {
           // Widget'ı tekrar yeniden oluştur
         });
@@ -570,7 +552,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Private chat mesajına git
   void _navigateToMessage(int messageId) {
     try {
-      debugPrint('📌 [PinnedMessagesWidget] Navigating to private message: $messageId');
       
       final controller = Get.find<ChatDetailController>();
       
@@ -578,7 +559,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
       
       if (messageIndex != -1) {
-        debugPrint('📌 [PinnedMessagesWidget] Message found at index: $messageIndex');
         
         // ScrollController varsa o mesaja git
         // Güvenli şekilde ekran yüksekliğini al
@@ -599,7 +579,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
           curve: Curves.easeInOut,
         );
         
-        debugPrint('📌 [PinnedMessagesWidget] Scrolled to center position: $finalPosition');
             } else {
         debugPrint('❌ [PinnedMessagesWidget] Message not found with ID: $messageId');
       }
@@ -611,7 +590,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Group chat mesajına git
   void _navigateToGroupMessage(String messageId) {
     try {
-      debugPrint('📌 [PinnedMessagesWidget] Navigating to group message: $messageId');
       
       final controller = Get.find<GroupChatDetailController>();
       
@@ -619,7 +597,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
       
       if (messageIndex != -1) {
-        debugPrint('📌 [PinnedMessagesWidget] Group message found at index: $messageIndex');
         
         // ScrollController varsa o mesaja git
         // Güvenli şekilde ekran yüksekliğini al
@@ -652,7 +629,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Private chat mesajının pinini kaldır
   void _unpinMessage(int messageId) async {
     try {
-      debugPrint('📌 [PinnedMessagesWidget] Unpinning private message: $messageId');
       
       final pinMessageService = Get.find<PinMessageService>();
       await pinMessageService.pinMessage(messageId);
@@ -666,7 +642,6 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Group chat mesajının pinini kaldır
   void _unpinGroupMessage(String messageId) async {
     try {
-      debugPrint('📌 [PinnedMessagesWidget] Unpinning group message: $messageId');
       
       final controller = Get.find<GroupChatDetailController>();
       final pinMessageService = Get.find<PinMessageService>();

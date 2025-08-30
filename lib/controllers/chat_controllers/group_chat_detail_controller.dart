@@ -359,30 +359,20 @@ class GroupChatDetailController extends GetxController {
   /// Yeni grup mesajı geldiğinde işle - OPTIMIZE
   void _onNewGroupMessage(dynamic data) {
     try {
-      debugPrint('📡 GroupChatDetailController - Yeni grup mesajı geldi: $data');
-      debugPrint('📡 [GroupChatDetailController] Data type: ${data.runtimeType}');
-      debugPrint('📡 [GroupChatDetailController] Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
       
       if (data is Map<String, dynamic>) {
         // Socket'ten gelen data yapısı: {message: {group_id: 2, ...}}
         final messageData = data['message'] as Map<String, dynamic>?;
         final incomingGroupId = messageData?['group_id']?.toString();
         
-        debugPrint('📡 [GroupChatDetailController] Message data: $messageData');
-        debugPrint('📡 [GroupChatDetailController] Incoming Group ID: $incomingGroupId');
-        debugPrint('📡 [GroupChatDetailController] Current Group ID: ${currentGroupId.value}');
         
         // Sadece bu grup için gelen mesajları işle
         if (incomingGroupId != null && incomingGroupId == currentGroupId.value) {
-          debugPrint('✅ Yeni grup mesajı bu gruba ait, mesaj listesine ekleniyor');
-          debugPrint('✅ Gelen Group ID: $incomingGroupId, Mevcut: ${currentGroupId.value}');
           
           // Pin durumu kontrolü - eğer mesaj zaten varsa ve pin durumu değiştiyse
           final messageId = messageData?['id']?.toString();
           final isPinned = messageData?['is_pinned'] ?? false;
           
-          debugPrint('🔍 [GroupChatDetailController] Pin durumu kontrolü: Message ID=$messageId, isPinned=$isPinned');
-          debugPrint('🔍 [GroupChatDetailController] Message contains is_pinned: ${messageData?.containsKey('is_pinned')}');
           
           // Pin durumu değişikliği varsa özel işlem yap
           if (messageId != null && messageData?.containsKey('is_pinned') == true) {
@@ -405,9 +395,6 @@ class GroupChatDetailController extends GetxController {
                 // PinnedMessagesWidget'ı güncelle
                 update();
                 
-                debugPrint('📌 Pin durumu güncellendi ve PinnedMessagesWidget yenilendi');
-                debugPrint('📌 Toplam mesaj sayısı: ${messages.length}');
-                debugPrint('📌 Pinlenmiş mesaj sayısı: ${messages.where((m) => m.isPinned).length}');
                 
                 // Pin durumu değişikliği için özel bildirim gönder
                 _notifyPinStatusChange(messageId, isPinned);
@@ -658,17 +645,10 @@ class GroupChatDetailController extends GetxController {
 
   /// Group chat socket durumunu kontrol et
   void checkGroupChatSocketConnection() {
-    debugPrint('📡 === GROUP CHAT SOCKET DURUM RAPORU ===');
-    debugPrint('📡 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
-    debugPrint('📡 Aktif Group ID: ${currentGroupId.value}');
-    debugPrint('📡 Group Message Subscription Aktif: ${!_groupMessageSubscription.isPaused}');
-    debugPrint('📡 Socket ID: ${_socketService.socket?.id}');
-    debugPrint('📡 Socket Connected: ${_socketService.socket?.connected}');
     
     // Socket service'den detaylı durum raporu al
     _socketService.checkSocketStatus();
     
-    debugPrint('📡 =======================================');
   }
 
   /// Group chat'e girdiğinde socket durumunu kontrol et
@@ -678,16 +658,11 @@ class GroupChatDetailController extends GetxController {
     
     // Group chat'e girdiğinde gruba join ol
     if (_socketService.isConnected.value) {
-      debugPrint('🔌 Group chat için gruba join olunuyor...');
-      debugPrint('📊 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
-      debugPrint('🆔 Gönderilecek Group ID: ${currentGroupId.value}');
       
       final joinData = {
         'group_id': currentGroupId.value,
       };
       
-      debugPrint('📤 group:join event\'i gönderiliyor...');
-      debugPrint('📋 Gönderilen Data: $joinData');
       
       _socketService.sendMessage('group:join', joinData);
       

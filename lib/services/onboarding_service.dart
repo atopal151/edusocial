@@ -14,7 +14,7 @@ class OnboardingServices {
   static Future<List<Map<String, dynamic>>> fetchSchools() async {
     final token = _box.read('token');
     if (token == null) {
-      // debugPrint("❗ Token bulunamadı! Okul listesi çekilemedi.",wrapWidth: 1024);
+      debugPrint("❗ Token bulunamadı! Okul listesi çekilemedi.",wrapWidth: 1024);
       return [];
     }
 
@@ -26,9 +26,7 @@ class OnboardingServices {
           'Accept': 'application/json',
         },
       );
-
-      // debugPrint("🔥 Okul Listesi Response: ${response.statusCode}",wrapWidth: 1024);
-      // debugPrint("🔥 Okul Listesi Body: ${response.body}",wrapWidth: 1024);
+  
 
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body)['data'];
@@ -40,11 +38,11 @@ class OnboardingServices {
                 })
             .toList();
       } else {
-        // debugPrint("❗ Okul listesi alınamadı: ${response.body}",wrapWidth: 1024);
+       debugPrint("❗ Okul listesi alınamadı: ${response.body}",wrapWidth: 1024);
         return [];
       }
     } catch (e) {
-      // debugPrint("❗ Okul listesi yüklenirken hata: $e",wrapWidth: 1024);
+      debugPrint("❗ Okul listesi yüklenirken hata: $e",wrapWidth: 1024);
       return [];
     }
   }
@@ -54,7 +52,7 @@ class OnboardingServices {
       {required int schoolId, required int departmentId}) async {
     final token = _box.read('token');
     if (token == null) {
-      // debugPrint("❗ Token bulunamadı! Okul güncelleme işlemi yapılamadı.");
+        debugPrint("❗ Token bulunamadı! Okul güncelleme işlemi yapılamadı.");
       return false;
     }
 
@@ -72,12 +70,10 @@ class OnboardingServices {
         }),
       );
 
-      // debugPrint("📤 Update School Response: ${response.statusCode}",wrapWidth: 1024);
-      // debugPrint("📤 Update School Body: ${response.body}",wrapWidth: 1024);
 
       return response.statusCode == 200;
     } catch (e) {
-      // debugPrint("❗ Okul güncelleme hatası: $e",wrapWidth: 1024);
+    debugPrint("❗ Okul güncelleme hatası: $e",wrapWidth: 1024);
       return false;
     }
   }
@@ -86,7 +82,7 @@ class OnboardingServices {
   static Future<bool> addLesson(String lessonName) async {
     final token = _box.read('token');
     if (token == null) {
-      // debugPrint("❗ Token bulunamadı! Ders eklenemedi.");
+      debugPrint("❗ Token bulunamadı! Ders eklenemedi.");
       return false;
     }
 
@@ -101,17 +97,15 @@ class OnboardingServices {
         body: jsonEncode({"name": lessonName}),
       );
 
-      // debugPrint("🔥 Ders Ekleme Response: ${response.statusCode}",wrapWidth: 1024);
-      // debugPrint("🔥 Ders Ekleme Body: ${response.body}",wrapWidth: 1024);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
-        // debugPrint("❗ Ders eklenirken hata: ${response.body}",wrapWidth: 1024);
+        debugPrint("❗ Ders eklenirken hata: ${response.body}",wrapWidth: 1024);
         return false;
       }
     } catch (e) {
-      // debugPrint("❗ Ders eklenirken exception: $e",wrapWidth: 1024);
+      debugPrint("❗ Ders eklenirken exception: $e",wrapWidth: 1024);
       return false;
     }
   }
@@ -139,7 +133,6 @@ class OnboardingServices {
       );
 
       debugPrint("🟢 Grup katılım response: ${response.statusCode}");
-      debugPrint("🟢 Response body: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Grup katılım isteği başarılı!");
@@ -171,11 +164,11 @@ class OnboardingServices {
         final List data = jsonDecode(response.body)['data'];
         return data.map((e) => GroupModel.fromJson(e)).toList();
       } else {
-        // debugPrint("❗ Grup listesi alınamadı: ${response.body}");
+        debugPrint("❗ Grup listesi alınamadı: ${response.body}");
         return [];
       }
     } catch (e) {
-      // debugPrint("❗ Grup listesi çekilirken hata: $e");
+      debugPrint("❗ Grup listesi çekilirken hata: $e");
       return [];
     }
   }

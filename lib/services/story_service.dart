@@ -19,10 +19,6 @@ class StoryService {
           "Authorization": "Bearer ${box.read('token')}",
         },
       );
-
-      // debugPrint("📥 Storyy Response: ${response.statusCode}", wrapWidth: 1024);
-      // debugPrint("📥 Story Body: ${response.body}", wrapWidth: 1024);
-
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         final List data = body["data"];
@@ -31,7 +27,7 @@ class StoryService {
         return [];
       }
     } catch (e) {
-      // debugPrint("❗ Story çekilirken hata: $e", wrapWidth: 1024);
+      debugPrint("❗ Story çekilirken hata: $e", wrapWidth: 1024);
       return [];
     }
   }
@@ -47,10 +43,6 @@ class StoryService {
         },
       );
 
-      // debugPrint("📥 Story uıd: $userId");
-      // debugPrint("📥 Story Detail Response: ${response.statusCode}");
-      // debugPrint("📥 Story Detail Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
@@ -64,7 +56,7 @@ class StoryService {
         return [];
       }
     } catch (e) {
-      // debugPrint("❗ fetchStoriesByUserId() hatası: $e");
+      debugPrint("❗ fetchStoriesByUserId() hatası: $e");
       return [];
     }
   }

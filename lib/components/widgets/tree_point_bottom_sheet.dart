@@ -14,13 +14,6 @@ class TreePointBottomSheet extends StatelessWidget {
     final LanguageService languageService = Get.find<LanguageService>();
     final PostController postController = Get.find<PostController>();
     
-    // Debug: Translation test
-    debugPrint('=== TreePointBottomSheet Debug ===');
-    debugPrint('Current language: ${languageService.currentLanguage.value}');
-    debugPrint('Translations loaded: ${languageService.translations.isNotEmpty}');
-    debugPrint('About translation: ${languageService.tr("common.actions.about")}');
-    debugPrint('Report translation: ${languageService.tr("common.actions.report")}');
-    debugPrint('================================');
     
     return SafeArea(
       child: Padding(

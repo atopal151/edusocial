@@ -128,12 +128,6 @@ class ChatDetailController extends GetxController {
       isOnline.value = isOnlineArg ?? false;
       isVerified.value = isVerifiedArg ?? false;
       
-      debugPrint('ChatDetailController initialized:');
-      debugPrint('  - User ID: ${currentChatId.value}');
-      debugPrint('  - Conversation ID: ${currentConversationId.value}');
-      debugPrint('  - Name: ${name.value}');
-      debugPrint('  - Username: ${username.value}');
-      debugPrint('  - Avatar URL: ${avatarUrl.value}');
 
       if (currentChatId.value != null) {
         fetchConversationMessages();
@@ -218,10 +212,6 @@ class ChatDetailController extends GetxController {
 
   void _onNewPrivateMessage(dynamic data) {
     try {
-      debugPrint('📡 [ChatDetailController] Yeni mesaj payload alındı');
-      debugPrint('📡 [ChatDetailController] Current Chat ID: ${currentChatId.value}');
-      debugPrint('📡 [ChatDetailController] Current Conversation ID: ${currentConversationId.value}');
-      debugPrint('📡 [ChatDetailController] Processing: $data');
       
       if (data is Map<String, dynamic>) {
         // Gelen mesajın conversation_id'sini string olarak al
@@ -266,9 +256,6 @@ class ChatDetailController extends GetxController {
 
   void _onPinMessageUpdate(dynamic data) {
     try {
-      debugPrint('📌 [ChatDetailController] Pin message update received: $data');
-      debugPrint('📌 [ChatDetailController] Data type: ${data.runtimeType}');
-      debugPrint('📌 [ChatDetailController] Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
       
       if (data is Map<String, dynamic>) {
         // Try different possible field names for message ID
@@ -276,10 +263,6 @@ class ChatDetailController extends GetxController {
         final isPinned = data['is_pinned'] ?? data['pinned'] ?? data['isPinned'] ?? false;
         final conversationId = data['conversation_id']?.toString() ?? data['conversationId']?.toString();
         
-        debugPrint('📌 [ChatDetailController] Message ID: $messageId');
-        debugPrint('📌 [ChatDetailController] Is Pinned: $isPinned');
-        debugPrint('📌 [ChatDetailController] Conversation ID: $conversationId');
-        debugPrint('📌 [ChatDetailController] Current Conversation ID: ${currentConversationId.value}');
         
         // Check if this pin update is for the current conversation
         if (conversationId != null && conversationId == currentConversationId.value) {
@@ -423,17 +406,10 @@ class ChatDetailController extends GetxController {
       // Fotoğrafları tarihe göre sırala (en yeni en üstte)
       // Fotoğraflar mesaj sırasına göre zaten sıralı geliyor
 
-      debugPrint('📊 Toplanan veriler (tarihe göre sıralandı):');
-      debugPrint('  - Belgeler: ${allDocuments.length} adet');
-      debugPrint('  - Linkler: ${uniqueLinks.length} adet');
-      debugPrint('  - Fotoğraflar: ${uniquePhotos.length} adet');
 
       // Kullanıcı detaylarını güncelle - doğru sender bilgilerini al
       final currentUserId = profileController.profile.value?.id;
       
-      debugPrint('🔍 Sender bilgileri analizi:');
-      debugPrint('  - Current User ID: $currentUserId');
-      debugPrint('  - Target Chat ID: ${currentChatId.value}');
       
       // Conversation'dan karşı tarafı bul
       SenderModel? targetSender;
@@ -499,10 +475,6 @@ class ChatDetailController extends GetxController {
       
       final userName = '${targetSender.name} ${targetSender.surname}'.trim();
       
-      debugPrint('🎯 Final User Details:');
-      debugPrint('  - Target ID: ${targetSender.id}');
-      debugPrint('  - Target Name: $userName');
-      debugPrint('  - Target Avatar: ${targetSender.avatarUrl}');
       
       // Null check ve fallback values
       userChatDetail.value = UserChatDetailModel(
@@ -523,10 +495,6 @@ class ChatDetailController extends GetxController {
         photoUrls: uniquePhotos,
       );
 
-      debugPrint('✅ ChatDetailController - userChatDetail güncellendi:');
-      debugPrint('  - ID: ${userChatDetail.value?.id}');
-      debugPrint('  - Name: ${userChatDetail.value?.name}');
-      debugPrint('  - Avatar URL: ${userChatDetail.value?.imageUrl}');
       
       // Mesajlar yüklendikten sonra en alta git
       _scrollToBottomWithRetry();
@@ -625,11 +593,6 @@ class ChatDetailController extends GetxController {
     if (currentChatId.value == null) return;
     if (isSendingMessage.value) return;
     
-    // Debug logları ekle
-    debugPrint('📤 Sending message:');
-    debugPrint('  - Text: "$message"');
-    debugPrint('  - Selected files: ${selectedFiles.length}');
-    debugPrint('  - File types: ${selectedFiles.map((f) => f.path.split('.').last).toList()}');
     
     // Eğer hiçbir şey seçilmemişse gönderme
     if (message.isEmpty && selectedFiles.isEmpty) {
@@ -742,16 +705,10 @@ class ChatDetailController extends GetxController {
   }
 
   void checkSocketConnection() {
-    debugPrint('📡 === PRIVATE CHAT SOCKET DURUM RAPORU ===');
-    debugPrint('📡 Socket Bağlantı Durumu: ${_socketService.isConnected.value}');
-    debugPrint('📡 Aktif Chat ID: ${currentChatId.value}');
-    debugPrint('📡 Conversation ID: ${currentConversationId.value}');
     
     // Socket service'den detaylı durum raporu al
     _socketService.checkSocketStatus();
     
-    debugPrint('📡 Private Message Subscription Aktif: ${!_privateMessageSubscription.isPaused}');
-    debugPrint('📡 =======================================');
   }
 
   /// Pin or unpin a message

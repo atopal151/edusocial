@@ -53,15 +53,17 @@ class ChatServices {
       final prefs = await SharedPreferences.getInstance();
       final jsonList = prefs.getStringList(_unreadChatsKey) ?? [];
       final conversationIds = jsonList.map((id) => int.parse(id)).toList();
-      
+
       // Conversation ID'yi listeden çıkar
       conversationIds.remove(conversationId);
-      
+
       // Güncellenmiş listeyi kaydet
-      final updatedJsonList = conversationIds.map((id) => id.toString()).toList();
+      final updatedJsonList =
+          conversationIds.map((id) => id.toString()).toList();
       await prefs.setStringList(_unreadChatsKey, updatedJsonList);
-      
-      printFullText('✅ Conversation $conversationId okunmuş olarak işaretlendi');
+
+      printFullText(
+          '✅ Conversation $conversationId okunmuş olarak işaretlendi');
     } catch (e) {
       printFullText('❌ Conversation okunmuş olarak işaretlenemedi: $e');
     }
@@ -73,17 +75,19 @@ class ChatServices {
       final prefs = await SharedPreferences.getInstance();
       final jsonList = prefs.getStringList(_unreadChatsKey) ?? [];
       final conversationIds = jsonList.map((id) => int.parse(id)).toList();
-      
+
       // Conversation ID'yi listeye ekle (eğer yoksa)
       if (!conversationIds.contains(conversationId)) {
         conversationIds.add(conversationId);
       }
-      
+
       // Güncellenmiş listeyi kaydet
-      final updatedJsonList = conversationIds.map((id) => id.toString()).toList();
+      final updatedJsonList =
+          conversationIds.map((id) => id.toString()).toList();
       await prefs.setStringList(_unreadChatsKey, updatedJsonList);
-      
-      printFullText('🔴 Conversation $conversationId okunmamış olarak işaretlendi');
+
+      printFullText(
+          '🔴 Conversation $conversationId okunmamış olarak işaretlendi');
     } catch (e) {
       printFullText('❌ Conversation okunmamış olarak işaretlenemedi: $e');
     }
@@ -135,14 +139,14 @@ class ChatServices {
       final prefs = await SharedPreferences.getInstance();
       final jsonList = prefs.getStringList(_unreadGroupsKey) ?? [];
       final groupIds = jsonList.map((id) => int.parse(id)).toList();
-      
+
       // Group ID'yi listeden çıkar
       groupIds.remove(groupId);
-      
+
       // Güncellenmiş listeyi kaydet
       final updatedJsonList = groupIds.map((id) => id.toString()).toList();
       await prefs.setStringList(_unreadGroupsKey, updatedJsonList);
-      
+
       printFullText('✅ Grup $groupId okunmuş olarak işaretlendi');
     } catch (e) {
       printFullText('❌ Grup okunmuş olarak işaretlenemedi: $e');
@@ -155,16 +159,16 @@ class ChatServices {
       final prefs = await SharedPreferences.getInstance();
       final jsonList = prefs.getStringList(_unreadGroupsKey) ?? [];
       final groupIds = jsonList.map((id) => int.parse(id)).toList();
-      
+
       // Group ID'yi listeye ekle (eğer yoksa)
       if (!groupIds.contains(groupId)) {
         groupIds.add(groupId);
       }
-      
+
       // Güncellenmiş listeyi kaydet
       final updatedJsonList = groupIds.map((id) => id.toString()).toList();
       await prefs.setStringList(_unreadGroupsKey, updatedJsonList);
-      
+
       printFullText('🔴 Grup $groupId okunmamış olarak işaretlendi');
     } catch (e) {
       printFullText('❌ Grup okunmamış olarak işaretlenemedi: $e');
@@ -187,13 +191,11 @@ class ChatServices {
 
     for (int attempt = 1; attempt <= _maxRetries; attempt++) {
       try {
-        //debugPrint('🔄 $operation - Attempt $attempt/$_maxRetries');
-
         final response = await request().timeout(_requestTimeout);
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           if (attempt > 1) {
-            //debugPrint('✅ $operation - Success on attempt $attempt');
+            debugPrint('✅ $operation - Success on attempt $attempt');
           }
           return response;
         } else {
@@ -202,7 +204,8 @@ class ChatServices {
         }
       } on SocketException catch (e) {
         lastException = e;
-        //debugPrint('🌐 $operation - Network error on attempt $attempt: ${e.message}');
+        debugPrint(
+            '🌐 $operation - Network error on attempt $attempt: ${e.message}');
 
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt; // Exponential backoff
@@ -211,16 +214,13 @@ class ChatServices {
         }
       } on TimeoutException catch (e) {
         lastException = e;
-        //debugPrint('⏰ $operation - Timeout on attempt $attempt');
 
         if (attempt < _maxRetries) {
           final delay = _baseDelay * attempt;
-          //debugPrint('⏳ Retrying in ${delay.inSeconds} seconds...');
           await Future.delayed(delay);
         }
       } on HttpException catch (e) {
         lastException = e;
-        //debugPrint('🔴 $operation - HTTP error on attempt $attempt: $e');
 
         // Don't retry for 4xx errors (client errors)
         if (e.toString().contains('4')) {
@@ -255,14 +255,6 @@ class ChatServices {
   }) async {
     final token = _box.read('token');
     final url = Uri.parse('${AppConstants.baseUrl}/conversation');
-
-    // Debug logları ekle
-    //debugPrint('📤 ChatServices.sendMessage called:');
-    //debugPrint('  - Receiver ID: $receiverId');
-    //debugPrint('  - Message: "$message"');
-    //debugPrint('  - Conversation ID: $conversationId');
-    //debugPrint('  - Media files: ${mediaFiles?.length ?? 0}');
-    //debugPrint('  - Links: ${links?.length ?? 0}');
 
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
@@ -316,11 +308,6 @@ class ChatServices {
       for (var file in imageFiles) {
         final fileExtension = file.path.split('.').last.toLowerCase();
         String mimeType = _getMimeType(fileExtension);
-
-        //debugPrint('  - File: ${file.path}');
-        //debugPrint('  - Extension: $fileExtension');
-        //debugPrint('  - MIME Type: $mimeType');
-        //debugPrint('  - Field Name: media[]');
 
         request.files.add(
           await http.MultipartFile.fromPath(
@@ -402,17 +389,6 @@ class ChatServices {
         operation: 'Fetch Online Friends',
       );
 
-      // Raw API response'u yazdır
-      printFullText('''
-🌐 ONLINE FRIENDS API RAW RESPONSE
-====================================
-📡 URL: ${url.toString()}
-📊 Status Code: ${response.statusCode}
-📦 Raw Response Body:
-${response.body}
-====================================
-''');
-
       final body = jsonDecode(response.body);
       final dataList = body['data'] as List<dynamic>;
 
@@ -463,37 +439,9 @@ ${response.body}
       operation: 'Fetch Conversation Messages',
     );
 
-    // Raw API response'u yazdır
-    printFullText('''
-🌐 PRIVATE CHAT MESSAGES API RAW RESPONSE
-==========================================
-📡 URL: $uri
-📊 Status Code: ${response.statusCode}
-📦 Raw Response Body:
-${response.body}
-==========================================
-''');
-
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
 
-    //debugPrint("✅ ${messagesJson.length} mesaj yüklendi (pagination)");
-
-    // İlk 5 mesajın detayını göster
-    //debugPrint("📖 === İLK 5 MESAJ DETAYI ===");
-    for (int i = 0; i < messagesJson.length && i < 5; i++) {
-      //final message = messagesJson[i];
-      //debugPrint("📖 Mesaj ${i + 1}:");
-      //debugPrint("  - ID: ${message['id']}");
-      //debugPrint("  - Message: ${message['message']}");
-      //debugPrint("  - Sender ID: ${message['sender_id']}");
-      //debugPrint("  - Is Read: ${message['is_read']}");
-      //debugPrint("  - Is Me: ${message['is_me']}");
-      //debugPrint("  - Created At: ${message['created_at']}");
-      //debugPrint("  - Raw JSON: ${jsonEncode(message)}");
-      //debugPrint("  - ---");
-    }
-    //debugPrint("📖 =========================");
 
     return messagesJson
         .map((json) => MessageModel.fromJson(json as Map<String, dynamic>,
@@ -556,8 +504,6 @@ ${response.body}
       final token = await _box.read('token');
       final url = '${AppConstants.baseUrl}/api/user/$userId';
 
-      //debugPrint('  - URL: $url');
-      //debugPrint('  - UserID: $userId');
 
       final response = await http.get(
         Uri.parse(url),
@@ -566,10 +512,6 @@ ${response.body}
           'Accept': 'application/json',
         },
       );
-
-      //debugPrint('📥 fetchUserDetails - API Yanıtı:');
-      //debugPrint('  - Status Code: ${response.statusCode}');
-      //debugPrint('  - Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -590,8 +532,8 @@ ${response.body}
       }
       throw Exception('Kullanıcı bilgileri getirilemedi!');
     } catch (e) {
-      //debugPrint('❌ fetchUserDetails - Hata: $e');
-      //debugPrint('  - Hata Mesajı: ${e.toString()}');
+      debugPrint('❌ fetchUserDetails - Hata: $e');
+      debugPrint('  - Hata Mesajı: ${e.toString()}');
       throw Exception('Kullanıcı bilgileri getirilemedi!');
     }
   }

@@ -12,7 +12,8 @@ class PostServices {
   static final _box = GetStorage();
 
   /// Gönderi oluşturma fonksiyonu
-  static Future<bool> createPost(String content, List<File> mediaFiles, {List<String>? links}) async {
+  static Future<bool> createPost(String content, List<File> mediaFiles,
+      {List<String>? links}) async {
     final token = _box.read('token');
 
     var request = http.MultipartRequest(
@@ -54,9 +55,6 @@ class PostServices {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      /* debugPrint("📤 CreatePost Response: ${response.statusCode}");
-      debugPrint("📤 CreatePost Body: ${response.body}");*/
-
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       debugPrint("❗ Post gönderilemedi: $e");
@@ -67,8 +65,6 @@ class PostServices {
   /// Anasayfa gönderilerini getir
   static Future<List<PostModel>> fetchHomePosts() async {
     final token = _box.read('token');
-    //debugPrint("🔄 PostServices.fetchHomePosts() çağrıldı");
-    //  debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
 
     try {
       final response = await http.get(
@@ -79,51 +75,15 @@ class PostServices {
         },
       );
 
-      //debugPrint("📥 Postlar Response: ${response.statusCode}", wrapWidth: 1024);
-      //debugPrint("📥 Postlar Body: ${response.body}", wrapWidth: 1024);
-
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
-        /// Debug için JSON'u ham olarak gör
-        //  debugPrint("📦 [DEBUG - JSON RAW]:\n${jsonEncode(body)}", wrapWidth: 1024);
-
         final List posts = body['data']['data'];
-        //debugPrint("📊 API'den ${posts.length} post alındı");
 
         final postList = posts.map((item) {
-          //debugPrint("🔍 === TIMELINE POST RAW JSON ===");
-          //debugPrint("🔍 Post JSON: ${jsonEncode(item)}", wrapWidth: 1024);
-          
-          // Media field'ını özellikle kontrol et
-          if (item['media'] != null) {
-            //debugPrint("📷 Media field exists:");
-            //debugPrint("📷 Media data: ${jsonEncode(item['media'])}");
-          } else {
-            //debugPrint("📷 Media field is NULL in timeline post");
-          }
-          
           return PostModel.fromJson(item);
         }).toList();
-        
-        //debugPrint("✅ ${postList.length} post başarıyla parse edildi");
-        
-        // Her post için detaylı bilgi
-        for (int i = 0; i < postList.length; i++) {
-          //final post = postList[i];
-          //debugPrint("📋 Post ${i + 1} Detayları:");
-          //debugPrint("  - ID: ${post.id}");
-          //debugPrint("  - Username: ${post.username}");
-          //debugPrint("  - Name: ${post.name}");
-          //debugPrint("  - Content: ${post.postDescription}");
-          //debugPrint("  - isOwner: ${post.isOwner}");
-          //debugPrint("  - isLiked: ${post.isLiked}");
-          //debugPrint("  - Like Count: ${post.likeCount}");
-          //debugPrint("  - Comment Count: ${post.commentCount}");
-          //debugPrint("  - Media URLs: ${post.mediaUrls.length}");
-          //debugPrint("  - Links: ${post.links.length}");
-        }
-        
+
         return postList;
       } else {
         debugPrint("❌ API yanıtı başarısız: ${response.statusCode}");
@@ -147,9 +107,6 @@ class PostServices {
           'Accept': 'application/json',
         },
       );
-
-      //debugPrint("📥 Post Detail Response: ${response.statusCode}");
-      //debugPrint("📥 Post Detail Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -181,9 +138,6 @@ class PostServices {
         },
       );
 
-      //debugPrint("📤 Like Response: ${response.statusCode}");
-      //debugPrint("📤 Like Body: ${response.body}");
-
       return response.statusCode == 200;
     } catch (e) {
       debugPrint("❌ toggleLike Hatası: $e");
@@ -203,9 +157,6 @@ class PostServices {
           'Accept': 'application/json',
         },
       );
-
-      //debugPrint("📤 Delete Post Response: ${response.statusCode}");
-      //debugPrint("📤 Delete Post Body: ${response.body}");
 
       return response.statusCode == 200;
     } catch (e) {
@@ -230,9 +181,6 @@ class PostServices {
           'post_id': postId,
         }),
       );
-
-      //debugPrint("📤 Report Post Response: ${response.statusCode}");
-      //debugPrint("📤 Report Post Body: ${response.body}");
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {

@@ -118,7 +118,6 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     if (text.isNotEmpty) {
       if (editingComment != null) {
         // Yorum düzenle
-        debugPrint('🔄 Yorum düzenleniyor: $text');
         final success = await controller.editComment(
           editingComment!.id.toString(), 
           widget.postId, 
@@ -130,8 +129,6 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
         }
       } else if (replyingTo != null) {
         // Yanıt gönder
-        debugPrint('🔄 Yanıt gönderiliyor: $text');
-        debugPrint('🔄 Yanıtlanan yorum: ${replyingTo!.userName}');
         
         final success = await controller.addReply(widget.postId, replyingTo!.id.toString(), text);
         

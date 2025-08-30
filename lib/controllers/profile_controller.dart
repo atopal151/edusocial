@@ -159,11 +159,6 @@ String formatSimpleDate(String dateStr) {
       profile.value = profileData;
       userId.value = profileData.id.toString();
       
-      debugPrint("✅ Temel profil verisi yüklendi:");
-      debugPrint("  - ID: ${profileData.id}");
-      debugPrint("  - Name: ${profileData.name} ${profileData.surname}");
-      debugPrint("  - Username: ${profileData.username}");
-      debugPrint("  - Account Type: ${profileData.accountType}");
       
       // Temel veriler
       fullName.value = "${profileData.name} ${profileData.surname}";

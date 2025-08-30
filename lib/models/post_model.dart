@@ -38,8 +38,6 @@ class PostModel {
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) {
-    //debugPrint("🔍 PostModel.fromJson çağrıldı");
-    //debugPrint("🔍 JSON: ${json.toString()}");
     
     final user = json['user'] ?? {};
     final mediaList = json['media'];
@@ -83,7 +81,6 @@ class PostModel {
     isVerified: user['is_verified'],
     );
     
-    //debugPrint("✅ PostModel oluşturuldu: ID=${postModel.id}, Username=${postModel.username}, isOwner=${postModel.isOwner}, Content=${postModel.postDescription}");
     return postModel;
   }
 

@@ -29,12 +29,6 @@ class UniversalMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Debug bilgisi
-    debugPrint('🔍 UniversalMessageWidget Analysis:');
-    debugPrint('🔍 Message: "${message.message}"');
-    debugPrint('🔍 MessageMedia: ${message.messageMedia.length}');
-    debugPrint('🔍 MessageLink: ${message.messageLink.length}');
-    debugPrint('🔍 MessageDocument: ${message.messageDocument?.length ?? 0}');
-    debugPrint('🔍 IsPinned: ${message.isPinned}');
     
     // Mesaj içeriğini analiz et
     final hasText = message.message.isNotEmpty;
@@ -71,16 +65,6 @@ class UniversalMessageWidget extends StatelessWidget {
       displayText = displayText.trim();
     }
     
-    // Debug: Final analysis
-    debugPrint('🔍 Final Analysis:');
-    debugPrint('🔍 DisplayText: "$displayText"');
-    debugPrint('🔍 AllLinks: $allLinks');
-    debugPrint('🔍 HasText: $hasText');
-    debugPrint('🔍 HasMedia: $hasMedia');
-    debugPrint('🔍 HasLinks: $hasLinks');
-    debugPrint('🔍 HasDocuments: $hasDocuments');
-    debugPrint('🔍 HasDocumentInMedia: $hasDocumentInMedia');
-    debugPrint('🔍 HasImageInMedia: $hasImageInMedia');
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -234,8 +218,6 @@ class UniversalMessageWidget extends StatelessWidget {
   Widget _buildDocumentItem(String title, String path, String fileSize) {
     return GestureDetector(
       onTap: () {
-        // Document açma işlemi
-        debugPrint('Document açılıyor: $path');
         // Burada document açma işlemi yapılabilir
       },
       child: Container(
@@ -335,7 +317,6 @@ class UniversalMessageWidget extends StatelessWidget {
                   );
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  debugPrint('UniversalMessageWidget image error: $error');
                   return Container(
                     width: 200,
                     height: 150,

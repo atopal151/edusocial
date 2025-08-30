@@ -13,9 +13,6 @@ class ProfileService {
   Future<ProfileModel> fetchProfileData() async {
     final token = box.read("token");
 
-    //debugPrint("🔄 ProfileService.fetchProfileData() başlatıldı");
-    //debugPrint("🔑 Token: ${token != null ? 'Var' : 'Yok'}");
-
     final response = await http.get(
       Uri.parse("${AppConstants.baseUrl}/me"),
       headers: {
@@ -24,21 +21,15 @@ class ProfileService {
       },
     );
 
-    //debugPrint("📥 ProfileService - HTTP Status Code: ${response.statusCode}");
-    //debugPrint("📦 ProfileService - Response Body: ${response.body}");
-    
     if (response.statusCode == 200) {
       // Gelen verinin tamamını JSON formatında yazdır
       try {
         final jsonBody = json.decode(response.body);
-        
-        // PrintFullText ile tam JSON response'u yazdır
-      
-        
+
         // Hesap doğrulama durumunu kontrol et
         if (jsonBody['data'] != null) {
           final data = jsonBody['data'];
-          
+
           // Olası doğrulama alanlarını kontrol et
           final verificationFields = [
             'is_verified',
@@ -52,67 +43,33 @@ class ProfileService {
             'verification_level',
             'verification_type'
           ];
-          
+
           printFullText("🔍 HESAP DOĞRULAMA ALANLARI KONTROLÜ:");
           for (String field in verificationFields) {
             if (data.containsKey(field)) {
               printFullText("✅ $field: ${data[field]}");
             }
           }
-          
-          // Tüm data alanlarını listele
-          printFullText("📊 DATA ALANLARI:");
-          data.forEach((key, value) {
-            printFullText("  $key: $value");
-          });
-        }
+
         
+        }
+
         // Data alanını ayrıca yazdır
-        if (jsonBody['data'] != null) {
-         // final dataJson = const JsonEncoder.withIndent('  ').convert(jsonBody['data']);
-          //debugPrint("📊 ProfileService - Data Alanı:");
-          //debugPrint(dataJson);
-          
-          // Entries alanını kontrol et
-          if (jsonBody['data']['entries'] != null) {
-            final entries = jsonBody['data']['entries'] as List;
-            //debugPrint("📝 ProfileService - Entries sayısı: ${entries.length}");
-            for (int i = 0; i < entries.length; i++) {
-              //debugPrint("📝 Entry $i: ${entries[i]}");
-            }
-          } else {
-            debugPrint("⚠️ ProfileService - Entries alanı bulunamadı");
-          }
-          
-          // Post verilerini debug et
-          if (jsonBody['data']['posts'] != null) {
-            final posts = jsonBody['data']['posts'] as List;
-            //debugPrint("📝 ProfileService - Post sayısı: ${posts.length}");
-            for (int i = 0; i < posts.length; i++) {
-              //debugPrint("📝 Post $i: ${posts[i]}");
-            }
-          } else {
-            debugPrint("⚠️ ProfileService - Posts alanı bulunamadı");
-          }
-          
-          // Account type kontrolü
-          //final accountType = jsonBody['data']['account_type'];
-          //adebugPrint("🔍 ProfileService - Account Type: $accountType");
-        }
-        
+        if (jsonBody['data'] != null) {}
+
         final profileModel = ProfileModel.fromJson(jsonBody['data']);
-        
+
         // Doğrulama durumunu yazdır
         printFullText("🔍 HESAP DOĞRULAMA DURUMU:");
         printFullText("  Doğrulanmış mı: ${isUserVerified(profileModel)}");
         printFullText("  Durum: ${getVerificationStatus(profileModel)}");
-        
+
         final verificationDetails = getVerificationDetails(profileModel);
         printFullText("  Detaylar:");
         verificationDetails.forEach((key, value) {
           printFullText("    $key: $value");
         });
-        
+
         return profileModel;
       } catch (e) {
         debugPrint("❌ ProfileService - JSON parse hatası: $e");
@@ -125,34 +82,33 @@ class ProfileService {
   }
 
   /// 🔥 YENİ: Kullanıcı adından entries'ları çek
-  static Future<PeopleProfileModel?> fetchUserByUsername(String username) async {
+  static Future<PeopleProfileModel?> fetchUserByUsername(
+      String username) async {
     final box = GetStorage();
-    final url = Uri.parse('${AppConstants.baseUrl}/user/find-by-username/$username');
+    final url =
+        Uri.parse('${AppConstants.baseUrl}/user/find-by-username/$username');
     final token = box.read('token');
 
     try {
-      //debugPrint("🔄 ProfileService - fetchUserByUsername çağrıldı: $username");
-      
+
       final response = await http.get(
         url,
         headers: {"Authorization": "Bearer $token"},
       ).timeout(const Duration(seconds: 10));
-      
-      //debugPrint("📥 ProfileService - Response status: ${response.statusCode}");
-      //debugPrint("📥 ProfileService - Response body: ${response.body}");
-      
+
+
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        
+
         // PrintFullText ile tam JSON response'u yazdır
         final formattedJson = const JsonEncoder.withIndent('  ').convert(body);
         printFullText("🔍 USER BY USERNAME API - TAM JSON RESPONSE:");
         printFullText(formattedJson);
-        
+
         // Hesap doğrulama durumunu kontrol et
         if (body['data'] != null) {
           final data = body['data'];
-          
+
           // Olası doğrulama alanlarını kontrol et
           final verificationFields = [
             'is_verified',
@@ -166,14 +122,15 @@ class ProfileService {
             'verification_level',
             'verification_type'
           ];
-          
-          printFullText("🔍 USER BY USERNAME - HESAP DOĞRULAMA ALANLARI KONTROLÜ:");
+
+          printFullText(
+              "🔍 USER BY USERNAME - HESAP DOĞRULAMA ALANLARI KONTROLÜ:");
           for (String field in verificationFields) {
             if (data.containsKey(field)) {
               printFullText("✅ $field: ${data[field]}");
             }
           }
-          
+
           // Tüm data alanlarını listele
           printFullText("📊 USER BY USERNAME - DATA ALANLARI:");
           data.forEach((key, value) {
@@ -184,7 +141,8 @@ class ProfileService {
         final model = PeopleProfileModel.fromJson(body['data']);
         return model;
       } else {
-        debugPrint("❌ ProfileService - fetchUserByUsername başarısız: ${response.statusCode}");
+        debugPrint(
+            "❌ ProfileService - fetchUserByUsername başarısız: ${response.statusCode}");
         return null;
       }
     } catch (e) {
@@ -201,12 +159,12 @@ class ProfileService {
     if (profile.accountVerified == true) return true;
     if (profile.documentVerified == true) return true;
     if (profile.identityVerified == true) return true;
-    
+
     // String alanları kontrol et
     if (profile.verificationStatus == 'verified') return true;
     if (profile.verificationLevel == 'verified') return true;
     if (profile.verificationType == 'verified') return true;
-    
+
     return false;
   }
 

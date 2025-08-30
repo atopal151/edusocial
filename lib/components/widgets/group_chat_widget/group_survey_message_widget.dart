@@ -26,12 +26,6 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
     final message = widget.message;
     
     // Debug: Survey mesajı içeriğini kontrol et
-    debugPrint('🔍 Survey Widget Debug:');
-    debugPrint('🔍 Message content: "${message.content}"');
-    debugPrint('🔍 Message pollOptions: ${message.pollOptions}');
-    debugPrint('🔍 Message isMultipleChoice: ${message.isMultipleChoice}');
-    debugPrint('🔍 Message surveyId: ${message.surveyId}');
-    debugPrint('🔍 Message type: ${message.messageType}');
     
     return Padding(
       padding: const EdgeInsets.only(top:8.0),
@@ -173,12 +167,10 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
         // API'den gelen survey verilerini kontrol et
         if (message.surveyData != null && message.surveyData!['choices'] != null) {
           final choices = message.surveyData!['choices'] as List<dynamic>;
-          debugPrint('🔍 Survey choices data: $choices');
           for (var choice in choices) {
             if (choice['id'] == choiceId) {
               percentage = (choice['percentage'] ?? 0.0).toDouble();
               isSelected = choice['is_selected'] ?? false;
-              debugPrint('🔍 Choice $choiceId - percentage: $percentage, isSelected: $isSelected');
               break;
             }
           }

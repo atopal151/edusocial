@@ -17,12 +17,8 @@ class GroupListItem extends StatelessWidget {
     
     return GestureDetector(
       onTap: () {
-        debugPrint('🔍 Group tapped: ${group.name}');
-        debugPrint('🔍 Is member: ${group.isMember}');
-        debugPrint('🔍 Group ID: ${group.id}');
         
         if (group.isMember) {
-          debugPrint('🚀 Navigating to group chat with ID: ${group.id}');
           Get.toNamed('/group_chat_detail', arguments: {'groupId': group.id.toString()});
         } else {
           debugPrint('❌ User is not a member of this group');
