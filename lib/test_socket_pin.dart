@@ -33,7 +33,7 @@ class _SocketPinTestState extends State<SocketPinTest> {
           pinEvents.add('Pin Event: $data');
         });
       }
-      print('📌 Pin event received: $data');
+      debugPrint('📌 Pin event received: $data');
     });
   }
 
@@ -57,12 +57,12 @@ class _SocketPinTestState extends State<SocketPinTest> {
     // Test pin message (message ID 241)
     final success = await _pinMessageService.pinGroupMessage(241, '2'); // group ID 2
     if (success) {
-      print('✅ Test pin message 241 sent successfully');
+      debugPrint('✅ Test pin message 241 sent successfully');
       setState(() {
         pinEvents.add('✅ Pin Message 241 - API call successful');
       });
     } else {
-      print('❌ Test pin message 241 failed');
+      debugPrint('❌ Test pin message 241 failed');
       setState(() {
         pinEvents.add('❌ Pin Message 241 - API call failed');
       });
@@ -73,12 +73,12 @@ class _SocketPinTestState extends State<SocketPinTest> {
     // Test unpin message (message ID 241)
     final success = await _pinMessageService.pinGroupMessage(241, '2'); // group ID 2
     if (success) {
-      print('✅ Test unpin message 241 sent successfully');
+      debugPrint('✅ Test unpin message 241 sent successfully');
       setState(() {
         pinEvents.add('✅ Unpin Message 241 - API call successful');
       });
     } else {
-      print('❌ Test unpin message 241 failed');
+      debugPrint('❌ Test unpin message 241 failed');
       setState(() {
         pinEvents.add('❌ Unpin Message 241 - API call failed');
       });
@@ -87,7 +87,7 @@ class _SocketPinTestState extends State<SocketPinTest> {
 
   void _testPinStatus() async {
     // Test pin status check
-    print('🔍 Testing pin status check...');
+    debugPrint('🔍 Testing pin status check...');
     setState(() {
       pinEvents.add('🔍 Pin Status Check Requested');
     });
@@ -97,12 +97,12 @@ class _SocketPinTestState extends State<SocketPinTest> {
       'group_id': '2',
     });
     
-    print('🔍 Pin status check request sent');
+    debugPrint('🔍 Pin status check request sent');
   }
 
   void _testChatMessageWithPin() async {
     // Test group:chat_message event with pin status
-    print('🔍 Testing group:chat_message with pin status...');
+    debugPrint('🔍 Testing group:chat_message with pin status...');
     setState(() {
       pinEvents.add('🔍 group:chat_message with pin status test');
     });
@@ -131,15 +131,15 @@ class _SocketPinTestState extends State<SocketPinTest> {
     
     // Manually trigger the event
     _socketService.onGroupMessage.listen((data) {
-      print('🔍 group:chat_message event received: $data');
+      debugPrint('🔍 group:chat_message event received: $data');
     });
     
-    print('🔍 group:chat_message test data prepared');
+    debugPrint('🔍 group:chat_message test data prepared');
   }
 
   void _testWebUnpinSimulation() async {
     // Web'den pin kaldırma simülasyonu
-    print('🔍 Testing web unpin simulation...');
+    debugPrint('🔍 Testing web unpin simulation...');
     setState(() {
       pinEvents.add('🔍 Web unpin simulation test');
     });
@@ -195,9 +195,9 @@ class _SocketPinTestState extends State<SocketPinTest> {
     };
     
     // Bu event'i manuel olarak tetikle
-    print('🔍 Web unpin simulation data prepared');
-    print('🔍 Message ID: 213, is_pinned: false');
-    print('🔍 Bu event group:chat_message olarak gelmeli ve PinnedMessagesWidget\'ı güncellemeli');
+    debugPrint('🔍 Web unpin simulation data prepared');
+        debugPrint('🔍 Message ID: 213, is_pinned: false');
+    debugPrint('🔍 Bu event group:chat_message olarak gelmeli ve PinnedMessagesWidget\'ı güncellemeli');
     
     setState(() {
       pinEvents.add('🔍 Web unpin simulation: Message 213 pin kaldırıldı');
@@ -232,7 +232,7 @@ class _SocketPinTestState extends State<SocketPinTest> {
 
   void _testAdminPinFeature() async {
     // Test admin pin feature
-    print('🔍 Testing admin pin feature...');
+      debugPrint('🔍 Testing admin pin feature...');
     setState(() {
       pinEvents.add('🔍 Admin pin feature test');
     });
@@ -240,12 +240,12 @@ class _SocketPinTestState extends State<SocketPinTest> {
     // Test pin message (message ID 242)
     final success = await _pinMessageService.pinGroupMessage(242, '2'); // group ID 2
     if (success) {
-      print('✅ Admin pin feature test successful');
+      debugPrint('✅ Admin pin feature test successful');
       setState(() {
         pinEvents.add('✅ Admin pin feature test successful');
       });
     } else {
-      print('❌ Admin pin feature test failed');
+      debugPrint('❌ Admin pin feature test failed');
       setState(() {
         pinEvents.add('❌ Admin pin feature test failed');
       });

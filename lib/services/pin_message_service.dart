@@ -78,78 +78,49 @@ class PinMessageService extends GetxService {
         'Content-Type': 'application/json',
       };
 
-      // Web'den gelen başarılı request'i analiz etmek için farklı data yapıları deneyelim
-      List<Map<String, dynamic>> testDataList = [
-        // Test 1: Sadece message_id (private chat gibi)
-        {'message_id': messageId},
+      // Başarılı olan endpoint ve format
+      final data = {
+        'message_id': messageId,
+        'group_id': int.tryParse(groupId) ?? groupId,
+      };
+
+      print('🔍 [PinMessageService] Using successful endpoint: /group-message-pin, format: $data');
+
+      final response = await _apiService.post(
+        '/group-message-pin',
+        data,
+        headers: headers,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('✅ [PinMessageService] Group message pinned/unpinned successfully');
+        print('✅ [PinMessageService] API Response: ${response.data}');
         
-        // Test 2: message_id + group_id
-        {'message_id': messageId, 'group_id': groupId},
-        
-        // Test 3: message_id + conversation_id (group_id'yi conversation_id olarak)
-        {'message_id': messageId, 'conversation_id': groupId},
-        
-        // Test 4: message_id + group_id + conversation_id
-        {'message_id': messageId, 'group_id': groupId, 'conversation_id': groupId},
-      ];
-
-      List<String> testEndpoints = [
-        '/conversation-pin',
-        '/group-pin', 
-        '/group-conversation-pin',
-        '/pin-message',
-        '/message-pin'
-      ];
-
-      // Her endpoint ve data kombinasyonunu dene
-      for (String endpoint in testEndpoints) {
-        for (Map<String, dynamic> data in testDataList) {
-          try {
-            print('🔍 [PinMessageService] Testing endpoint: $endpoint with data: $data');
-            
-            final response = await _apiService.post(endpoint, data, headers: headers);
-            
-            print('✅ [PinMessageService] SUCCESS! Endpoint: $endpoint, Data: $data');
-            print('📌 [PinMessageService] API Response Status: ${response.statusCode}');
-            print('📌 [PinMessageService] API Response Body: ${response.data}');
-
-            if (response.statusCode == 200 || response.statusCode == 201) {
-              final responseData = response.data;
-              
-              // API response'undan pin durumunu al
-              bool isPinned = false;
-              if (responseData is Map<String, dynamic>) {
-                if (responseData.containsKey('is_pinned')) {
-                  isPinned = responseData['is_pinned'] ?? false;
-                } else if (responseData.containsKey('data') && responseData['data'] is Map<String, dynamic>) {
-                  isPinned = responseData['data']['is_pinned'] ?? false;
-                }
-              }
-              
-              print('✅ [PinMessageService] Group message pinned/unpinned successfully');
-              print('📌 [PinMessageService] Final pin status: $isPinned');
-              print('📌 [PinMessageService] Working endpoint: $endpoint');
-              print('📌 [PinMessageService] Working data: $data');
-
-              // Send socket event for real-time updates
-              _socketService.sendMessage('group:pin_message', {
-                'message_id': messageId,
-                'group_id': groupId,
-                'is_pinned': isPinned,
-                'action': isPinned ? 'pin' : 'unpin',
-              });
-
-              return true;
-            }
-          } catch (e) {
-            print('❌ [PinMessageService] Failed - Endpoint: $endpoint, Data: $data, Error: $e');
-            continue; // Sonraki kombinasyonu dene
+        // API response'undan pin durumunu al
+        bool isPinned = false;
+        if (response.data is Map<String, dynamic>) {
+          if (response.data.containsKey('data') && response.data['data'] is Map<String, dynamic>) {
+            isPinned = response.data['data']['is_pinned'] ?? false;
+          } else if (response.data.containsKey('is_pinned')) {
+            isPinned = response.data['is_pinned'] ?? false;
           }
         }
-      }
+        
+        print('📌 [PinMessageService] Final pin status: $isPinned');
 
-      print('❌ [PinMessageService] All endpoint and data combinations failed');
-      return false;
+        // Send socket event for real-time updates
+        _socketService.sendMessage('group:pin_message', {
+          'message_id': messageId,
+          'group_id': groupId,
+          'is_pinned': isPinned,
+          'action': isPinned ? 'pin' : 'unpin',
+        });
+
+        return true;
+      } else {
+        print('❌ [PinMessageService] Group message pin/unpin failed: ${response.statusCode} - ${response.data}');
+        return false;
+      }
       
     } catch (e) {
       print('❌ [PinMessageService] Pin Group Message Error: $e');
