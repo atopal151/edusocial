@@ -98,10 +98,10 @@ class UniversalMessageWidget extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   child: Icon(
-                    Icons.push_pin,
+                    message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
                     size: 12,
                     color: message.isPinned 
-                        ? const Color(0xff414751)
+                        ? Colors.orange.shade600 // Sarı pin ikonu (group chat ile aynı)
                         : const Color(0xff9ca3ae),
                   ),
                 ),
@@ -199,13 +199,13 @@ class UniversalMessageWidget extends StatelessWidget {
                 },
                 child: Container(
                   padding: const EdgeInsets.all(2),
-                  child: Icon(
-                    Icons.push_pin,
-                    size: 12,
-                    color: message.isPinned 
-                        ? const Color(0xff414751)
-                        : const Color(0xff9ca3ae),
-                  ),
+                                  child: Icon(
+                  message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  size: 12,
+                  color: message.isPinned 
+                      ? Colors.orange.shade600 // Sarı pin ikonu (group chat ile aynı)
+                      : const Color(0xff9ca3ae),
+                ),
                 ),
               ),
             ],

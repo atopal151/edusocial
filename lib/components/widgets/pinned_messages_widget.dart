@@ -401,6 +401,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         ),
         child: Row(
           children: [
+          
             CircleAvatar(
               radius: 12,
               backgroundColor: Colors.grey[300],
@@ -437,6 +438,23 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                     ),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Pin kaldırma butonu (admin için)
+            GestureDetector(
+              onTap: () => _unpinMessage(message.id),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Icon(
+                  Icons.push_pin,
+                  size: 14,
+                  color: Colors.red.shade600,
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -519,6 +537,24 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                 ],
               ),
             ),
+            const SizedBox(width: 8),
+            // Pin kaldırma butonu (sadece admin için)
+            if (controller.isCurrentUserAdmin)
+              GestureDetector(
+                onTap: () => _unpinGroupMessage(message.id),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Icon(
+                    Icons.push_pin,
+                    size: 14,
+                    color: Colors.red.shade600,
+                  ),
+                ),
+              ),
             const SizedBox(width: 8),
             Text(
               '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}',
@@ -620,6 +656,43 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       }
     } catch (e) {
       print('❌ [PinnedMessagesWidget] Group navigation error: $e');
+    }
+  }
+
+  /// Private chat mesajının pinini kaldır
+  void _unpinMessage(int messageId) async {
+    try {
+      print('📌 [PinnedMessagesWidget] Unpinning private message: $messageId');
+      
+      final pinMessageService = Get.find<PinMessageService>();
+      await pinMessageService.pinMessage(messageId);
+      
+      print('✅ [PinnedMessagesWidget] Private message unpinned successfully');
+    } catch (e) {
+      print('❌ [PinnedMessagesWidget] Unpin private message error: $e');
+    }
+  }
+
+  /// Group chat mesajının pinini kaldır
+  void _unpinGroupMessage(String messageId) async {
+    try {
+      print('📌 [PinnedMessagesWidget] Unpinning group message: $messageId');
+      
+      final controller = Get.find<GroupChatDetailController>();
+      final pinMessageService = Get.find<PinMessageService>();
+      
+      // Message ID'yi integer'a çevir
+      final messageIdInt = int.tryParse(messageId);
+      if (messageIdInt == null) {
+        print('❌ [PinnedMessagesWidget] Invalid message ID: $messageId');
+        return;
+      }
+      
+      await pinMessageService.pinGroupMessage(messageIdInt, controller.currentGroupId.value);
+      
+      print('✅ [PinnedMessagesWidget] Group message unpinned successfully');
+    } catch (e) {
+      print('❌ [PinnedMessagesWidget] Unpin group message error: $e');
     }
   }
 }
