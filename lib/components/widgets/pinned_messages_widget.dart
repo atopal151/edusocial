@@ -24,6 +24,7 @@ class PinnedMessagesWidget extends StatefulWidget {
 class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   StreamSubscription? _pinUpdateSubscription;
   StreamSubscription? _groupMessageSubscription;
+  StreamSubscription? _privateMessageSubscription;
   Timer? _refreshTimer;
   bool _isExpanded = false; // Show more/less state
   double? _screenHeight; // Store screen height safely
@@ -46,6 +47,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   void dispose() {
     _pinUpdateSubscription?.cancel();
     _groupMessageSubscription?.cancel();
+    _privateMessageSubscription?.cancel();
     _refreshTimer?.cancel();
     super.dispose();
   }
@@ -62,47 +64,83 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   }
 
   void _setupPinUpdateListener() {
-    if (widget.isGroupChat) {
-      try {
-        final socketService = Get.find<SocketService>();
-        _pinUpdateSubscription = socketService.onPinMessage.listen((data) {
-          if (mounted) {
+    try {
+      final socketService = Get.find<SocketService>();
+      
+      // Pin/Unpin event'lerini dinle (hem group hem private chat için)
+      _pinUpdateSubscription = socketService.onPinMessage.listen((data) {
+        if (mounted) {
+          debugPrint('📌 [PinnedMessagesWidget] Pin update event received: $data');
 
-            // Pin durumu değişikliği kontrolü
-            if (data is Map<String, dynamic>) {
-              final isPinned = data['is_pinned'] ?? false;
-              final source = data['source'];
-              final action = data['action'];
+          // Pin durumu değişikliği kontrolü
+          if (data is Map<String, dynamic>) {
+            final isPinned = data['is_pinned'] ?? false;
+            final source = data['source'];
+            final action = data['action'];
+            final conversationId = data['conversation_id']?.toString();
+            final groupId = data['group_id']?.toString();
 
+            debugPrint('📌 [PinnedMessagesWidget] Parsed data: isPinned=$isPinned, source=$source, action=$action, conversationId=$conversationId, groupId=$groupId');
 
-              if (!isPinned ||
-                  source == 'group:unpin_message' ||
-                  action == 'unpin') {
-                // Unpin durumunda widget'ı zorla yenile
-                _forceWidgetRefresh();
-              } else {
-                setState(() {
-                  // Widget'ı yeniden oluştur
-                });
+            // Private chat için conversation ID kontrolü
+            if (!widget.isGroupChat && conversationId != null) {
+              try {
+                final chatController = Get.find<ChatDetailController>();
+                if (conversationId == chatController.currentConversationId.value) {
+                  debugPrint('📌 [PinnedMessagesWidget] Private chat pin update detected');
+                  debugPrint('📌 [PinnedMessagesWidget] Pin status: $isPinned, Source: $source, Action: $action');
+                  
+                  // Her durumda widget'ı zorla yenile
+                  _forceWidgetRefresh();
+                  
+                  // Ek olarak controller'ı da güncelle
+                  chatController.update();
+                  
+                  debugPrint('📌 [PinnedMessagesWidget] Private chat widget and controller updated');
+                }
+              } catch (e) {
+                debugPrint('❌ [PinnedMessagesWidget] ChatDetailController not found: $e');
               }
-            } else {
-              setState(() {
-                // Widget'ı yeniden oluştur
-              });
             }
+            
+            // Group chat için group ID kontrolü
+            if (widget.isGroupChat && groupId != null) {
+              try {
+                final groupController = Get.find<GroupChatDetailController>();
+                if (groupId == groupController.currentGroupId.value.toString()) {
+                  debugPrint('📌 [PinnedMessagesWidget] Group chat pin update detected');
+                  
+                  if (!isPinned ||
+                      source == 'group:unpin_message' ||
+                      action == 'unpin') {
+                    // Unpin durumunda widget'ı zorla yenile
+                    _forceWidgetRefresh();
+                  } else {
+                    setState(() {
+                      // Widget'ı yeniden oluştur
+                    });
+                  }
+                }
+              } catch (e) {
+                debugPrint('❌ [PinnedMessagesWidget] GroupChatDetailController not found: $e');
+              }
+            }
+          } else {
+            setState(() {
+              // Widget'ı yeniden oluştur
+            });
           }
-        });
+        }
+      });
 
-        // Group message events'ini de dinle
+      // Group message events'ini de dinle (sadece group chat için)
+      if (widget.isGroupChat) {
         _groupMessageSubscription = socketService.onGroupMessage.listen((data) {
           if (mounted) {
-
             // Pin durumu kontrolü
             if (data is Map<String, dynamic> && data.containsKey('message')) {
               final messageData = data['message'] as Map<String, dynamic>?;
               if (messageData != null && messageData.containsKey('is_pinned')) {
-
-
                 // Widget'ı yenile
                 setState(() {
                   // Widget'ı yeniden oluştur
@@ -111,15 +149,43 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
             }
           }
         });
-
-      } catch (e) {
-        debugPrint('❌ [PinnedMessagesWidget] Pin update listener setup error: $e');
       }
+
+      // Private message events'ini de dinle (sadece private chat için)
+      if (!widget.isGroupChat) {
+        _privateMessageSubscription = socketService.onPrivateMessage.listen((data) {
+          if (mounted) {
+            debugPrint('📌 [PinnedMessagesWidget] Private message event received: $data');
+            
+            // Pin durumu kontrolü
+            if (data is Map<String, dynamic> && data.containsKey('is_pinned')) {
+              final isPinned = data['is_pinned'] ?? false;
+              final conversationId = data['conversation_id']?.toString();
+              
+              debugPrint('📌 [PinnedMessagesWidget] Private message pin status detected: isPinned=$isPinned, conversationId=$conversationId');
+              
+              try {
+                final chatController = Get.find<ChatDetailController>();
+                if (conversationId == chatController.currentConversationId.value) {
+                  debugPrint('📌 [PinnedMessagesWidget] Private chat pin update - forcing widget refresh');
+                  _forceWidgetRefresh();
+                }
+              } catch (e) {
+                debugPrint('❌ [PinnedMessagesWidget] ChatDetailController not found: $e');
+              }
+            }
+          }
+        });
+      }
+
+    } catch (e) {
+      debugPrint('❌ [PinnedMessagesWidget] Pin update listener setup error: $e');
     }
   }
 
   /// Widget'ı zorla yenile (unpin işlemleri için)
   void _forceWidgetRefresh() {
+    debugPrint('📌 [PinnedMessagesWidget] Force widget refresh triggered');
 
     // Önce setState ile yenile
     setState(() {
@@ -127,11 +193,30 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
     });
 
     // Sonra kısa bir gecikme ile tekrar yenile (unpin işlemi için)
-    Future.delayed(Duration(milliseconds: 50), () {
+    Future.delayed(Duration(milliseconds: 100), () {
       if (mounted) {
         setState(() {
           // Widget'ı tekrar yeniden oluştur
         });
+      }
+    });
+
+    // Daha uzun bir gecikme ile tekrar yenile (socket event'leri için)
+    Future.delayed(Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          // Widget'ı tekrar yeniden oluştur
+        });
+      }
+    });
+
+    // En son bir kez daha yenile (tüm güncellemeler için)
+    Future.delayed(Duration(milliseconds: 600), () {
+      if (mounted) {
+        setState(() {
+          // Widget'ı tekrar yeniden oluştur
+        });
+        debugPrint('📌 [PinnedMessagesWidget] Final widget refresh completed');
       }
     });
   }
@@ -147,105 +232,118 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
 
   Widget _buildPrivatePinnedMessages() {
     return Obx(() {
-      final controller = Get.find<ChatDetailController>();
-      final pinnedMessages =
-          controller.messages.where((msg) => msg.isPinned).toList();
+      try {
+        final controller = Get.find<ChatDetailController>();
+        
+        // Messages listesini force refresh et
+        controller.messages.refresh();
+        
+        final pinnedMessages =
+            controller.messages.where((msg) => msg.isPinned).toList();
 
-      if (pinnedMessages.isEmpty) {
-        return const SizedBox.shrink();
-      }
+        debugPrint('📌 [PinnedMessagesWidget] Building private pinned messages. Count: ${pinnedMessages.length}');
+        debugPrint('📌 [PinnedMessagesWidget] Pinned message IDs: ${pinnedMessages.map((m) => m.id).toList()}');
 
-      return Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'Sabitlenen Mesajlar',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff414751),
+        if (pinnedMessages.isEmpty) {
+          debugPrint('📌 [PinnedMessagesWidget] No pinned messages found');
+          return const SizedBox.shrink();
+        }
+
+              return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Sabitlenen Mesajlar',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xff414751),
+                    ),
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  '${pinnedMessages.length}',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: const Color(0xff9ca3ae),
+                  const Spacer(),
+                  Text(
+                    '${pinnedMessages.length}',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: const Color(0xff9ca3ae),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Show first message or all messages based on expanded state
-            if (_isExpanded && pinnedMessages.length > 5)
-              // Scrollable container for more than 5 messages
-              ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 350, // Maximum height for scrollable area
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      ...pinnedMessages.map((message) => _buildPinnedMessageItem(message)),
-                    ],
+                ],
+              ),
+              const SizedBox(height: 8),
+              // Show first message or all messages based on expanded state
+              if (_isExpanded && pinnedMessages.length > 5)
+                // Scrollable container for more than 5 messages
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 350, // Maximum height for scrollable area
                   ),
-                ),
-              )
-            else if (_isExpanded)
-              // Show all messages without scroll for 5 or fewer messages
-              ...pinnedMessages.map((message) => _buildPinnedMessageItem(message))
-            else
-              // Show only first message when collapsed
-              ...pinnedMessages.take(1).map((message) => _buildPinnedMessageItem(message)),
-            
-            // Show more/less button if there are more than 1 message
-            if (pinnedMessages.length > 1)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isExpanded = !_isExpanded;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                   
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  child: SingleChildScrollView(
+                    child: Column(
                       children: [
-                        Icon(
-                          _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                          size: 16,
-                          color: const Color(0xff6b7280),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          _isExpanded 
-                              ? 'Daha az göster' 
-                              : '${pinnedMessages.length - 1} mesaj daha göster',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff6b7280),
-                          ),
-                        ),
+                        ...pinnedMessages.map((message) => _buildPinnedMessageItem(message)),
                       ],
                     ),
                   ),
+                )
+              else if (_isExpanded)
+                // Show all messages without scroll for 5 or fewer messages
+                ...pinnedMessages.map((message) => _buildPinnedMessageItem(message))
+              else
+                // Show only first message when collapsed
+                ...pinnedMessages.take(1).map((message) => _buildPinnedMessageItem(message)),
+              
+              // Show more/less button if there are more than 1 message
+              if (pinnedMessages.length > 1)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isExpanded = !_isExpanded;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                            size: 16,
+                            color: const Color(0xff6b7280),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _isExpanded 
+                                ? 'Daha az göster' 
+                                : '${pinnedMessages.length - 1} mesaj daha göster',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xff6b7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-          ],
-        ),
-      );
+            ],
+          ),
+        );
+      } catch (e) {
+        debugPrint('❌ [PinnedMessagesWidget] Error building private pinned messages: $e');
+        return const SizedBox.shrink();
+      }
     });
   }
 
@@ -366,6 +464,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   }
 
   Widget _buildPinnedMessageItem(MessageModel message) {
+    final profileImage = message.senderAvatarUrl;
     final username = message.sender.name;
     final content = message.message;
     final timestamp = DateTime.tryParse(message.createdAt) ?? DateTime.now();
@@ -385,14 +484,19 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
             CircleAvatar(
               radius: 12,
               backgroundColor: Colors.grey[300],
-              child: Text(
-                username.isNotEmpty ? username[0].toUpperCase() : '?',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
+              backgroundImage: (profileImage != null && profileImage.isNotEmpty && !profileImage.endsWith('/0'))
+                  ? NetworkImage(profileImage)
+                  : null,
+              child: (profileImage == null || profileImage.isEmpty || profileImage.endsWith('/0'))
+                  ? Text(
+                      username.isNotEmpty ? username[0].toUpperCase() : '?',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -482,14 +586,19 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
             CircleAvatar(
               radius: 12,
               backgroundColor: Colors.grey[300],
-              child: Text(
-                username.isNotEmpty ? username[0].toUpperCase() : '?',
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
+              backgroundImage: (message.profileImage.isNotEmpty && !message.profileImage.endsWith('/0'))
+                  ? NetworkImage(message.profileImage)
+                  : null,
+              child: (message.profileImage.isEmpty || message.profileImage.endsWith('/0'))
+                  ? Text(
+                      username.isNotEmpty ? username[0].toUpperCase() : '?',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -552,6 +661,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Private chat mesajına git
   void _navigateToMessage(int messageId) {
     try {
+      debugPrint('📌 [PinnedMessagesWidget] Navigating to private message: $messageId');
       
       final controller = Get.find<ChatDetailController>();
       
@@ -559,27 +669,57 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
       
       if (messageIndex != -1) {
+        debugPrint('📌 [PinnedMessagesWidget] Message found at index: $messageIndex');
         
-        // ScrollController varsa o mesaja git
-        // Güvenli şekilde ekran yüksekliğini al
-        final screenHeight = _screenHeight ?? 800.0; // Default fallback
+        // ScrollController'ın hazır olmasını bekle
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            // Güvenli şekilde ekran yüksekliğini al
+            final screenHeight = _screenHeight ?? 800.0;
+            
+            // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 100px)
+            final messagePosition = messageIndex * 100.0;
+            
+            // Mesajın ekranın orta alt kısmına gelmesi için hedef pozisyonu hesapla
+            // Ekranın %70'ine kadar scroll et (alt kısımda kalsın)
+            final targetPosition = messagePosition - (screenHeight * 0.3);
+            
+            // Negatif pozisyon olmaması için kontrol et
+            final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
+            
+            debugPrint('📌 [PinnedMessagesWidget] Screen height: $screenHeight');
+            debugPrint('📌 [PinnedMessagesWidget] Message position: $messagePosition');
+            debugPrint('📌 [PinnedMessagesWidget] Target position: $targetPosition');
+            debugPrint('📌 [PinnedMessagesWidget] Final position: $finalPosition');
+            
+            controller.scrollController.animateTo(
+              finalPosition,
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeInOut,
+            );
+            
+            debugPrint('📌 [PinnedMessagesWidget] Scroll animation started');
+            
+            // Mesajı highlight et
+            controller.highlightMessage(messageId);
+            
+            // Mesajı vurgulamak için kısa bir gecikme sonrası tekrar scroll
+            Future.delayed(Duration(milliseconds: 850), () {
+              if (controller.scrollController.hasClients) {
+                controller.scrollController.animateTo(
+                  finalPosition,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+            
+          } catch (e) {
+            debugPrint('❌ [PinnedMessagesWidget] Scroll animation error: $e');
+          }
+        });
         
-        // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 100px)
-        final messagePosition = messageIndex * 100.0;
-        
-        // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
-        final targetPosition = messagePosition - (screenHeight / 2) + 50; // 50px offset for better centering
-        
-        // Negatif pozisyon olmaması için kontrol et
-        final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
-        
-        controller.scrollController.animateTo(
-          finalPosition,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-        
-            } else {
+      } else {
         debugPrint('❌ [PinnedMessagesWidget] Message not found with ID: $messageId');
       }
     } catch (e) {
@@ -590,6 +730,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   /// Group chat mesajına git
   void _navigateToGroupMessage(String messageId) {
     try {
+      debugPrint('📌 [PinnedMessagesWidget] Navigating to group message: $messageId');
       
       final controller = Get.find<GroupChatDetailController>();
       
@@ -597,28 +738,53 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
       
       if (messageIndex != -1) {
+        debugPrint('📌 [PinnedMessagesWidget] Group message found at index: $messageIndex');
         
-        // ScrollController varsa o mesaja git
-        // Güvenli şekilde ekran yüksekliğini al
-        final screenHeight = _screenHeight ?? 800.0; // Default fallback
+        // ScrollController'ın hazır olmasını bekle
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            // Güvenli şekilde ekran yüksekliğini al
+            final screenHeight = _screenHeight ?? 800.0;
+            
+            // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 120px)
+            final messagePosition = messageIndex * 120.0;
+            
+            // Mesajın ekranın orta alt kısmına gelmesi için hedef pozisyonu hesapla
+            // Ekranın %70'ine kadar scroll et (alt kısımda kalsın)
+            final targetPosition = messagePosition - (screenHeight * 0.3);
+            
+            // Negatif pozisyon olmaması için kontrol et
+            final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
+            
+            
+            controller.scrollController.animateTo(
+              finalPosition,
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeInOut,
+            );
+            
+            debugPrint('📌 [PinnedMessagesWidget] Group scroll animation started');
+            
+            // Mesajı highlight et
+            controller.highlightMessage(messageId);
+            
+            // Mesajı vurgulamak için kısa bir gecikme sonrası tekrar scroll
+            Future.delayed(Duration(milliseconds: 850), () {
+              if (controller.scrollController.hasClients) {
+                controller.scrollController.animateTo(
+                  finalPosition,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+            
+          } catch (e) {
+            debugPrint('❌ [PinnedMessagesWidget] Group scroll animation error: $e');
+          }
+        });
         
-        // Mesajın pozisyonunu hesapla (her mesaj için yaklaşık 120px)
-        final messagePosition = messageIndex * 120.0;
-        
-        // Mesajın ekranın ortasına gelmesi için hedef pozisyonu hesapla
-        final targetPosition = messagePosition - (screenHeight / 2) + 60; // 60px offset for better centering
-        
-        // Negatif pozisyon olmaması için kontrol et
-        final finalPosition = targetPosition < 0 ? 0.0 : targetPosition;
-        
-        controller.scrollController.animateTo(
-          finalPosition,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-        
-        debugPrint('📌 [PinnedMessagesWidget] Scrolled to group message center position: $finalPosition');
-            } else {
+      } else {
         debugPrint('❌ [PinnedMessagesWidget] Group message not found with ID: $messageId');
       }
     } catch (e) {

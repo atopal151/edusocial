@@ -54,6 +54,9 @@ class GroupChatDetailController extends GetxController {
   
   // Scroll to bottom button visibility
   final RxBool showScrollToBottomButton = false.obs;
+  
+  // Highlighted message for navigation
+  final RxString highlightedMessageId = RxString('');
 
   // Grup chat verilerinden çıkarılan belge, bağlantı ve fotoğraf listeleri
   final RxList<DocumentModel> groupDocuments = <DocumentModel>[].obs;
@@ -2077,6 +2080,27 @@ class GroupChatDetailController extends GetxController {
     _userCache.clear(); // Clear cache
     _lastMessageCount = 0; // Reset message count tracker
     super.onClose();
+  }
+
+  /// Highlight a message (for navigation from pinned messages)
+  void highlightMessage(String messageId) {
+    try {
+      debugPrint('📌 [GroupChatDetailController] Highlighting message: $messageId');
+      
+      // Highlight the message
+      highlightedMessageId.value = messageId;
+      
+      // Remove highlight after 3 seconds
+      Future.delayed(Duration(seconds: 3), () {
+        if (highlightedMessageId.value == messageId) {
+          highlightedMessageId.value = '';
+          debugPrint('📌 [GroupChatDetailController] Highlight removed for message: $messageId');
+        }
+      });
+      
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Highlight message error: $e');
+    }
   }
 
   /// Pin or unpin a group message

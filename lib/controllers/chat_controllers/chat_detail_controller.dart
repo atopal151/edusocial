@@ -55,6 +55,9 @@ class ChatDetailController extends GetxController {
   
   // Scroll to bottom button visibility
   final RxBool showScrollToBottomButton = false.obs;
+  
+  // Highlighted message for navigation
+  final RxInt highlightedMessageId = RxInt(-1);
 
   // Controllers
   final ProfileController profileController = Get.find<ProfileController>();
@@ -256,16 +259,22 @@ class ChatDetailController extends GetxController {
 
   void _onPinMessageUpdate(dynamic data) {
     try {
+      debugPrint('📌 [ChatDetailController] Pin message update received: $data');
       
       if (data is Map<String, dynamic>) {
         // Try different possible field names for message ID
         final messageId = data['message_id'] ?? data['id'] ?? data['messageId'];
         final isPinned = data['is_pinned'] ?? data['pinned'] ?? data['isPinned'] ?? false;
         final conversationId = data['conversation_id']?.toString() ?? data['conversationId']?.toString();
+        final source = data['source']?.toString();
+        final action = data['action']?.toString();
         
+        debugPrint('📌 [ChatDetailController] Parsed data: messageId=$messageId, isPinned=$isPinned, conversationId=$conversationId, source=$source, action=$action');
         
         // Check if this pin update is for the current conversation
         if (conversationId != null && conversationId == currentConversationId.value) {
+          debugPrint('📌 [ChatDetailController] Pin update is for current conversation');
+          
           // Find the message in the current conversation and update its pin status
           final messageIndex = messages.indexWhere((msg) => msg.id.toString() == messageId.toString());
           
@@ -288,6 +297,13 @@ class ChatDetailController extends GetxController {
             Get.find<ChatDetailController>().update();
             
             debugPrint('✅ [ChatDetailController] UI update triggered');
+            
+            // Pin/Unpin işlemi için özel log
+            if (isPinned) {
+              debugPrint('📌 [ChatDetailController] Message $messageId PINNED successfully');
+            } else {
+              debugPrint('📌 [ChatDetailController] Message $messageId UNPINNED successfully');
+            }
           } else {
             debugPrint('⚠️ [ChatDetailController] Message not found in current conversation: ID $messageId');
             debugPrint('⚠️ [ChatDetailController] Available message IDs: ${messages.map((m) => m.id).toList()}');
@@ -711,25 +727,75 @@ class ChatDetailController extends GetxController {
     
   }
 
+  /// Highlight a message (for navigation from pinned messages)
+  void highlightMessage(int messageId) {
+    try {
+      debugPrint('📌 [ChatDetailController] Highlighting message: $messageId');
+      
+      // Highlight the message
+      highlightedMessageId.value = messageId;
+      
+      // Remove highlight after 3 seconds
+      Future.delayed(Duration(seconds: 3), () {
+        if (highlightedMessageId.value == messageId) {
+          highlightedMessageId.value = -1;
+          debugPrint('📌 [ChatDetailController] Highlight removed for message: $messageId');
+        }
+      });
+      
+    } catch (e) {
+      debugPrint('❌ [ChatDetailController] Highlight message error: $e');
+    }
+  }
+
   /// Pin or unpin a message
   Future<void> pinMessage(int messageId) async {
     try {
+      debugPrint('📌 [ChatDetailController] Pin message işlemi başlatıldı: Message ID $messageId');
+      
+      // API'den önce mevcut pin durumunu al
+      final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+      if (messageIndex == -1) {
+        debugPrint('⚠️ [ChatDetailController] Message not found in list: ID $messageId');
+        return;
+      }
+      
+      final currentMessage = messages[messageIndex];
+      final currentPinStatus = currentMessage.isPinned;
+      
+      debugPrint('📌 [ChatDetailController] Current pin status: $currentPinStatus');
+      
       final success = await _pinMessageService.pinMessage(messageId);
       
       if (success) {
-        // Update the message in the list
-        final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
-        if (messageIndex != -1) {
-          final message = messages[messageIndex];
-          final updatedMessage = message.copyWith(isPinned: !message.isPinned);
-          messages[messageIndex] = updatedMessage;
-          
-          // Update UI
-          update();
-          
-          // Success - no snackbar needed
-        }
+        debugPrint('✅ [ChatDetailController] Pin message API başarılı');
+        
+        // API başarılı olduğunda manuel güncelleme yapma
+        // Socket event'i ile güncellenecek
+        debugPrint('📌 [ChatDetailController] Waiting for socket event to update UI...');
+        
+        // Kısa bir gecikme ile socket event'inin gelmesini bekle
+        Future.delayed(Duration(milliseconds: 500), () {
+          // Eğer socket event gelmediyse manuel güncelle
+          final updatedMessageIndex = messages.indexWhere((msg) => msg.id == messageId);
+          if (updatedMessageIndex != -1) {
+            final updatedMessage = messages[updatedMessageIndex];
+            if (updatedMessage.isPinned == currentPinStatus) {
+              debugPrint('📌 [ChatDetailController] Socket event did not update, manually updating...');
+              
+              // Manuel güncelleme
+              final newMessage = updatedMessage.copyWith(isPinned: !currentPinStatus);
+              messages[updatedMessageIndex] = newMessage;
+              messages.refresh();
+              update();
+              
+              debugPrint('✅ [ChatDetailController] Manual UI update completed');
+            }
+          }
+        });
+        
       } else {
+        debugPrint('❌ [ChatDetailController] Pin message API failed');
         Get.snackbar(
           languageService.tr('messages.pinError'),
           languageService.tr('messages.tryAgain'),
@@ -739,7 +805,7 @@ class ChatDetailController extends GetxController {
         );
       }
     } catch (e) {
-      debugPrint('❌ Pin message error: $e');
+      debugPrint('❌ [ChatDetailController] Pin message error: $e');
       Get.snackbar(
         languageService.tr('messages.pinError'),
         languageService.tr('messages.tryAgain'),

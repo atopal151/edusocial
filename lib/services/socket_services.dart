@@ -195,6 +195,68 @@ class SocketService extends GetxService {
         
       }
       
+      // Pin durumu kontrolü - hem direkt data hem de message objesi içinde kontrol et
+      bool pinStatusDetected = false;
+      
+      if (data is Map<String, dynamic>) {
+        // Önce message objesi içinde kontrol et
+        if (data.containsKey('message')) {
+          final messageData = data['message'] as Map<String, dynamic>?;
+          if (messageData != null && messageData.containsKey('is_pinned')) {
+            final messageId = messageData['id']?.toString();
+            final isPinned = messageData['is_pinned'] ?? false;
+            final conversationId = messageData['conversation_id']?.toString();
+            debugPrint('📌 [SocketService] conversation:new_message içinde pin durumu tespit edildi (message objesi): Message ID=$messageId, Conversation ID=$conversationId, isPinned=$isPinned');
+            pinStatusDetected = true;
+            
+            // Pin durumu değişikliği için özel event gönder
+            if (messageId != null && conversationId != null) {
+              final pinUpdateEvent = {
+                'message_id': messageId,
+                'conversation_id': conversationId,
+                'is_pinned': isPinned,
+                'timestamp': DateTime.now().millisecondsSinceEpoch,
+                'source': 'conversation:new_message',
+                'message_data': messageData,
+              };
+              
+              debugPrint('📌 [SocketService] Conversation pin durumu değişikliği event\'i gönderiliyor: $pinUpdateEvent');
+              _pinMessageController.add(pinUpdateEvent);
+            }
+          }
+        }
+        
+        // Eğer message objesi içinde yoksa, direkt data içinde kontrol et
+        if (!pinStatusDetected && data.containsKey('is_pinned')) {
+          final messageId = data['id']?.toString();
+          final isPinned = data['is_pinned'] ?? false;
+          final conversationId = data['conversation_id']?.toString();
+          debugPrint('📌 [SocketService] conversation:new_message içinde pin durumu tespit edildi (direkt data): Message ID=$messageId, Conversation ID=$conversationId, isPinned=$isPinned');
+          pinStatusDetected = true;
+          
+          // Pin durumu değişikliği için özel event gönder
+          if (messageId != null && conversationId != null) {
+            final pinUpdateEvent = {
+              'message_id': messageId,
+              'conversation_id': conversationId,
+              'is_pinned': isPinned,
+              'timestamp': DateTime.now().millisecondsSinceEpoch,
+              'source': 'conversation:new_message',
+              'message_data': data,
+            };
+            
+            debugPrint('📌 [SocketService] Conversation pin durumu değişikliği event\'i gönderiliyor: $pinUpdateEvent');
+            _pinMessageController.add(pinUpdateEvent);
+          }
+        }
+        
+        if (pinStatusDetected) {
+          debugPrint('📌 [SocketService] Conversation pin event\'i tetiklendi ve ChatDetailController güncellenmeli');
+        } else {
+          debugPrint('📌 [SocketService] Conversation pin durumu tespit edilmedi - normal mesaj event\'i');
+        }
+      }
+      
       _privateMessageController.add(data);
       
       // Mesaj bildirimi gönder (uygulama açıkken)
@@ -208,17 +270,234 @@ class SocketService extends GetxService {
 
     // Chat bazında unread count event'lerini dinle
     _socket!.on('conversation:unread_count', (data) {
-      debugPrint('📨 Chat bazında unread count: $data');
+      debugPrint('📨 Chat bazında unread count (conversation:unread_count): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('chat:unread_count', (data) {
+      debugPrint('📨 Chat bazında unread count (chat:unread_count): $data');
       _handlePerChatUnreadCount(data);
     });
 
     // Pin/Unpin message events
+    _socket!.on('conversation:message_pinned', (data) {
+      debugPrint('📌 Conversation message pinned geldi (SocketService): $data');
+      _pinMessageController.add(data);
+      
+      // Pin message controller'a da gönder (pin işlemi için)
+      if (data is Map<String, dynamic>) {
+        // Message data'yı parse et
+        Map<String, dynamic> messageData;
+        if (data.containsKey('message')) {
+          messageData = data['message'] as Map<String, dynamic>;
+        } else {
+          messageData = data;
+        }
+        
+        final messageId = messageData['id']?.toString();
+        final conversationId = messageData['conversation_id']?.toString();
+        
+        debugPrint('📌 [SocketService] conversation:message_pinned - Message ID: $messageId, Conversation ID: $conversationId');
+        
+        // Özel pin event'i oluştur
+        final pinEvent = {
+          'message_id': messageId,
+          'conversation_id': conversationId,
+          'is_pinned': true, // Pin durumu
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'source': 'conversation:message_pinned',
+          'message_data': messageData,
+          'action': 'pin',
+        };
+        
+        debugPrint('📌 [SocketService] Conversation pin event\'i gönderiliyor: $pinEvent');
+        _pinMessageController.add(pinEvent);
+      }
+    });
+
+    _socket!.on('conversation:message_unpinned', (data) {
+      debugPrint('📌 Conversation message unpinned geldi (SocketService): $data');
+      _pinMessageController.add(data);
+      
+      // Pin message controller'a da gönder (unpin işlemi için)
+      if (data is Map<String, dynamic>) {
+        // Message data'yı parse et
+        Map<String, dynamic> messageData;
+        if (data.containsKey('message')) {
+          messageData = data['message'] as Map<String, dynamic>;
+        } else {
+          messageData = data;
+        }
+        
+        final messageId = messageData['id']?.toString();
+        final conversationId = messageData['conversation_id']?.toString();
+        
+        debugPrint('📌 [SocketService] conversation:message_unpinned - Message ID: $messageId, Conversation ID: $conversationId');
+        
+        // Özel unpin event'i oluştur
+        final unpinEvent = {
+          'message_id': messageId,
+          'conversation_id': conversationId,
+          'is_pinned': false, // Unpin durumu
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'source': 'conversation:message_unpinned',
+          'message_data': messageData,
+          'action': 'unpin',
+        };
+        
+        debugPrint('📌 [SocketService] Conversation unpin event\'i gönderiliyor: $unpinEvent');
+        _pinMessageController.add(unpinEvent);
+      }
+    });
+
+    // Group pin/unpin events
     _socket!.on('group:message_pinned', (data) {
+      debugPrint('📌 Group message pinned geldi (SocketService): $data');
+      _pinMessageController.add(data);
+      
+      // Pin message controller'a da gönder (pin işlemi için)
+      if (data is Map<String, dynamic>) {
+        // Message data'yı parse et
+        Map<String, dynamic> messageData;
+        if (data.containsKey('message')) {
+          messageData = data['message'] as Map<String, dynamic>;
+        } else {
+          messageData = data;
+        }
+        
+        final messageId = messageData['id']?.toString();
+        final groupId = messageData['group_id']?.toString();
+        
+        debugPrint('📌 [SocketService] group:message_pinned - Message ID: $messageId, Group ID: $groupId');
+        
+        // Özel pin event'i oluştur
+        final pinEvent = {
+          'message_id': messageId,
+          'group_id': groupId,
+          'is_pinned': true, // Pin durumu
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'source': 'group:message_pinned',
+          'message_data': messageData,
+          'action': 'pin',
+        };
+        
+        debugPrint('📌 [SocketService] Pin event\'i gönderiliyor: $pinEvent');
+        _pinMessageController.add(pinEvent);
+      }
+    });
+
+    _socket!.on('group:message_unpinned', (data) {
       _pinMessageController.add(data);
     });
 
-    _socket!.on('group:unpin_message', (data) {
+    // Alternative event names for pin/unpin
+    _socket!.on('message:pinned', (data) {
       _pinMessageController.add(data);
+    });
+
+    _socket!.on('message:unpinned', (data) {
+      _pinMessageController.add(data);
+    });
+
+    // Custom pin/unpin events that we send
+    _socket!.on('conversation:pin_message', (data) {
+      _pinMessageController.add(data);
+    });
+
+    // Handle pin/unpin events from onAny listener
+    _socket!.onAny((event, data) {
+      // Check if this is a pin/unpin related event
+      if (data is Map<String, dynamic> && 
+          data.containsKey('is_pinned') && 
+          (data.containsKey('conversation_id') || data.containsKey('group_id'))) {
+        
+        // Prevent duplicate events by checking if this is already a pin/unpin specific event
+        if (event.toString().contains('pin') || 
+            event.toString().contains('unpin') ||
+            event.toString().contains('conversation:pin_message') ||
+            event.toString().contains('group:pin_message')) {
+          
+          debugPrint('📌 [SocketService] Skipping duplicate pin event from onAny: $event');
+          return;
+        }
+        
+        debugPrint('📌 [SocketService] Pin event detected in onAny: $event');
+        // Broadcast to pin message listeners
+        _pinMessageController.add(data);
+      }
+    });
+
+    _socket!.on('group:pin_message', (data) {
+      _pinMessageController.add(data);
+    });
+
+    // Pin durumu kontrolü için event'ler
+    _socket!.on('group:pinned_messages', (data) {
+      _pinMessageController.add(data);
+    });
+
+    _socket!.on('group:pin_status_update', (data) {
+      _pinMessageController.add(data);
+    });
+
+    _socket!.on('conversation:unread', (data) {
+      debugPrint('📨 Chat bazında unread count (conversation:unread): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('chat:unread', (data) {
+      debugPrint('📨 Chat bazında unread count (chat:unread): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('user:conversation_unread', (data) {
+      debugPrint('📨 Chat bazında unread count (user:conversation_unread): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('unread:conversation', (data) {
+      debugPrint('📨 Chat bazında unread count (unread:conversation): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('conversation:count', (data) {
+      debugPrint('📨 Chat bazında unread count (conversation:count): $data');
+      _handlePerChatUnreadCount(data);
+    });
+
+    _socket!.on('group:unpin_message', (data) {
+      debugPrint('📌 Group unpin message geldi (SocketService): $data');
+      _pinMessageController.add(data);
+      
+      // Pin message controller'a da gönder (unpin işlemi için)
+      if (data is Map<String, dynamic>) {
+        // Message data'yı parse et
+        Map<String, dynamic> messageData;
+        if (data.containsKey('message')) {
+          messageData = data['message'] as Map<String, dynamic>;
+        } else {
+          messageData = data;
+        }
+        
+        final messageId = messageData['id']?.toString();
+        final groupId = messageData['group_id']?.toString();
+        
+        debugPrint('📌 [SocketService] group:unpin_message - Message ID: $messageId, Group ID: $groupId');
+        
+        // Özel unpin event'i oluştur
+        final unpinEvent = {
+          'message_id': messageId,
+          'group_id': groupId,
+          'is_pinned': false, // Unpin durumu
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'source': 'group:unpin_message',
+          'message_data': messageData,
+          'action': 'unpin',
+        };
+        
+        debugPrint('📌 [SocketService] Unpin event\'i gönderiliyor: $unpinEvent');
+        _pinMessageController.add(unpinEvent);
+      }
     });
 
     // 4. Yeni bildirim
@@ -230,7 +509,16 @@ class SocketService extends GetxService {
       _sendOneSignalNotification('notification', data);
     });
 
-    // 5. Comment notification (global)
+    // 5. Notification event (private chat'teki gibi global)
+    _socket!.on('notification:event', (data) {
+      debugPrint('🔔 Notification event geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi gönder (uygulama açıkken)
+      _sendOneSignalNotification('notification', data);
+    });
+
+    // 6. Comment notification (global)
     _socket!.on('comment:event', (data) {
       debugPrint('💬 Comment event geldi (SocketService): $data');
       _commentNotificationController.add(data);
@@ -329,9 +617,60 @@ class SocketService extends GetxService {
       _sendOneSignalNotification('event_invitation', data);
     });
 
+    // 16. Event reminder notification (global)
+    _socket!.on('event:reminder', (data) {
+      debugPrint('⏰ Event reminder event geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 17. Post mention notification (global)
+    _socket!.on('post:mention', (data) {
+      debugPrint('📝 Post mention event geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 18. Comment mention notification (global)
+    _socket!.on('comment:mention', (data) {
+      debugPrint('💬 Comment mention event geldi (SocketService): $data');
+      _commentNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 19. System notification (global)
+    _socket!.on('system:notification', (data) {
+      debugPrint('🔔 System notification event geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
     // 21. User notification (user:{user_id} kanalı)
     _socket!.on('user:notification', (data) {
-      debugPrint('👤 User notification geldi (SocketService): $data');
+      printFullText('👤 User notification geldi (SocketService): $data');
+      
+      // is_read alanını kontrol et ve logla
+      if (data is Map && data.containsKey('notification_data')) {
+        final notificationData = data['notification_data'];
+        if (notificationData is Map && notificationData.containsKey('is_read')) {
+          final isRead = notificationData['is_read'];
+          printFullText('👤 🔍 SocketService - is_read değeri: $isRead (Type: ${isRead.runtimeType})');
+          
+          if (isRead == true) {
+            printFullText('👤 ✅ SocketService - Bildirim zaten okunmuş');
+          } else {
+            printFullText('👤 🔴 SocketService - Bildirim okunmamış');
+          }
+        } else {
+          printFullText('👤 ⚠️ SocketService - notification_data içinde is_read alanı bulunamadı');
+        }
+      } else {
+        printFullText('👤 ⚠️ SocketService - notification_data alanı bulunamadı');
+      }
       
       // Çoklu bildirim kontrolü
       final notificationId = data['notification_data']?['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString();
@@ -377,44 +716,590 @@ class SocketService extends GetxService {
       }
       
       // OneSignal bildirimi gönder (uygulama açıkken)
+      debugPrint('👤 OneSignal bildirimi gönderiliyor... Tip: $notificationType');
       _sendOneSignalNotification(notificationType, data);
+      debugPrint('👤 OneSignal bildirimi gönderme tamamlandı');
+      debugPrint('👤 =======================================');
+    });
+
+    // 22. User specific notification (user:{user_id} formatı)
+    _socket!.on('user:*', (data) {
+      debugPrint('👤 User specific notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 23. Private notification (alternatif event ismi)
+    _socket!.on('private:notification', (data) {
+      debugPrint('🔒 Private notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 24. User message (alternatif event ismi)
+    _socket!.on('user:message', (data) {
+      debugPrint('👤 User message geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 25. Direct notification (alternatif event ismi)
+    _socket!.on('direct:notification', (data) {
+      debugPrint('📨 Direct notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 26. Personal notification (alternatif event ismi)
+    _socket!.on('personal:notification', (data) {
+      debugPrint('👤 Personal notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 27. Post comment notification
+    _socket!.on('post:comment', (data) {
+      debugPrint('💬 Post comment notification geldi (SocketService): $data');
+      _commentNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 28. Comment notification (alternatif event ismi)
+    _socket!.on('comment:new', (data) {
+      debugPrint('💬 Comment notification geldi (SocketService): $data');
+      _commentNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 29. Post activity notification
+    _socket!.on('post:activity', (data) {
+      debugPrint('📝 Post activity notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 30. Timeline notification
+    _socket!.on('timeline:notification', (data) {
+      debugPrint('📅 Timeline notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 31. Follow notification
+    _socket!.on('follow:notification', (data) {
+      debugPrint('👥 Follow notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 32. Like notification
+    _socket!.on('like:notification', (data) {
+      debugPrint('❤️ Like notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 33. Group notification
+    _socket!.on('group:notification', (data) {
+      debugPrint('👥 Group notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 34. Event notification
+    _socket!.on('event:notification', (data) {
+      debugPrint('📅 Event notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 35. General activity notification
+    _socket!.on('activity:notification', (data) {
+      debugPrint('🎯 Activity notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 36. Real-time notification (genel)
+    _socket!.on('realtime:notification', (data) {
+      debugPrint('⚡ Real-time notification geldi (SocketService): $data');
+      _userNotificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 37. All notifications (catch-all)
+    _socket!.on('*', (data) {
+      debugPrint('🔔 Wildcard notification geldi (SocketService): $data');
+      _notificationController.add(data);
+      
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+    });
+
+    // 38. Tüm event'leri yakalamak için wildcard listener
+    _socket!.onAny((event, data) {
+      //debugPrint('🎯 === SOCKET EVENT YAKALANDI ===');
+      //debugPrint('🎯 Event: $event');
+      //debugPrint('🎯 Data: $data');
+      //debugPrint('🎯 Data Type: ${data.runtimeType}');
+      
+      // Data'yı daha detaylı analiz et
+      if (data is Map) {
+        debugPrint('🎯 Data Keys: ${data.keys.toList()}');
+        if (data.containsKey('type')) {
+          debugPrint('🎯 Notification Type: ${data['type']}');
+        }
+        if (data.containsKey('message')) {
+          debugPrint('🎯 Message: ${data['message']}');
+        }
+        if (data.containsKey('user_id')) {
+          debugPrint('🎯 User ID: ${data['user_id']}');
+        }
+        if (data.containsKey('group_id')) {
+          debugPrint('🎯 Group ID: ${data['group_id']}');
+        }
+        if (data.containsKey('conversation_id')) {
+          debugPrint('🎯 Conversation ID: ${data['conversation_id']}');
+        }
+      }
+      
+      debugPrint('🎯 ================================');
+      
+      // Eğer user kanalından gelen bir event ise
+      if (event.toString().contains('user') || 
+          event.toString().contains('notification') ||
+          event.toString().contains('comment') ||
+          event.toString().contains('like') ||
+          event.toString().contains('follow') ||
+          event.toString().contains('post')) {
+        
+        debugPrint('✅ User kanalından gelen event tespit edildi!');
+        _userNotificationController.add(data);
+        
+        // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+      }
+      
+      // Pin/Unpin event'lerini yakala
+      if (data is Map<String, dynamic> && 
+          data.containsKey('is_pinned') && 
+          (data.containsKey('conversation_id') || data.containsKey('group_id'))) {
+        
+        debugPrint('📌 Pin/Unpin event detected in onAny: $event');
+        debugPrint('📌 Event data: $data');
+        
+        // Broadcast to pin message listeners
+        _pinMessageController.add(data);
+      }
+    });
+
+    // 39. User kanalından gelen tüm verileri detaylı logla
+    _socket!.on('user:*', (data) {
+      debugPrint('👤 === USER KANALI DETAYLI LOG ===');
+      debugPrint('👤 Event: user:*');
+      debugPrint('👤 Raw Data: $data');
+      debugPrint('👤 Data Type: ${data.runtimeType}');
+      
+      if (data is Map<String, dynamic>) {
+        debugPrint('👤 === DATA ANALİZİ ===');
+        debugPrint('👤 Tüm Keys: ${data.keys.toList()}');
+        
+        // Her key'i detaylı incele
+        data.forEach((key, value) {
+          debugPrint('👤 $key: $value (${value.runtimeType})');
+        });
+        
+        // Özel alanları kontrol et
+        if (data.containsKey('type')) {
+          debugPrint('👤 📝 Event Type: ${data['type']}');
+        }
+        if (data.containsKey('message')) {
+          debugPrint('👤 💬 Message: ${data['message']}');
+        }
+        if (data.containsKey('user_id')) {
+          debugPrint('👤 👤 User ID: ${data['user_id']}');
+        }
+        if (data.containsKey('group_id')) {
+          debugPrint('👤 👥 Group ID: ${data['group_id']}');
+        }
+        if (data.containsKey('conversation_id')) {
+          debugPrint('👤 💭 Conversation ID: ${data['conversation_id']}');
+        }
+        if (data.containsKey('sender')) {
+          debugPrint('👤 👤 Sender: ${data['sender']}');
+        }
+        if (data.containsKey('receiver')) {
+          debugPrint('👤 👤 Receiver: ${data['receiver']}');
+        }
+        if (data.containsKey('created_at')) {
+          debugPrint('👤 ⏰ Created At: ${data['created_at']}');
+        }
+        if (data.containsKey('updated_at')) {
+          debugPrint('👤 ⏰ Updated At: ${data['updated_at']}');
+        }
+        if (data.containsKey('is_read')) {
+          debugPrint('👤 ✅ Is Read: ${data['is_read']}');
+        }
+        if (data.containsKey('media')) {
+          debugPrint('👤 📁 Media: ${data['media']}');
+        }
+        if (data.containsKey('links')) {
+          debugPrint('👤 🔗 Links: ${data['links']}');
+        }
+        if (data.containsKey('poll_options')) {
+          debugPrint('👤 📊 Poll Options: ${data['poll_options']}');
+        }
+      }
+      
+      debugPrint('👤 ================================');
     });
 
     // 21.5. Group message notification (user:{user_id} kanalından)
     _socket!.on('user:group_message', (data) {
-      debugPrint('👥 Group message notification geldi (SocketService): $data');
+      printFullText('👥 Group message notification geldi (SocketService): $data');
+      
+      if (data is Map<String, dynamic>) {
+        printFullText('👥 === GROUP MESSAGE DETAYLI ANALİZ ===');
+        
+        // Grup ID'sini doğru yerden al
+        dynamic groupId = data['group_id'];
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          groupId = messageData['group_id'] ?? data['group_id'];
+        }
+        printFullText('👥 Group ID: $groupId');
+      }
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('user:group_chat', (data) {
+      debugPrint('👥 User group chat geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] user:group_chat - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] user:group_chat - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('user:group_chat_message', (data) {
+      debugPrint('👥 User group chat message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] user:group_chat_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] user:group_chat_message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    // 21.8. User kanalında grup mesajları için ek olası event'ler
+    _socket!.on('user:new_group_message', (data) {
+      debugPrint('👥 User new group message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('user:chat_message', (data) {
+      debugPrint('👥 User chat message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('user:message_group', (data) {
+      debugPrint('👥 User message group geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('user:group_message_new', (data) {
+      debugPrint('👥 User group message new geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('user:new_message', (data) {
+      debugPrint('👥 User new message geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:message_new', (data) {
+      debugPrint('👥 User message new geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:chat', (data) {
+      debugPrint('👥 User chat geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
+    });
+
+    _socket!.on('user:group', (data) {
+      debugPrint('👥 User group geldi (SocketService): $data');
+      _groupMessageController.add(data);
+      _sendOneSignalNotification('group', data);
     });
 
     // 21.6. Group message (alternatif event isimleri)
     _socket!.on('group:message', (data) {
-      debugPrint('👥 Group message event geldi (SocketService): $data');
+      printFullText('👥 Group message event geldi (SocketService): $data');
+      
+      if (data is Map<String, dynamic>) {
+        printFullText('👥 === GROUP MESSAGE EVENT DETAYLI ANALİZ ===');
+        
+        // Grup ID'sini doğru yerden al
+        dynamic groupId = data['group_id'];
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          groupId = messageData['group_id'] ?? data['group_id'];
+        }
+        printFullText('👥 Group ID: $groupId');
+      }
+      
+      debugPrint('📡 [SocketService] group:message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group:message - _groupMessageController.add() tamamlandı');
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('group_conversation:new_message', (data) {
+      debugPrint('👥 Group conversation new message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group_conversation:new_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group_conversation:new_message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('conversation:group_message', (data) {
+      debugPrint('👥 Conversation group message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] conversation:group_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] conversation:group_message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    // 21.7. Ek grup mesaj event'leri (backend'de farklı isimler kullanılıyor olabilir)
+    _socket!.on('group:new_message', (data) {
+      printFullText('👥 Group new message geldi (SocketService): $data');
+      printFullText('👥 Data type: ${data.runtimeType}');
+      printFullText('👥 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
+      if (data is Map<String, dynamic>) {
+        printFullText('👥 === GROUP NEW MESSAGE DETAYLI ANALİZ ===');
+        printFullText('👥 Group ID: ${data['group_id']}');
+        printFullText('👥 Message: ${data['message']}');
+        printFullText('👥 Sender ID: ${data['sender_id']}');
+        printFullText('👥 Is Me: ${data['is_me']}');
+        printFullText('👥 Is Read: ${data['is_read']}');
+        printFullText('👥 Created At: ${data['created_at']}');
+        printFullText('👥 Message ID: ${data['id']}');
+        
+        // Message alanını kontrol et
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          printFullText('👥 📝 MESSAGE ALANı VAR: ${messageData.runtimeType}');
+          printFullText('👥 📝 Message data: $messageData');
+          printFullText('👥 📝 Message keys: ${messageData.keys.toList()}');
+          printFullText('👥 📝 Message text: ${messageData['message']}');
+          printFullText('👥 📝 Message is_read: ${messageData['is_read']}');
+          printFullText('👥 📝 Message is_me: ${messageData['is_me']}');
+        }
+        
+        // User alanını kontrol et
+        if (data.containsKey('user') && data['user'] is Map<String, dynamic>) {
+          final userData = data['user'] as Map<String, dynamic>;
+          printFullText('👥 👤 USER ALANı VAR: ${userData.runtimeType}');
+          printFullText('👥 👤 User keys: ${userData.keys.toList()}');
+          printFullText('👥 👤 User name: ${userData['name']}');
+          printFullText('👥 👤 User ID: ${userData['id']}');
+        }
+        
+        printFullText('👥 === ANALİZ TAMAMLANDI ===');
+      }
+      
+      debugPrint('📡 [SocketService] group:new_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group:new_message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('group_chat:message', (data) {
+      debugPrint('👥 Group chat message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group_chat:message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group_chat:message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('group_chat:new_message', (data) {
+      debugPrint('👥 Group chat new message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] group_chat:new_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] group_chat:new_message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('chat:group_message', (data) {
+      debugPrint('👥 Chat group message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] chat:group_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] chat:group_message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('message:group', (data) {
+      debugPrint('👥 Message group geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] message:group - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] message:group - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
+    });
+
+    _socket!.on('new:group_message', (data) {
+      debugPrint('👥 New group message geldi (SocketService): $data');
+      debugPrint('📡 [SocketService] new:group_message - _groupMessageController.add() çağrılıyor');
+      _groupMessageController.add(data);
+      debugPrint('📡 [SocketService] new:group_message - _groupMessageController.add() tamamlandı');
+      
+      // Özel grup mesaj bildirimi gönder (uygulama açıkken)
+      debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
+      _sendCustomGroupMessageNotification(data);
+      debugPrint('👥 Özel grup mesaj bildirimi gönderme tamamlandı');
     });
 
     _socket!.on('group:chat_message', (data) {
       debugPrint('👥 Group chat message geldi (SocketService): $data');
       _groupMessageController.add(data);
       
-      // Pin durumu kontrolü
-      if (data is Map<String, dynamic> && data.containsKey('is_pinned')) {
-        final messageId = data['id']?.toString();
-        final isPinned = data['is_pinned'] ?? false;
-        final groupId = data['group_id']?.toString();
+      // Pin durumu kontrolü - hem direkt data hem de message objesi içinde kontrol et
+      bool pinStatusDetected = false;
+      
+      if (data is Map<String, dynamic>) {
+        // Önce message objesi içinde kontrol et
+        if (data.containsKey('message')) {
+          final messageData = data['message'] as Map<String, dynamic>?;
+          if (messageData != null && messageData.containsKey('is_pinned')) {
+            final messageId = messageData['id']?.toString();
+            final isPinned = messageData['is_pinned'] ?? false;
+            final groupId = messageData['group_id']?.toString();
+            debugPrint('📌 [SocketService] group:chat_message içinde pin durumu tespit edildi (message objesi): Message ID=$messageId, Group ID=$groupId, isPinned=$isPinned');
+            pinStatusDetected = true;
+            
+            // Pin durumu değişikliği için özel event gönder
+            if (messageId != null && groupId != null) {
+              final pinUpdateEvent = {
+                'message_id': messageId,
+                'group_id': groupId,
+                'is_pinned': isPinned,
+                'timestamp': DateTime.now().millisecondsSinceEpoch,
+                'source': 'group:chat_message',
+                'message_data': messageData,
+              };
+              
+              debugPrint('📌 [SocketService] Pin durumu değişikliği event\'i gönderiliyor: $pinUpdateEvent');
+              _pinMessageController.add(pinUpdateEvent);
+            }
+          }
+        }
         
-        if (messageId != null && groupId != null) {
-          final pinUpdateEvent = {
-            'message_id': messageId,
-            'group_id': groupId,
-            'is_pinned': isPinned,
-            'timestamp': DateTime.now().millisecondsSinceEpoch,
-            'source': 'group:chat_message',
-            'message_data': data,
-          };
-          _pinMessageController.add(pinUpdateEvent);
+        // Eğer message objesi içinde yoksa, direkt data içinde kontrol et
+        if (!pinStatusDetected && data.containsKey('is_pinned')) {
+          final messageId = data['id']?.toString();
+          final isPinned = data['is_pinned'] ?? false;
+          final groupId = data['group_id']?.toString();
+          debugPrint('📌 [SocketService] group:chat_message içinde pin durumu tespit edildi (direkt data): Message ID=$messageId, Group ID=$groupId, isPinned=$isPinned');
+          pinStatusDetected = true;
+          
+          // Pin durumu değişikliği için özel event gönder
+          if (messageId != null && groupId != null) {
+            final pinUpdateEvent = {
+              'message_id': messageId,
+              'group_id': groupId,
+              'is_pinned': isPinned,
+              'timestamp': DateTime.now().millisecondsSinceEpoch,
+              'source': 'group:chat_message',
+              'message_data': data,
+            };
+            
+            debugPrint('📌 [SocketService] Pin durumu değişikliği event\'i gönderiliyor: $pinUpdateEvent');
+            _pinMessageController.add(pinUpdateEvent);
+          }
+        }
+        
+        if (pinStatusDetected) {
+          debugPrint('📌 [SocketService] Pin event\'i tetiklendi ve PinnedMessagesWidget güncellenmeli');
+        } else {
+          debugPrint('📌 [SocketService] Pin durumu tespit edilmedi - normal mesaj event\'i');
         }
       }
       
@@ -434,17 +1319,22 @@ class SocketService extends GetxService {
     // Bağlantı durumunu kontrol et
     Future.delayed(Duration(seconds: 5), () {
       debugPrint('🔍 Socket bağlantı durumu kontrol ediliyor... ($urlName)');
+      debugPrint('🔍 isConnected.value: ${isConnected.value}');
+      debugPrint('🔍 _socket?.connected: ${_socket?.connected}');
+      debugPrint('🔍 _socket?.id: ${_socket?.id}');
     });
   }
 
   // Mesaj gönderme
   void sendMessage(String event, dynamic data) {
     debugPrint('📤 Mesaj gönderiliyor: $event');
+    debugPrint('📤 Data: $data');
     if (_socket != null && _socket!.connected) {
       _socket!.emit(event, data);
       debugPrint('✅ Mesaj gönderildi');
     } else {
       debugPrint('❌ Socket bağlı değil, mesaj gönderilemedi');
+      debugPrint('❌ Socket durumu: ${_socket?.connected}');
     }
   }
 
@@ -452,6 +1342,7 @@ class SocketService extends GetxService {
   void sendTestEvent(String eventName, Map<String, dynamic> data) {
     if (_socket != null && _socket!.connected) {
       debugPrint('🧪 Test event gönderiliyor: $eventName');
+      debugPrint('🧪 Test data: $data');
       _socket!.emit(eventName, data);
       debugPrint('✅ Test event gönderildi');
     } else {
@@ -461,17 +1352,43 @@ class SocketService extends GetxService {
 
   // Socket durumunu kontrol etme
   void checkSocketStatus() {
-    // Socket durumu kontrol edildi
+   
   }
 
   /// User kanalına join ol
   void joinUserChannel(String userId) {
     if (_socket != null && _socket!.connected) {
       debugPrint('👤 User kanalına join olunuyor: user:$userId');
+      debugPrint('👤 Socket ID: ${_socket!.id}');
+      debugPrint('👤 Socket connected: ${_socket!.connected}');
       
       // User kanalı
       _socket!.emit('join', {'channel': 'user:$userId'});
       _socket!.emit('subscribe', {'channel': 'user:$userId'});
+      _socket!.emit('join:user', {'user_id': userId});
+      _socket!.emit('subscribe:user', {'user_id': userId});
+      
+      // Alternatif join yöntemleri
+      _socket!.emit('join', {'user_id': userId});
+      _socket!.emit('subscribe', {'user_id': userId});
+      _socket!.emit('user:join', {'user_id': userId});
+      _socket!.emit('user:subscribe', {'user_id': userId});
+      
+      // Farklı kanal isimleri
+      _socket!.emit('join', {'channel': 'notifications'});
+      _socket!.emit('subscribe', {'channel': 'notifications'});
+      _socket!.emit('join', {'channel': 'user_notifications'});
+      _socket!.emit('subscribe', {'channel': 'user_notifications'});
+      _socket!.emit('join', {'channel': 'user_$userId'});
+      _socket!.emit('subscribe', {'channel': 'user_$userId'});
+      
+      // Genel notification kanalları
+      _socket!.emit('join', {'channel': 'comments'});
+      _socket!.emit('subscribe', {'channel': 'comments'});
+      _socket!.emit('join', {'channel': 'likes'});
+      _socket!.emit('subscribe', {'channel': 'likes'});
+      _socket!.emit('join', {'channel': 'follows'});
+      _socket!.emit('subscribe', {'channel': 'follows'});
       
       debugPrint('✅ User kanalına join istekleri gönderildi');
     } else {
@@ -484,8 +1401,11 @@ class SocketService extends GetxService {
     if (_socket != null && _socket!.connected) {
       debugPrint('👤 User kanalından ayrılıyor: user:$userId');
       
+      // Farklı event isimlerini dene
       _socket!.emit('leave', {'channel': 'user:$userId'});
       _socket!.emit('unsubscribe', {'channel': 'user:$userId'});
+      _socket!.emit('leave:user', {'user_id': userId});
+      _socket!.emit('unsubscribe:user', {'user_id': userId});
       
       debugPrint('✅ User kanalından ayrılma istekleri gönderildi');
     } else {
@@ -501,6 +1421,8 @@ class SocketService extends GetxService {
       // User kanalı
       _socket!.emit('join', {'channel': 'user:$userId'});
       _socket!.emit('subscribe', {'channel': 'user:$userId'});
+      _socket!.emit('join:user', {'user_id': userId});
+      _socket!.emit('subscribe:user', {'user_id': userId});
       
       debugPrint('✅ User kanalına join istekleri gönderildi');
     } else {
@@ -515,9 +1437,12 @@ class SocketService extends GetxService {
       
       // Token'dan user ID'yi çıkar
       final token = GetStorage().read('token');
+      debugPrint('🔔 Token var mı: ${token != null}');
       
       if (token != null) {
         debugPrint('🔔 Bağlantı sonrası user kanalına join olunuyor...');
+        debugPrint('🔔 Socket bağlı mı: ${_socket?.connected}');
+        debugPrint('🔔 Socket ID: ${_socket?.id}');
         
         // User kanalına join ol (user ID olmadan genel join)
         _socket!.emit('join', {'channel': 'user'});
@@ -539,6 +1464,7 @@ class SocketService extends GetxService {
       }
     } catch (e) {
       debugPrint('❌ Bağlantı sonrası user kanalına join olma hatası: $e');
+      debugPrint('❌ Hata detayı: ${e.toString()}');
     }
   }
 
@@ -547,8 +1473,20 @@ class SocketService extends GetxService {
     if (_socket != null && _socket!.connected) {
       debugPrint('📨 Unread count isteniyor...');
       
+      // Farklı event isimlerini dene
       _socket!.emit('get:unread_count');
+      _socket!.emit('request:unread_count');
+      _socket!.emit('unread:count');
       _socket!.emit('conversation:get_unread_count');
+      _socket!.emit('chat:unread_count');
+      _socket!.emit('get:conversation_unread_counts');
+      _socket!.emit('request:per_chat_unread');
+      
+      // Chat bazında unread count için yeni event'ler
+      _socket!.emit('get:conversation_unread_details');
+      _socket!.emit('request:unread_by_conversation');
+      _socket!.emit('conversation:get_unread_details');
+      _socket!.emit('chat:get_unread_details');
       
       debugPrint('✅ Unread count istekleri gönderildi');
     } else {
@@ -565,6 +1503,20 @@ class SocketService extends GetxService {
   /// Chat bazında unread count'ları handle et
   void _handlePerChatUnreadCount(dynamic data) {
     debugPrint('🔍 Chat bazında unread count işleniyor: $data');
+    debugPrint('🔍 Data type: ${data.runtimeType}');
+    debugPrint('🔍 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+    
+    if (data is Map<String, dynamic>) {
+      debugPrint('🔍 === PER CHAT UNREAD COUNT DETAYI ===');
+      debugPrint('🔍 Conversation ID: ${data['conversation_id']}');
+      debugPrint('🔍 Chat ID: ${data['chat_id']}');
+      debugPrint('🔍 User ID: ${data['user_id']}');
+      debugPrint('🔍 Unread Count: ${data['unread_count']}');
+      debugPrint('🔍 Count: ${data['count']}');
+      debugPrint('🔍 Message Count: ${data['message_count']}');
+      debugPrint('🔍 Is Read: ${data['is_read']}');
+      debugPrint('🔍 ====================================');
+    }
     
     // Chat controller'a gönder
     _perChatUnreadCountController.add(data);
@@ -578,31 +1530,51 @@ class SocketService extends GetxService {
       // Kullanıcının katıldığı grupları al
       final userGroups = await _groupServices.getUserGroups();
       
+      debugPrint('👥 getUserGroups() sonucu: ${userGroups?.length ?? 0} grup');
+      debugPrint('👥 getUserGroups() null mu: ${userGroups == null}');
+      debugPrint('👥 getUserGroups() boş mu: ${userGroups?.isEmpty ?? true}');
+      
       if (userGroups != null && userGroups.isNotEmpty) {
         debugPrint('👥 ${userGroups.length} adet gruba join olunuyor...');
         
         for (final group in userGroups) {
           final groupId = group.id.toString();
+          debugPrint('👥 Grup detayı: ${group.name} (ID: $groupId)');
           
           if (groupId.isNotEmpty) {
+            debugPrint('👥 Gruba join olunuyor: ${group.name} (ID: $groupId)');
+            
             // Gruba join ol
             _socket!.emit('group:join', {'group_id': groupId});
+            
             debugPrint('✅ Gruba join isteği gönderildi: ${group.name}');
+          } else {
+            debugPrint('⚠️ Boş grup ID: ${group.name}');
           }
         }
         
         debugPrint('✅ Tüm gruplara join istekleri gönderildi');
       } else {
         debugPrint('ℹ️ Kullanıcının katıldığı grup bulunamadı');
+        debugPrint('ℹ️ userGroups null: ${userGroups == null}');
+        debugPrint('ℹ️ userGroups empty: ${userGroups?.isEmpty ?? true}');
       }
     } catch (e) {
       debugPrint('❌ Gruplara join olma hatası: $e');
+      debugPrint('❌ Hata detayı: ${e.toString()}');
     }
   }
 
   // OneSignal bildirimi gönder (uygulama açıkken)
   void _sendOneSignalNotification(String type, dynamic data) async {
     try {
+      debugPrint('📱 =======================================');
+      debugPrint('📱 OneSignal bildirimi gönderiliyor...');
+      debugPrint('📱 Tip: $type');
+      debugPrint('📱 Data: $data');
+      debugPrint('📱 Data Type: ${data.runtimeType}');
+      debugPrint('📱 Data Keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+      
       // DEBOUNCE: Aynı mesaj için çoklu bildirim engelle
       final notificationKey = '${type}_${data['id'] ?? DateTime.now().millisecondsSinceEpoch}';
       final now = DateTime.now();
@@ -827,6 +1799,9 @@ class SocketService extends GetxService {
         conversationId: data['conversation_id']?.toString() ?? data['group_id']?.toString() ?? '',
         data: data,
       );
+      
+      debugPrint('✅ OneSignal bildirimi gönderildi');
+      debugPrint('📱 Bildirim detayları: title=$title, message=$message, avatar=$avatar');
     } catch (e) {
       debugPrint('❌ OneSignal bildirimi gönderilemedi: $e');
     }
@@ -863,9 +1838,12 @@ class SocketService extends GetxService {
   // Özel grup mesaj bildirimi gönder (grup profil resmi, grup adı ve gönderen bilgisi ile)
   void _sendCustomGroupMessageNotification(dynamic data) async {
     try {
+      debugPrint('👥 Özel grup mesaj bildirimi hazırlanıyor...');
+      
       // Group mesaj data yapısı: {message: {message: "text", user: {name: "...", avatar_url: "..."}}}
       final messageData = data['message'] as Map<String, dynamic>?;
       if (messageData == null) {
+        debugPrint('❌ Group message data is null');
         return;
       }
       
@@ -878,8 +1856,11 @@ class SocketService extends GetxService {
       // Kendi mesajımız için bildirim gönderme
       final currentUserId = GetStorage().read('user_id')?.toString() ?? '';
       if (senderUserId == currentUserId) {
+        debugPrint('🚫 Kendi mesajımız için bildirim gönderilmiyor. Sender: $senderUserId, Current: $currentUserId');
         return;
       }
+      
+      debugPrint('👥 Group mesaj detayları: sender=$senderName, message=$messageText, groupId=$groupId, senderUserId=$senderUserId');
       
       // DEBOUNCE: Aynı mesaj için çoklu bildirim engelle
       final notificationKey = 'group_${groupId}_${messageData['id']}';
@@ -888,6 +1869,7 @@ class SocketService extends GetxService {
       
       if (lastNotification != null && 
           now.difference(lastNotification) < _notificationDebounce) {
+        debugPrint('🚫 Group mesaj bildirimi debounced: $notificationKey');
         return;
       }
       
@@ -901,8 +1883,9 @@ class SocketService extends GetxService {
         final groupDetail = await _groupServices.fetchGroupDetail(groupId);
         groupName = groupDetail.name;
         groupAvatar = groupDetail.avatarUrl ?? '';
+        debugPrint('👥 Grup bilgileri alındı: name=$groupName, avatar=$groupAvatar');
       } catch (e) {
-        // Grup bilgileri alınamadı, varsayılan değerler kullanılacak
+        debugPrint('⚠️ Grup bilgileri alınamadı: $e');
       }
       
       // Bildirim içeriğini hazırla: "Gönderen Adı: Mesaj"
@@ -921,6 +1904,9 @@ class SocketService extends GetxService {
           'group_avatar': groupAvatar,
         },
       );
+      
+      debugPrint('✅ Özel grup mesaj bildirimi gönderildi');
+      debugPrint('📱 Bildirim detayları: title=$groupName, message=$notificationMessage, avatar=$groupAvatar');
     } catch (e) {
       debugPrint('❌ Özel grup mesaj bildirimi gönderilemedi: $e');
     }
@@ -936,7 +1922,9 @@ class SocketService extends GetxService {
 
   // Dinleyicileri temizle
   void removeAllListeners() {
+    debugPrint('🔌 Socket dinleyicileri temizleniyor...');
     _socket?.clearListeners();
+    debugPrint('✅ Socket dinleyicileri temizlendi');
   }
 
   @override
@@ -959,7 +1947,22 @@ class SocketService extends GetxService {
 
   /// Uygulama başlatıldığında socket durumunu kontrol et
   void checkInitialSocketStatus() {
-    // Socket durumu kontrol edildi
+    //debugPrint('🚀 === UYGULAMA BAŞLATILDI - SOCKET DURUMU ===');
+    //debugPrint('🚀 Socket Bağlantı Durumu: ${isConnected.value}');
+    //debugPrint('🚀 Socket ID: ${_socket?.id}');
+    //debugPrint('🚀 Socket Connected: ${_socket?.connected}');
+    //debugPrint('🚀 Socket URL: $_socketUrl');
+    //debugPrint('🚀 ===========================================');
+    
+    // User kanalından gelen tüm event'leri dinlemeye başla
+    //debugPrint('👤 User kanalından gelen tüm event\'ler dinleniyor...');
+    //  debugPrint('👤 Beklenen event\'ler:');
+    //debugPrint('👤  - user:notification');
+    //debugPrint('👤  - user:group_message');
+    //debugPrint('👤  - user:message');
+    //debugPrint('👤  - user:* (wildcard)');
+    //debugPrint('👤  - Tüm diğer event\'ler');
+    //debugPrint('👤 ===========================================');
   }
 
 }
