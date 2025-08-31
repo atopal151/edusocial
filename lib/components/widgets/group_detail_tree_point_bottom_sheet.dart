@@ -74,8 +74,7 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
               onTap: () {
                 Get.back();
                 if (groupId != null) {
-                  final groupController = Get.find<GroupController>();
-                  groupController.leaveGroup(groupId!);
+                  _showLeaveGroupConfirmation(groupId!);
                 }
               },
             ),
@@ -105,5 +104,56 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
         'groupId': groupId,
       });
     }
+  }
+
+  void _showLeaveGroupConfirmation(String groupId) {
+    final LanguageService languageService = Get.find<LanguageService>();
+    
+    Get.dialog(
+      AlertDialog(
+        title: Text(
+          languageService.tr("groups.groupDetail.leaveGroup.confirmation.title"),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xff414751),
+          ),
+        ),
+        content: Text(
+          languageService.tr("groups.groupDetail.leaveGroup.confirmation.message"),
+          style: TextStyle(
+            fontSize: 14,
+            color: Color(0xff9ca3ae),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              languageService.tr("common.cancel"),
+              style: TextStyle(
+                color: Color(0xff9ca3ae),
+                fontSize: 14,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back(); // Dialog'u kapat
+              final groupController = Get.find<GroupController>();
+              groupController.leaveGroup(groupId);
+            },
+            child: Text(
+              languageService.tr("groups.groupDetail.leaveGroup.confirmation.confirm"),
+              style: TextStyle(
+                color: Color(0xffef5050),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

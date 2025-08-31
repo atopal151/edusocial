@@ -696,6 +696,13 @@
         "report": "Report",
         "createEvent": "Create Event"
       },
+      "dialogs": {
+        "leaveGroup": {
+          "title": "Leave Group",
+          "message": "Are you sure you want to leave this group? This action cannot be undone.",
+          "confirm": "Leave"
+        }
+      },
       "emptyStates": {
         "documents": "No documents added yet",
         "links": "No links added yet",

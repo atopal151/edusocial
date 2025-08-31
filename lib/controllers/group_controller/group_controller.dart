@@ -11,7 +11,6 @@ import '../../models/chat_models/group_chat_model.dart';
 import '../../services/group_services/group_service.dart';
 import '../../services/language_service.dart';
 import '../../components/snackbars/custom_snackbar.dart';
-import '../../components/print_full_text.dart';
 import '../chat_controllers/chat_controller.dart';
 
 class GroupController extends GetxController {
@@ -435,13 +434,13 @@ class GroupController extends GetxController {
     }
   }
 
-  /// 🚪 Gruptan ayrılma işlemi
+  /// 🚪 Gruptan ayrılma işlemi (Withdraw Group Invitation endpoint'i kullanarak)
   void leaveGroup(String groupId) async {
     try {
-      final success = await _groupServices.leaveGroup(groupId);
+      final success = await _groupServices.withdrawGroupInvitation(groupId);
       
       if (success) {
-        // Kullanıcının gruplarından kaldır
+        // Kullanıcının gruplarından kaldır 
         userGroups.removeWhere((group) => group.id == groupId);
         
         // Tüm gruplar listesinden de kaldır
@@ -461,6 +460,9 @@ class GroupController extends GetxController {
           type: SnackbarType.success,
           duration: const Duration(seconds: 3),
         );
+        
+        // Grup detay ve chat ekranlarından çık - Ana sayfaya dön
+        Get.until((route) => route.settings.name == '/home' || route.settings.name == '/groups' || route.settings.name == '/main');
         
         // Grup listesini yenile
         await fetchUserGroups();

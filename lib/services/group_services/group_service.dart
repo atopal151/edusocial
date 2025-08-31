@@ -3,11 +3,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:edusocial/components/print_full_text.dart';
-import 'package:edusocial/controllers/chat_controllers/chat_controller.dart';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -613,30 +611,27 @@ class GroupServices {
     }
   }
 
-  /// Gruptan ayrılma işlemi
-  Future<bool> leaveGroup(String groupId) async {
+  /// Gruptan ayrılma işlemi (Withdraw Group Invitation endpoint'i kullanarak)
+  Future<bool> withdrawGroupInvitation(String groupId) async {
     final box = GetStorage();
     final token = box.read('token');
 
     try {
       debugPrint("🔄 Gruptan ayrılma isteği gönderiliyor... Group ID: $groupId");
 
-      final response = await http.post(
-        Uri.parse("${AppConstants.baseUrl}/group-leave"),
+      final response = await http.put(
+        Uri.parse("${AppConstants.baseUrl}/group-join/$groupId"),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: json.encode({
-          "group_id": groupId,
-        }),
       );
 
-      debugPrint("📤 Leave group response: ${response.statusCode}");
-      debugPrint("📤 Leave group body: ${response.body}");
+      debugPrint("📤 Withdraw group invitation response: ${response.statusCode}");
+      debugPrint("📤 Withdraw group invitation body: ${response.body}");
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
         debugPrint("✅ Gruptan başarıyla ayrıldı");
         return true;
       } else {
@@ -644,7 +639,7 @@ class GroupServices {
         return false;
       }
     } catch (e) {
-      debugPrint("💥 Leave group error: $e");
+      debugPrint("💥 Withdraw group invitation error: $e");
       return false;
     }
   }

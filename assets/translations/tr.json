@@ -748,6 +748,13 @@
         "report": "Şikayet Et",
         "createEvent": "Etkinlik Oluştur"
       },
+      "dialogs": {
+        "leaveGroup": {
+          "title": "Gruptan Ayrıl",
+          "message": "Gruptan ayrılık istediğinize emin misiniz?",
+          "confirm": "Gruptan Ayrıl"
+        }
+      },
       "emptyStates": {
         "documents": "Henüz belge eklenmemiş",
         "links": "Henüz bağlantı eklenmemiş",

@@ -12,23 +12,6 @@ import 'package:intl/intl.dart';
 class EventServices {
   
   // Helper method to print long strings without truncation
-  void _printLongString(String prefix, String text) {
-    const int maxLength = 800; // Flutter debugPrint limit is around 1000 chars
-    
-    if (text.length <= maxLength) {
-      debugPrint("$prefix: $text");
-      return;
-    }
-    
-    debugPrint("$prefix (PART 1/${(text.length / maxLength).ceil()}): ${text.substring(0, maxLength)}");
-    
-    for (int i = maxLength; i < text.length; i += maxLength) {
-      int end = (i + maxLength < text.length) ? i + maxLength : text.length;
-      int partNumber = (i / maxLength).round() + 1;
-      int totalParts = (text.length / maxLength).ceil();
-      debugPrint("$prefix (PART $partNumber/$totalParts): ${text.substring(i, end)}");
-    }
-  }
   Future<List<EventModel>> fetchEvents() async {
     try {
       final token = GetStorage().read("token");
