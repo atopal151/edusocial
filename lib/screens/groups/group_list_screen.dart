@@ -63,37 +63,73 @@ class GroupListScreen extends StatelessWidget {
                 ),
                 Obx(() {
                   debugPrint("🔍 GroupListScreen - Obx widget triggered, userGroups.length: ${controller.userGroups.length}");
+                  debugPrint("🔍 GroupListScreen - isLoading: ${controller.isLoading.value}");
+                  debugPrint("🔍 GroupListScreen - userGroups.isEmpty: ${controller.userGroups.isEmpty}");
+                  
+                  if (controller.userGroups.isEmpty && !controller.isLoading.value) {
+                    debugPrint("⚠️ GroupListScreen - userGroups boş ve loading değil!");
+                  }
+                  
                   return SizedBox(
                     height: 210,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: controller.userGroups.length,
-                      itemBuilder: (context, index) {
-                      // DEBUG: Print userGroups length and current group
-                      debugPrint("🔍 GroupListScreen - userGroups.length: ${controller.userGroups.length}, building index: $index");
-                      final group = controller.userGroups[index];
-                      debugPrint("🔍 GroupListScreen - building group: ${group.name} (ID: ${group.id})");
-                      return InkWell(
-                        onTap: () {
-                          controller.getToGroupChatDetail(group.id);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: GroupCard(
-                            chatNotification: group.messageCount,
-                            imageUrl: group.bannerUrl,
-                            groupName: group.name,
-                            groupDescription: group.description,
-                            memberCount: group.userCountWithAdmin,
-                            action: languageService.tr("groups.groupList.joined"),
-                            onJoinPressed: () {},
-                            isFounder: group.isFounder,
-                          ),
+                    child: controller.userGroups.isEmpty && !controller.isLoading.value
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.group_outlined,
+                                  size: 48,
+                                  color: Colors.grey[400],
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  languageService.tr("groups.groupList.noGroups"),
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  languageService.tr("groups.groupList.joinGroupsBelow"),
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: controller.userGroups.length,
+                            itemBuilder: (context, index) {
+                            // DEBUG: Print userGroups length and current group
+                            debugPrint("🔍 GroupListScreen - userGroups.length: ${controller.userGroups.length}, building index: $index");
+                            final group = controller.userGroups[index];
+                            debugPrint("🔍 GroupListScreen - building group: ${group.name} (ID: ${group.id})");
+                            return InkWell(
+                              onTap: () {
+                                controller.getToGroupChatDetail(group.id);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: GroupCard(
+                                  chatNotification: group.messageCount,
+                                  imageUrl: group.bannerUrl,
+                                  groupName: group.name,
+                                  groupDescription: group.description,
+                                  memberCount: group.userCountWithAdmin,
+                                  action: languageService.tr("groups.groupList.joined"),
+                                  onJoinPressed: () {},
+                                  isFounder: group.isFounder,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                );
+                  ); 
                 }),
                 Padding(
                   padding: const EdgeInsets.all(12.0),

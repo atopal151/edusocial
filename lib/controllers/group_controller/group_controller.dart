@@ -46,6 +46,11 @@ class GroupController extends GetxController {
     categoryGroup.value = [];
 
     ever(selectedCategory, (_) => updateFilteredGroups());
+    
+    // Kullanıcının gruplarını ve diğer verileri yükle
+    fetchUserGroups();
+    fetchAllGroups();
+    fetchGroupAreas();
   }
 
 //-------------------------------fetch-------------------------------
@@ -54,61 +59,22 @@ class GroupController extends GetxController {
     debugPrint("🔄 GroupController.fetchUserGroups() çağrıldı");
     
     try {
-      // Hem kullanıcının gruplarını hem de tüm grupları al
-      final userGroups = await _groupServices.fetchUserGroups();
-      final allGroups = await _groupServices.fetchAllGroups();
+      // Kullanıcının gruplarını doğrudan API'den al
+      final userGroupsFromAPI = await _groupServices.fetchUserGroups();
       
-      debugPrint("📥 API'den gelen user groups verisi (${userGroups.length} grup):");
-      debugPrint("📥 API'den gelen all groups verisi (${allGroups.length} grup):");
+      debugPrint("📥 API'den gelen user groups verisi (${userGroupsFromAPI.length} grup):");
       
-      // Basit yaklaşım: Tüm gruplardan kullanıcının oluşturduğu veya üye olduğu olanları filtrele
-      final accessibleGroups = allGroups.where((group) {
-        // Kullanıcının oluşturduğu gruplar - her zaman göster
-        if (group.isFounder) {
-          debugPrint("✅ Group '${group.name}' gösteriliyor (kullanıcının oluşturduğu grup)");
-          return true;
-        }
-        
-        // Kullanıcının üye olduğu gruplar - her zaman göster
-        if (group.isMember) {
-          debugPrint("✅ Group '${group.name}' gösteriliyor (kullanıcının üye olduğu grup)");
-          return true;
-        }
-        
-        // Public gruplar - her zaman göster
-        if (!group.isPrivate) {
-          debugPrint("✅ Group '${group.name}' gösteriliyor (public grup)");
-          return true;
-        }
-        
-        // Private gruplar - sadece üye olan kullanıcılar görebilir
-        if (group.isPrivate && group.isMember) {
-          debugPrint("✅ Group '${group.name}' gösteriliyor (private grup, üye)");
-          return true;
-        } else {
-          debugPrint("❌ Group '${group.name}' gizlendi (private grup, üye değil)");
-          return false;
-        }
-      }).toList();
+      // API'den gelen kullanıcı gruplarını doğrudan ata
+      debugPrint("🔍 GroupController - userGroups.assignAll() çağrılıyor, userGroupsFromAPI.length: ${userGroupsFromAPI.length}");
+      userGroups.assignAll(userGroupsFromAPI);
+      debugPrint("🔍 GroupController - userGroups.assignAll() tamamlandı, userGroups.length: ${userGroups.length}");
       
-      debugPrint("🔍 Filtreleme sonucu: ${allGroups.length} gruptan ${accessibleGroups.length} grup gösteriliyor");
+      // ChatController ile grup listesini senkronize et
+      // Önce userGroups'ın güncellenmesini bekle
+      await Future.delayed(Duration(milliseconds: 100));
+      syncGroupListWithChatController();
       
-  
-      
-
-        
-
-      
-                debugPrint("🔍 GroupController - userGroups.assignAll() çağrılıyor, accessibleGroups.length: ${accessibleGroups.length}");
-          userGroups.assignAll(accessibleGroups);
-          debugPrint("🔍 GroupController - userGroups.assignAll() tamamlandı, userGroups.length: ${userGroups.length}");
-          
-          // ChatController ile grup listesini senkronize et
-          // Önce userGroups'ın güncellenmesini bekle
-          await Future.delayed(Duration(milliseconds: 100));
-          syncGroupListWithChatController();
-      
-      debugPrint("✅ User groups başarıyla yüklendi: ${filteredGroups.length} grup");
+      debugPrint("✅ User groups başarıyla yüklendi: ${userGroups.length} grup");
     } catch (e) {
       debugPrint("❌ User groups yüklenirken hata: $e");
     } finally {
@@ -453,6 +419,110 @@ class GroupController extends GetxController {
         CustomSnackbar.show(
           title: languageService.tr("common.error"),
           message: languageService.tr("groups.errors.joinFailed"),
+          type: SnackbarType.error,
+          duration: const Duration(seconds: 4),
+        );
+      }
+    } catch (e) {
+      // Hata durumu için custom snackbar
+      final languageService = Get.find<LanguageService>();
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("groups.errors.serverError"),
+        type: SnackbarType.error,
+        duration: const Duration(seconds: 4),
+      );
+    }
+  }
+
+  /// 🚪 Gruptan ayrılma işlemi
+  void leaveGroup(String groupId) async {
+    try {
+      final success = await _groupServices.leaveGroup(groupId);
+      
+      if (success) {
+        // Kullanıcının gruplarından kaldır
+        userGroups.removeWhere((group) => group.id == groupId);
+        
+        // Tüm gruplar listesinden de kaldır
+        allGroups.removeWhere((group) => group.id == groupId);
+        filteredGroups.removeWhere((group) => group.id == groupId);
+        
+        // ChatController'dan da kaldır
+        final chatController = Get.find<ChatController>();
+        chatController.groupChatList.removeWhere((group) => group.groupId == int.tryParse(groupId));
+        chatController.filteredGroupChatList.removeWhere((group) => group.groupId == int.tryParse(groupId));
+        
+        // Custom snackbar ile dil desteği
+        final languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("groups.success.leftGroup"),
+          message: languageService.tr("groups.success.leftGroup"),
+          type: SnackbarType.success,
+          duration: const Duration(seconds: 3),
+        );
+        
+        // Grup listesini yenile
+        await fetchUserGroups();
+        await fetchAllGroups();
+      } else {
+        // Hata durumu için custom snackbar
+        final languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("common.error"),
+          message: languageService.tr("groups.errors.leaveFailed"),
+          type: SnackbarType.error,
+          duration: const Duration(seconds: 4),
+        );
+      }
+    } catch (e) {
+      // Hata durumu için custom snackbar
+      final languageService = Get.find<LanguageService>();
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("groups.errors.serverError"),
+        type: SnackbarType.error,
+        duration: const Duration(seconds: 4),
+      );
+    }
+  }
+
+  /// 🗑️ Grup silme işlemi (sadece grup kurucusu yapabilir)
+  void deleteGroup(String groupId) async {
+    try {
+      final success = await _groupServices.deleteGroup(groupId);
+      
+      if (success) {
+        // Kullanıcının gruplarından kaldır
+        userGroups.removeWhere((group) => group.id == groupId);
+        
+        // Tüm gruplar listesinden de kaldır
+        allGroups.removeWhere((group) => group.id == groupId);
+        filteredGroups.removeWhere((group) => group.id == groupId);
+        
+        // ChatController'dan da kaldır
+        final chatController = Get.find<ChatController>();
+        chatController.groupChatList.removeWhere((group) => group.groupId == int.tryParse(groupId));
+        chatController.filteredGroupChatList.removeWhere((group) => group.groupId == int.tryParse(groupId));
+        
+        // Custom snackbar ile dil desteği
+        final languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("common.success"),
+          message: "Grup başarıyla silindi",
+          type: SnackbarType.success,
+          duration: const Duration(seconds: 3),
+        );
+        
+        // Grup listesini yenile
+        await fetchUserGroups();
+        await fetchAllGroups();
+      } else {
+        // Hata durumu için custom snackbar
+        final languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("common.error"),
+          message: "Grup silme işlemi başarısız",
           type: SnackbarType.error,
           duration: const Duration(seconds: 4),
         );

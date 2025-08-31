@@ -17,6 +17,7 @@ import '../../services/survey_service.dart';
 import '../../services/pin_message_service.dart';
 import '../profile_controller.dart';
 import '../../components/snackbars/custom_snackbar.dart';
+import '../chat_controllers/chat_controller.dart';
 
 class GroupChatDetailController extends GetxController {
   // Services
@@ -58,6 +59,11 @@ class GroupChatDetailController extends GetxController {
   // Highlighted message for navigation
   final RxString highlightedMessageId = RxString('');
 
+  // UNREAD COUNT: Group chat için okunmamış mesaj sayısı sistemi
+  final RxInt groupUnreadCount = 0.obs;
+  final RxBool hasUnreadMessages = false.obs;
+  final RxList<String> unreadMessageIds = <String>[].obs;
+  
   // Grup chat verilerinden çıkarılan belge, bağlantı ve fotoğraf listeleri
   final RxList<DocumentModel> groupDocuments = <DocumentModel>[].obs;
   final RxList<LinkModel> groupLinks = <LinkModel>[].obs;
@@ -164,6 +170,18 @@ class GroupChatDetailController extends GetxController {
       
       // Group chat'e girdiğinde socket durumunu kontrol et
       onGroupChatEntered();
+      
+      // UNREAD COUNT: Grup açıldığında unread count'u sıfırla (private chat'teki gibi)
+      markGroupAsRead();
+      
+      // ChatController'dan bu grubu okundu olarak işaretle
+      try {
+        final chatController = Get.find<ChatController>();
+        chatController.getGroupChatPage(currentGroupId.value);
+        debugPrint('✅ [GroupChatDetailController] ChatController\'dan grup okundu olarak işaretlendi');
+      } catch (e) {
+        debugPrint('⚠️ [GroupChatDetailController] ChatController bulunamadı: $e');
+      }
       
       // İlk yükleme sonrası pin durumlarını kontrol et
       Future.delayed(Duration(milliseconds: 1000), () {
@@ -422,6 +440,9 @@ class GroupChatDetailController extends GetxController {
           
           // OPTIMIZE: Tüm grup detayını tekrar çekme, sadece yeni mesajı ekle
           _addNewMessageFromSocket(data);
+          
+          // UNREAD COUNT: Yeni mesaj geldiğinde unread count'u güncelle
+          _updateGroupUnreadCount(messageData);
           
           debugPrint('✅ Yeni grup mesajı işlendi');
         } else {
@@ -2166,6 +2187,93 @@ class GroupChatDetailController extends GetxController {
         backgroundColor: Colors.red.shade100,
         colorText: Colors.red.shade800,
       );
+    }
+  }
+
+  /// 📊 UNREAD COUNT: Yeni grup mesajı geldiğinde unread count'u güncelle
+  void _updateGroupUnreadCount(dynamic messageData) {
+    try {
+      if (messageData is Map<String, dynamic>) {
+        final messageId = messageData['id']?.toString();
+        final isMe = messageData['is_me'] ?? false;
+        final isRead = messageData['is_read'] ?? false;
+        
+        // Kendi mesajımız değilse ve okunmamışsa unread count'u artır
+        if (!isMe && !isRead && messageId != null) {
+          if (!unreadMessageIds.contains(messageId)) {
+            unreadMessageIds.add(messageId);
+            groupUnreadCount.value = unreadMessageIds.length;
+            hasUnreadMessages.value = true;
+            
+            debugPrint('🔴 [GroupChatDetailController] Unread count artırıldı: ${groupUnreadCount.value}');
+            debugPrint('🔴 [GroupChatDetailController] Unread message IDs: $unreadMessageIds');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Unread count güncelleme hatası: $e');
+    }
+  }
+
+  /// 📖 UNREAD COUNT: Grubu okundu olarak işaretle
+  void markGroupAsRead() {
+    try {
+      debugPrint('📖 [GroupChatDetailController] Grup okundu olarak işaretleniyor...');
+      
+      // Unread count'u sıfırla
+      groupUnreadCount.value = 0;
+      hasUnreadMessages.value = false;
+      unreadMessageIds.clear();
+      
+      debugPrint('✅ [GroupChatDetailController] Grup okundu olarak işaretlendi');
+      
+      // Socket'e grup okundu bilgisini gönder
+      _socketService.sendMessage('group:mark_as_read', {
+        'group_id': currentGroupId.value,
+      });
+      
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Grup okundu işaretleme hatası: $e');
+    }
+  }
+
+  /// 📊 UNREAD COUNT: Grup unread count'unu al
+  int get currentGroupUnreadCount => groupUnreadCount.value;
+
+  /// 📊 UNREAD COUNT: Grup unread durumunu al
+  bool get isGroupUnread => hasUnreadMessages.value;
+
+  /// 📊 UNREAD COUNT: Grup unread count'unu manuel olarak ayarla
+  void setGroupUnreadCount(int count) {
+    try {
+      groupUnreadCount.value = count;
+      hasUnreadMessages.value = count > 0;
+      
+      debugPrint('📊 [GroupChatDetailController] Unread count manuel olarak ayarlandı: $count');
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Unread count ayarlama hatası: $e');
+    }
+  }
+
+  /// 📊 UNREAD COUNT: Socket'ten gelen grup unread count'unu handle et
+  void handleGroupUnreadCount(dynamic data) {
+    try {
+      debugPrint('📊 [GroupChatDetailController] Socket\'ten gelen grup unread count: $data');
+      
+      if (data is Map<String, dynamic>) {
+        final groupId = data['group_id']?.toString();
+        final unreadCount = data['unread_count'] ?? 
+                           data['count'] ?? 
+                           data['message_count'] ?? 0;
+        
+        // Bu grup için unread count'u güncelle
+        if (groupId == currentGroupId.value) {
+          setGroupUnreadCount(unreadCount);
+          debugPrint('✅ [GroupChatDetailController] Grup unread count güncellendi: $unreadCount');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] Grup unread count handle hatası: $e');
     }
   }
 }

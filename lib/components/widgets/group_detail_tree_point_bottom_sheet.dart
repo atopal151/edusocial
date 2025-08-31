@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../services/language_service.dart';
+import '../../controllers/group_controller/group_controller.dart';
 
 class GroupDetailTreePointBottomSheet extends StatelessWidget {
   final String? groupId;
@@ -71,6 +72,11 @@ class GroupDetailTreePointBottomSheet extends StatelessWidget {
                     color: Color(0xff414751)),
               ),
               onTap: () {
+                Get.back();
+                if (groupId != null) {
+                  final groupController = Get.find<GroupController>();
+                  groupController.leaveGroup(groupId!);
+                }
               },
             ),
             ListTile(

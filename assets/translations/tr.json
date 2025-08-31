@@ -713,7 +713,9 @@
       "loading": "Gruplar yükleniyor...",
       "groupSelected": "Grup Seçildi",
       "redirectingToGroup": "grubuna yönlendiriliyor.",
-      "notMember": "Bu grubun üyesi değilsiniz"
+      "notMember": "Bu grubun üyesi değilsiniz",
+      "noGroups": "Henüz hiçbir gruba katılmadınız",
+      "joinGroupsBelow": "Aşağıdaki listeden gruplara katılın"
     },
     "createGroup": {
       "title": "Yeni Grup Oluştur",

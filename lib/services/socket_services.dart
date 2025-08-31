@@ -7,6 +7,7 @@ import 'onesignal_service.dart';
 import 'package:get_storage/get_storage.dart';
 import 'group_services/group_service.dart';
 import '../components/print_full_text.dart';
+import '../controllers/chat_controllers/chat_controller.dart';
 
 class SocketService extends GetxService {
   io.Socket? _socket;
@@ -21,6 +22,11 @@ class SocketService extends GetxService {
   // DEBOUNCE: Çoklu bildirimleri engellemek için
   final Map<String, DateTime> _lastNotificationTime = {};
   static const Duration _notificationDebounce = Duration(seconds: 10);
+  
+  // JOIN DEBOUNCE: Çoklu join işlemlerini engellemek için
+  bool _isJoiningChannels = false;
+  DateTime? _lastJoinTime;
+  static const Duration _joinDebounce = Duration(seconds: 5);
 
   // Stream Controllers for broadcasting events
   final _privateMessageController = StreamController<dynamic>.broadcast();
@@ -94,7 +100,7 @@ class SocketService extends GetxService {
       debugPrint('✅ Socket ID: ${_socket!.id}');
       
       // Bağlantı kurulduktan sonra tüm kanallara join ol
-      Future.delayed(Duration(seconds: 1), () async {
+      Future.delayed(Duration(seconds: 2), () async {
         await _joinAllChannelsAfterConnection();
       });
     });
@@ -134,6 +140,12 @@ class SocketService extends GetxService {
     // Reconnection events
     _socket!.onReconnect((_) {
       debugPrint('🔄 Socket yeniden bağlandı! ($urlName)');
+      
+      // Yeniden bağlandıktan sonra tüm kanallara tekrar join ol
+      Future.delayed(Duration(seconds: 1), () async {
+        debugPrint('🔄 Yeniden bağlantı sonrası kanallara join olunuyor...');
+        await _joinAllChannelsAfterConnection();
+      });
     });
     
     _socket!.onReconnectAttempt((attemptNumber) {
@@ -272,6 +284,12 @@ class SocketService extends GetxService {
 
     // 3. Okunmamış mesaj sayısı (toplam)
     _socket!.on('conversation:un_read_message_count', (data) {
+      _unreadMessageCountController.add(data);
+    });
+
+    // 3.1. Grup okunmamış mesaj sayısı (toplam)
+    _socket!.on('group:un_read_message_count', (data) {
+      debugPrint('📨 Grup okunmamış mesaj sayısı (group:un_read_message_count): $data');
       _unreadMessageCountController.add(data);
     });
 
@@ -485,6 +503,27 @@ class SocketService extends GetxService {
     _socket!.on('conversation:count', (data) {
       debugPrint('📨 Chat bazında unread count (conversation:count): $data');
       _handlePerChatUnreadCount(data);
+    });
+
+    // Grup bazında unread count event'lerini dinle
+    _socket!.on('group:unread_count', (data) {
+      debugPrint('📨 Grup bazında unread count (group:unread_count): $data');
+      _handlePerGroupUnreadCount(data);
+    });
+
+    _socket!.on('group:count', (data) {
+      debugPrint('📨 Grup bazında unread count (group:count): $data');
+      _handlePerGroupUnreadCount(data);
+    });
+
+    _socket!.on('user:group_unread', (data) {
+      debugPrint('📨 Grup bazında unread count (user:group_unread): $data');
+      _handlePerGroupUnreadCount(data);
+    });
+
+    _socket!.on('unread:group', (data) {
+      debugPrint('📨 Grup bazında unread count (unread:group): $data');
+      _handlePerGroupUnreadCount(data);
     });
 
     _socket!.on('group:unpin_message', (data) {
@@ -1019,6 +1058,57 @@ class SocketService extends GetxService {
           }
         }
         printFullText('👥 Group ID: $groupId');
+        
+        // 🔴 GROUP UNREAD MESSAGE ANALİZİ - Private chat'teki gibi
+        final isRead = data['is_read'] ?? false;
+        
+        if (!isRead) {
+          debugPrint('🔴 GRUP KIRMIZI NOKTA GÖSTERİLECEK: Okunmamış grup mesajı (is_read: $isRead)');
+        } else {
+          debugPrint('⚪ GRUP KIRMIZI NOKTA GÖSTERİLMEYECEK: Okunmuş grup mesajı (is_read: $isRead)');
+        }
+        
+        // GROUP alanını kontrol et
+        if (data.containsKey('group')) {
+          final group = data['group'];
+          if (group is Map<String, dynamic>) {
+            debugPrint('👥 📁 Group keys: ${group.keys.toList()}');
+            if (group.containsKey('unread_count')) {
+              debugPrint('👥 🔥 GROUP UNREAD COUNT BULUNDU: ${group['unread_count']}');
+            }
+            if (group.containsKey('unread_messages_count')) {
+              debugPrint('👥 🔥 GROUP UNREAD MESSAGES COUNT BULUNDU: ${group['unread_messages_count']}');
+            }
+          }
+        } else {
+          debugPrint('👥 ❌ Group alanı yok');
+        }
+        
+        // SENDER alanını kontrol et
+        if (data.containsKey('sender')) {
+          final sender = data['sender'];
+          debugPrint('👥 👤 SENDER ALANı VAR: ${sender.runtimeType}');
+          if (sender is Map<String, dynamic>) {
+            debugPrint('👥 👤 Sender keys: ${sender.keys.toList()}');
+            if (sender.containsKey('unread_messages_total_count')) {
+              debugPrint('👥 🔥 SENDER UNREAD COUNT: ${sender['unread_messages_total_count']}');
+            }
+          }
+        }
+        
+        // MESSAGE alanını kontrol et
+        if (data.containsKey('message')) {
+          final message = data['message'];
+          if (message is Map<String, dynamic>) {
+            debugPrint('👥 💬 Message keys: ${message.keys.toList()}');
+            if (message.containsKey('is_read')) {
+              debugPrint('👥 🔥 MESSAGE IS_READ: ${message['is_read']}');
+            }
+            if (message.containsKey('is_me')) {
+              debugPrint('👥 🔥 MESSAGE IS_ME: ${message['is_me']}');
+            }
+          }
+        }
       }
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
@@ -1033,6 +1123,9 @@ class SocketService extends GetxService {
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] user:group_chat - _groupMessageController.add() tamamlandı');
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1045,6 +1138,9 @@ class SocketService extends GetxService {
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] user:group_chat_message - _groupMessageController.add() tamamlandı');
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1056,6 +1152,9 @@ class SocketService extends GetxService {
       debugPrint('👥 User new group message geldi (SocketService): $data');
       _groupMessageController.add(data);
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1065,6 +1164,9 @@ class SocketService extends GetxService {
     _socket!.on('user:chat_message', (data) {
       debugPrint('👥 User chat message geldi (SocketService): $data');
       _groupMessageController.add(data);
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -1076,6 +1178,9 @@ class SocketService extends GetxService {
       debugPrint('👥 User message group geldi (SocketService): $data');
       _groupMessageController.add(data);
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1086,6 +1191,9 @@ class SocketService extends GetxService {
       debugPrint('👥 User group message new geldi (SocketService): $data');
       _groupMessageController.add(data);
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1095,24 +1203,40 @@ class SocketService extends GetxService {
     _socket!.on('user:new_message', (data) {
       debugPrint('👥 User new message geldi (SocketService): $data');
       _groupMessageController.add(data);
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       _sendOneSignalNotification('group', data);
     });
 
     _socket!.on('user:message_new', (data) {
       debugPrint('👥 User message new geldi (SocketService): $data');
       _groupMessageController.add(data);
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       _sendOneSignalNotification('group', data);
     });
 
     _socket!.on('user:chat', (data) {
       debugPrint('👥 User chat geldi (SocketService): $data');
       _groupMessageController.add(data);
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       _sendOneSignalNotification('group', data);
     });
 
     _socket!.on('user:group', (data) {
       debugPrint('👥 User group geldi (SocketService): $data');
       _groupMessageController.add(data);
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       _sendOneSignalNotification('group', data);
     });
 
@@ -1140,6 +1264,9 @@ class SocketService extends GetxService {
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] group:message - _groupMessageController.add() tamamlandı');
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1152,6 +1279,9 @@ class SocketService extends GetxService {
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] group_conversation:new_message - _groupMessageController.add() tamamlandı');
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1163,6 +1293,9 @@ class SocketService extends GetxService {
       debugPrint('📡 [SocketService] conversation:group_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] conversation:group_message - _groupMessageController.add() tamamlandı');
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -1221,6 +1354,9 @@ class SocketService extends GetxService {
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] group:new_message - _groupMessageController.add() tamamlandı');
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1232,6 +1368,9 @@ class SocketService extends GetxService {
       debugPrint('📡 [SocketService] group_chat:message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] group_chat:message - _groupMessageController.add() tamamlandı');
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -1245,6 +1384,9 @@ class SocketService extends GetxService {
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] group_chat:new_message - _groupMessageController.add() tamamlandı');
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1256,6 +1398,9 @@ class SocketService extends GetxService {
       debugPrint('📡 [SocketService] chat:group_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] chat:group_message - _groupMessageController.add() tamamlandı');
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -1269,6 +1414,9 @@ class SocketService extends GetxService {
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] message:group - _groupMessageController.add() tamamlandı');
       
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
+      
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
       _sendCustomGroupMessageNotification(data);
@@ -1280,6 +1428,9 @@ class SocketService extends GetxService {
       debugPrint('📡 [SocketService] new:group_message - _groupMessageController.add() çağrılıyor');
       _groupMessageController.add(data);
       debugPrint('📡 [SocketService] new:group_message - _groupMessageController.add() tamamlandı');
+      
+      // Grup unread count'unu güncelle
+      _updateGroupUnreadCountFromSocket(data);
       
       // Özel grup mesaj bildirimi gönder (uygulama açıkken)
       debugPrint('👥 Özel grup mesaj bildirimi gönderiliyor...');
@@ -1490,7 +1641,23 @@ class SocketService extends GetxService {
   // Bağlantı kurulduktan sonra tüm kanallara join ol
   Future<void> _joinAllChannelsAfterConnection() async {
     try {
+      // DEBOUNCE: Çoklu join işlemlerini engelle
+      final now = DateTime.now();
+      if (_isJoiningChannels) {
+        debugPrint('🚫 Join işlemi zaten devam ediyor, yeni istek reddedildi');
+        return;
+      }
+      
+      if (_lastJoinTime != null && now.difference(_lastJoinTime!) < _joinDebounce) {
+        debugPrint('🚫 Join işlemi çok sık çağrılıyor, debounce uygulandı');
+        return;
+      }
+      
+      _isJoiningChannels = true;
+      _lastJoinTime = now;
+      
       debugPrint('🔔 _joinAllChannelsAfterConnection() başlatıldı');
+      debugPrint('🔔 Uygulama başlatıldığında veya yeniden bağlandığında grup kanallarına join olunuyor...');
       
       // Token'dan user ID'yi çıkar
       final token = GetStorage().read('token');
@@ -1516,12 +1683,16 @@ class SocketService extends GetxService {
         debugPrint('📨 Unread count isteği başlatılıyor...');
         _requestUnreadCount();
         debugPrint('📨 Unread count isteği tamamlandı');
+        
+        debugPrint('✅ Tüm kanallara join işlemi tamamlandı - Grup mesajları artık dinleniyor!');
       } else {
         debugPrint('❌ Token bulunamadı, join işlemleri yapılamıyor');
       }
     } catch (e) {
       debugPrint('❌ Bağlantı sonrası user kanalına join olma hatası: $e');
       debugPrint('❌ Hata detayı: ${e.toString()}');
+    } finally {
+      _isJoiningChannels = false;
     }
   }
 
@@ -1544,6 +1715,16 @@ class SocketService extends GetxService {
       _socket!.emit('request:unread_by_conversation');
       _socket!.emit('conversation:get_unread_details');
       _socket!.emit('chat:get_unread_details');
+      
+      // Grup unread count istekleri
+      _socket!.emit('get:group_unread_count');
+      _socket!.emit('request:group_unread_count');
+      _socket!.emit('group:get_unread_count');
+      _socket!.emit('get:group_unread_counts');
+      _socket!.emit('request:per_group_unread');
+      _socket!.emit('get:group_unread_details');
+      _socket!.emit('request:unread_by_group');
+      _socket!.emit('group:get_unread_details');
       
       debugPrint('✅ Unread count istekleri gönderildi');
     } else {
@@ -1579,10 +1760,37 @@ class SocketService extends GetxService {
     _perChatUnreadCountController.add(data);
   }
 
+  /// Grup bazında unread count'ları handle et
+  void _handlePerGroupUnreadCount(dynamic data) {
+    debugPrint('🔍 Grup bazında unread count işleniyor: $data');
+    debugPrint('🔍 Data type: ${data.runtimeType}');
+    debugPrint('🔍 Data keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
+    
+    if (data is Map<String, dynamic>) {
+      debugPrint('🔍 === PER GROUP UNREAD COUNT DETAYI ===');
+      debugPrint('🔍 Group ID: ${data['group_id']}');
+      debugPrint('🔍 User ID: ${data['user_id']}');
+      debugPrint('🔍 Unread Count: ${data['unread_count']}');
+      debugPrint('🔍 Count: ${data['count']}');
+      debugPrint('🔍 Message Count: ${data['message_count']}');
+      debugPrint('🔍 Is Read: ${data['is_read']}');
+      debugPrint('🔍 ====================================');
+    }
+    
+    // Chat controller'a gönder
+    _perChatUnreadCountController.add(data);
+  }
+
   // Kullanıcının katıldığı gruplara join ol
   Future<void> _joinUserGroups() async {
     try {
       debugPrint('👥 Kullanıcının katıldığı gruplar alınıyor...');
+      
+      // Socket bağlı mı kontrol et
+      if (_socket == null || !_socket!.connected) {
+        debugPrint('❌ Socket bağlı değil, gruplara join olunamıyor');
+        return;
+      }
       
       // Kullanıcının katıldığı grupları al
       final userGroups = await _groupServices.getUserGroups();
@@ -1601,16 +1809,21 @@ class SocketService extends GetxService {
           if (groupId.isNotEmpty) {
             debugPrint('👥 Gruba join olunuyor: ${group.name} (ID: $groupId)');
             
-            // Gruba join ol
-            _socket!.emit('group:join', {'group_id': groupId});
+            // TEST: Join işlemini geçici olarak devre dışı bırak
+            // _socket!.emit('group:join', {'group_id': groupId});
+            // _socket!.emit('join:group', {'group_id': groupId});
+            // _socket!.emit('subscribe:group', {'group_id': groupId});
             
-            debugPrint('✅ Gruba join isteği gönderildi: ${group.name}');
+            debugPrint('🧪 TEST: Join işlemi devre dışı bırakıldı - mesajları dinlemeye devam ediyoruz');
+            
+            // Her grup arasında kısa bir bekleme
+            await Future.delayed(Duration(milliseconds: 100));
           } else {
             debugPrint('⚠️ Boş grup ID: ${group.name}');
           }
         }
         
-        debugPrint('✅ Tüm gruplara join istekleri gönderildi');
+        debugPrint('✅ TEST: Join işlemi olmadan grup mesajları dinleniyor');
       } else {
         debugPrint('ℹ️ Kullanıcının katıldığı grup bulunamadı');
         debugPrint('ℹ️ userGroups null: ${userGroups == null}');
@@ -1663,7 +1876,7 @@ class SocketService extends GetxService {
               debugPrint('⚠️ Sender data is not a Map: ${data['sender']}');
               senderData = null;
             }
-            socketr
+            
             final senderName = senderData?['name'] ?? 'Bilinmeyen';
             final messageText = data['message'] ?? 'Yeni bir mesajınız var';
             message = '$senderName: $messageText';
@@ -2109,6 +2322,58 @@ class SocketService extends GetxService {
 
   /// Socket nesnesi
   io.Socket? get socket => _socket;
+
+  /// Socket'ten gelen grup mesajında unread count'u güncelle
+  void _updateGroupUnreadCountFromSocket(dynamic data) {
+    try {
+      debugPrint('📊 [SocketService] Grup unread count güncelleniyor...');
+      
+      if (data is Map<String, dynamic>) {
+        // Grup ID'sini al
+        int? groupId;
+        bool isMe = false;
+        bool isRead = false;
+        
+        // Direkt data'dan al
+        groupId = data['group_id'];
+        isMe = data['is_me'] ?? false;
+        isRead = data['is_read'] ?? true;
+        
+        // Message objesi içinden de kontrol et
+        if (data.containsKey('message') && data['message'] is Map<String, dynamic>) {
+          final messageData = data['message'] as Map<String, dynamic>;
+          groupId = messageData['group_id'] ?? groupId;
+          isMe = messageData['is_me'] ?? isMe;
+          isRead = messageData['is_read'] ?? isRead;
+        }
+        
+        // User objesi içinden unread count'u al
+        int unreadCount = 0;
+        if (data.containsKey('user') && data['user'] is Map<String, dynamic>) {
+          final userData = data['user'] as Map<String, dynamic>;
+          unreadCount = userData['unread_messages_total_count'] ?? 0;
+        }
+        
+        debugPrint('📊 [SocketService] Grup ID: $groupId, isMe: $isMe, isRead: $isRead, unreadCount: $unreadCount');
+        
+        // Kendi mesajımız değilse ve grup ID varsa güncelle
+        if (!isMe && groupId != null) {
+          try {
+            final chatController = Get.find<ChatController>();
+            // Grup unread count'unu güncelle
+            chatController.handleGroupUnreadCount(groupId, unreadCount);
+            debugPrint('✅ [SocketService] Grup unread count güncellendi: groupId=$groupId, unreadCount=$unreadCount');
+          } catch (e) {
+            debugPrint('⚠️ [SocketService] ChatController bulunamadı: $e');
+          }
+        } else {
+          debugPrint('📊 [SocketService] Kendi mesajımız veya grup ID yok, güncelleme yapılmadı');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [SocketService] Grup unread count güncelleme hatası: $e');
+    }
+  }
 
   /// Uygulama başlatıldığında socket durumunu kontrol et
   void checkInitialSocketStatus() {

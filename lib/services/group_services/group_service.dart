@@ -3,9 +3,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:edusocial/components/print_full_text.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_controller.dart';
 import 'package:edusocial/models/group_models/grup_suggestion_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -388,7 +390,7 @@ class GroupServices {
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         
-        /*// API'den gelen ham veriyi debug et
+        // API'den gelen ham veriyi debug et
         printFullText('🔍 =======================================');
         printFullText('🔍 GROUP DETAIL API RAW RESPONSE');
         printFullText('🔍 =======================================');
@@ -397,41 +399,48 @@ class GroupServices {
         printFullText('🔍 Response Headers: ${response.headers}');
         printFullText('🔍 Raw Response Body:');
         printFullText(response.body);
-        printFullText('🔍 =======================================');*/
+        printFullText('🔍 =======================================');
         
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
-          //final groupData = jsonBody['data']['group'];
-
-          //debugPrint('📊 GRUP DETAY VERİLERİ (OPTIMIZED):');
-          //debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          //debugPrint('ID: ${groupData['id']}');
-
-          // OPTIMIZE: Count instead of logging full data
-          //final groupChats = groupData['group_chats'] as List? ?? [];
-          //final groupEvents = groupData['group_events'] as List? ?? [];
-          //final users = jsonBody['data']['users'] as List? ?? [];
-
-          //debugPrint('Messages: ${groupChats.length} adet');
-          //debugPrint('Events: ${groupEvents.length} adet');
-          //debugPrint('Users: ${users.length} adet');
-          //debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
-          // Sadece pin durumlarını kontrol et
+          // Pin durumlarını ve okunmamış mesaj sayısını kontrol et
           final groupData = jsonBody['data']['group'];
           final groupChats = groupData['group_chats'] as List? ?? [];
           
-          printFullText('🔍 [GroupService] === PIN DURUMU KONTROLÜ ===');
+          printFullText('🔍 [GroupService] === PIN DURUMU VE OKUNMAMIŞ MESAJ KONTROLÜ ===');
           printFullText('🔍 [GroupService] Toplam mesaj sayısı: ${groupChats.length}');
+          
+          // API'dan gelen unread_messages_total_count'u kullan
+          final userData = groupData['user'];
+          final apiUnreadCount = userData['unread_messages_total_count'] ?? 0;
+          
+          debugPrint('🔍 [GroupService] API\'dan gelen unread count: $apiUnreadCount');
+          
+          int pinnedMessageCount = 0;
           
           for (int i = 0; i < groupChats.length; i++) {
             final chat = groupChats[i];
             final messageId = chat['id'];
-            final isPinned = chat['is_pinned'];
+            final isPinned = chat['is_pinned'] ?? false;
+            final isRead = chat['is_read'] ?? true;
             final messageContent = chat['message'];
+            final userId = chat['user_id'];
             
-            printFullText('🔍 [GroupService] Mesaj $i: ID=$messageId, is_pinned=$isPinned, content="$messageContent"');
+            // Pin durumunu kontrol et
+            if (isPinned) {
+              pinnedMessageCount++;
+            }
+            
+            printFullText('🔍 [GroupService] Mesaj $i: ID=$messageId, user_id=$userId, is_pinned=$isPinned, is_read=$isRead, content="$messageContent"');
           }
-          printFullText('🔍 [GroupService] === PIN DURUMU KONTROLÜ TAMAMLANDI ===');
+          
+          printFullText('🔍 [GroupService] === ÖZET ===');
+          printFullText('🔍 [GroupService] Toplam mesaj: ${groupChats.length}');
+          printFullText('🔍 [GroupService] API Unread Count: $apiUnreadCount');
+          printFullText('🔍 [GroupService] Pinli mesaj: $pinnedMessageCount');
+          printFullText('🔍 [GroupService] === KONTROL TAMAMLANDI ===');
+          
+          // API'dan gelen unread count'u logla
+          debugPrint('📊 [GroupService] API\'dan gelen unread count: $apiUnreadCount');
           
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
@@ -601,6 +610,75 @@ class GroupServices {
     } catch (e) {
       debugPrint('💥 Get user groups error: $e');
       return null;
+    }
+  }
+
+  /// Gruptan ayrılma işlemi
+  Future<bool> leaveGroup(String groupId) async {
+    final box = GetStorage();
+    final token = box.read('token');
+
+    try {
+      debugPrint("🔄 Gruptan ayrılma isteği gönderiliyor... Group ID: $groupId");
+
+      final response = await http.post(
+        Uri.parse("${AppConstants.baseUrl}/group-leave"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "group_id": groupId,
+        }),
+      );
+
+      debugPrint("📤 Leave group response: ${response.statusCode}");
+      debugPrint("📤 Leave group body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint("✅ Gruptan başarıyla ayrıldı");
+        return true;
+      } else {
+        debugPrint("❌ Gruptan ayrılma başarısız: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("💥 Leave group error: $e");
+      return false;
+    }
+  }
+
+  /// Grubu silme işlemi (sadece grup kurucusu yapabilir)
+  Future<bool> deleteGroup(String groupId) async {
+    final box = GetStorage();
+    final token = box.read('token');
+
+    try {
+      debugPrint("🔄 Grup silme isteği gönderiliyor... Group ID: $groupId");
+
+      final response = await http.delete(
+        Uri.parse("${AppConstants.baseUrl}/groups/$groupId"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      debugPrint("📤 Delete group response: ${response.statusCode}");
+      debugPrint("📤 Delete group body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+        debugPrint("✅ Grup başarıyla silindi");
+        return true;
+      } else {
+        debugPrint("❌ Grup silme başarısız: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("💥 Delete group error: $e");
+      return false;
     }
   }
 }

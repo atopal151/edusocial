@@ -21,6 +21,7 @@ class GroupModel {
   final String? pivotCreatedAt;
   final String? pivotUpdatedAt;
   bool hasUnreadMessages; // Okunmamış mesaj var mı?
+  int unreadCount; // Okunmamış mesaj sayısı
 
   GroupModel({
     required this.id,
@@ -45,9 +46,13 @@ class GroupModel {
     this.pivotCreatedAt,
     this.pivotUpdatedAt,
     this.hasUnreadMessages = false, // Başlangıçta false
+    this.unreadCount = 0, // Başlangıçta 0
   });
 
   factory GroupModel.fromJson(Map<String, dynamic> json) {
+    // API'dan gelen unread_messages_total_count'u kullan
+    final unreadCount = json['unread_messages_total_count'] ?? json['unread_count'] ?? 0;
+    
     return GroupModel(
       id: json['id'].toString(),
       userId: json['user_id'] ?? 0,
@@ -70,12 +75,16 @@ class GroupModel {
       humanCreatedAt: json['human_created_at'] ?? '',
       pivotCreatedAt: json['pivot']?['created_at'],
       pivotUpdatedAt: json['pivot']?['updated_at'],
+      unreadCount: unreadCount,
+      hasUnreadMessages: unreadCount > 0,
     );
   }
 
   GroupModel copyWith({
     bool? isJoined,
     bool? isPending,
+    int? unreadCount,
+    bool? hasUnreadMessages,
   }) {
     return GroupModel(
       id: id,
@@ -99,6 +108,8 @@ class GroupModel {
       humanCreatedAt: humanCreatedAt,
       pivotCreatedAt: pivotCreatedAt,
       pivotUpdatedAt: pivotUpdatedAt,
+      unreadCount: unreadCount ?? this.unreadCount,
+      hasUnreadMessages: hasUnreadMessages ?? this.hasUnreadMessages,
     );
   }
 }

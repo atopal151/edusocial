@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../services/language_service.dart';
 import '../../services/onesignal_service.dart';
 import '../../controllers/chat_controllers/group_chat_detail_controller.dart';
+import '../../controllers/group_controller/group_controller.dart';
 
 class GroupChatBottomSheet extends StatefulWidget {
   const GroupChatBottomSheet({super.key});
@@ -264,6 +265,11 @@ class _GroupChatBottomSheetState extends State<GroupChatBottomSheet> {
             onPressed: () {
               Get.back();
               // Gruptan ayrıl işlemi
+              final groupController = Get.find<GroupController>();
+              final group = chatController.groupData.value;
+              if (group != null) {
+                groupController.leaveGroup(group.id);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xffef5050),

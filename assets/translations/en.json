@@ -662,7 +662,9 @@
       "joined": "Joined",
       "pending": "Pending Approval",
       "join": "Join",
-      "loading": "Loading groups..."
+      "loading": "Loading groups...",
+      "noGroups": "You haven't joined any groups yet",
+      "joinGroupsBelow": "Join groups from the list below"
     },
     "createGroup": {
       "title": "Create New Group",

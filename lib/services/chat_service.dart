@@ -20,6 +20,8 @@ class ChatServices {
 
   // Kırmızı nokta durumunu kaydetmek için key
   static const String _unreadChatsKey = 'unread_chat_conversation_ids';
+  static const String _unreadGroupsKey = 'unread_group_ids';
+  static const String _totalUnreadCountKey = 'total_unread_count';
 
   /// 🔴 Kırmızı nokta olan conversation ID'leri kaydet
   static Future<void> saveUnreadChats(List<int> conversationIds) async {
@@ -93,20 +95,6 @@ class ChatServices {
     }
   }
 
-  /// 🔴 Tüm kırmızı nokta durumlarını temizle
-  static Future<void> clearAllUnreadChats() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_unreadChatsKey);
-      printFullText('🗑️ Tüm kırmızı nokta durumları temizlendi');
-    } catch (e) {
-      printFullText('❌ Kırmızı nokta durumları temizlenemedi: $e');
-    }
-  }
-
-  // Grup mesajları için kalıcı kırmızı nokta durumunu kaydetmek için key
-  static const String _unreadGroupsKey = 'unread_group_ids';
-
   /// 🔴 Kırmızı nokta olan grup ID'lerini kaydet
   static Future<void> saveUnreadGroups(List<int> groupIds) async {
     try {
@@ -172,6 +160,41 @@ class ChatServices {
       printFullText('🔴 Grup $groupId okunmamış olarak işaretlendi');
     } catch (e) {
       printFullText('❌ Grup okunmamış olarak işaretlenemedi: $e');
+    }
+  }
+
+  /// 🔴 Tüm kırmızı nokta durumlarını temizle
+  static Future<void> clearAllUnreadChats() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_unreadChatsKey);
+      printFullText('🗑️ Tüm kırmızı nokta durumları temizlendi');
+    } catch (e) {
+      printFullText('❌ Kırmızı nokta durumları temizlenemedi: $e');
+    }
+  }
+
+  /// 📊 Toplam unread count'u kaydet
+  static Future<void> saveTotalUnreadCount(int count) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_totalUnreadCountKey, count);
+      printFullText('💾 Toplam unread count kaydedildi: $count');
+    } catch (e) {
+      printFullText('❌ Toplam unread count kaydedilemedi: $e');
+    }
+  }
+
+  /// 📊 Toplam unread count'u geri yükle
+  static Future<int> loadTotalUnreadCount() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final count = prefs.getInt(_totalUnreadCountKey) ?? 0;
+      printFullText('📂 Toplam unread count yüklendi: $count');
+      return count;
+    } catch (e) {
+      printFullText('❌ Toplam unread count yüklenemedi: $e');
+      return 0;
     }
   }
 
@@ -442,7 +465,6 @@ class ChatServices {
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
 
-
     return messagesJson
         .map((json) => MessageModel.fromJson(json as Map<String, dynamic>,
             currentUserId: currentUserId))
@@ -504,7 +526,6 @@ class ChatServices {
       final token = await _box.read('token');
       final url = '${AppConstants.baseUrl}/api/user/$userId';
 
-
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -535,33 +556,6 @@ class ChatServices {
       debugPrint('❌ fetchUserDetails - Hata: $e');
       debugPrint('  - Hata Mesajı: ${e.toString()}');
       throw Exception('Kullanıcı bilgileri getirilemedi!');
-    }
-  }
-
-  // Toplam unread count için key
-  static const String _totalUnreadCountKey = 'total_unread_count';
-
-  /// 📊 Toplam unread count'u kaydet
-  static Future<void> saveTotalUnreadCount(int count) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_totalUnreadCountKey, count);
-      printFullText('💾 Toplam unread count kaydedildi: $count');
-    } catch (e) {
-      printFullText('❌ Toplam unread count kaydedilemedi: $e');
-    }
-  }
-
-  /// 📊 Toplam unread count'u geri yükle
-  static Future<int> loadTotalUnreadCount() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final count = prefs.getInt(_totalUnreadCountKey) ?? 0;
-      printFullText('📂 Toplam unread count yüklendi: $count');
-      return count;
-    } catch (e) {
-      printFullText('❌ Toplam unread count yüklenemedi: $e');
-      return 0;
     }
   }
 }
