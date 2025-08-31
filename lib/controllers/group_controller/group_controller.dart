@@ -68,6 +68,13 @@ class GroupController extends GetxController {
       userGroups.assignAll(userGroupsFromAPI);
       debugPrint("🔍 GroupController - userGroups.assignAll() tamamlandı, userGroups.length: ${userGroups.length}");
       
+      // Admin gruplarını da kontrol et ve ekle
+      final adminGroups = userGroups.where((group) => group.isFounder).toList();
+      debugPrint("🔍 Admin grupları bulundu: ${adminGroups.length} grup");
+      for (final adminGroup in adminGroups) {
+        debugPrint("🔍 Admin grup: ${adminGroup.name} (ID: ${adminGroup.id})");
+      }
+      
       // ChatController ile grup listesini senkronize et
       // Önce userGroups'ın güncellenmesini bekle
       await Future.delayed(Duration(milliseconds: 100));
@@ -266,10 +273,21 @@ class GroupController extends GetxController {
       debugPrint("🔄 syncGroupListWithChatController() başladı - userGroups.length: ${userGroups.length}");
       final chatController = Get.find<ChatController>();
       
-      // userGroups boşsa, allGroups'dan filtrele
+      // Kullanıcının hem üye olduğu hem de admin olduğu grupları dahil et
       final groupsToSync = userGroups.isEmpty ? allGroups.where((group) => 
         group.isFounder || group.isMember || !group.isPrivate || (group.isPrivate && group.isMember)
       ).toList() : userGroups;
+      
+      // Admin gruplarını da ekle (eğer userGroups'da yoksa)
+      final adminGroups = allGroups.where((group) => group.isFounder).toList();
+      for (final adminGroup in adminGroups) {
+        final exists = groupsToSync.any((group) => group.id == adminGroup.id);
+        if (!exists) {
+          groupsToSync.add(adminGroup);
+          debugPrint("🔍 ADMIN GROUP EKLENDİ: ${adminGroup.name} (ID: ${adminGroup.id})");
+        }
+      }
+      
       debugPrint("🔄 Senkronize edilecek grup sayısı: ${groupsToSync.length}");
       
       // GroupController'daki userGroups'u ChatController'daki groupChatList ile senkronize et
@@ -282,11 +300,12 @@ class GroupController extends GetxController {
           chatGroup.groupName = userGroup.name;
           chatGroup.lastMessage = userGroup.description; // Geçici olarak description kullan
           chatGroup.lastMessageTime = userGroup.humanCreatedAt;
+          chatGroup.isAdmin = userGroup.isFounder; // Admin durumunu güncelle
           
           // hasUnreadMessages durumunu da güncelle
           userGroup.hasUnreadMessages = chatGroup.hasUnreadMessages;
           
-          debugPrint("🔄 Grup senkronize edildi: ${userGroup.name} (ID: ${userGroup.id}) - hasUnreadMessages: ${userGroup.hasUnreadMessages}");
+          debugPrint("🔄 Grup senkronize edildi: ${userGroup.name} (ID: ${userGroup.id}) - isAdmin: ${userGroup.isFounder} - hasUnreadMessages: ${userGroup.hasUnreadMessages}");
         } else {
           // Yeni grup ekle
           final newChatGroup = GroupChatModel(
@@ -300,7 +319,7 @@ class GroupController extends GetxController {
           );
           
           chatController.groupChatList.add(newChatGroup);
-          debugPrint("🔄 Yeni grup eklendi: ${userGroup.name} (ID: ${userGroup.id})");
+          debugPrint("🔄 Yeni grup eklendi: ${userGroup.name} (ID: ${userGroup.id}) - isAdmin: ${userGroup.isFounder}");
         }
       }
       

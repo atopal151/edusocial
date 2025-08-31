@@ -124,6 +124,7 @@ class GroupServices {
     final token = box.read('token');
 
     try {
+      // Hem kullanıcının üye olduğu hem de admin olduğu grupları getir
       final uri = Uri.parse("${AppConstants.baseUrl}/me/groups");
 
       final response = await http.get(
@@ -170,6 +171,21 @@ class GroupServices {
 
         final userGroupList =
             data.map((item) => GroupModel.fromJson(item)).toList();
+
+        // Kullanıcının admin olduğu grupları da ekle
+        // Eğer API'den gelen verilerde isFounder=true olan gruplar varsa, bunlar zaten dahil edilmiş olmalı
+        // Ancak eğer eksikse, tüm grupları kontrol edip admin olduğu grupları da ekleyelim
+        final allGroups = await fetchAllGroups();
+        final adminGroups = allGroups.where((group) => group.isFounder).toList();
+        
+        // Admin gruplarını userGroupList'e ekle (eğer zaten yoksa)
+        for (final adminGroup in adminGroups) {
+          final exists = userGroupList.any((group) => group.id == adminGroup.id);
+          if (!exists) {
+            userGroupList.add(adminGroup);
+            printFullText("🔍 ADMIN GROUP EKLENDİ: ${adminGroup.name} (ID: ${adminGroup.id})");
+          }
+        }
 
         return userGroupList;
       } else {
