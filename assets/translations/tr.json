@@ -401,7 +401,15 @@
       "sendMessage": "Mesaj gönder",
       "attachFile": "Dosya ekle",
       "attachImage": "Resim ekle",
-      "createPoll": "Anket oluştur"
+      "createPoll": "Anket oluştur",
+      "userInfo": "Kullanıcı Bilgisi",
+      "clearMessages": "Mesajları Temizle",
+      "muteChat": {
+        "muted": "Sohbet Sessize Alındı",
+        "unmuted": "Sohbet Bildirimleri Açık",
+        "mutedDesc": "Bu sohbetten bildirim almayacaksınız",
+        "unmutedDesc": "Bu sohbetten bildirim alacaksınız"
+      }
     },
     "fileTypes": {
       "document": "Belge",
@@ -440,6 +448,18 @@
     "dateSeparator": {
       "today": "Bugün",
       "yesterday": "Dün"
+    },
+    "dialogs": {
+      "clearMessages": {
+        "title": "Mesajları Temizle",
+        "message": "Bu sohbetteki tüm mesajları temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+        "confirm": "Temizle"
+      },
+      "report": {
+        "title": "Kullanıcıyı Bildir",
+        "message": "Bu kullanıcıyı bildirmek istediğinizden emin misiniz? Bu işlem ekibimiz tarafından incelenecektir.",
+        "confirm": "Bildir"
+      }
     }
   },
   "entry": {
@@ -748,13 +768,7 @@
         "report": "Şikayet Et",
         "createEvent": "Etkinlik Oluştur"
       },
-      "dialogs": {
-        "leaveGroup": {
-          "title": "Gruptan Ayrıl",
-          "message": "Gruptan ayrılık istediğinize emin misiniz?",
-          "confirm": "Gruptan Ayrıl"
-        }
-      },
+     
       "emptyStates": {
         "documents": "Henüz belge eklenmemiş",
         "links": "Henüz bağlantı eklenmemiş",
@@ -762,6 +776,13 @@
       },
       "documentInfo": "Mb •",
       "documentPrefix": "Belge -"
+    },
+    "dialogs": {
+      "leaveGroup": {
+        "title": "Gruptan Ayrıl",
+        "message": "Gruptan ayrılık istediğinize emin misiniz?",
+        "confirm": "Gruptan Ayrıl"
+      }
     },
     "groupParticipants": {
       "title": "Grup Katılımcıları",

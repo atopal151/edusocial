@@ -48,10 +48,8 @@ class SocketService extends GetxService {
   Stream<dynamic> get onCommentNotification => _commentNotificationController.stream;
   Stream<dynamic> get onPinMessage => _pinMessageController.stream;
 
-  // Bağlantı adresi - farklı endpoint'leri deneyeceğiz
-  static const String _socketUrl = 'https://stageapi.edusocial.pl';
-  static const String _socketUrlWithPort = 'https://stageapi.edusocial.pl:3000';
-  static const String _socketUrlWithPath = 'https://stageapi.edusocial.pl/socket.io';
+  // Bağlantı adresi
+  static const String _socketUrl = 'https://stage.edusocial.pl';
 
   // Socket başlat
   void connect(String jwtToken) {
@@ -63,7 +61,7 @@ class SocketService extends GetxService {
       return;
     }
 
-    // Farklı URL'leri dene
+    // Ana URL'ye bağlan
     _tryConnectWithUrl(_socketUrl, jwtToken, 'Ana URL');
   }
 
@@ -114,22 +112,7 @@ class SocketService extends GetxService {
       isConnected.value = false;
       debugPrint('❌ Socket bağlantı hatası ($urlName): $err');
       debugPrint('❌ Hata tipi: ${err.runtimeType}');
-      
-      // Eğer bu URL başarısız olursa, diğer URL'leri dene
-      if (url == _socketUrl) {
-        debugPrint('🔄 Diğer URL\'ler deneniyor...');
-        Future.delayed(Duration(seconds: 2), () {
-          _tryConnectWithUrl(_socketUrlWithPort, jwtToken, 'Port 3000');
-        });
-      } else if (url == _socketUrlWithPort) {
-        debugPrint('🔄 Son URL deneniyor...');
-        Future.delayed(Duration(seconds: 2), () {
-          _tryConnectWithUrl(_socketUrlWithPath, jwtToken, 'Socket.io Path');
-        });
-      } else {
-        debugPrint('❌ Tüm URL\'ler başarısız oldu!');
-        debugPrint('🔍 Lütfen sunucu yöneticisi ile iletişime geçin.');
-      }
+      debugPrint('🔍 Lütfen sunucu yöneticisi ile iletişime geçin.');
     });
     
     _socket!.onError((err) {
@@ -279,7 +262,7 @@ class SocketService extends GetxService {
       _privateMessageController.add(data);
       
       // Mesaj bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('message', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 3. Okunmamış mesaj sayısı (toplam)
@@ -571,8 +554,7 @@ class SocketService extends GetxService {
       debugPrint('🔔 Yeni bildirim geldi (SocketService): $data');
       _notificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('notification', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 5. Notification event (private chat'teki gibi global)
@@ -580,8 +562,7 @@ class SocketService extends GetxService {
       debugPrint('🔔 Notification event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('notification', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 6. Comment notification (global)
@@ -589,8 +570,7 @@ class SocketService extends GetxService {
       debugPrint('💬 Comment event geldi (SocketService): $data');
       _commentNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('comment', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 6. Like notification (global)
@@ -598,8 +578,7 @@ class SocketService extends GetxService {
       debugPrint('❤️ Like event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('like', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 7. Follow notification (global)
@@ -607,8 +586,7 @@ class SocketService extends GetxService {
       debugPrint('👥 Follow event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('follow', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 8. Post notification (global)
@@ -616,8 +594,7 @@ class SocketService extends GetxService {
       debugPrint('📝 Post event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('post', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 9. Group join request notification (global)
@@ -625,8 +602,7 @@ class SocketService extends GetxService {
       debugPrint('👥 Group join request event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group_join_request', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 10. Group join accepted notification (global)
@@ -634,8 +610,7 @@ class SocketService extends GetxService {
       debugPrint('✅ Group join accepted event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group_join_accepted', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 11. Group join declined notification (global)
@@ -643,8 +618,7 @@ class SocketService extends GetxService {
       debugPrint('❌ Group join declined event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('group_join_declined', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 12. Follow request notification (global)
@@ -652,8 +626,7 @@ class SocketService extends GetxService {
       debugPrint('👤 Follow request event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('follow_request', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 13. Follow accepted notification (global)
@@ -661,8 +634,7 @@ class SocketService extends GetxService {
       debugPrint('✅ Follow accepted event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('follow_accepted', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 14. Follow declined notification (global)
@@ -670,8 +642,7 @@ class SocketService extends GetxService {
       debugPrint('❌ Follow declined event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('follow_declined', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 15. Event invitation notification (global)
@@ -679,8 +650,7 @@ class SocketService extends GetxService {
       debugPrint('📅 Event invitation event geldi (SocketService): $data');
       _userNotificationController.add(data);
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      _sendOneSignalNotification('event_invitation', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 16. Event reminder notification (global)
@@ -788,10 +758,8 @@ class SocketService extends GetxService {
         }
       }
       
-      // OneSignal bildirimi gönder (uygulama açıkken)
-      debugPrint('👤 OneSignal bildirimi gönderiliyor... Tip: $notificationType');
-      _sendOneSignalNotification(notificationType, data);
-      debugPrint('👤 OneSignal bildirimi gönderme tamamlandı');
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
+      debugPrint('👤 Socket notification işlendi - OneSignal bildirimi kaldırıldı');
       debugPrint('👤 =======================================');
     });
 
@@ -1207,7 +1175,7 @@ class SocketService extends GetxService {
       // Grup unread count'unu güncelle
       _updateGroupUnreadCountFromSocket(data);
       
-      _sendOneSignalNotification('group', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     _socket!.on('user:message_new', (data) {
@@ -1217,7 +1185,7 @@ class SocketService extends GetxService {
       // Grup unread count'unu güncelle
       _updateGroupUnreadCountFromSocket(data);
       
-      _sendOneSignalNotification('group', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     _socket!.on('user:chat', (data) {
@@ -1227,7 +1195,7 @@ class SocketService extends GetxService {
       // Grup unread count'unu güncelle
       _updateGroupUnreadCountFromSocket(data);
       
-      _sendOneSignalNotification('group', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     _socket!.on('user:group', (data) {
@@ -1237,7 +1205,7 @@ class SocketService extends GetxService {
       // Grup unread count'unu güncelle
       _updateGroupUnreadCountFromSocket(data);
       
-      _sendOneSignalNotification('group', data);
+      // OneSignal bildirimi kaldırıldı - sadece badge güncellenir
     });
 
     // 21.6. Group message (alternatif event isimleri)
@@ -1835,369 +1803,7 @@ class SocketService extends GetxService {
     }
   }
 
-  // OneSignal bildirimi gönder (uygulama açıkken)
-  void _sendOneSignalNotification(String type, dynamic data) async {
-    try {
-      debugPrint('📱 =======================================');
-      debugPrint('📱 OneSignal bildirimi gönderiliyor...');
-      debugPrint('📱 Tip: $type');
-      debugPrint('📱 Data: $data');
-      debugPrint('📱 Data Type: ${data.runtimeType}');
-      debugPrint('📱 Data Keys: ${data is Map ? data.keys.toList() : 'Not a Map'}');
-      
-      // DEBOUNCE: Aynı mesaj için çoklu bildirim engelle
-      final notificationKey = '${type}_${data['id'] ?? DateTime.now().millisecondsSinceEpoch}';
-      final now = DateTime.now();
-      final lastNotification = _lastNotificationTime[notificationKey];
-      
-      if (lastNotification != null && 
-          now.difference(lastNotification) < _notificationDebounce) {
-        debugPrint('🚫 Bildirim debounced: $notificationKey');
-        return;
-      }
-      
-      _lastNotificationTime[notificationKey] = now;
-      
-      String title = '';
-      String message = '';
-      String avatar = '';
-      
-      // Bildirim tipine göre başlık ve mesaj ayarla
-      switch (type) {
-        case 'message':
-          title = 'Yeni Mesaj';
-          // Private mesaj data yapısı: {message: "text", sender: {name: "...", avatar_url: "..."}}
-          if (data is Map<String, dynamic> && data.containsKey('sender')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? senderData;
-            if (data['sender'] is Map<String, dynamic>) {
-              senderData = data['sender'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ Sender data is not a Map: ${data['sender']}');
-              senderData = null;
-            }
-            
-            final senderName = senderData?['name'] ?? 'Bilinmeyen';
-            final messageText = data['message'] ?? 'Yeni bir mesajınız var';
-            message = '$senderName: $messageText';
-            avatar = senderData?['avatar_url'] ?? senderData?['profile_image'] ?? '';
-          } else {
-            message = data['message'] ?? 'Yeni bir mesajınız var';
-            avatar = data['sender_avatar'] ?? data['profile_image'] ?? '';
-          }
-          break;
-        case 'group':
-          // Group mesaj data yapısı: {message: {message: "text", user: {name: "..."}}}
-          if (data is Map<String, dynamic> && data.containsKey('message')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? messageData;
-            if (data['message'] is Map<String, dynamic>) {
-              messageData = data['message'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ Message data is not a Map: ${data['message']}');
-              messageData = null;
-            }
-            
-            if (messageData != null && messageData.containsKey('user')) {
-              // Güvenli tip kontrolü
-              Map<String, dynamic>? userData;
-              if (messageData['user'] is Map<String, dynamic>) {
-                userData = messageData['user'] as Map<String, dynamic>;
-              } else {
-                debugPrint('⚠️ User data is not a Map: ${messageData['user']}');
-                userData = null;
-              }
-              
-              final senderName = userData?['name'] ?? 'Bilinmeyen';
-              final messageText = messageData['message'] ?? 'Grup sohbetinde yeni mesaj';
-              title = 'Grup Mesajı';
-              message = '$senderName: $messageText';
-              avatar = userData?['avatar_url'] ?? '';
-            } else {
-              title = 'Grup Mesajı';
-              message = data['message'] ?? 'Grup sohbetinde yeni mesaj';
-              avatar = data['group_avatar'] ?? '';
-            }
-          } else {
-            title = 'Grup Mesajı';
-            message = data['message'] ?? 'Grup sohbetinde yeni mesaj';
-            avatar = data['group_avatar'] ?? '';
-          }
-          break;
-        case 'notification':
-          title = 'Yeni Bildirim';
-          // Notification data yapısı: {notification_data: {notification_full_data: {user: {...}, post: {...}}, type: "post-like"}}
-          if (data is Map<String, dynamic> && data.containsKey('notification_data')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? notificationData;
-            if (data['notification_data'] is Map<String, dynamic>) {
-              notificationData = data['notification_data'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ Notification data is not a Map: ${data['notification_data']}');
-              notificationData = null;
-            }
-            
-            if (notificationData != null && notificationData.containsKey('notification_full_data')) {
-              // Güvenli tip kontrolü
-              Map<String, dynamic>? notificationFullData;
-              if (notificationData['notification_full_data'] is Map<String, dynamic>) {
-                notificationFullData = notificationData['notification_full_data'] as Map<String, dynamic>;
-              } else {
-                debugPrint('⚠️ Notification full data is not a Map: ${notificationData['notification_full_data']}');
-                notificationFullData = null;
-              }
-              
-              final notificationType = notificationData['type']?.toString() ?? '';
-              
-              if (notificationFullData != null) {
-                // Güvenli tip kontrolü
-                Map<String, dynamic>? userData;
-                if (notificationFullData['user'] is Map<String, dynamic>) {
-                  userData = notificationFullData['user'] as Map<String, dynamic>;
-                } else {
-                  debugPrint('⚠️ User data is not a Map: ${notificationFullData['user']}');
-                  userData = null;
-                }
-                
-                // Güvenli tip kontrolü
-                Map<String, dynamic>? postData;
-                if (notificationFullData['post'] is Map<String, dynamic>) {
-                  postData = notificationFullData['post'] as Map<String, dynamic>;
-                } else {
-                  debugPrint('⚠️ Post data is not a Map: ${notificationFullData['post']}');
-                  postData = null;
-                }
-                
-                final userName = userData?['name'] ?? 'Bilinmeyen';
-                final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
-                
-                // Bildirim tipine göre mesaj oluştur
-                switch (notificationType) {
-                  case 'post-like':
-                    final postContent = postData?['content'] ?? 'Post\'unuzu beğendi';
-                    message = '$userName: $postContent';
-                    title = 'Yeni Beğeni';
-                    break;
-                  case 'post-comment':
-                    final postContent = postData?['content'] ?? 'Post\'unuza yorum geldi';
-                    message = '$userName: $postContent';
-                    title = 'Yeni Yorum';
-                    break;
-                  case 'follow-request':
-                    message = '$userName sizi takip etmek istiyor';
-                    title = 'Takip İsteği';
-                    break;
-                  case 'group-join-request':
-                    // Güvenli tip kontrolü
-                    Map<String, dynamic>? groupData;
-                    if (notificationFullData['group'] is Map<String, dynamic>) {
-                      groupData = notificationFullData['group'] as Map<String, dynamic>;
-                    } else {
-                      debugPrint('⚠️ Group data is not a Map: ${notificationFullData['group']}');
-                      groupData = null;
-                    }
-                    
-                    final groupName = groupData?['name'] ?? 'Grup';
-                    message = '$userName $groupName grubuna katılmak istiyor';
-                    title = 'Grup Katılma İsteği';
-                    break;
-                  default:
-                    message = '$userName size bildirim gönderdi';
-                    title = 'Yeni Bildirim';
-                }
-                
-                avatar = userAvatar;
-              } else {
-                message = data['message'] ?? data['content'] ?? 'Yeni bir bildiriminiz var';
-                avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-              }
-            } else {
-              message = data['message'] ?? data['content'] ?? 'Yeni bir bildiriminiz var';
-              avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-            }
-          } else {
-            message = data['message'] ?? data['content'] ?? 'Yeni bir bildiriminiz var';
-            avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          }
-          break;
-        case 'comment':
-          title = 'Yeni Yorum';
-          // Comment data yapısı: {user: {name: "...", avatar_url: "..."}, content: "..."}
-          if (data is Map<String, dynamic> && data.containsKey('user')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? userData;
-            if (data['user'] is Map<String, dynamic>) {
-              userData = data['user'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ User data is not a Map: ${data['user']}');
-              userData = null;
-            }
-            
-            final userName = userData?['name'] ?? 'Bilinmeyen';
-            final commentText = data['content'] ?? data['message'] ?? 'Post\'unuza yeni yorum geldi';
-            message = '$userName: $commentText';
-            avatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
-          } else {
-            message = data['message'] ?? data['content'] ?? 'Post\'unuza yeni yorum geldi';
-            avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          }
-          break;
-        case 'like':
-          title = 'Yeni Beğeni';
-          // Like data yapısı: {user: {name: "...", avatar_url: "..."}, post: {content: "..."}}
-          if (data is Map<String, dynamic> && data.containsKey('user')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? userData;
-            if (data['user'] is Map<String, dynamic>) {
-              userData = data['user'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ User data is not a Map: ${data['user']}');
-              userData = null;
-            }
-            
-            final userName = userData?['name'] ?? 'Bilinmeyen';
-            final postContent = data['post']?['content'] ?? 'Post\'unuza yeni beğeni geldi';
-            message = '$userName: $postContent';
-            avatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
-          } else {
-            message = data['message'] ?? data['content'] ?? 'Post\'unuza yeni beğeni geldi';
-            avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          }
-          break;
-        case 'follow':
-          title = 'Yeni Takipçi';
-          // Follow data yapısı: {user: {name: "...", avatar_url: "..."}}
-          if (data is Map<String, dynamic> && data.containsKey('user')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? userData;
-            if (data['user'] is Map<String, dynamic>) {
-              userData = data['user'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ User data is not a Map: ${data['user']}');
-              userData = null;
-            }
-            
-            final userName = userData?['name'] ?? 'Bilinmeyen';
-            message = '$userName sizi takip etmeye başladı';
-            avatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
-          } else {
-            message = data['message'] ?? data['content'] ?? 'Yeni bir takipçiniz var';
-            avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          }
-          break;
-        case 'post':
-          title = 'Post Aktivitesi';
-          message = data['message'] ?? data['content'] ?? 'Post\'unuzda yeni aktivite';
-          avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          break;
-        case 'group_join_request':
-          title = 'Grup Katılma İsteği';
-          // Group join request data yapısı: {user: {name: "...", avatar_url: "..."}, group: {name: "..."}}
-          if (data is Map<String, dynamic> && data.containsKey('user')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? userData;
-            if (data['user'] is Map<String, dynamic>) {
-              userData = data['user'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ User data is not a Map: ${data['user']}');
-              userData = null;
-            }
-            
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? groupData;
-            if (data['group'] is Map<String, dynamic>) {
-              groupData = data['group'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ Group data is not a Map: ${data['group']}');
-              groupData = null;
-            }
-            
-            final userName = userData?['name'] ?? 'Bilinmeyen';
-            final groupName = groupData?['name'] ?? 'Grup';
-            message = '$userName $groupName grubuna katılmak istiyor';
-            avatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
-          } else {
-            message = data['message'] ?? data['content'] ?? 'Grup katılma isteği geldi';
-            avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          }
-          break;
-        case 'group_join_accepted':
-          title = 'Grup Katılma Kabul';
-          message = data['message'] ?? data['content'] ?? 'Grup katılma isteğiniz kabul edildi';
-          avatar = data['group_avatar'] ?? '';
-          break;
-        case 'group_join_declined':
-          title = 'Grup Katılma Red';
-          message = data['message'] ?? data['content'] ?? 'Grup katılma isteğiniz reddedildi';
-          avatar = data['group_avatar'] ?? '';
-          break;
-        case 'follow_request':
-          title = 'Takip İsteği';
-          // Follow request data yapısı: {user: {name: "...", avatar_url: "..."}}
-          if (data is Map<String, dynamic> && data.containsKey('user')) {
-            // Güvenli tip kontrolü
-            Map<String, dynamic>? userData;
-            if (data['user'] is Map<String, dynamic>) {
-              userData = data['user'] as Map<String, dynamic>;
-            } else {
-              debugPrint('⚠️ User data is not a Map: ${data['user']}');
-              userData = null;
-            }
-            
-            final userName = userData?['name'] ?? 'Bilinmeyen';
-            message = '$userName sizi takip etmek istiyor';
-            avatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
-          } else {
-            message = data['message'] ?? data['content'] ?? 'Yeni takip isteği geldi';
-            avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          }
-          break;
-        case 'follow_accepted':
-          title = 'Takip Kabul';
-          message = data['message'] ?? data['content'] ?? 'Takip isteğiniz kabul edildi';
-          avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          break;
-        case 'follow_declined':
-          title = 'Takip Red';
-          message = data['message'] ?? data['content'] ?? 'Takip isteğiniz reddedildi';
-          avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          break;
-        case 'event_invitation':
-          title = 'Etkinlik Daveti';
-          message = data['message'] ?? data['content'] ?? 'Yeni etkinlik daveti geldi';
-          avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-          break;
-        default:
-          title = 'Bildirim';
-          message = data['message'] ?? data['content'] ?? 'Yeni bildirim';
-          avatar = data['user_avatar'] ?? data['profile_image'] ?? '';
-      }
-      
-      // Kendi mesajımız için bildirim gönderme kontrolü
-      final currentUserId = GetStorage().read('user_id')?.toString() ?? '';
-      if (data is Map<String, dynamic> && data.containsKey('user_id')) {
-        final senderUserId = data['user_id']?.toString() ?? '';
-        if (senderUserId == currentUserId) {
-          debugPrint('🚫 Kendi mesajımız için bildirim gönderilmiyor. Sender: $senderUserId, Current: $currentUserId');
-          return;
-        }
-      }
-      
-      // OneSignal bildirimi gönder
-      _oneSignalService.sendCustomMessageNotification(
-        senderName: title,
-        message: message,
-        senderAvatar: avatar,
-        conversationId: data['conversation_id']?.toString() ?? data['group_id']?.toString() ?? '',
-        data: data,
-      );
-      
-      debugPrint('✅ OneSignal bildirimi gönderildi');
-      debugPrint('📱 Bildirim detayları: title=$title, message=$message, avatar=$avatar');
-    } catch (e) {
-      debugPrint('❌ OneSignal bildirimi gönderilemedi: $e');
-    }
-  }
+  
 
   // Özel grup mesaj bildirimi gönder (grup profil resmi, grup adı ve gönderen bilgisi ile)
   void _sendCustomGroupMessageNotification(dynamic data) async {

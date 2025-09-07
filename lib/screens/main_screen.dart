@@ -22,6 +22,7 @@ import '../screens/home/home_screen.dart';
 import 'chat/user_chat/chat_list_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../utils/navbar_menu.dart';
+import '../components/widgets/sliding_notification_widget.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -197,18 +198,24 @@ class MainScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      body: Obx(() {
-        return IndexedStack(
-          index: navigationController.selectedIndex.value,
-          children: [
-            HomeScreen(),
-            ChatListScreen(),
-            MatchResultScreen(),
-            EntryScreen(),
-            ProfileScreen(),
-          ],
-        );
-      }),
+      body: Stack(
+        children: [
+          Obx(() {
+            return IndexedStack(
+              index: navigationController.selectedIndex.value,
+              children: [
+                HomeScreen(),
+                ChatListScreen(),
+                MatchResultScreen(),
+                EntryScreen(),
+                ProfileScreen(),
+              ],
+            );
+          }),
+          // Sliding notification widget
+          const SlidingNotificationWidget(),
+        ],
+      ),
       bottomNavigationBar: NavbarMenu(),
     );
   }

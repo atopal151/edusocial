@@ -16,7 +16,6 @@ class GroupServices {
   // OPTIMIZE: HTTP client configuration for better network resilience
   static final http.Client _httpClient = http.Client();
 
-
   // RETRY: Configuration for retry mechanism
   static const int _maxRetries = 3;
   static const Duration _baseDelay =
@@ -135,19 +134,20 @@ class GroupServices {
         },
       );
 
-      printFullText("📥 USER GROUPS API RESPONSE:");
+      /*printFullText("📥 USER GROUPS API RESPONSE:");
       printFullText("Status Code: ${response.statusCode}");
-      printFullText("Response Body: ${response.body}");
-      
+      printFullText("Response Body: ${response.body}");*/
+
       // Her grubun detayını ayrı ayrı yazdır
-      if (response.statusCode == 200) {
-        final jsonBody = json.decode(response.body);
-        final List<dynamic> data = jsonBody['data'] ?? [];
-        
-        printFullText("🔍 USER GROUPS - TOPLAM ${data.length} GRUP:");
+      /*if (response.statusCode == 200) {
+        //final jsonBody = json.decode(response.body);
+        //final List<dynamic> data = jsonBody['data'] ?? [];
+
+        /*printFullText("🔍 USER GROUPS - TOPLAM ${data.length} GRUP:");
         for (int i = 0; i < data.length; i++) {
           final group = data[i];
-          printFullText("""
+
+         /* printFullText("""
 📋 USER GROUP ${i + 1}:
   - ID: ${group['id']}
   - Name: ${group['name']}
@@ -161,9 +161,9 @@ class GroupServices {
   - Created At: ${group['created_at']}
   - Updated At: ${group['updated_at']}
   ---
-""");
-        }
-      }
+""");*/
+        }*/
+      }*/
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -176,14 +176,17 @@ class GroupServices {
         // Eğer API'den gelen verilerde isFounder=true olan gruplar varsa, bunlar zaten dahil edilmiş olmalı
         // Ancak eğer eksikse, tüm grupları kontrol edip admin olduğu grupları da ekleyelim
         final allGroups = await fetchAllGroups();
-        final adminGroups = allGroups.where((group) => group.isFounder).toList();
-        
+        final adminGroups =
+            allGroups.where((group) => group.isFounder).toList();
+
         // Admin gruplarını userGroupList'e ekle (eğer zaten yoksa)
         for (final adminGroup in adminGroups) {
-          final exists = userGroupList.any((group) => group.id == adminGroup.id);
+          final exists =
+              userGroupList.any((group) => group.id == adminGroup.id);
           if (!exists) {
             userGroupList.add(adminGroup);
-            printFullText("🔍 ADMIN GROUP EKLENDİ: ${adminGroup.name} (ID: ${adminGroup.id})");
+            printFullText(
+                "🔍 ADMIN GROUP EKLENDİ: ${adminGroup.name} (ID: ${adminGroup.id})");
           }
         }
 
@@ -241,19 +244,19 @@ class GroupServices {
         },
       );
 
-      printFullText("📥 ALL GROUPS API RESPONSE:");
+      /*printFullText("📥 ALL GROUPS API RESPONSE:");
       printFullText("Status Code: ${response.statusCode}");
-      printFullText("Response Body: ${response.body}");
-      
+      printFullText("Response Body: ${response.body}");*/
+
       // Her grubun detayını ayrı ayrı yazdır
-      if (response.statusCode == 200) {
+      /*if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         final List<dynamic> data = jsonBody['data'] ?? [];
-        
+
         printFullText("🔍 ALL GROUPS - TOPLAM ${data.length} GRUP:");
         for (int i = 0; i < data.length; i++) {
           final group = data[i];
-          printFullText("""
+          /*printFullText("""
 📋 ALL GROUP ${i + 1}:
   - ID: ${group['id']}
   - Name: ${group['name']}
@@ -267,9 +270,9 @@ class GroupServices {
   - Created At: ${group['created_at']}
   - Updated At: ${group['updated_at']}
   ---
-""");
+""");*/
         }
-      }
+      }*/
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -403,9 +406,9 @@ class GroupServices {
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
-        
+
         // API'den gelen ham veriyi debug et
-        printFullText('🔍 =======================================');
+        /*printFullText('🔍 =======================================');
         printFullText('🔍 GROUP DETAIL API RAW RESPONSE');
         printFullText('🔍 =======================================');
         printFullText('🔍 URL: ${uri.toString()}');
@@ -414,23 +417,26 @@ class GroupServices {
         printFullText('🔍 Raw Response Body:');
         printFullText(response.body);
         printFullText('🔍 =======================================');
-        
+        */
         if (jsonBody['status'] == true && jsonBody['data'] != null) {
           // Pin durumlarını ve okunmamış mesaj sayısını kontrol et
           final groupData = jsonBody['data']['group'];
           final groupChats = groupData['group_chats'] as List? ?? [];
-          
-          printFullText('🔍 [GroupService] === PIN DURUMU VE OKUNMAMIŞ MESAJ KONTROLÜ ===');
-          printFullText('🔍 [GroupService] Toplam mesaj sayısı: ${groupChats.length}');
-          
+
+          printFullText(
+              '🔍 [GroupService] === PIN DURUMU VE OKUNMAMIŞ MESAJ KONTROLÜ ===');
+          printFullText(
+              '🔍 [GroupService] Toplam mesaj sayısı: ${groupChats.length}');
+
           // API'dan gelen unread_messages_total_count'u kullan
           final userData = groupData['user'];
           final apiUnreadCount = userData['unread_messages_total_count'] ?? 0;
-          
-          debugPrint('🔍 [GroupService] API\'dan gelen unread count: $apiUnreadCount');
-          
+
+          debugPrint(
+              '🔍 [GroupService] API\'dan gelen unread count: $apiUnreadCount');
+
           int pinnedMessageCount = 0;
-          
+
           for (int i = 0; i < groupChats.length; i++) {
             final chat = groupChats[i];
             final messageId = chat['id'];
@@ -438,24 +444,26 @@ class GroupServices {
             final isRead = chat['is_read'] ?? true;
             final messageContent = chat['message'];
             final userId = chat['user_id'];
-            
+
             // Pin durumunu kontrol et
             if (isPinned) {
               pinnedMessageCount++;
             }
-            
-            printFullText('🔍 [GroupService] Mesaj $i: ID=$messageId, user_id=$userId, is_pinned=$isPinned, is_read=$isRead, content="$messageContent"');
+
+            printFullText(
+                '🔍 [GroupService] Mesaj $i: ID=$messageId, user_id=$userId, is_pinned=$isPinned, is_read=$isRead, content="$messageContent"');
           }
-          
-          printFullText('🔍 [GroupService] === ÖZET ===');
+
+          /*printFullText('🔍 [GroupService] === ÖZET ===');
           printFullText('🔍 [GroupService] Toplam mesaj: ${groupChats.length}');
           printFullText('🔍 [GroupService] API Unread Count: $apiUnreadCount');
           printFullText('🔍 [GroupService] Pinli mesaj: $pinnedMessageCount');
-          printFullText('🔍 [GroupService] === KONTROL TAMAMLANDI ===');
-          
+          printFullText('🔍 [GroupService] === KONTROL TAMAMLANDI ===');*/
+
           // API'dan gelen unread count'u logla
-          debugPrint('📊 [GroupService] API\'dan gelen unread count: $apiUnreadCount');
-          
+          debugPrint(
+              '📊 [GroupService] API\'dan gelen unread count: $apiUnreadCount');
+
           return GroupDetailModel.fromJson(jsonBody['data']);
         }
         throw Exception('No group data found');
@@ -570,7 +578,6 @@ class GroupServices {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
@@ -588,8 +595,6 @@ class GroupServices {
     final box = GetStorage();
     final token = box.read('token');
     try {
-     
-
       final response = await _makeRequestWithRetry(
         () => http.get(
           Uri.parse('${AppConstants.baseUrl}/timeline/groups'),
@@ -601,16 +606,10 @@ class GroupServices {
         operation: 'Get User Groups',
       );
 
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
 
-
         final List<dynamic> data = responseData['data'] as List<dynamic>;
-
-  
-
-        
 
         final List<GroupModel> groups =
             data.map((json) => GroupModel.fromJson(json)).toList();
@@ -633,7 +632,8 @@ class GroupServices {
     final token = box.read('token');
 
     try {
-      debugPrint("🔄 Gruptan ayrılma isteği gönderiliyor... Group ID: $groupId");
+      debugPrint(
+          "🔄 Gruptan ayrılma isteği gönderiliyor... Group ID: $groupId");
 
       final response = await http.put(
         Uri.parse("${AppConstants.baseUrl}/group-join/$groupId"),
@@ -644,10 +644,13 @@ class GroupServices {
         },
       );
 
-      debugPrint("📤 Withdraw group invitation response: ${response.statusCode}");
+      debugPrint(
+          "📤 Withdraw group invitation response: ${response.statusCode}");
       debugPrint("📤 Withdraw group invitation body: ${response.body}");
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         debugPrint("✅ Gruptan başarıyla ayrıldı");
         return true;
       } else {
@@ -680,7 +683,9 @@ class GroupServices {
       debugPrint("📤 Delete group response: ${response.statusCode}");
       debugPrint("📤 Delete group body: ${response.body}");
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         debugPrint("✅ Grup başarıyla silindi");
         return true;
       } else {

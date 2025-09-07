@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../models/match_model.dart';
+import 'people_profile_controller.dart';
 
 class MatchController extends GetxController {
   final LanguageService languageService = Get.find<LanguageService>();
@@ -74,6 +75,24 @@ class MatchController extends GetxController {
         message = "${currentMatch.name} ${languageService.tr("common.messages.userFollowed")}";
         // Açık profil için following durumunu güncelle
         matches[currentIndex.value] = matches[currentIndex.value].copyWith(isFollowing: true);
+      }
+
+      // People profile controller'ı güncelle (eğer profil açıksa)
+      try {
+        if (Get.isRegistered<PeopleProfileController>()) {
+          final peopleProfileController = Get.find<PeopleProfileController>();
+          // Sadece aynı kullanıcının profili açıksa güncelle
+          if (peopleProfileController.profile.value?.id == userId) {
+            if (isPrivate) {
+              peopleProfileController.updateFollowStatusFromMatch(false, true);
+            } else {
+              peopleProfileController.updateFollowStatusFromMatch(true, false);
+            }
+            debugPrint("✅ Match kartından takip durumu people profile'a senkronize edildi");
+          }
+        }
+      } catch (e) {
+        debugPrint("⚠️ People profile controller güncellenemedi: $e");
       }
 
       CustomSnackbar.show(

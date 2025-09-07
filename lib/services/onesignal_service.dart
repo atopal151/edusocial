@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_service.dart';
 import 'package:flutter/material.dart'; // Added for Color
+import '../controllers/global_sliding_notification_controller.dart';
 
 class OneSignalService extends GetxService {
   static const String _appId = "a26f3c4c-771d-4b68-85d6-a33c1ef1766f";
@@ -224,6 +225,18 @@ class OneSignalService extends GetxService {
         case 'message':
           shouldShow = prefs.getBool('message_notifications') ?? true;
           debugPrint('🔍 Mesaj bildirimleri kontrol edildi: $shouldShow');
+          
+          // Private chat bazlı mute kontrolü ekle
+          if (shouldShow) {
+            final conversationId = data['conversation_id']?.toString();
+            if (conversationId != null) {
+              final isPrivateChatMuted = prefs.getBool('private_chat_muted_$conversationId') ?? false;
+              if (isPrivateChatMuted) {
+                shouldShow = false;
+                debugPrint('🔇 Private chat sessize alınmış: $conversationId');
+              }
+            }
+          }
           break;
         case 'group':
           shouldShow = prefs.getBool('message_notifications') ?? true; // Group chat mesajları
@@ -592,6 +605,18 @@ class OneSignalService extends GetxService {
         case 'message':
           shouldShow = prefs.getBool('message_notifications') ?? true;
           debugPrint('🔍 sendLocalNotification - Mesaj bildirimleri kontrol edildi: $shouldShow');
+          
+          // Private chat bazlı mute kontrolü ekle
+          if (shouldShow) {
+            final conversationId = data?['conversation_id']?.toString();
+            if (conversationId != null) {
+              final isPrivateChatMuted = prefs.getBool('private_chat_muted_$conversationId') ?? false;
+              if (isPrivateChatMuted) {
+                shouldShow = false;
+                debugPrint('🔇 Private chat sessize alınmış: $conversationId');
+              }
+            }
+          }
           break;
         case 'group':
           shouldShow = prefs.getBool('message_notifications') ?? true; // Group chat mesajları
@@ -818,31 +843,31 @@ class OneSignalService extends GetxService {
       
       _isShowingNotification = true;
       
-      // Beyaz arka planlı, profil resmi ile bildirim
-      Get.snackbar(
-        title,
-        message,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.black87,
-        duration: const Duration(seconds: 4),
-        margin: const EdgeInsets.all(16),
-        borderRadius: 12,
-        snackStyle: SnackStyle.FLOATING,
-        icon: userAvatar.isNotEmpty
-            ? CircleAvatar(
-                backgroundImage: NetworkImage(
-                  userAvatar.startsWith('http') 
-                      ? userAvatar 
-                      : 'https://stageapi.edusocial.pl/storage/$userAvatar',
-                ),
-                radius: 16,
-              )
-            : const CircleAvatar(
-                radius: 16,
-                child: Icon(Icons.person, size: 16),
-              ),
-      );
+      // Sliding notification göster
+      try {
+        final slidingController = Get.find<GlobalSlidingNotificationController>();
+        slidingController.showNotification(
+          title: title,
+          message: message,
+          avatar: userAvatar,
+          type: notificationType,
+        );
+        debugPrint('✅ Sliding notification gösterildi: $title - $message');
+      } catch (e) {
+        debugPrint('❌ Sliding notification controller bulunamadı: $e');
+        // Fallback olarak normal snackbar göster
+        Get.snackbar(
+          title,
+          message,
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.white,
+          colorText: Colors.black87,
+          duration: const Duration(seconds: 4),
+          margin: const EdgeInsets.all(16),
+          borderRadius: 12,
+          snackStyle: SnackStyle.FLOATING,
+        );
+      }
       
       debugPrint('✅ Özel notification bildirimi gösterildi');
       debugPrint('📱 Bildirim detayları: title=$title, message=$message, user=$userName, avatar=$userAvatar');
@@ -1387,6 +1412,54 @@ class OneSignalService extends GetxService {
     }
     
     debugPrint('🗑️ Tüm grup mute ayarları temizlendi');
+  }
+
+  // Private chat bazlı mute fonksiyonları
+  Future<void> mutePrivateChat(String conversationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('private_chat_muted_$conversationId', true);
+    debugPrint('🔇 Private chat sessize alındı: $conversationId');
+  }
+
+  Future<void> unmutePrivateChat(String conversationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('private_chat_muted_$conversationId', false);
+    debugPrint('🔊 Private chat sesi açıldı: $conversationId');
+  }
+
+  Future<bool> isPrivateChatMuted(String conversationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('private_chat_muted_$conversationId') ?? false;
+  }
+
+  // Tüm sessize alınmış private chat'leri al
+  Future<List<String>> getMutedPrivateChats() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+    final mutedPrivateChats = <String>[];
+    
+    for (final key in keys) {
+      if (key.startsWith('private_chat_muted_') && prefs.getBool(key) == true) {
+        final conversationId = key.replaceFirst('private_chat_muted_', '');
+        mutedPrivateChats.add(conversationId);
+      }
+    }
+    
+    return mutedPrivateChats;
+  }
+
+  // Tüm private chat mute ayarlarını temizle
+  Future<void> clearAllPrivateChatMutes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+    
+    for (final key in keys) {
+      if (key.startsWith('private_chat_muted_')) {
+        await prefs.remove(key);
+      }
+    }
+    
+    debugPrint('🗑️ Tüm private chat mute ayarları temizlendi');
   }
 
   // OneSignal'ın kendi servisi ile test notification (Firebase gerektirmez)

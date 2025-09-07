@@ -400,7 +400,15 @@
       "sendMessage": "Send message",
       "attachFile": "Attach file",
       "attachImage": "Attach image",
-      "createPoll": "Create poll"
+      "createPoll": "Create poll",
+      "userInfo": "User Info",
+      "clearMessages": "Clear Messages",
+      "muteChat": {
+        "muted": "Chat Muted",
+        "unmuted": "Chat Notifications On",
+        "mutedDesc": "You won't receive notifications from this chat",
+        "unmutedDesc": "You will receive notifications from this chat"
+      }
     },
     "fileTypes": {
       "document": "Document",
@@ -437,6 +445,18 @@
       "cannotOpen": "Link could not be opened. Please try again.",
       "cannotOpenThis": "This link cannot be opened",
       "openError": "An error occurred while opening the link"
+    },
+    "dialogs": {
+      "clearMessages": {
+        "title": "Clear Messages",
+        "message": "Are you sure you want to clear all messages from this chat? This action cannot be undone.",
+        "confirm": "Clear"
+      },
+      "report": {
+        "title": "Report User",
+        "message": "Are you sure you want to report this user? This action will be reviewed by our team.",
+        "confirm": "Report"
+      }
     }
   },
   "entry": {
@@ -696,13 +716,7 @@
         "report": "Report",
         "createEvent": "Create Event"
       },
-      "dialogs": {
-        "leaveGroup": {
-          "title": "Leave Group",
-          "message": "Are you sure you want to leave this group? This action cannot be undone.",
-          "confirm": "Leave"
-        }
-      },
+      
       "emptyStates": {
         "documents": "No documents added yet",
         "links": "No links added yet",
@@ -711,6 +725,13 @@
       "documentInfo": "Mb •",
       "documentPrefix": "Document -"
     },
+    "dialogs": {
+        "leaveGroup": {
+          "title": "Leave Group",
+          "message": "Are you sure you want to leave this group? This action cannot be undone.",
+          "confirm": "Leave"
+        }
+      },
     "groupParticipants": {
       "title": "Group Participants",
       "noParticipants": "No participants yet",

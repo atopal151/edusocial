@@ -169,18 +169,16 @@ class GroupCard extends StatelessWidget {
                       if (isFounder)
                         Container(
                           margin: EdgeInsets.only(left: 4),
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          width: 16,
+                          height: 16,
                           decoration: BoxDecoration(
                             color: Color(0xffEF5050),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(
-                            "Kurucu",
-                            style: GoogleFonts.inter(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                          child: Icon(
+                            Icons.admin_panel_settings,
+                            size: 10,
+                            color: Colors.white,
                           ),
                         ),
                     ],

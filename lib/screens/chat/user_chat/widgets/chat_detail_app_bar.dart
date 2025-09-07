@@ -2,6 +2,7 @@ import 'package:edusocial/controllers/chat_controllers/chat_detail_controller.da
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../components/widgets/private_chat_bottom_sheet.dart';
 
 class ChatDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   const ChatDetailAppBar({super.key});
@@ -51,6 +52,14 @@ class ChatDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         InkWell(
           onTap: () {
+            showModalBottomSheet(
+              backgroundColor: Colors.white,
+              context: context,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+              ),
+              builder: (context) => const PrivateChatBottomSheet(),
+            );
           },
           child: Container(
             decoration: BoxDecoration(

@@ -106,19 +106,19 @@ class GroupChatDetailController extends GetxController {
     
     // 1. Grup kurucusu kontrolü
     final isFounder = group.isFounder;
-    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isFounder=$isFounder');
+    //debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isFounder=$isFounder');
     
     // 2. Admin sayısı kontrolü (user_count_with_admin > 0 ise admin var)
     final hasAdminUsers = group.userCountWithAdmin > 0;
-    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: hasAdminUsers=$hasAdminUsers');
+    //debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: hasAdminUsers=$hasAdminUsers');
     
     // 3. Grup üyesi kontrolü
     final isMember = group.isMember;
-    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isMember=$isMember');
+    //debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: isMember=$isMember');
     
     // Admin yetkisi: Grup kurucusu VEYA admin sayısı > 0 olan grupta üye olmak
     final isAdmin = isFounder || (hasAdminUsers && isMember);
-    debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: Final result=$isAdmin');
+    //debugPrint('🔍 [GroupChatDetailController] Admin kontrolü: Final result=$isAdmin');
     
     return isAdmin;
   }
@@ -2205,8 +2205,8 @@ class GroupChatDetailController extends GetxController {
             groupUnreadCount.value = unreadMessageIds.length;
             hasUnreadMessages.value = true;
             
-            debugPrint('🔴 [GroupChatDetailController] Unread count artırıldı: ${groupUnreadCount.value}');
-            debugPrint('🔴 [GroupChatDetailController] Unread message IDs: $unreadMessageIds');
+            //debugPrint('🔴 [GroupChatDetailController] Unread count artırıldı: ${groupUnreadCount.value}');
+            //debugPrint('🔴 [GroupChatDetailController] Unread message IDs: $unreadMessageIds');
           }
         }
       }

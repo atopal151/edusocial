@@ -36,8 +36,10 @@ class _MatchCardState extends State<MatchCard> {
         },
         onPanEnd: (details) {
           if (_dragOffset.dx > 100) {
-            // Sağa swipe - Follow
-            controller.followUser();
+            // Sağa swipe - Follow (sadece pending değilse)
+            if (!match.isPending) {
+              controller.followUser();
+            }
           } else if (_dragOffset.dx < -100) {
             // Sola swipe - Skip ve yeni eşleşme
             controller.nextMatch();
@@ -255,8 +257,8 @@ class _MatchCardState extends State<MatchCard> {
                 _buildActionButton(
                   iconPath: 'images/icons/match_user_add_icon.svg',
                   label: _getFollowButtonText(match, languageService),
-                  color: const Color(0xff65D384),
-                  onTap: controller.followUser,
+                  color: _getFollowButtonColor(match),
+                  onTap: match.isPending ? () {} : controller.followUser,
                 ),
                 _buildActionButton(
                   iconPath: 'images/icons/match_message_icon.svg',
@@ -296,6 +298,21 @@ class _MatchCardState extends State<MatchCard> {
     
     // Eğer profil açıksa
     return languageService.tr("match.card.follow");
+  }
+
+  Color _getFollowButtonColor(match) {
+    // Eğer kullanıcı zaten takip ediliyorsa
+    if (match.isFollowing) {
+      return const Color(0xff9CA3AE); // Gri renk
+    }
+    
+    // Eğer takip isteği beklemedeyse
+    if (match.isPending) {
+      return const Color(0xffFFA500); // Turuncu renk
+    }
+    
+    // Diğer durumlar için yeşil
+    return const Color(0xff65D384);
   }
 
   Widget _buildActionButton({
