@@ -73,7 +73,6 @@ class _PrivateChatBottomSheetState extends State<PrivateChatBottomSheet> {
               ),
               onTap: () {
                 Get.back();
-                // TODO: Navigate to user profile
               },
             ),
             
@@ -208,7 +207,7 @@ class _PrivateChatBottomSheetState extends State<PrivateChatBottomSheet> {
           TextButton(
             onPressed: () {
               Get.back();
-              // TODO: Implement clear messages functionality
+              //  
               // chatController.clearMessages();
             },
             child: Text(
@@ -258,8 +257,7 @@ class _PrivateChatBottomSheetState extends State<PrivateChatBottomSheet> {
           ),
           TextButton(
             onPressed: () {
-              Get.back();
-              // TODO: Implement report functionality
+              Get.back(); 
             },
             child: Text(
               languageService.tr("chat.dialogs.report.confirm"),

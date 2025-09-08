@@ -435,8 +435,6 @@ class GroupServices {
           debugPrint(
               '🔍 [GroupService] API\'dan gelen unread count: $apiUnreadCount');
 
-          int pinnedMessageCount = 0;
-
           for (int i = 0; i < groupChats.length; i++) {
             final chat = groupChats[i];
             final messageId = chat['id'];
@@ -444,11 +442,6 @@ class GroupServices {
             final isRead = chat['is_read'] ?? true;
             final messageContent = chat['message'];
             final userId = chat['user_id'];
-
-            // Pin durumunu kontrol et
-            if (isPinned) {
-              pinnedMessageCount++;
-            }
 
             printFullText(
                 '🔍 [GroupService] Mesaj $i: ID=$messageId, user_id=$userId, is_pinned=$isPinned, is_read=$isRead, content="$messageContent"');

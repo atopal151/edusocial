@@ -286,6 +286,7 @@
       "title": "Hatırlatıcı Detayı",
       "titleLabel": "📝 Başlık:",
       "timeLabel": "⏰ Zaman:",
+      "colorLabel": "🎨 Renk:",
       "notificationLabel": "🔔 Bildirim:",
       "notificationOn": "Açık",
       "notificationOff": "Kapalı",

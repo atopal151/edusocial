@@ -281,7 +281,7 @@ class PeopleProfileController extends GetxController {
   void updateFollowStatusFromMatch(bool isFollowing, bool isPending) {
     debugPrint("🔄 Match kartından takip durumu güncelleniyor: isFollowing=$isFollowing, isPending=$isPending");
     this.isFollowing.value = isFollowing;
-    this.isFollowingPending.value = isPending;
+    isFollowingPending.value = isPending;
     debugPrint("✅ Takip durumu güncellendi");
   }
 

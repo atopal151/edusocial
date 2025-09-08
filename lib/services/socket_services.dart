@@ -725,7 +725,6 @@ class SocketService extends GetxService {
       _userNotificationController.add(data);
       
       // Bildirim tipini belirle - güvenli tip kontrolü
-      String notificationType = 'notification';
       if (data is Map<String, dynamic> && data.containsKey('notification_data')) {
         Map<String, dynamic>? notificationData;
         if (data['notification_data'] is Map<String, dynamic>) {
@@ -741,20 +740,16 @@ class SocketService extends GetxService {
         switch (type) {
           case 'post-like':
           case 'post-comment':
-            notificationType = 'post';
             break;
           case 'follow-request':
           case 'follow-accepted':
           case 'follow-declined':
-            notificationType = 'follow';
             break;
           case 'group-join-request':
           case 'group-join-accepted':
           case 'group-join-declined':
-            notificationType = 'group';
             break;
           default:
-            notificationType = 'notification';
         }
       }
       

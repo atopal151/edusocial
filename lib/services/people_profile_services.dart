@@ -22,6 +22,7 @@ class PeopleProfileService {
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
+        
 
         final model = PeopleProfileModel.fromJson(body['data']);
 
@@ -49,6 +50,7 @@ class PeopleProfileService {
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
+        
 
         if (body['data'] != null) {
           final userData = body['data'];

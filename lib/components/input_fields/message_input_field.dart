@@ -172,7 +172,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
               ),
               
 
-              IconButton(
+              Obx(() => IconButton(
                 icon: Container(
                   width: 40,
                   height: 40,
@@ -186,11 +186,20 @@ class _MessageInputFieldState extends State<MessageInputField> {
                     borderRadius: BorderRadius.all(Radius.circular(15)),
                   ),
                   child: Center(
-                    child: SvgPicture.asset(
-                      'images/icons/send_icon.svg',
-                      width: 18,
-                      height: 18,
-                    ),
+                    child: widget.controller.isSendingMessage.value
+                        ? SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            'images/icons/send_icon.svg',
+                            width: 18,
+                            height: 18,
+                          ),
                   ),
                 ),
                 onPressed: widget.controller.isSendingMessage.value
@@ -203,7 +212,7 @@ class _MessageInputFieldState extends State<MessageInputField> {
                           messageController.clear();
                         }
                       },
-              ),
+              )),
             ],
           ),
         ],

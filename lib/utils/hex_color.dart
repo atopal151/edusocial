@@ -10,9 +10,15 @@ class HexColor extends Color {
 }
 
 extension ColorExtension on Color {
-  String toHex({bool leadingHashSign = true}) =>
-      '${leadingHashSign ? '#' : ''}'
-      '${r.round().toRadixString(16).padLeft(2, '0')}'
-      '${g.round().toRadixString(16).padLeft(2, '0')}'
-      '${b.round().toRadixString(16).padLeft(2, '0')}';
+  String toHex({bool leadingHashSign = true}) {
+    // RGB değerleri 0-255 aralığında olmalı
+    final red = (r * 255).round();
+    final green = (g * 255).round();
+    final blue = (b * 255).round();
+    
+    return '${leadingHashSign ? '#' : ''}'
+        '${red.toRadixString(16).padLeft(2, '0')}'
+        '${green.toRadixString(16).padLeft(2, '0')}'
+        '${blue.toRadixString(16).padLeft(2, '0')}';
+  }
 }

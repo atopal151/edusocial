@@ -285,6 +285,7 @@
       "title": "Reminder Detail",
       "titleLabel": "📝 Title:",
       "timeLabel": "⏰ Time:",
+      "colorLabel": "🎨 Color:",
       "notificationLabel": "🔔 Notification:",
       "notificationOn": "On",
       "notificationOff": "Off",

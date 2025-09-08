@@ -56,6 +56,33 @@ class VerificationService extends GetxService {
       }
     } catch (e) {
       debugPrint('❌ VerificationService.verifyUser hatası: $e');
+      
+      // 422 hatası için özel mesaj
+      if (e.toString().contains('422')) {
+        return {
+          'success': false,
+          'message': 'Dosya formatı veya içeriği uygun değil. Lütfen farklı bir dosya deneyin.',
+        };
+      }
+      
+      // DioException için detaylı hata mesajı
+      if (e is dio.DioException) {
+        String errorMessage = 'Doğrulama sırasında bir hata oluştu';
+        
+        if (e.response?.statusCode == 422) {
+          errorMessage = 'Dosya formatı veya içeriği uygun değil. Lütfen farklı bir dosya deneyin.';
+        } else if (e.response?.statusCode == 413) {
+          errorMessage = 'Dosya boyutu çok büyük. Lütfen daha küçük bir dosya seçin.';
+        } else if (e.response?.statusCode == 415) {
+          errorMessage = 'Desteklenmeyen dosya formatı. Lütfen JPG, PNG veya PDF formatında bir dosya seçin.';
+        }
+        
+        return {
+          'success': false,
+          'message': errorMessage,
+        };
+      }
+      
       return {
         'success': false,
         'message': 'Doğrulama sırasında bir hata oluştu: $e',

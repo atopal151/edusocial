@@ -4,6 +4,7 @@ import '../../models/calendar_model.dart';
 import '../../services/calendar_service.dart';
 import '../../services/language_service.dart';
 import '../../utils/date_format.dart';
+import '../../utils/hex_color.dart';
 
 Future<void> showReminderDetailDialog(BuildContext context, int reminderId) async {
   final LanguageService languageService = Get.find<LanguageService>();
@@ -42,6 +43,24 @@ Future<void> showReminderDetailDialog(BuildContext context, int reminderId) asyn
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Renk göstergesi
+                Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: HexColor.fromHex(reminder.color),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey.shade300, width: 1),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text("🎨 ${languageService.tr("calendar.reminderDetail.colorLabel")}: ${reminder.color}",
+                        style: TextStyle(fontSize: 14)),
+                  ],
+                ),
+                SizedBox(height: 10),
                 Text("📝 ${languageService.tr("calendar.reminderDetail.titleLabel")}: ${reminder.title}",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 SizedBox(height: 10),

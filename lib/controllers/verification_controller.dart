@@ -128,6 +128,25 @@ class VerificationController extends GetxController {
       return;
     }
 
+    // Dosya validasyonu
+    if (!_verificationService.isValidFileType(uploadedFile.value!)) {
+      CustomSnackbar.show(
+        title: _languageService.tr("verification.snackbar.error"),
+        message: "Desteklenmeyen dosya formatı. Lütfen JPG, PNG veya PDF formatında bir dosya seçin.",
+        type: SnackbarType.error,
+      );
+      return;
+    }
+
+    if (!_verificationService.isValidFileSize(uploadedFile.value!)) {
+      CustomSnackbar.show(
+        title: _languageService.tr("verification.snackbar.error"),
+        message: "Dosya boyutu çok büyük. Lütfen 10MB'dan küçük bir dosya seçin.",
+        type: SnackbarType.error,
+      );
+      return;
+    }
+
     isLoading.value = true;
 
     try {
