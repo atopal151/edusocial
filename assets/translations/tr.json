@@ -242,10 +242,13 @@
       "delete": "Sil"
     },
     "reminderForm": {
+      "createTitle": "Hatırlatıcı Oluştur",
+      "editTitle": "Hatırlatıcı Düzenle",
+      "titleLabel": "Başlık",
       "titleHint": "Hatırlatma Başlığı",
-      "dateLabel": "Tarih:",
-      "timeLabel": "Saat:",
-      "colorLabel": "Renk:",
+      "dateLabel": "Tarih",
+      "timeLabel": "Saat",
+      "colorLabel": "Renk",
       "selectDate": "Tarih Seç",
       "selectTime": "Saat Seç",
       "selectColor": "Renk Seç",
@@ -263,6 +266,12 @@
       "titleRequired": "Başlık zorunludur",
       "dateTimeRequired": "Tarih ve saat zorunludur",
       "colorRequired": "Renk seçimi zorunludur"
+    },
+    "colors": {
+      "green": "Yeşil",
+      "blue": "Mavi",
+      "orange": "Turuncu",
+      "red": "Kırmızı"
     },
     "errors": {
       "remindersLoadFailed": "Hatırlatmalar yüklenemedi",
@@ -471,6 +480,7 @@
       "refreshSuccess": "Entry verileri başarıyla yenilendi",
       "refreshLoading": "Entry verileri yenileniyor...",
       "allCategories": "Tüm Kategoriler",
+      "categories": "kategori",
       "all": "Tümü",
       "entries": "entry"
     },
@@ -750,7 +760,8 @@
       "loading": {
         "creating": "Grup oluşturuluyor...",
         "areas": "Grup alanları yükleniyor..."
-      }
+      },
+      "imageFormatWarning": "Desteklenen formatlar: PNG, SVG, JPEG, GIF"
     },
     "groupDetail": {
       "title": "Grup Detayı",
@@ -910,7 +921,8 @@
         "cameraError": "Kamera açılırken bir hata oluştu",
         "shareError": "Hikaye paylaşılırken bir hata oluştu",
         "selectPhotoWarning": "Lütfen bir fotoğraf seçin",
-        "storiesShared": "hikaye başarıyla paylaşıldı"
+        "storiesShared": "hikaye başarıyla paylaşıldı",
+        "imageFormatWarning": "Desteklenen formatlar: PNG, SVG, JPEG, GIF"
       },
       "myStoryList": {
         "you": "@Sen"
@@ -952,7 +964,8 @@
       "contentRequired": "Lütfen gönderi içeriği girin.",
       "warning": "Uyarı",
       "error": "Hata",
-      "loading": "Paylaşılıyor..."
+      "loading": "Paylaşılıyor...",
+      "imageFormatWarning": "Desteklenen formatlar: PNG, SVG, JPEG, GIF"
     },
     "loading": {
       "homeData": "Ana sayfa verileri yükleniyor...",
@@ -1295,7 +1308,8 @@
       "lessonNameEmpty": "Ders adı boş olamaz",
       "lessonAlreadyExists": "Bu ders zaten eklenmiş",
       "lessonAddError": "Ders eklenirken hata oluştu",
-      "lessonRemoveError": "Ders silinirken hata oluştu"
+      "lessonRemoveError": "Ders silinirken hata oluştu",
+      "imageFormatWarning": "Desteklenen formatlar: PNG, SVG, JPEG, GIF"
     },
     "mainProfile": {
       "editProfile": "Profili Düzenle",
@@ -1921,7 +1935,8 @@
         "uploadFile": "Dosya Yükle",
         "changeFile": "Dosyayı Değiştir",
         "fileUploaded": "Dosya başarıyla yüklendi"
-      }
+      },
+      "imageFormatWarning": "Desteklenen formatlar: PNG, SVG, JPEG, GIF"
     },
     "actions": {
       "verify": "Doğrula",

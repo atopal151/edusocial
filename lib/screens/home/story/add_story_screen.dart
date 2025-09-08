@@ -328,16 +328,49 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
           ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: CustomButton(
-              height: 45,
-              borderRadius: 8,
-              text: languageService.tr("home.story.addStory.selectFromGallery"),
-              onPressed: pickImages,
-              isLoading: false.obs,
-              backgroundColor: const Color(0xFFF5F5F5),
-              textColor: const Color(0xFFF26B6B),
-              borderColor: const Color(0xFFF26B6B),
-             
+            child: Column(
+              children: [
+                CustomButton(
+                  height: 45,
+                  borderRadius: 8,
+                  text: languageService.tr("home.story.addStory.selectFromGallery"),
+                  onPressed: pickImages,
+                  isLoading: false.obs,
+                  backgroundColor: const Color(0xFFF5F5F5),
+                  textColor: const Color(0xFFF26B6B),
+                  borderColor: const Color(0xFFF26B6B),
+                 
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Color(0xfff3f4f6),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Color(0xff6b7280),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          languageService.tr("home.story.addStory.imageFormatWarning"),
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: Color(0xff6b7280),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           if (_selectedImages.isNotEmpty)

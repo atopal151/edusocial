@@ -57,6 +57,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeaderPhotoWithAvatar(),
+                    const SizedBox(height: 12),
+                    _buildImageFormatWarning(),
                     const SizedBox(height: 20),
                     _buildTextField(
                         languageService.tr("profile.editProfile.username"), "@", controller.usernameController),
@@ -603,6 +605,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       title,
       style: GoogleFonts.inter(
           fontWeight: FontWeight.w600, fontSize: 13.28, color: Color(0xff414751)),
+    );
+  }
+
+  Widget _buildImageFormatWarning() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Color(0xfff3f4f6),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            size: 16,
+            color: Color(0xff6b7280),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              languageService.tr("profile.editProfile.imageFormatWarning"),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: Color(0xff6b7280),
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

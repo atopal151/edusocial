@@ -5,6 +5,7 @@ import 'package:edusocial/controllers/post_controller.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/services/language_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -319,18 +320,68 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           Container(
             color: Color(0xfffafafa),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            child: Column(
               children: [
-                buildIconButton(Icon(Icons.camera_alt_outlined),
-                    iconColor: Color(0xFFF26B6B), onPressed: () {
-                  pickFromCamera();
-                }),
-                SizedBox(width: 10),
-                buildIconButton(Icon(Icons.photo_outlined),
-                    iconColor: Color(0xFFF26B6B), onPressed: () {
-                  pickImages();
-                }),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    buildIconButton(
+                      SvgPicture.asset(
+                        "images/icons/camera.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xFF9ca3ae),
+                          BlendMode.srcIn,
+                        ),
+                      ), 
+                      onPressed: () {
+                        pickFromCamera();
+                      }
+                    ),
+                    SizedBox(width: 10),
+                    buildIconButton(
+                      SvgPicture.asset(
+                        "images/icons/selected_document.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xFF9ca3ae),
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      onPressed: () {
+                        pickImages();
+                      }
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Color(0xfff3f4f6),
+                    borderRadius: BorderRadius.circular(8),
+                   
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Color(0xff6b7280),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          languageService.tr("home.createPost.imageFormatWarning"),
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: Color(0xff6b7280),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           )

@@ -29,6 +29,7 @@ class TopicsController extends GetxController {
     // Loading state'ini başlat
     isTopicLoading.value = true;
     selectedTopic.value = topic.title; // Seçili topic'i güncelle
+    debugPrint("🔄 Loading state başlatıldı - isTopicLoading: ${isTopicLoading.value}");
 
     try {
       // Topic ID'si ile ilgili entry'yi bul
@@ -38,8 +39,15 @@ class TopicsController extends GetxController {
         debugPrint("📝 Entry ID: ${entry.id}");
         debugPrint("📝 Entry Topic: ${entry.topic?.name}");
         debugPrint("📝 Entry Topic Category: ${entry.topic?.category?.title}");
+        
         // Entry detay sayfasına yönlendir
-        Get.toNamed("/entryDetail", arguments: {'entry': entry});
+        await Get.toNamed("/entryDetail", arguments: {'entry': entry});
+        
+        // Sayfa açıldıktan sonra loading state'ini sıfırla
+        debugPrint("🔄 Entry detay sayfası açıldı, loading state sıfırlanıyor...");
+        isTopicLoading.value = false;
+        selectedTopic.value = '';
+        debugPrint("✅ Loading state sıfırlandı - isTopicLoading: ${isTopicLoading.value}");
       } else {
         debugPrint("❌ Entry bulunamadı");
         CustomSnackbar.show(
@@ -47,6 +55,9 @@ class TopicsController extends GetxController {
           message: _languageService.tr("entry.errors.entryNotFound"),
           type: SnackbarType.error,
         );
+        // Hata durumunda loading state'ini sıfırla
+        isTopicLoading.value = false;
+        selectedTopic.value = '';
       }
     } catch (e) {
       debugPrint("❌ Hata oluştu: $e");
@@ -55,17 +66,24 @@ class TopicsController extends GetxController {
         message: _languageService.tr("entry.errors.generalError"),
         type: SnackbarType.error,
       );
-    } finally {
-      // Loading state'ini bitir
+      // Hata durumunda loading state'ini sıfırla
       isTopicLoading.value = false;
+      selectedTopic.value = '';
     }
   }
 
   // Loading state'ini sıfırla (entry detay sayfasından geri dönüldüğünde çağrılır)
   void resetTopicLoadingState() {
     debugPrint("🔄 TopicsController: Loading state sıfırlanıyor");
+    debugPrint("🔄 TopicsController: Önceki isTopicLoading değeri: ${isTopicLoading.value}");
+    debugPrint("🔄 TopicsController: Önceki selectedTopic değeri: '${selectedTopic.value}'");
+    
     isTopicLoading.value = false;
     selectedTopic.value = '';
+    
+    debugPrint("🔄 TopicsController: Yeni isTopicLoading değeri: ${isTopicLoading.value}");
+    debugPrint("🔄 TopicsController: Yeni selectedTopic değeri: '${selectedTopic.value}'");
+    debugPrint("✅ TopicsController: Loading state başarıyla sıfırlandı");
   }
 
   // Topic ID'si ile ilgili entry'yi bul ve topic bilgisini enjekte et

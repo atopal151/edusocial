@@ -97,6 +97,37 @@ class _VerificationUploadScreenState extends State<VerificationUploadScreen> {
                             : _buildUploadPrompt()),
                       ),
                     ),
+                    
+                    // Image format warning
+                    Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Color(0xfff3f4f6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: Color(0xff6b7280),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              languageService.tr("verification.documentUpload.imageFormatWarning"),
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Color(0xff6b7280),
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

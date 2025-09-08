@@ -43,6 +43,7 @@ class EntryController extends GetxController {
   // CATEGORY MANAGEMENT: Kategori yönetimi için yeni state'ler
   final RxList<TopicCategoryModel> categories = <TopicCategoryModel>[].obs;
   final RxString selectedCategory = 'all'.obs; // Varsayılan olarak "all" seçili (dil desteği için)
+  final RxList<String> selectedCategories = <String>[].obs; // Çoklu kategori seçimi için
   final RxBool isCategoryLoading = false.obs;
 
   final EntryServices entryServices = EntryServices();
@@ -114,29 +115,57 @@ class EntryController extends GetxController {
     }
   }
 
-  /// CATEGORY MANAGEMENT: Kategori seçimi fonksiyonu
+  /// CATEGORY MANAGEMENT: Kategori seçimi fonksiyonu (çoklu seçim destekli)
   void selectCategory(String categoryName) {
-    selectedCategory.value = categoryName;
+    // "All" seçilirse diğer tüm seçimleri temizle
+    if (categoryName == 'all') {
+      selectedCategories.clear();
+      selectedCategory.value = 'all';
+    } else {
+      // "All" seçiliyse onu kaldır
+      if (selectedCategory.value == 'all') {
+        selectedCategory.value = '';
+      }
+      
+      // Kategori zaten seçili mi kontrol et
+      if (selectedCategories.contains(categoryName)) {
+        // Seçiliyse kaldır
+        selectedCategories.remove(categoryName);
+        debugPrint('📂 Kategori kaldırıldı: $categoryName');
+      } else {
+        // Seçili değilse ekle
+        selectedCategories.add(categoryName);
+        debugPrint('📂 Kategori eklendi: $categoryName');
+      }
+      
+      // Eğer hiç kategori seçili değilse "all" yap
+      if (selectedCategories.isEmpty) {
+        selectedCategory.value = 'all';
+      } else {
+        selectedCategory.value = selectedCategories.join(', ');
+      }
+    }
+    
     applyCategoryFilter();
-    debugPrint('📂 Kategori seçildi: $categoryName');
+    debugPrint('📂 Seçili kategoriler: ${selectedCategories.join(', ')}');
   }
 
-  /// CATEGORY MANAGEMENT: Seçilen kategoriye göre entry'leri filtrele
+  /// CATEGORY MANAGEMENT: Seçilen kategoriye göre entry'leri filtrele (çoklu seçim destekli)
   void applyCategoryFilter() {
-    if (selectedCategory.value == 'all') {
+    if (selectedCategory.value == 'all' || selectedCategories.isEmpty) {
       // Tüm entry'leri göster
       displayEntries.assignAll(allDisplayEntries);
     } else {
-      // Seçilen kategoriye ait entry'leri filtrele
+      // Seçilen kategorilere ait entry'leri filtrele
       final filtered = allDisplayEntries.where((item) => 
-        item.categoryTitle == selectedCategory.value
+        selectedCategories.contains(item.categoryTitle)
       ).toList();
       displayEntries.assignAll(filtered);
     }
     
     // Arama filtresini de uygula
     applySearchFilterToDisplayList();
-    debugPrint('📊 Filtrelenmiş entry sayısı: ${displayEntries.length}');
+    debugPrint('📊 Filtrelenmiş entry sayısı: ${displayEntries.length} (Kategoriler: ${selectedCategories.join(', ')})');
   }
 
   // Tüm tartışma konularını getir (Eski, artık sadece topic-categories için kullanılacak)
@@ -354,17 +383,17 @@ class EntryController extends GetxController {
     }
   }
 
-  // IMPROVED: Arama ve kategori filtresini birlikte uygular
+  // IMPROVED: Arama ve kategori filtresini birlikte uygular (çoklu seçim destekli)
   void applySearchFilterToDisplayList() {
     final query = _entrySearchController?.text.toLowerCase() ?? '';
     
     // Önce kategori filtresini uygula
     List<DisplayEntryItem> categoryFiltered;
-    if (selectedCategory.value == 'all') {
+    if (selectedCategory.value == 'all' || selectedCategories.isEmpty) {
       categoryFiltered = allDisplayEntries.toList();
     } else {
       categoryFiltered = allDisplayEntries.where((item) => 
-        item.categoryTitle == selectedCategory.value
+        selectedCategories.contains(item.categoryTitle)
       ).toList();
     }
     
@@ -381,7 +410,7 @@ class EntryController extends GetxController {
       );
     }
     
-    debugPrint('🔍 Filter sonucu: ${displayEntries.length} entry (Kategori: ${selectedCategory.value}, Arama: "$query")');
+    debugPrint('🔍 Filter sonucu: ${displayEntries.length} entry (Kategoriler: ${selectedCategories.join(', ')}, Arama: "$query")');
   }
 
   // Fetch Topic Categories With Topics (Bu metod artık fetchAndPrepareEntries ile entegre edilebilir)

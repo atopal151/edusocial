@@ -253,6 +253,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  /// Chat listesini yenile (mesaj gönderildikten sonra çağrılır)
+  Future<void> refreshChatList() async {
+    debugPrint("🔄 Chat listesi yenileniyor...");
+    await fetchChatList();
+  }
+
   /// 📥 Yeni birebir mesaj geldiğinde listeyi güncelle
   Future<void> handleNewPrivateMessage(dynamic data) async {
     try {

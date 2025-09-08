@@ -197,6 +197,10 @@ class ChatDetailController extends GetxController {
       final chatController = Get.find<ChatController>();
       chatController.resumePrivateMessageListener();
       debugPrint('▶️ ChatController private message listener tekrar başlatıldı');
+      
+      // Chat listesini de yenile (ekran kapatılırken)
+      chatController.refreshChatList();
+      debugPrint("✅ Chat listesi ekran kapatılırken yenilendi");
     } catch (e) {
       debugPrint('⚠️ ChatController resume edilemedi: $e');
     }
@@ -659,6 +663,15 @@ class ChatDetailController extends GetxController {
       
       // Mesaj gönderildikten sonra mesajları yeniden yükle
       await fetchConversationMessages();
+      
+      // Chat listesini de yenile (mesaj gönderildiği için liste güncellenmeli)
+      try {
+        final chatController = Get.find<ChatController>();
+        await chatController.refreshChatList();
+        debugPrint("✅ Chat listesi mesaj gönderildikten sonra yenilendi");
+      } catch (e) {
+        debugPrint("⚠️ Chat listesi yenilenirken hata: $e");
+      }
       
       // Mesaj gönderildikten sonra en alta git
       WidgetsBinding.instance.addPostFrameCallback((_) {

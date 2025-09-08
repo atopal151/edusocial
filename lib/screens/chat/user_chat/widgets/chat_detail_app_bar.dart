@@ -1,4 +1,5 @@
 import 'package:edusocial/controllers/chat_controllers/chat_detail_controller.dart';
+import 'package:edusocial/controllers/chat_controllers/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,7 +18,15 @@ class ChatDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
       surfaceTintColor: const Color(0xfffafafa),
       leading: Center(
         child: InkWell(
-          onTap: () {
+          onTap: () async {
+            // Chat listesini yenile ve geri dön
+            try {
+              final chatController = Get.find<ChatController>();
+              await chatController.refreshChatList();
+              debugPrint("✅ Chat listesi geri dönüş sırasında yenilendi");
+            } catch (e) {
+              debugPrint("⚠️ Chat listesi yenilenirken hata: $e");
+            }
             Get.back();
           },
           borderRadius: BorderRadius.circular(50),

@@ -13,6 +13,9 @@ class HotTopicsListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final selected = controller.selectedTopic.value;
+      final isTopicLoading = controller.isTopicLoading.value;
+      
+      debugPrint("🔄 HotTopicsListView build - selectedTopic: '$selected', isTopicLoading: $isTopicLoading");
 
       if (controller.isLoading.value) {
         return const Center();
@@ -35,9 +38,13 @@ class HotTopicsListView extends StatelessWidget {
 
             return GestureDetector(
               onTap: () {
+                debugPrint("🔄 Topic tıklandı: '${topic.title}', isTopicLoading: ${controller.isTopicLoading.value}");
                 if (!controller.isTopicLoading.value) {
+                  debugPrint("✅ Topic tıklama işlemi başlatılıyor...");
                   controller.selectTopic(topic.title);
                   controller.onHotTopicTap(topic);
+                } else {
+                  debugPrint("⚠️ Topic loading durumunda, tıklama engellendi");
                 }
               },
               child: Container(
@@ -62,15 +69,21 @@ class HotTopicsListView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Loading durumunda spinner göster
-                    if (isSelected && controller.isTopicLoading.value)
-                      SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
+                    if (isSelected && controller.isTopicLoading.value) ...[
+                      Builder(
+                        builder: (context) {
+                          debugPrint("🔄 Loading spinner gösteriliyor - topic: '$selected'");
+                          return SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          );
+                        },
                       )
+                    ]
                     else if (isSelected)
                       ShaderMask(
                         shaderCallback: (bounds) => LinearGradient(

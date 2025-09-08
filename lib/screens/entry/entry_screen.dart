@@ -126,7 +126,9 @@ class EntryScreenState extends State<EntryScreen> {
                             itemCount: allCategories.length,
                             itemBuilder: (context, index) {
                               final categoryName = allCategories[index];
-                              final isSelected = entryController.selectedCategory.value == categoryName;
+                              final isSelected = categoryName == 'all' 
+                                  ? entryController.selectedCategory.value == 'all'
+                                  : entryController.selectedCategories.contains(categoryName);
                               
                               // Kategori için entry sayısını hesapla
                               int entryCount;
@@ -205,7 +207,9 @@ class EntryScreenState extends State<EntryScreen> {
                               Text(
                                 selectedCat == 'all' 
                                   ? languageService.tr("entry.entryScreen.allCategories")
-                                  : selectedCat,
+                                  : entryController.selectedCategories.length > 1
+                                    ? '${entryController.selectedCategories.length} ${languageService.tr("entry.entryScreen.categories")}'
+                                    : selectedCat,
                                 style: GoogleFonts.inter(
                                   fontSize: 13.78,
                                   fontWeight: FontWeight.w600,

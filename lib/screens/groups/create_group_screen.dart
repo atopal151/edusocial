@@ -185,6 +185,35 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                         color: Color(0xff414751),
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Color(0xffffffff),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: Color(0xff6b7280),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              languageService.tr("groups.createGroup.imageFormatWarning"),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xff6b7280),
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

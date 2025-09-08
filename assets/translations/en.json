@@ -241,10 +241,13 @@
       "delete": "Delete"
     },
     "reminderForm": {
+      "createTitle": "Create Reminder",
+      "editTitle": "Edit Reminder",
+      "titleLabel": "Title",
       "titleHint": "Reminder Title",
-      "dateLabel": "Date:",
-      "timeLabel": "Time:",
-      "colorLabel": "Color:",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "colorLabel": "Color",
       "selectDate": "Select Date",
       "selectTime": "Select Time",
       "selectColor": "Select Color",
@@ -262,6 +265,12 @@
       "titleRequired": "Title is required",
       "dateTimeRequired": "Date and time are required",
       "colorRequired": "Color selection is required"
+    },
+    "colors": {
+      "green": "Green",
+      "blue": "Blue",
+      "orange": "Orange",
+      "red": "Red"
     },
     "errors": {
       "remindersLoadFailed": "Failed to load reminders",
@@ -468,6 +477,7 @@
       "refreshSuccess": "Entry data refreshed successfully",
       "refreshLoading": "Refreshing entry data...",
       "allCategories": "All Categories",
+      "categories": "categories",
       "all": "All",
       "entries": "entries"
     },
@@ -699,7 +709,8 @@
       "loading": {
         "creating": "Creating group...",
         "areas": "Loading group areas..."
-      }
+      },
+      "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
     },
     "groupDetail": {
       "title": "Group Details",
@@ -858,7 +869,8 @@
         "cameraError": "An error occurred while opening camera",
         "shareError": "An error occurred while sharing story",
         "selectPhotoWarning": "Please select a photo",
-        "storiesShared": "stories shared successfully"
+        "storiesShared": "stories shared successfully",
+        "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
       },
       "myStoryList": {
         "you": "@You"
@@ -890,7 +902,8 @@
       "contentRequired": "Please enter post content.",
       "warning": "Warning",
       "error": "Error",
-      "loading": "Sharing..."
+      "loading": "Sharing...",
+      "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
     },
     "loading": {
       "homeData": "Loading home data...",
@@ -1176,7 +1189,8 @@
       "lessonNameEmpty": "Lesson name cannot be empty",
       "lessonAlreadyExists": "This lesson already exists",
       "lessonAddError": "Error adding lesson",
-      "lessonRemoveError": "Error removing lesson"
+      "lessonRemoveError": "Error removing lesson",
+      "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
     },
     "peopleProfile": {
       "loading": "Loading user profile...",
@@ -1896,7 +1910,8 @@
         "uploadFile": "Upload File",
         "changeFile": "Change File",
         "fileUploaded": "File uploaded successfully"
-      }
+      },
+      "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
     },
     "actions": {
       "verify": "Verify",

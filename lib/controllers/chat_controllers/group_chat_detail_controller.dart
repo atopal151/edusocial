@@ -1614,6 +1614,15 @@ class GroupChatDetailController extends GetxController {
           await refreshMessagesOptimized();
           // Ensure we stay at bottom after refresh
           scrollToBottomForNewMessage();
+          
+          // Grup listesini de yenile (mesaj gönderildiği için liste güncellenmeli)
+          try {
+            final chatController = Get.find<ChatController>();
+            await chatController.fetchGroupList();
+            debugPrint("✅ Grup listesi mesaj gönderildikten sonra yenilendi");
+          } catch (e) {
+            debugPrint("⚠️ Grup listesi yenilenirken hata: $e");
+          }
         });
       } else {
         Get.snackbar(
@@ -2088,6 +2097,15 @@ class GroupChatDetailController extends GetxController {
   void onClose() {
     // Chat liste controller'ın group message listener'ını tekrar başlat (Artık gerekli değil - sürekli aktif)
     debugPrint('▶️ ChatController group message listener artık başlatılmıyor - sürekli aktif');
+    
+    // Grup listesini yenile (ekran kapatılırken)
+    try {
+      final chatController = Get.find<ChatController>();
+      chatController.fetchGroupList();
+      debugPrint("✅ Grup listesi ekran kapatılırken yenilendi");
+    } catch (e) {
+      debugPrint("⚠️ Grup listesi yenilenirken hata: $e");
+    }
     
     // Socket listener guard'ı reset et
     _isSocketListenerSetup = false;

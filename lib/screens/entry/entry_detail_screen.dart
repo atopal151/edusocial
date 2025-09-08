@@ -39,6 +39,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     // TopicsController'ı bul (eğer varsa)
     try {
       _topicsController = Get.find<TopicsController>();
+      debugPrint("🔄 EntryDetailScreen initState: TopicsController bulundu");
     } catch (e) {
       debugPrint("⚠️ TopicsController bulunamadı: $e");
     }
