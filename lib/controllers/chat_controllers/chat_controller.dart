@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:edusocial/models/chat_models/chat_user_model.dart';
+import '../profile_controller.dart';
 import 'package:edusocial/models/chat_models/last_message_model.dart';
 import 'package:edusocial/services/chat_service.dart';
 import 'package:edusocial/services/socket_services.dart';
@@ -245,6 +246,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       // Kalıcı kırmızı nokta durumlarını uygula
       _updateChatListUnreadStatus();
 
+
       debugPrint("✅ Chat listesi güncellendi. Toplam: ${chatList.length} sohbet");
     } catch (e) {
       debugPrint('❌ Chat listesi çekilirken hata: $e');
@@ -460,6 +462,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     
     totalUnreadCount.value = count;
     
+    // ProfileController'daki unread count'u da güncelle
+    updateProfileControllerUnreadCount(count);
+    
     // Kalıcı olarak kaydet
     await ChatServices.saveTotalUnreadCount(count);
     
@@ -494,6 +499,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     // Chat detail sayfasından döndüğünde socket'ten güncel unread count'u kontrol et
     debugPrint("🔄 Chat detail sayfasından dönüldü, socket'ten güncel unread count kontrol ediliyor...");
     await _checkAndUpdateUnreadCountAfterChat();
+    
+    // Profile API'sini de yeniden yükle
+    await _refreshProfileAfterMessageRead();
   }
 
   /// 📖 Chat'i okundu olarak işaretle (Local state'i güncelle)
@@ -544,6 +552,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             filteredChatList[filteredIndex].hasUnreadMessages = false;
           }
           
+          
           // Observable'ları tetikle
           chatList.refresh();
           filteredChatList.refresh();
@@ -551,8 +560,22 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       }
       
       debugPrint("📖 Chat okundu olarak işaretlendi: conversationId=$targetConversationId");
+      
+      // Profile API'sini yeniden yükle ki unread_messages_total_count güncellensin
+      _refreshProfileAfterMessageRead();
     } catch (e) {
       debugPrint("❌ markChatAsRead hatası: $e");
+    }
+  }
+
+  /// 📬 Mesaj okunduktan sonra Profile API'sini yeniden yükle
+  Future<void> _refreshProfileAfterMessageRead() async {
+    try {
+      final profileController = Get.find<ProfileController>();
+      await profileController.loadProfile();
+      debugPrint("✅ Profile API mesaj okunduktan sonra yeniden yüklendi");
+    } catch (e) {
+      debugPrint("❌ Profile API yeniden yüklenirken hata: $e");
     }
   }
 
@@ -566,6 +589,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     debugPrint("🔄 Grup chat sayfasından dönüldü, grup okunmuş olarak işaretleniyor...");
     await _markGroupAsRead(groupId);
     await _checkAndUpdateUnreadCountAfterChat();
+    
+    // Profile API'sini de yeniden yükle
+    await _refreshProfileAfterMessageRead();
   }
 
   /// 🔄 Tüm chat verilerini yenile
@@ -662,6 +688,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   /// 🔍 Arama filtresi - Hem people hem de groups için
   void filterChatList(String value) {
+    if (isClosed) return; // Controller dispose edilmişse işlemi durdur
+    
     if (value.isEmpty) {
       filteredChatList.assignAll(chatList);
       filteredGroupChatList.assignAll(groupChatList);
@@ -688,6 +716,18 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   int get privateUnreadCount {
     return totalUnreadCount.value;
   }
+  
+  /// 📬 ProfileController'daki unread count'u güncelle
+  void updateProfileControllerUnreadCount(int count) {
+    try {
+      final profileController = Get.find<ProfileController>();
+      profileController.unreadMessagesTotalCount.value = count;
+      debugPrint("📬 ProfileController unread count güncellendi: $count");
+    } catch (e) {
+      debugPrint("❌ ProfileController bulunamadı: $e");
+    }
+  }
+
 
   /// 📊 Grup mesajlarının toplam okunmamış sayısını hesapla
   int get groupUnreadCount {

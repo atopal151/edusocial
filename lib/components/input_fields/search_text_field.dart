@@ -24,7 +24,7 @@ class SearchTextField extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
-        onChanged: onChanged,
+        onChanged: controller != null ? onChanged : null,
         textInputAction: TextInputAction.search,
         enableSuggestions: true,
         autocorrect: false, // Search için autocorrect kapalı

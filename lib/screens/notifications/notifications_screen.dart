@@ -368,13 +368,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Widget buildNotificationTile(NotificationModel n) {
     // Her bildirim satırı için is_read değerini debug et
-    debugPrint('📱 === NOTIFICATION TILE DEBUG ===');
-    debugPrint('📱 Notification ID: ${n.id}');
-    debugPrint('📱 Notification Type: ${n.type}');
-    debugPrint('📱 isRead: ${n.isRead}');
-    debugPrint('📱 Message: ${n.message}');
-    debugPrint('📱 ==============================');
-    
     return ListTile(
       tileColor: n.isRead ? Colors.transparent : const Color(0xffEEF3F8),
       leading: Stack(

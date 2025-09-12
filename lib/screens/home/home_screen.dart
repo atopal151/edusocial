@@ -14,6 +14,7 @@ import '../../controllers/post_controller.dart';
 import 'story/my_story_list.dart';
 import 'post_home_list.dart';
 import '../../services/language_service.dart';
+//import '../../services/onesignal_service.dart';
 
 class HomeScreen extends StatelessWidget {
   final HomeController controller = Get.find();
@@ -48,25 +49,121 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xfffafafa),
       appBar: UserAppBar(),
-      floatingActionButton: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: [Color(0xFFEF5050), Color(0xFFFF7743)],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topRight,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Konfigürasyon test butonu
+          /*Container(
+            width: 50,
+            height: 50,
+            margin: EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topRight,
+              ),
+            ),
+            child: FloatingActionButton(
+              onPressed: () async {
+                try {
+                  final oneSignalService = Get.find<OneSignalService>();
+                  await oneSignalService.testOneSignalConfiguration();
+                  
+                  // Başarı mesajı göster
+                  Get.snackbar(
+                    'Konfigürasyon Testi',
+                    'OneSignal konfigürasyon testi başlatıldı. Console loglarını kontrol edin.',
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Color(0xFF4CAF50),
+                    colorText: Colors.white,
+                    duration: Duration(seconds: 4),
+                    icon: Icon(Icons.settings, color: Colors.white),
+                  );
+                } catch (e) {
+                  Get.snackbar(
+                    'Hata',
+                    'Konfigürasyon testi başlatılamadı: $e',
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                    duration: Duration(seconds: 3),
+                  );
+                }
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Icon(Icons.settings, color: Color(0xffffffff), size: 20),
+            ),
           ),
-        ),
-        child: FloatingActionButton(
-          onPressed: () {
-            Get.toNamed("/create_post");
-          },
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: Icon(Icons.add, color: Color(0xffffffff), size: 25),
-        ),
+          // Background test butonu
+          Container(
+            width: 50,
+            height: 50,
+            margin: EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFF2196F3), Color(0xFF21CBF3)],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topRight,
+              ),
+            ),
+            child: FloatingActionButton(
+              onPressed: () async {
+                try {
+                  final oneSignalService = Get.find<OneSignalService>();
+                  await oneSignalService.testBackgroundNotification();
+                  
+                  // Başarı mesajı göster
+                  Get.snackbar(
+                    'Test Başlatıldı',
+                    'Background notification testi başlatıldı. Uygulamayı kapatın ve bildirimi kontrol edin.',
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Color(0xFF2196F3),
+                    colorText: Colors.white,
+                    duration: Duration(seconds: 4),
+                    icon: Icon(Icons.notifications, color: Colors.white),
+                  );
+                } catch (e) {
+                  Get.snackbar(
+                    'Hata',
+                    'Test başlatılamadı: $e',
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                    duration: Duration(seconds: 3),
+                  );
+                }
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Icon(Icons.notifications_active, color: Color(0xffffffff), size: 20),
+            ),
+          ),*/
+          // Post ekleme butonu
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [Color(0xFFEF5050), Color(0xFFFF7743)],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topRight,
+              ),
+            ),
+            child: FloatingActionButton(
+              onPressed: () {
+                Get.toNamed("/create_post");
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Icon(Icons.add, color: Color(0xffffffff), size: 25),
+            ),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
   

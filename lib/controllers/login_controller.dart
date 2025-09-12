@@ -131,11 +131,22 @@ class LoginController extends GetxController {
           final onboardingController = Get.find<OnboardingController>();
           onboardingController.userEmail = emailController.text;
           onboardingController.loadSchoolList();
+          
+          // Controller'ları temizle
+          emailController.clear();
+          passwordController.clear();
+          
           Get.offAllNamed('/step1');
         } else {
           /// Zaten onboarding tamamlamış, ana ekrana
           // Tüm verileri yeniden yükle
           await _reloadAllData();
+          
+          // Controller'ları temizle
+          emailController.clear();
+          passwordController.clear();
+          
+          // Ana ekrana geç
           Get.offAllNamed('/main');
         }
       } else {

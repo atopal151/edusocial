@@ -53,6 +53,20 @@ class NotificationController extends GetxController {
   void _setupSocketListener() {
     _notificationSubscription = _socketService.onNotification.listen((data) {
       debugPrint('🔔 Yeni bildirim geldi (NotificationController): $data');
+      
+      // Sadece mobile channel'dan gelen bildirimleri işle
+      if (data is Map && data.containsKey('channel')) {
+        final channel = data['channel']?.toString();
+        debugPrint('📱 Channel: $channel');
+        
+        if (channel != 'mobile') {
+          debugPrint('🚫 Web channel bildirimi atlandı, sadece mobile dinleniyor');
+          return;
+        }
+        
+        debugPrint('✅ Mobile channel bildirimi işleniyor');
+      }
+      
       // API'den verileri yeniden çek
       isLoading.value = true;
       fetchNotifications();
@@ -60,6 +74,20 @@ class NotificationController extends GetxController {
     
     _commentNotificationSubscription = _socketService.onCommentNotification.listen((data) {
       debugPrint('💬 Yeni yorum bildirimi geldi (NotificationController): $data');
+      
+      // Sadece mobile channel'dan gelen bildirimleri işle
+      if (data is Map && data.containsKey('channel')) {
+        final channel = data['channel']?.toString();
+        debugPrint('📱 Channel: $channel');
+        
+        if (channel != 'mobile') {
+          debugPrint('🚫 Web channel bildirimi atlandı, sadece mobile dinleniyor');
+          return;
+        }
+        
+        debugPrint('✅ Mobile channel bildirimi işleniyor');
+      }
+      
       // API'den verileri yeniden çek
       isLoading.value = true;
       fetchNotifications();
@@ -68,6 +96,19 @@ class NotificationController extends GetxController {
     _userNotificationSubscription = _socketService.onUserNotification.listen((data) {
       printFullText('👤 Yeni user notification geldi (NotificationController): $data');
       printFullText('👤 Data type: ${data.runtimeType}');
+      
+      // Sadece mobile channel'dan gelen bildirimleri işle
+      if (data is Map && data.containsKey('channel')) {
+        final channel = data['channel']?.toString();
+        printFullText('📱 Channel: $channel');
+        
+        if (channel != 'mobile') {
+          printFullText('🚫 Web channel bildirimi atlandı, sadece mobile dinleniyor');
+          return;
+        }
+        
+        printFullText('✅ Mobile channel bildirimi işleniyor');
+      }
       
       if (data is Map) {
         printFullText('👤 === NOTIFICATION CONTROLLER DETAYLI ANALİZ ===');

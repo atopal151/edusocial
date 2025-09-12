@@ -2,33 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>Kamera erişimi gerekiyor</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Bu uygulama dosya seçmek için galeriye erişmek istiyor.</string>
-	<key>NSDocumentTypes</key>
-	<array>
- 	 	<string>public.content</string>
- 		 <string>public.data</string>
-	</array>
-	<key>NSAppTransportSecurity</key>
-		<dict>
-  			<key>NSAllowsArbitraryLoads</key>
-  			<true/>
-		</dict>
-
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Bu uygulama etkinlik konumu seçmek için konum bilgisine ihtiyaç duyar</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Bu uygulama etkinlik konumu seçmek için konum bilgisine ihtiyaç duyar</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Galeriye erişim gerekiyor</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Uygulama fotoğraf galerisine erişmek istiyor</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Uygulama kamera kullanım izni istiyor</string>	
 	<key>CFBundleDisplayName</key>
 	<string>Edusocial</string>
 	<key>CFBundleExecutable</key>
@@ -45,10 +22,49 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.edusocial.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>edusocial</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Uygulama kamera kullanım izni istiyor</string>
+	<key>NSDocumentTypes</key>
+	<array>
+		<string>public.content</string>
+		<string>public.data</string>
+	</array>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Bu uygulama etkinlik konumu seçmek için konum bilgisine ihtiyaç duyar</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Bu uygulama etkinlik konumu seçmek için konum bilgisine ihtiyaç duyar</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Uygulama fotoğraf galerisine erişmek istiyor</string>
+	<key>OneSignal_disable_badge_clearing</key>
+	<true/>
+	<key>OneSignal_location_shared</key>
+	<false/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -66,29 +82,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>edusocial</string>
-			</array>
-			<key>CFBundleURLName</key>
-			<string>com.edusocial.app</string>
-		</dict>
-	</array>
-	<!-- OneSignal için gerekli ayarlar -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
-	</array>
-	<key>OneSignal_disable_badge_clearing</key>
-	<true/>
-	<key>OneSignal_location_shared</key>
-	<false/>
 </dict>
 </plist>

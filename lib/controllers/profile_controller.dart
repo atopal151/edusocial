@@ -50,6 +50,9 @@ class ProfileController extends GetxController {
   // 📊 Filtrelenmiş sayılar
   var filteredFollowers = 0.obs;
   var filteredFollowing = 0.obs;
+  
+  // 📬 API'dan gelen okunmamış mesaj sayısı
+  var unreadMessagesTotalCount = 0.obs;
 
   // 📝 Kullanıcının entries'ları (PeopleProfileScreen'deki gibi)
   var personEntries = <EntryModel>[].obs;
@@ -179,6 +182,11 @@ String formatSimpleDate(String dateStr) {
       followerList.assignAll(profileData.followers);
       followingList.assignAll(profileData.followings);
       
+      // API'dan gelen okunmamış mesaj sayısını al
+      unreadMessagesTotalCount.value = profileData.unreadMessagesTotalCount;
+      debugPrint("📬 API'dan gelen okunmamış mesaj sayısı: ${unreadMessagesTotalCount.value}");
+      
+      
       // Filtrelenmiş sayıları hesapla
       calculateFilteredFollowers();
       calculateFilteredFollowing();
@@ -209,6 +217,7 @@ String formatSimpleDate(String dateStr) {
       rethrow;
     }
   }
+
 
   /// PeopleProfileService ile detaylı profil verilerini yükle
   Future<void> _loadDetailedProfileData(String username) async {

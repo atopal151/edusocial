@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../models/notification_model.dart';
 import '../utils/constants.dart';
+//import '../components/print_full_text.dart';
 
 class NotificationService {
   static final _box = GetStorage();
@@ -23,6 +24,9 @@ class NotificationService {
       );
 
       if (response.statusCode == 200) {
+        // API'dan gelen ham notification response datasını printfulltext ile yazdır
+        //printFullText('🔔 [NotificationService] Notifications API Response: ${response.body}');
+        
         final jsonBody = jsonDecode(response.body);
 
         final postNotifs = jsonBody['data']?['post_notifications'] ?? [];

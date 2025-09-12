@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../components/user_appbar/user_appbar.dart';
 import '../../../controllers/chat_controllers/chat_controller.dart';
 import '../../../controllers/group_controller/group_controller.dart';
+import '../../../controllers/profile_controller.dart';
 import '../../../services/language_service.dart';
 import '../../../components/widgets/verification_badge.dart';
 
@@ -49,6 +50,7 @@ class _ChatListScreenState extends State<ChatListScreen>
       });
     }
   }
+
 
   /// Chat verilerini yenile
   Future<void> _refreshChatData() async {
@@ -116,11 +118,15 @@ class _ChatListScreenState extends State<ChatListScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SearchTextField(
               label: languageService.tr("chat.chatList.searchPlaceholder"),
-              controller: chatController.searchController,
+              controller: chatController.isClosed ? null : chatController.searchController,
               onChanged: (value) {
                 // Hem people hem de groups için arama yap
-                chatController.filterChatList(value);
-                groupController.filterUserGroups(value);
+                if (!chatController.isClosed) {
+                  chatController.filterChatList(value);
+                }
+                if (!groupController.isClosed) {
+                  groupController.filterUserGroups(value);
+                }
               },
             ),
           ),
@@ -235,7 +241,8 @@ class _ChatListScreenState extends State<ChatListScreen>
                 tabs: [
                   // Kişisel Mesajlar Tab'ı (API'den gelen unread count ile)
                   Obx(() {
-                    final unreadCount = chatController.privateUnreadCount;
+                    final profileController = Get.find<ProfileController>();
+                    final unreadCount = profileController.unreadMessagesTotalCount.value;
                     final peopleText = languageService.tr("chat.chatList.tabs.people");
                     return Tab(
                       child: Row(

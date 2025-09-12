@@ -22,6 +22,9 @@ class ProfileService {
     );
 
     if (response.statusCode == 200) {
+      // API'dan gelen ham profil response datasını printfulltext ile yazdır
+      //printFullText('👤 [ProfileService] Profile API Response: ${response.body}');
+      
       // Gelen verinin tamamını JSON formatında yazdır
       try {
         final jsonBody = json.decode(response.body);

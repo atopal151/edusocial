@@ -21,6 +21,9 @@ class PeopleProfileService {
       ).timeout(const Duration(seconds: 10)); // 10 saniye timeout
 
       if (response.statusCode == 200) {
+        // API'dan gelen ham people profile response datasını printfulltext ile yazdır
+        //printFullText('👥 [PeopleProfileService] User Profile API Response: ${response.body}');
+        
         final body = jsonDecode(response.body);
         
 

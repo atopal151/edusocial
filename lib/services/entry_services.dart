@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:edusocial/components/print_full_text.dart';
 import 'package:edusocial/models/topic_with_entry_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +36,24 @@ class EntryServices {
       );
 
       if (response.statusCode == 200) {
+        // HAM JSON YANITINI LOG'LA
+        debugPrint("🔥 HAM API YANITI:");
+        debugPrint("🔥 Status Code: ${response.statusCode}");
+        debugPrint("🔥 Response Headers: ${response.headers}");
+        printFullText("🔥 Raw Response Body: ${response.body}");
+        
         final jsonBody = jsonDecode(response.body);
-
+        
+        // JSON PARSE EDİLMİŞ HALİNİ LOG'LA
+        debugPrint("🔥 JSON Parse Edilmiş Yanıt:");
+        printFullText("🔥 JSON Body: $jsonBody");
+        
         if (jsonBody != null && jsonBody["data"] != null) {
           final data = jsonBody["data"];
+          
+          debugPrint("🔥 Data Alanı:");
+          debugPrint("🔥 Data: $data");
+          debugPrint("🔥 Data Type: ${data.runtimeType}");
 
           if (data is Map<String, dynamic>) {
             final result = TopicEntryResponse.fromJson(data);

@@ -50,6 +50,7 @@ class CustomTextField extends StatelessWidget {
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
             ),
+            // TextField'ı her zaman aktif bırak, controller dispose kontrolü parent'ta yapılacak
           ),
         ),
       ],
