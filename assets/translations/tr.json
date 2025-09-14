@@ -227,7 +227,6 @@
       "joinRequestFailed": "Gruba katılım isteği gönderilemedi. Lütfen daha sonra tekrar deneyin."
     }
   },
-  
   "calendar": {
     "title": "Takvim",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \neiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -307,11 +306,11 @@
     }
   },
   "entryShare": {
-  "title": "Konu Başlığı",
-  "entryContent": "Entry",
-  "category": "Kategori",
-  "createTopicButton": "+ Konu Oluştur"
-},
+    "title": "Konu Başlığı",
+    "entryContent": "Entry",
+    "category": "Kategori",
+    "createTopicButton": "+ Konu Oluştur"
+  },
   "groupChatDetail": {
     "appBar": {
       "memberCount": "üye"
@@ -427,7 +426,22 @@
       "video": "Video",
       "audio": "Ses"
     },
-    
+    "poll": {
+      "title": "Anket sorusu yazın",
+      "option": "Seçenek ekleyin",
+      "addOption": "Seçenek Ekle",
+      "send": "Anket Gönder"
+    },
+    "survey": {
+      "title": "Anket başlığı yazın",
+      "addChoice": "Seçenek ekleyin",
+      "multipleChoice": "Çoklu seçim",
+      "send": "Anket Gönder"
+    },
+    "dateSeparator": {
+      "today": "Bugün",
+      "yesterday": "Dün"
+    },
     "groupChat": {
       "fileSelected": "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz...",
       "messagePlaceholder": "Bir mesaj yazınız..."
@@ -437,27 +451,10 @@
       "openError": "Belge açılırken hata oluştu",
       "clickToDownload": "Tıklayarak indir"
     },
-    
     "link": {
       "cannotOpen": "Link açılamadı. Lütfen tekrar deneyin.",
       "cannotOpenThis": "Bu link açılamıyor",
       "openError": "Link açılırken bir hata oluştu"
-    },
-    "poll": {
-      "title": "Anket sorusu yazın",
-      "option": "Seçenek ekleyin",
-      "addOption": "Seçenek Ekle",
-      "send": "Anket Gönder"
-    },
-                "survey": {
-              "title": "Anket başlığı yazın",
-              "addChoice": "Seçenek ekleyin",
-              "multipleChoice": "Çoklu seçim",
-              "send": "Anket Gönder"
-            },
-    "dateSeparator": {
-      "today": "Bugün",
-      "yesterday": "Dün"
     },
     "dialogs": {
       "clearMessages": {
@@ -485,8 +482,8 @@
       "entries": "entry"
     },
     "entryDetail": {
-      "categoryNotFound": "Kategori Yok",
-      "topicNotFound": "Konu Bilgisi Yok",
+      "noCategory": "Kategori Yok",
+      "noTopicInfo": "Konu Bilgisi Yok",
       "commentPlaceholder": "Bu konuya entry paylaşın",
       "sendComment": "Yorum gönder",
       "entryCount": "Entry Sayısı",
@@ -502,7 +499,6 @@
         "playStore": "Play Store"
       }
     },
-    
     "entryCard": {
       "share": "Paylaş",
       "upvote": "Beğen",
@@ -577,7 +573,7 @@
       "title": "Etkinlik Oluştur",
       "eventTitle": "Etkinlik Başlığı",
       "eventTitleHint": "Etkinlik başlığını girin",
-      "eventDescription": "Etkinlik Açıklaması", 
+      "eventDescription": "Etkinlik Açıklaması",
       "eventDescriptionHint": "Etkinliğinizi açıklayın",
       "eventBanner": "Etkinlik Kapak Fotoğrafı",
       "bannerHint": "Kapak fotoğrafı seçmek için tıklayın",
@@ -585,7 +581,7 @@
       "locationHint": "Etkinlik konumu veya Google Maps linki",
       "startDate": "Başlangıç Tarihi",
       "startTime": "Başlangıç Saati",
-      "endDate": "Bitiş Tarihi", 
+      "endDate": "Bitiş Tarihi",
       "endTime": "Bitiş Saati",
       "selectDateTime": "Seç",
       "createButton": "Etkinlik Oluştur",
@@ -610,7 +606,6 @@
         "updateFailed": "Etkinlik güncellenirken bir hata oluştu",
         "createFailed": "Etkinlik oluşturulamadı"
       },
-    
       "validation": {
         "titleRequired": "Etkinlik başlığı gerekli",
         "descriptionRequired": "Etkinlik açıklaması gerekli",
@@ -628,7 +623,6 @@
       "currentLocation": "Konumum",
       "confirmLocation": "Onayla"
     },
-  
     "eventCard": {
       "share": "Paylaş",
       "viewLocation": "Konumu Gör",
@@ -662,42 +656,6 @@
       "expired": "Bu Etkinlik Sona Erdi",
       "retry": "Tekrar Dene"
     },
-    "event": {
-      "reminder": {
-        "success": "Etkinlik hatırlatıcısı ayarlandı",
-        "error": "Hatırlatıcı ayarlanırken bir hata oluştu"
-      },
-      "invitation": {
-        "accepted": "Etkinlik daveti kabul edildi",
-        "declined": "Etkinlik daveti reddedildi",
-        "error": "Davet yanıtlanırken bir hata oluştu",
-        "alreadyResponded": "Bu etkinliğe zaten cevap verdiniz"
-      },
-      "share": {
-        "success": "Etkinlik başarıyla paylaşıldı"
-      },
-      "location": {
-        "viewing": "Konum bilgisi görüntüleniyor"
-      },
-      "notifications": {
-        "reminder": {
-          "success": "Etkinlik hatırlatıcısı ayarlandı",
-          "error": "Hatırlatıcı ayarlanırken bir hata oluştu"
-        },
-        "invitation": {
-          "accepted": "Etkinlik daveti kabul edildi",
-          "declined": "Etkinlik daveti reddedildi",
-          "error": "Davet yanıtlanırken bir hata oluştu",
-          "alreadyResponded": "Bu etkinliğe zaten cevap verdiniz"
-        },
-        "share": {
-          "success": "Etkinlik başarıyla paylaşıldı"
-        },
-        "location": {
-          "viewing": "Konum bilgisi görüntüleniyor"
-        }
-      }
-    },
     "loading": {
       "events": "Etkinlikler yükleniyor...",
       "eventDetails": "Etkinlik detayları yükleniyor...",
@@ -727,10 +685,42 @@
       "setNotification": "Bildirim Ayarla",
       "removeNotification": "Bildirimi Kaldır"
     },
+    "reminder": {
+      "success": "Etkinlik hatırlatıcısı başarıyla ayarlandı",
+      "error": "Hatırlatıcı ayarlanırken hata oluştu"
+    },
+    "invitation": {
+      "accepted": "Etkinlik daveti kabul edildi",
+      "declined": "Etkinlik daveti reddedildi",
+      "error": "Davete yanıt verilirken hata oluştu",
+      "alreadyResponded": "Bu etkinliğe zaten yanıt verdiniz"
+    },
+    "share": {
+      "success": "Etkinlik başarıyla paylaşıldı"
+    },
+    "location": {
+      "viewing": "Konum bilgisi görüntüleniyor"
+    },
     "notifications": {
+      "reminder": {
+        "success": "Etkinlik hatırlatıcısı başarıyla ayarlandı",
+        "error": "Hatırlatıcı ayarlanırken hata oluştu"
+      },
+      "invitation": {
+        "accepted": "Etkinlik daveti kabul edildi",
+        "declined": "Etkinlik daveti reddedildi",
+        "error": "Davetiyeye yanıt verilirken hata oluştu",
+        "alreadyResponded": "Bu etkinliğe zaten yanıt verdiniz"
+      },
+      "share": {
+        "success": "Etkinlik başarıyla paylaşıldı"
+      },
+      "location": {
+        "viewing": "Konum bilgisi görüntüleniyor"
+      },
       "shared": "Paylaşıldı",
-      "locationView": "Konum Gör",
-      "locationInfo": "için konum bilgisi görüntüleniyor."
+      "locationView": "Konumu Görüntüle",
+      "locationInfo": "konum bilgisi görüntüleniyor."
     }
   },
   "groups": {
@@ -774,13 +764,11 @@
         "links": "Bağlantılar",
         "photos": "Fotoğraflar"
       },
-
       "bottomSheet": {
         "leaveGroup": "Gruptan Ayrıl",
         "report": "Şikayet Et",
         "createEvent": "Etkinlik Oluştur"
       },
-     
       "emptyStates": {
         "documents": "Henüz belge eklenmemiş",
         "links": "Henüz bağlantı eklenmemiş",
@@ -865,6 +853,16 @@
         "unmutedDesc": "Bu gruptan bildirim alacaksınız"
       }
     },
+    "notifications": {
+      "error": "Hata",
+      "noGroupSelected": "Grup seçilmedi"
+    },
+    "suggestion": {
+      "joined": "Katıldınız",
+      "sendRequest": "İstek Gönder",
+      "joinGroup": "Gruba Katıl",
+      "requestSent": "İstek Gönderildi"
+    },
     "list": {
       "groupSelected": "Grup Seçildi",
       "redirectingToGroup": "grubuna yönlendiriliyor.",
@@ -879,16 +877,6 @@
       "unpinMessage": "Sabitlemeyi kaldır",
       "navigateToMessage": "Mesaja git",
       "emptyState": "Henüz sabitlenen mesaj yok"
-    },
-    "notifications": {
-      "error": "Hata",
-      "noGroupSelected": "Grup seçilmedi"
-    },
-    "suggestion": {
-      "joined": "Katıldınız",
-      "sendRequest": "İstek Gönder",
-      "joinGroup": "Gruba Katıl",
-      "requestSent": "İstek Gönderildi"
     }
   },
   "home": {
@@ -926,9 +914,6 @@
       },
       "myStoryList": {
         "you": "@Sen"
-      },
-      "viewer": {
-        "noImage": "Görsel yok"
       },
       "storyViewer": {
         "noImage": "Görsel yok",
@@ -1084,6 +1069,7 @@
     },
     "card": {
       "follow": "Takip Et",
+      "skip": "Atla",
       "next": "Geç",
       "online": "Çevrimiçi",
       "education": "Eğitim",
@@ -1105,6 +1091,12 @@
     "yesterday": "Dün",
     "lastWeek": "Son 7 Gün",
     "earlier": "Daha Önce",
+    "grouping": {
+      "today": "Bugün",
+      "yesterday": "Dün",
+      "lastWeek": "Son 7 Gün",
+      "older": "Daha Önce"
+    },
     "timeAgo": {
       "justNow": "az önce",
       "minutesAgo": "dakika önce",
@@ -1125,6 +1117,16 @@
       "eventInvitation": "Etkinlik Daveti",
       "systemNotification": "Sistem Bildirimi"
     },
+    "notificationTypes": {
+      "followRequest": "Takip İsteği",
+      "followJoinRequest": "Takip ve Katılma İsteği",
+      "postLike": "Post Beğenisi",
+      "postComment": "Post Yorumu",
+      "groupJoinRequest": "Grup Katılma İsteği",
+      "groupJoin": "Grup Katılımı",
+      "createGroupEvent": "Grup Etkinliği Oluştur",
+      "groupAccept": "Grup Kabulü"
+    },
     "messages": {
       "likedPost": "postunuzu beğendi",
       "commentedPost": "postunuza yorum yaptı",
@@ -1134,12 +1136,78 @@
       "group": "grup",
       "sentMessage": "size mesaj gönderdi",
       "sentGroupMessage": "grubunda mesaj gönderdi",
-      "invitedToEvent": "sizi bir etkinliğe davet etti"
+      "invitedToEvent": "sizi bir etkinliğe davet etti",
+      "followRequest": "sizi takip etmek istiyor",
+      "postLiked": "postunuzu beğendi",
+      "postCommented": "postunuza yorum yaptı",
+      "groupJoinRequest": "grubuna katılmak istiyor",
+      "groupJoined": "grubuna katıldı",
+      "eventCreated": "bir grup etkinliği oluşturdu",
+      "groupAccepted": "grup isteğiniz kabul edildi"
     },
     "actions": {
       "accept": "Onayla",
       "decline": "Reddet",
+      "accepted": "Kabul Edildi",
+      "rejected": "Reddedildi",
+      "follow": "Takip Et",
+      "unfollow": "Takibi Bırak",
+      "close": "Kapat",
       "sendMessage": "Mesaj Gönder"
+    },
+    "loading": {
+      "notifications": "Bildirimler yükleniyor...",
+      "refreshing": "Bildirimler yenileniyor...",
+      "refreshed": "Bildirimler başarıyla yenilendi",
+      "accepting": "Kabul ediliyor...",
+      "declining": "Reddediliyor...",
+      "following": "Takip ediliyor...",
+      "unfollowing": "Takip bırakılıyor..."
+    },
+    "errors": {
+      "notificationsLoadFailed": "Bildirimler yüklenemedi",
+      "followRequestFailed": "Takip isteği kabul edilemedi",
+      "groupJoinRequestFailed": "Grup katılma isteği işlenemedi",
+      "followFailed": "Takip işlemi başarısız",
+      "unfollowFailed": "Takibi bırakma işlemi başarısız",
+      "eventCreateRequestFailed": "Etkinlik oluşturma isteği kabul edilemedi",
+      "networkError": "Ağ bağlantısı hatası",
+      "serverError": "Sunucu hatası oluştu",
+      "generalError": "Bir hata oluştu"
+    },
+    "success": {
+      "notificationsRefreshed": "Bildirimler başarıyla yenilendi",
+      "followRequestAccepted": "Takip isteği kabul edildi",
+      "followRequestDeclined": "Takip isteği reddedildi",
+      "groupJoinRequestAccepted": "Grup katılma isteği kabul edildi",
+      "groupJoinRequestDeclined": "Grup katılma isteği reddedildi",
+      "userFollowed": "Kullanıcı takip edildi",
+      "userUnfollowed": "Kullanıcı takibi bırakıldı",
+      "eventCreateRequestAccepted": "Etkinlik oluşturma isteği kabul edildi",
+      "eventCreateRequestDeclined": "Etkinlik oluşturma isteği reddedildi"
+    },
+    "validation": {
+      "userIdRequired": "Kullanıcı ID'si gerekli",
+      "groupIdRequired": "Grup ID'si gerekli",
+      "eventIdRequired": "Etkinlik ID'si gerekli",
+      "decisionRequired": "Karar gerekli"
+    },
+    "debug": {
+      "buildingButton": "Bildirim için buton oluşturuluyor:",
+      "notificationType": "Tür:",
+      "isFollowing": "Takip Ediliyor mu:",
+      "isFollowingPending": "Takip Bekliyor mu:",
+      "isAccepted": "Kabul Edildi mi:",
+      "isRejected": "Reddedildi mi:",
+      "status": "Durum:",
+      "groupId": "Grup ID:",
+      "senderUserId": "Gönderen Kullanıcı ID:",
+      "message": "Mesaj:",
+      "groupJoinRequestButton": "Bildirim için grup katılma isteği butonu oluşturuluyor:",
+      "groupIdNull": "Grup ID null, buton gösterilmiyor",
+      "requestAccepted": "İstek zaten kabul edildi, 'Kabul Edildi' butonu gösteriliyor",
+      "requestRejected": "İstek reddedildi, 'Reddedildi' butonu gösteriliyor",
+      "requestPending": "İstek bekliyor, kabul/reddet butonları gösteriliyor"
     }
   },
   "slidingNotifications": {
@@ -1902,7 +1970,12 @@
       "year": "y"
     }
   },
-
+  "notification": {
+    "accepted": "Onaylandı",
+    "rejected": "Reddedildi",
+    "accept": "Onayla",
+    "decline": "Reddet"
+  },
   "entryDetail": {
     "noCategory": "Kategori Yok",
     "noTopicInfo": "Konu Bilgisi Yok",
@@ -1928,7 +2001,7 @@
       "driverLicense": "Sürücü Belgesi",
       "driverLicenseSubtitle": "AB Sürücü belgelerini kabul ediyoruz",
       "description": "Bilgilerinizi kontrol etmek için pasaport, kimlik kartı veya sürücü belgesi yükleyin",
-      "uploadArea": { 
+      "uploadArea": {
         "passport": "Pasaport Taraması",
         "id_card": "Kimlik Kartı Taraması",
         "driverLicense": "Sürücü Belgesi Taraması",
@@ -1952,17 +2025,17 @@
       "fileUploadError": "Dosya yükleme hatası",
       "fileRemoved": "Dosya başarıyla kaldırıldı"
     },
-            "validation": {
-          "documentTypeRequired": "Lütfen bir belge türü seçin",
-          "fileRequired": "Lütfen bir belge yükleyin",
-          "fileSizeLimit": "Dosya boyutu 10MB'dan küçük olmalıdır",
-          "fileTypeNotSupported": "Dosya türü desteklenmiyor. Lütfen JPG, PNG veya PDF yükleyin"
-        },
-        "snackbar": {
-          "success": "Başarılı",
-          "error": "Hata",
-          "warning": "Uyarı",
-          "info": "Bilgi"
-        }
+    "validation": {
+      "documentTypeRequired": "Lütfen bir belge türü seçin",
+      "fileRequired": "Lütfen bir belge yükleyin",
+      "fileSizeLimit": "Dosya boyutu 10MB'dan küçük olmalıdır",
+      "fileTypeNotSupported": "Dosya türü desteklenmiyor. Lütfen JPG, PNG veya PDF yükleyin"
+    },
+    "snackbar": {
+      "success": "Başarılı",
+      "error": "Hata",
+      "warning": "Uyarı",
+      "info": "Bilgi"
+    }
   }
-} 
+}

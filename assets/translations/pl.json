@@ -1,0 +1,2041 @@
+{
+  "signup": {
+    "title": "Poznaj ludzi o\npodobnych zainteresowaniach!",
+    "subtitle": "EduSocial to innowacyjna platforma społecznościowa zaprojektowana dla studentów uczących się w międzynarodowych szkołach w Polsce.",
+    "form": {
+      "title": "Zarejestruj się",
+      "name": "Imię",
+      "surname": "Nazwisko",
+      "username": "Nazwa użytkownika",
+      "email": "E-mail",
+      "password": "Hasło",
+      "confirmPassword": "Potwierdź hasło"
+    },
+    "privacyPolicy": "Przeczytałem, zrozumiałem i akceptuję politykę prywatności oraz warunki użytkowania.",
+    "registerButton": "Zarejestruj się",
+    "loginLink": {
+      "text": "Masz już konto?",
+      "link": "Zaloguj się."
+    },
+    "validation": {
+      "nameRequired": "Pole imienia jest wymagane",
+      "surnameRequired": "Pole nazwiska jest wymagane",
+      "usernameRequired": "Nazwa użytkownika jest wymagana",
+      "usernameMinLength": "Nazwa użytkownika musi mieć co najmniej 3 znaki",
+      "emailRequired": "Pole e-mail jest wymagane",
+      "emailInvalid": "Wprowadź prawidłowy adres e-mail",
+      "passwordRequired": "Pole hasła jest wymagane",
+      "passwordMinLength": "Hasło musi mieć co najmniej 6 znaków",
+      "confirmPasswordRequired": "Pole potwierdzenia hasła jest wymagane",
+      "passwordsNotMatch": "Hasła nie pasują do siebie",
+      "privacyPolicyRequired": "Musisz zaakceptować politykę prywatności"
+    },
+    "errors": {
+      "signupFailed": "Rejestracja nie powiodła się",
+      "networkError": "Błąd połączenia sieciowego",
+      "usernameExists": "Ta nazwa użytkownika jest już zajęta",
+      "emailExists": "Ten adres e-mail jest już używany",
+      "serverError": "Wystąpił błąd serwera"
+    },
+    "success": {
+      "signupSuccess": "Rejestracja zakończona sukcesem!",
+      "welcomeMessage": "Witamy w EduSocial!"
+    }
+  },
+  "login": {
+    "title": "Poznaj ludzi o\npodobnych zainteresowaniach!",
+    "subtitle": "EduSocial to innowacyjna platforma społecznościowa zaprojektowana dla studentów uczących się w międzynarodowych szkołach w Polsce.",
+    "form": {
+      "title": "Zaloguj się",
+      "usernameOrEmail": "Nazwa użytkownika lub e-mail",
+      "password": "Hasło"
+    },
+    "forgotPassword": "Zapomniałeś hasła?",
+    "loginButton": "Zaloguj się",
+    "signupLink": {
+      "text": "Nie masz konta?",
+      "link": "Zarejestruj się."
+    },
+    "validation": {
+      "usernameOrEmailRequired": "Nazwa użytkownika lub e-mail jest wymagana",
+      "passwordRequired": "Hasło jest wymagane",
+      "invalidCredentials": "Nieprawidłowa nazwa użytkownika/e-mail lub hasło",
+      "allFieldsRequired": "Proszę wypełnić wszystkie pola.",
+      "validEmailRequired": "Wprowadź prawidłowy adres e-mail."
+    },
+    "errors": {
+      "loginFailed": "Logowanie nie powiodło się",
+      "networkError": "Błąd połączenia sieciowego",
+      "invalidCredentials": "Nieprawidłowa nazwa użytkownika/e-mail lub hasło",
+      "accountLocked": "Twoje konto zostało zablokowane",
+      "serverError": "Wystąpił błąd serwera"
+    },
+    "success": {
+      "loginSuccess": "Logowanie zakończone sukcesem!",
+      "welcomeBack": "Witamy z powrotem!"
+    }
+  },
+  "forgotPassword": {
+    "title": "Zapomniałeś hasła?",
+    "subtitle": "Wprowadź swój adres e-mail, a wyślemy Ci link do resetowania hasła.",
+    "form": {
+      "title": "Resetowanie hasła",
+      "email": "Adres e-mail",
+      "sendButton": "Wyślij link resetujący"
+    },
+    "validation": {
+      "emailRequired": "Adres e-mail jest wymagany",
+      "validEmailRequired": "Wprowadź prawidłowy adres e-mail"
+    },
+    "success": {
+      "title": "E-mail wysłany!",
+      "message": "Wysłaliśmy link do resetowania hasła na Twój adres e-mail."
+    },
+    "errors": {
+      "sendFailed": "Nie udało się wysłać e-maila resetującego",
+      "networkError": "Błąd połączenia sieciowego"
+    },
+    "backToLogin": "Powrót do logowania"
+  },
+  "resetPassword": {
+    "title": "Resetowanie hasła",
+    "subtitle": "Wprowadź swoje nowe hasło poniżej.",
+    "form": {
+      "title": "Nowe hasło",
+      "newPassword": "Nowe hasło",
+      "confirmPassword": "Potwierdź hasło",
+      "resetButton": "Resetuj hasło"
+    },
+    "validation": {
+      "newPasswordRequired": "Nowe hasło jest wymagane",
+      "confirmPasswordRequired": "Potwierdzenie hasła jest wymagane",
+      "passwordMinLength": "Hasło musi mieć co najmniej 6 znaków",
+      "passwordsDoNotMatch": "Hasła nie pasują do siebie"
+    },
+    "success": {
+      "title": "Hasło zresetowane!",
+      "message": "Twoje hasło zostało pomyślnie zresetowane."
+    },
+    "errors": {
+      "resetFailed": "Resetowanie hasła nie powiodło się",
+      "networkError": "Błąd połączenia sieciowego",
+      "invalidRequest": "Nieprawidłowe żądanie resetowania"
+    }
+  },
+  "step1": {
+    "header": {
+      "title": "Uzupełnij informacje o szkole",
+      "subtitle": "Dodaj swoją szkołę, wydział i klasę, aby spersonalizować platformę dla siebie!"
+    },
+    "form": {
+      "school": "Szkoła",
+      "department": "Wydział"
+    },
+    "warning": "Jeśli nie wypełnisz poprawnie swojego członkostwa, Twoje konto może zostać trwale zamknięte.",
+    "continueButton": "Kontynuuj",
+    "loading": {
+      "schools": "Ładowanie szkół...",
+      "departments": "Ładowanie wydziałów..."
+    },
+    "validation": {
+      "schoolRequired": "Wybór szkoły jest wymagany",
+      "departmentRequired": "Wybór wydziału jest wymagany"
+    },
+    "errors": {
+      "schoolsLoadFailed": "Nie udało się załadować szkół",
+      "departmentsLoadFailed": "Nie udało się załadować wydziałów",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "schoolUpdateFailed": "Nie udało się zapisać informacji o szkole i wydziale"
+    },
+    "snackbars": {
+      "missingInfo": "Brakujące informacje",
+      "schoolSelectionRequired": "Proszę uzupełnić wybór szkoły i wydziału."
+    }
+  },
+  "step2": {
+    "header": {
+      "title": "Uzupełnij swoje informacje",
+      "subtitle": "Dodaj swoją szkołę, wydział i klasę, aby spersonalizować platformę dla siebie!"
+    },
+    "form": {
+      "courseQuestion": "Jakie przedmioty studiujesz?",
+      "courseInput": "Wprowadź nazwę przedmiotu",
+      "savedCourses": "Zapisane przedmioty",
+      "addButton": "Dodaj"
+    },
+    "warning": "Jeśli nie wypełnisz poprawnie swojego członkostwa, Twoje konto może zostać trwale zamknięte.",
+    "continueButton": "Kontynuuj",
+    "validation": {
+      "courseRequired": "Musisz dodać co najmniej jeden przedmiot",
+      "courseMinLength": "Nazwa przedmiotu musi mieć co najmniej 2 znaki",
+      "courseMaxLength": "Nazwa przedmiotu może mieć maksymalnie 50 znaków",
+      "courseAlreadyExists": "Ten przedmiot został już dodany"
+    },
+    "errors": {
+      "courseAddFailed": "Nie udało się dodać przedmiotu",
+      "courseRemoveFailed": "Nie udało się usunąć przedmiotu",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera"
+    },
+    "success": {
+      "courseAdded": "Przedmiot został pomyślnie dodany",
+      "courseRemoved": "Przedmiot został pomyślnie usunięty"
+    }
+  },
+  "step3": {
+    "header": {
+      "title": "Uzupełnij swoje informacje",
+      "subtitle": "Dodaj swoją szkołę, wydział i klasę, aby spersonalizować platformę dla siebie!"
+    },
+    "groupsSection": {
+      "title": "Grupy, do których chciałbyś dołączyć"
+    },
+    "groupActions": {
+      "joined": "Dołączyłeś",
+      "pending": "Oczekuje na dołączenie",
+      "joinRequest": "Wyślij prośbę o dołączenie",
+      "join": "Dołącz do grupy"
+    },
+    "completeButton": "Uzupełnij konto",
+    "loading": {
+      "groups": "Ładowanie grup...",
+      "joining": "Dołączanie do grupy...",
+      "completing": "Uzupełnianie konta..."
+    },
+    "validation": {
+      "groupsRequired": "Musisz wybrać co najmniej jedną grupę"
+    },
+    "errors": {
+      "groupsLoadFailed": "Nie udało się załadować grup",
+      "joinGroupFailed": "Nie udało się dołączyć do grupy",
+      "completeOnboardingFailed": "Uzupełnianie konta nie powiodło się",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "groupAlreadyJoined": "Jesteś już członkiem tej grupy",
+      "groupRequestPending": "Masz już oczekującą prośbę o dołączenie do tej grupy",
+      "invalidGroupId": "Nieprawidłowy identyfikator grupy"
+    },
+    "success": {
+      "title": "Sukces",
+      "groupJoined": "Pomyślnie dołączyłeś do grupy",
+      "joinRequestSent": "Twoja prośba o dołączenie została wysłana",
+      "onboardingCompleted": "Twoje konto zostało pomyślnie uzupełnione!",
+      "welcomeMessage": "Witamy w EduSocial!"
+    },
+    "snackbars": {
+      "joinRequestFailed": "Nie udało się wysłać prośby o dołączenie. Spróbuj ponownie później."
+    }
+  },
+  "calendar": {
+    "title": "Kalendarz",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \neiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "dateSelector": {
+      "previousDay": "Poprzedni dzień",
+      "nextDay": "Następny dzień",
+      "selectDate": "Wybierz datę"
+    },
+    "addReminder": "Dodaj przypomnienie",
+    "reminderCard": {
+      "edit": "Edytuj",
+      "delete": "Usuń"
+    },
+    "reminderForm": {
+      "createTitle": "Utwórz przypomnienie",
+      "editTitle": "Edytuj przypomnienie",
+      "titleLabel": "Tytuł",
+      "titleHint": "Tytuł przypomnienia",
+      "dateLabel": "Data",
+      "timeLabel": "Czas",
+      "colorLabel": "Kolor",
+      "selectDate": "Wybierz datę",
+      "selectTime": "Wybierz czas",
+      "selectColor": "Wybierz kolor",
+      "sendNotification": "Wyślij powiadomienie",
+      "save": "Zapisz",
+      "update": "Zaktualizuj",
+      "ok": "OK"
+    },
+    "loading": {
+      "reminders": "Ładowanie przypomnień...",
+      "saving": "Zapisywanie...",
+      "deleting": "Usuwanie..."
+    },
+    "validation": {
+      "titleRequired": "Tytuł jest wymagany",
+      "dateTimeRequired": "Data i czas są wymagane",
+      "colorRequired": "Wybór koloru jest wymagany"
+    },
+    "colors": {
+      "green": "Zielony",
+      "blue": "Niebieski",
+      "orange": "Pomarańczowy",
+      "red": "Czerwony"
+    },
+    "errors": {
+      "remindersLoadFailed": "Nie udało się załadować przypomnień",
+      "reminderSaveFailed": "Nie udało się zapisać przypomnienia",
+      "reminderDeleteFailed": "Nie udało się usunąć przypomnienia",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "operationFailed": "Operacja nie powiodła się"
+    },
+    "success": {
+      "reminderSaved": "Przypomnienie zostało pomyślnie zapisane",
+      "reminderDeleted": "Przypomnienie zostało pomyślnie usunięte",
+      "reminderUpdated": "Przypomnienie zostało pomyślnie zaktualizowane",
+      "reminderAdded": "Przypomnienie zostało dodane"
+    },
+    "emptyState": {
+      "title": "Nie masz jeszcze żadnych przypomnień",
+      "subtitle": "Zacznij od dodania nowego przypomnienia"
+    },
+    "reminderDetail": {
+      "title": "Szczegóły przypomnienia",
+      "titleLabel": "📝 Tytuł:",
+      "timeLabel": "⏰ Czas:",
+      "colorLabel": "🎨 Kolor:",
+      "notificationLabel": "🔔 Powiadomienie:",
+      "notificationOn": "Włączone",
+      "notificationOff": "Wyłączone",
+      "close": "Zamknij",
+      "error": {
+        "title": "Błąd",
+        "message": "Nie udało się pobrać przypomnienia."
+      }
+    }
+  },
+  "entryShare": {
+    "title": "Tytuł tematu",
+    "entryContent": "Wpis",
+    "category": "Kategoria",
+    "createTopicButton": "+ Utwórz temat"
+  },
+  "groupChatDetail": {
+    "appBar": {
+      "memberCount": "członek"
+    },
+    "emptyState": {
+      "title": "Brak wiadomości",
+      "subtitle": "Wyślij pierwszą wiadomość!"
+    },
+    "loading": {
+      "messages": "Ładowanie wiadomości...",
+      "groupData": "Ładowanie informacji o grupie...",
+      "sending": "Wysyłanie..."
+    },
+    "errors": {
+      "groupLoadFailed": "Nie udało się załadować informacji o grupie",
+      "messagesLoadFailed": "Nie udało się załadować wiadomości",
+      "messageSendFailed": "Nie udało się wysłać wiadomości",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "groupDataLoadFailed": "Nie udało się załadować danych grupy",
+      "pleaseRetry": "Spróbuj ponownie"
+    },
+    "success": {
+      "messageSent": "Wiadomość została pomyślnie wysłana"
+    },
+    "actions": {
+      "more": "Więcej",
+      "groupDetails": "Szczegóły grupy"
+    }
+  },
+  "chat": {
+    "chatList": {
+      "searchPlaceholder": "Szukaj osób",
+      "onlineFriends": "Znajomi online",
+      "tabs": {
+        "people": "Osoby",
+        "groups": "Grupy"
+      },
+      "refreshSuccess": "Wiadomości prywatne zostały pomyślnie odświeżone"
+    },
+    "chatDetail": {
+      "onlineStatus": {
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "error": {
+        "title": "Błąd",
+        "userInfoNotLoaded": "Informacje o użytkowniku nie zostały jeszcze załadowane!"
+      }
+    },
+    "userChatDetail": {
+      "error": {
+        "title": "Błąd",
+        "userInfoNotFound": "Nie znaleziono informacji o użytkowniku!",
+        "userInfoLoadFailed": "Nie udało się załadować informacji o użytkowniku"
+      },
+      "tabs": {
+        "documents": "Dokumenty",
+        "links": "Linki",
+        "photos": "Zdjęcia"
+      },
+      "documentInfo": "MB •"
+    },
+    "messageInput": {
+      "placeholder": "Napisz wiadomość...",
+      "fileSelected": "Plik wybrany. Możesz napisać wiadomość lub wysłać bezpośrednio...",
+      "fileSize": "KB",
+      "removeFile": "Usuń plik"
+    },
+    "chatDetailBottom": {
+      "placeholder": "Napisz wiadomość... (Linki są automatycznie wykrywane)",
+      "send": "Wyślij"
+    },
+    "loading": {
+      "messages": "Ładowanie wiadomości...",
+      "sending": "Wysyłanie...",
+      "loadingUserInfo": "Ładowanie informacji o użytkowniku...",
+      "loadingOldMessages": "Ładowanie..."
+    },
+    "errors": {
+      "messageSendFailed": "Nie udało się wysłać wiadomości",
+      "fileUploadFailed": "Nie udało się przesłać pliku",
+      "imageUploadFailed": "Nie udało się przesłać obrazu",
+      "documentUploadFailed": "Nie udało się przesłać dokumentu",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera"
+    },
+    "success": {
+      "messageSent": "Wiadomość została pomyślnie wysłana",
+      "fileUploaded": "Plik został pomyślnie przesłany",
+      "imageUploaded": "Obraz został pomyślnie przesłany",
+      "documentUploaded": "Dokument został pomyślnie przesłany"
+    },
+    "actions": {
+      "more": "Więcej",
+      "userDetails": "Szczegóły użytkownika",
+      "sendMessage": "Wyślij wiadomość",
+      "attachFile": "Załącz plik",
+      "attachImage": "Załącz obraz",
+      "createPoll": "Utwórz ankietę",
+      "userInfo": "Informacje o użytkowniku",
+      "clearMessages": "Wyczyść wiadomości",
+      "muteChat": {
+        "muted": "Czat wyciszony",
+        "unmuted": "Powiadomienia czatu włączone",
+        "mutedDesc": "Nie będziesz otrzymywać powiadomień z tego czatu",
+        "unmutedDesc": "Będziesz otrzymywać powiadomienia z tego czatu"
+      }
+    },
+    "fileTypes": {
+      "document": "Dokument",
+      "image": "Obraz",
+      "video": "Wideo",
+      "audio": "Audio"
+    },
+    "poll": {
+      "title": "Napisz pytanie ankiety",
+      "option": "Dodaj opcję",
+      "addOption": "Dodaj opcję",
+      "send": "Wyślij ankietę"
+    },
+    "survey": {
+      "title": "Napisz tytuł ankiety",
+      "addChoice": "Dodaj opcję",
+      "multipleChoice": "Wielokrotny wybór",
+      "send": "Wyślij ankietę"
+    },
+    "dateSeparator": {
+      "today": "Dzisiaj",
+      "yesterday": "Wczoraj"
+    },
+    "groupChat": {
+      "fileSelected": "Plik wybrany. Możesz napisać wiadomość lub wysłać bezpośrednio...",
+      "messagePlaceholder": "Napisz wiadomość..."
+    },
+    "document": {
+      "cannotOpen": "Dokument nie może być otwarty",
+      "openError": "Wystąpił błąd podczas otwierania dokumentu",
+      "clickToDownload": "Kliknij, aby pobrać"
+    },
+    "link": {
+      "cannotOpen": "Link nie może być otwarty. Spróbuj ponownie.",
+      "cannotOpenThis": "Ten link nie może być otwarty",
+      "openError": "Wystąpił błąd podczas otwierania linku"
+    },
+    "dialogs": {
+      "clearMessages": {
+        "title": "Wyczyść wiadomości",
+        "message": "Czy na pewno chcesz wyczyścić wszystkie wiadomości w tym czacie? Ta akcja nie może być cofnięta.",
+        "confirm": "Wyczyść"
+      },
+      "report": {
+        "title": "Zgłoś użytkownika",
+        "message": "Czy na pewno chcesz zgłosić tego użytkownika? Zostanie to sprawdzone przez nasz zespół.",
+        "confirm": "Zgłoś"
+      }
+    }
+  },
+  "entry": {
+    "entryScreen": {
+      "searchPlaceholder": "Szukaj wpisów",
+      "newTopicButton": "+ Utwórz nowy temat",
+      "noEntriesFound": "Nie znaleziono wpisów do wyświetlenia.",
+      "refreshSuccess": "Dane wpisów zostały pomyślnie odświeżone",
+      "refreshLoading": "Odświeżanie danych wpisów...",
+      "allCategories": "Wszystkie kategorie",
+      "categories": "kategoria",
+      "all": "Wszystkie",
+      "entries": "wpis"
+    },
+    "entryDetail": {
+      "noCategory": "Brak kategorii",
+      "noTopicInfo": "Brak informacji o temacie",
+      "commentPlaceholder": "Podziel się wpisem na ten temat",
+      "sendComment": "Wyślij komentarz",
+      "entryCount": "Liczba wpisów",
+      "shareText": {
+        "topicTitle": "Tytuł tematu",
+        "category": "Kategoria",
+        "author": "Autor",
+        "entryContent": "Treść wpisu",
+        "aboutTopic": "O temacie",
+        "downloadApp": "Pobierz aplikację EduSocial:",
+        "openApp": "Otwórz aplikację",
+        "appStore": "App Store",
+        "playStore": "Play Store"
+      }
+    },
+    "entryCard": {
+      "share": "Udostępnij",
+      "upvote": "Lubię",
+      "downvote": "Nie lubię",
+      "reply": "Odpowiedz",
+      "report": "Zgłoś",
+      "delete": "Usuń",
+      "edit": "Edytuj"
+    },
+    "entryCommentCard": {
+      "reply": "Odpowiedz",
+      "share": "Udostępnij",
+      "report": "Zgłoś",
+      "delete": "Usuń",
+      "edit": "Edytuj"
+    },
+    "loading": {
+      "entries": "Ładowanie wpisów...",
+      "comments": "Ładowanie komentarzy...",
+      "sending": "Wysyłanie...",
+      "creating": "Tworzenie..."
+    },
+    "errors": {
+      "entriesLoadFailed": "Nie udało się załadować wpisów",
+      "commentsLoadFailed": "Nie udało się załadować komentarzy",
+      "entrySendFailed": "Nie udało się wysłać wpisu",
+      "topicCreateFailed": "Nie udało się utworzyć tematu",
+      "voteFailed": "Głosowanie nie powiodło się",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "entryNotFound": "Nie znaleziono wpisu dla tego tematu",
+      "generalError": "Wystąpił błąd"
+    },
+    "success": {
+      "entrySent": "Wpis został pomyślnie wysłany",
+      "topicCreated": "Temat został pomyślnie utworzony",
+      "voteRecorded": "Głos został zapisany",
+      "commentSent": "Komentarz został pomyślnie wysłany"
+    },
+    "validation": {
+      "titleRequired": "Tytuł tematu jest wymagany",
+      "contentRequired": "Treść wpisu jest wymagana",
+      "categoryRequired": "Wybór kategorii jest wymagany",
+      "titleMinLength": "Tytuł tematu musi mieć co najmniej 3 znaki",
+      "contentMinLength": "Treść wpisu musi mieć co najmniej 10 znaków",
+      "titleMaxLength": "Tytuł tematu może mieć maksymalnie 100 znaków",
+      "contentMaxLength": "Treść wpisu może mieć maksymalnie 1000 znaków"
+    },
+    "actions": {
+      "share": "Udostępnij",
+      "like": "Lubię",
+      "dislike": "Nie lubię",
+      "reply": "Odpowiedz",
+      "report": "Zgłoś",
+      "delete": "Usuń",
+      "edit": "Edytuj",
+      "createTopic": "Utwórz temat",
+      "sendEntry": "Wyślij wpis"
+    }
+  },
+  "event": {
+    "eventScreen": {
+      "title": "Wydarzenia",
+      "loading": "Ładowanie wydarzeń...",
+      "noEvents": "Nie znaleziono wydarzeń do wyświetlenia.",
+      "emptyState": {
+        "title": "Brak wydarzeń",
+        "subtitle": "Nowe wydarzenia zostaną wkrótce dodane"
+      }
+    },
+    "createEvent": {
+      "title": "Utwórz wydarzenie",
+      "eventTitle": "Tytuł wydarzenia",
+      "eventTitleHint": "Wprowadź tytuł wydarzenia",
+      "eventDescription": "Opis wydarzenia",
+      "eventDescriptionHint": "Opisz swoje wydarzenie",
+      "eventBanner": "Zdjęcie okładki wydarzenia",
+      "bannerHint": "Kliknij, aby wybrać zdjęcie okładki",
+      "location": "Lokalizacja",
+      "locationHint": "Lokalizacja wydarzenia lub link Google Maps",
+      "startDate": "Data rozpoczęcia",
+      "startTime": "Godzina rozpoczęcia",
+      "endDate": "Data zakończenia",
+      "endTime": "Godzina zakończenia",
+      "selectDateTime": "Wybierz",
+      "createButton": "Utwórz wydarzenie",
+      "success": {
+        "created": "Wydarzenie zostało pomyślnie utworzone!"
+      },
+      "validation": {
+        "titleRequired": "Tytuł wydarzenia jest wymagany",
+        "descriptionRequired": "Opis wydarzenia jest wymagany",
+        "startDateRequired": "Data rozpoczęcia jest wymagana",
+        "endDateRequired": "Data zakończenia jest wymagana",
+        "endBeforeStart": "Data zakończenia musi być po dacie rozpoczęcia"
+      }
+    },
+    "editEvent": {
+      "title": "Edytuj wydarzenie",
+      "updateButton": "Zaktualizuj wydarzenie",
+      "success": {
+        "updated": "Wydarzenie zostało pomyślnie zaktualizowane!"
+      },
+      "error": {
+        "updateFailed": "Wystąpił błąd podczas aktualizacji wydarzenia",
+        "createFailed": "Nie udało się utworzyć wydarzenia"
+      },
+      "validation": {
+        "titleRequired": "Tytuł wydarzenia jest wymagany",
+        "descriptionRequired": "Opis wydarzenia jest wymagany",
+        "locationRequired": "Lokalizacja wydarzenia jest wymagana",
+        "startDateTimeRequired": "Data i godzina rozpoczęcia są wymagane",
+        "endDateTimeRequired": "Data i godzina zakończenia są wymagane",
+        "endTimeAfterStart": "Godzina zakończenia musi być po godzinie rozpoczęcia",
+        "groupRequired": "Wybór grupy jest wymagany"
+      }
+    },
+    "locationPicker": {
+      "title": "Wybierz lokalizację",
+      "selectedLocation": "Wybrana lokalizacja",
+      "tapToSelect": "Dotknij mapę, aby wybrać lokalizację",
+      "currentLocation": "Moja lokalizacja",
+      "confirmLocation": "Potwierdź"
+    },
+    "eventCard": {
+      "share": "Udostępnij",
+      "viewLocation": "Zobacz lokalizację",
+      "notification": "Powiadomienie",
+      "notificationSet": "Powiadomienie o wydarzeniu zostało ustawione.",
+      "expired": "Wydarzenie wygasło",
+      "more": "Więcej",
+      "shareText": {
+        "downloadApp": "Pobierz aplikację EduSocial:",
+        "openApp": "Otwórz aplikację",
+        "appStore": "App Store",
+        "playStore": "Play Store"
+      }
+    },
+    "eventDetail": {
+      "title": "Szczegóły wydarzenia",
+      "notFound": "Wydarzenie nie zostało znalezione",
+      "date": "Data",
+      "time": "Czas",
+      "location": "Lokalizacja",
+      "description": "Opis",
+      "organizer": "Organizator",
+      "participants": "Uczestnicy",
+      "join": "Dołącz",
+      "leave": "Opuść",
+      "share": "Udostępnij",
+      "report": "Zgłoś",
+      "until": "Do",
+      "setReminder": "Przypomnienie",
+      "joinEvent": "Dołącz",
+      "expired": "To wydarzenie się zakończyło",
+      "retry": "Spróbuj ponownie"
+    },
+    "loading": {
+      "events": "Ładowanie wydarzeń...",
+      "eventDetails": "Ładowanie szczegółów wydarzenia...",
+      "joining": "Dołączanie...",
+      "leaving": "Opuszczanie..."
+    },
+    "errors": {
+      "eventsLoadFailed": "Nie udało się załadować wydarzeń",
+      "eventDetailLoadFailed": "Nie udało się załadować szczegółów wydarzenia",
+      "joinFailed": "Nie udało się dołączyć do wydarzenia",
+      "leaveFailed": "Nie udało się opuścić wydarzenia",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera"
+    },
+    "success": {
+      "eventShared": "Wydarzenie zostało pomyślnie udostępnione",
+      "joinedEvent": "Pomyślnie dołączyłeś do wydarzenia",
+      "leftEvent": "Pomyślnie opuściłeś wydarzenie",
+      "notificationSet": "Powiadomienie o wydarzeniu zostało ustawione"
+    },
+    "actions": {
+      "share": "Udostępnij",
+      "viewLocation": "Zobacz lokalizację",
+      "join": "Dołącz",
+      "leave": "Opuść",
+      "report": "Zgłoś",
+      "setNotification": "Ustaw powiadomienie",
+      "removeNotification": "Usuń powiadomienie"
+    },
+    "reminder": {
+      "success": "Przypomnienie o wydarzeniu zostało pomyślnie ustawione",
+      "error": "Wystąpił błąd podczas ustawiania przypomnienia"
+    },
+    "invitation": {
+      "accepted": "Zaproszenie na wydarzenie zostało zaakceptowane",
+      "declined": "Zaproszenie na wydarzenie zostało odrzucone",
+      "error": "Wystąpił błąd podczas odpowiadania na zaproszenie",
+      "alreadyResponded": "Już odpowiedziałeś na to wydarzenie"
+    },
+    "share": {
+      "success": "Wydarzenie zostało pomyślnie udostępnione"
+    },
+    "location": {
+      "viewing": "Przeglądanie informacji o lokalizacji"
+    },
+    "notifications": {
+      "reminder": {
+        "success": "Przypomnienie o wydarzeniu zostało pomyślnie ustawione",
+        "error": "Wystąpił błąd podczas ustawiania przypomnienia"
+      },
+      "invitation": {
+        "accepted": "Zaproszenie na wydarzenie zostało zaakceptowane",
+        "declined": "Zaproszenie na wydarzenie zostało odrzucone",
+        "error": "Wystąpił błąd podczas odpowiadania na zaproszenie",
+        "alreadyResponded": "Już odpowiedziałeś na to wydarzenie"
+      },
+      "share": {
+        "success": "Wydarzenie zostało pomyślnie udostępnione"
+      },
+      "location": {
+        "viewing": "Przeglądanie informacji o lokalizacji"
+      },
+      "shared": "Udostępnione",
+      "locationView": "Zobacz lokalizację",
+      "locationInfo": "przeglądanie informacji o lokalizacji."
+    }
+  },
+  "groups": {
+    "groupList": {
+      "createGroupButton": "Utwórz nową grupę",
+      "myGroups": "Twoje grupy",
+      "allGroups": "Wszystkie grupy",
+      "joined": "Dołączyłeś",
+      "pending": "Oczekuje na zatwierdzenie",
+      "join": "Dołącz",
+      "loading": "Ładowanie grup...",
+      "groupSelected": "Grupa wybrana",
+      "redirectingToGroup": "przekierowanie do grupy.",
+      "notMember": "Nie jesteś członkiem tej grupy",
+      "noGroups": "Nie dołączyłeś jeszcze do żadnej grupy",
+      "joinGroupsBelow": "Dołącz do grup z poniższej listy"
+    },
+    "createGroup": {
+      "title": "Utwórz nową grupę",
+      "groupPhoto": "Zdjęcie grupy",
+      "groupName": "Nazwa grupy",
+      "groupDescription": "Opis grupy",
+      "groupArea": "Obszar grupy",
+      "privacySetting": "Wymagaj prośby o dołączenie do grupy.",
+      "cancel": "Anuluj",
+      "createGroup": "Utwórz grupę",
+      "loading": {
+        "creating": "Tworzenie grupy...",
+        "areas": "Ładowanie obszarów grup..."
+      },
+      "imageFormatWarning": "Obsługiwane formaty: PNG, SVG, JPEG, GIF"
+    },
+    "groupDetail": {
+      "title": "Szczegóły grupy",
+      "noParticipants": "Nie znaleziono uczestników",
+      "created": "Utworzono",
+      "participantCount": "Liczba uczestników",
+      "groupEvents": "Wydarzenia grupy",
+      "tabs": {
+        "documents": "Dokumenty",
+        "links": "Linki",
+        "photos": "Zdjęcia"
+      },
+      "bottomSheet": {
+        "leaveGroup": "Opuść grupę",
+        "report": "Zgłoś",
+        "createEvent": "Utwórz wydarzenie"
+      },
+      "emptyStates": {
+        "documents": "Nie dodano jeszcze dokumentów",
+        "links": "Nie dodano jeszcze linków",
+        "photos": "Nie dodano jeszcze zdjęć"
+      },
+      "documentInfo": "MB •",
+      "documentPrefix": "Dokument -"
+    },
+    "dialogs": {
+      "leaveGroup": {
+        "title": "Opuść grupę",
+        "message": "Czy na pewno chcesz opuścić grupę?",
+        "confirm": "Opuść grupę"
+      }
+    },
+    "groupParticipants": {
+      "title": "Uczestnicy grupy",
+      "noParticipants": "Brak uczestników",
+      "sendMessage": "Wyślij wiadomość"
+    },
+    "groupCard": {
+      "share": "Udostępnij",
+      "join": "Dołącz",
+      "leave": "Opuść",
+      "report": "Zgłoś",
+      "delete": "Usuń",
+      "edit": "Edytuj",
+      "messages": "Wiadomość"
+    },
+    "loading": {
+      "groups": "Ładowanie grup...",
+      "groupDetails": "Ładowanie szczegółów grupy...",
+      "participants": "Ładowanie uczestników...",
+      "creating": "Tworzenie...",
+      "joining": "Dołączanie...",
+      "leaving": "Opuszczanie..."
+    },
+    "errors": {
+      "groupsLoadFailed": "Nie udało się załadować grup",
+      "groupDetailLoadFailed": "Nie udało się załadować szczegółów grupy",
+      "participantsLoadFailed": "Nie udało się załadować uczestników",
+      "groupCreateFailed": "Nie udało się utworzyć grupy",
+      "joinFailed": "Nie udało się dołączyć do grupy",
+      "leaveFailed": "Nie udało się opuścić grupy",
+      "noGroupSelected": "Nie wybrano grupy",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera"
+    },
+    "success": {
+      "groupCreated": "Grupa została pomyślnie utworzona",
+      "joinedGroup": "Pomyślnie dołączyłeś do grupy",
+      "leftGroup": "Pomyślnie opuściłeś grupę",
+      "groupShared": "Grupa została pomyślnie udostępniona",
+      "requestSent": "Prośba została wysłana",
+      "joinRequestSent": "Twoja prośba o dołączenie została wysłana"
+    },
+    "validation": {
+      "nameRequired": "Nazwa grupy jest wymagana",
+      "descriptionRequired": "Opis grupy jest wymagany",
+      "areaRequired": "Wybór obszaru grupy jest wymagany",
+      "nameMinLength": "Nazwa grupy musi mieć co najmniej 3 znaki",
+      "descriptionMinLength": "Opis grupy musi mieć co najmniej 10 znaków",
+      "nameMaxLength": "Nazwa grupy może mieć maksymalnie 50 znaków",
+      "descriptionMaxLength": "Opis grupy może mieć maksymalnie 500 znaków"
+    },
+    "actions": {
+      "createGroup": "Utwórz grupę",
+      "joinGroup": "Dołącz do grupy",
+      "leaveGroup": "Opuść grupę",
+      "shareGroup": "Udostępnij grupę",
+      "reportGroup": "Zgłoś grupę",
+      "deleteGroup": "Usuń grupę",
+      "editGroup": "Edytuj grupę",
+      "viewParticipants": "Zobacz uczestników",
+      "sendMessage": "Wyślij wiadomość",
+      "groupInfo": "Informacje o grupie",
+      "viewMembers": "Zobacz członków",
+      "muteGroup": {
+        "muted": "Grupa wyciszona",
+        "unmuted": "Powiadomienia grupy włączone",
+        "mutedDesc": "Nie będziesz otrzymywać powiadomień z tej grupy",
+        "unmutedDesc": "Będziesz otrzymywać powiadomienia z tej grupy"
+      }
+    },
+    "notifications": {
+      "error": "Błąd",
+      "noGroupSelected": "Nie wybrano grupy"
+    },
+    "suggestion": {
+      "joined": "Dołączyłeś",
+      "sendRequest": "Wyślij prośbę",
+      "joinGroup": "Dołącz do grupy",
+      "requestSent": "Prośba wysłana"
+    },
+    "list": {
+      "groupSelected": "Grupa wybrana",
+      "redirectingToGroup": "przekierowanie do grupy.",
+      "join": "Dołącz",
+      "pendingApproval": "Oczekuje na zatwierdzenie"
+    },
+    "pinnedMessages": {
+      "title": "Przypięte wiadomości",
+      "showMore": "pokaż więcej wiadomości",
+      "showLess": "Pokaż mniej",
+      "noPinnedMessages": "Brak przypiętych wiadomości",
+      "unpinMessage": "Odepnij wiadomość",
+      "navigateToMessage": "Przejdź do wiadomości",
+      "emptyState": "Brak przypiętych wiadomości"
+    }
+  },
+  "home": {
+    "homeScreen": {
+      "suggestedGroups": "Grupy, które mogą Cię zainteresować",
+      "hotTopics": "Gorące tematy",
+      "refreshSuccess": "Dane strony głównej zostały pomyślnie odświeżone",
+      "refreshLoading": "Odświeżanie danych strony głównej...",
+      "refreshError": "Błąd odświeżania danych strony głównej"
+    },
+    "groupSuggestion": {
+      "joined": "Dołączyłeś",
+      "sendRequest": "Wyślij prośbę",
+      "joinGroup": "Dołącz do grupy"
+    },
+    "hotTopics": {
+      "noTopics": "Nie znaleziono gorących tematów"
+    },
+    "postHome": {
+      "noPosts": "Nie znaleziono postów do wyświetlenia",
+      "loading": "Ładowanie postów..."
+    },
+    "story": {
+      "addStory": {
+        "title": "Dodaj do historii",
+        "nearby": "W pobliżu",
+        "selectFromGallery": "Wybierz z galerii",
+        "share": "Udostępnij",
+        "photoSelectionError": "Wystąpił błąd podczas wybierania zdjęcia",
+        "cameraError": "Wystąpił błąd podczas otwierania kamery",
+        "shareError": "Wystąpił błąd podczas udostępniania historii",
+        "selectPhotoWarning": "Proszę wybrać zdjęcie",
+        "storiesShared": "historia została pomyślnie udostępniona",
+        "imageFormatWarning": "Obsługiwane formaty: PNG, SVG, JPEG, GIF"
+      },
+      "myStoryList": {
+        "you": "@Ty"
+      },
+      "storyViewer": {
+        "noImage": "Brak obrazu",
+        "timeAgo": {
+          "justNow": "właśnie teraz",
+          "minutesAgo": "min temu",
+          "hoursAgo": "godz. temu",
+          "yesterday": "wczoraj",
+          "daysAgo": "dni temu"
+        }
+      },
+      "myStoryViewer": {
+        "timeAgo": {
+          "justNow": "właśnie teraz",
+          "minutesAgo": "min temu",
+          "hoursAgo": "godz. temu",
+          "yesterday": "wczoraj",
+          "daysAgo": "dni temu"
+        }
+      }
+    },
+    "createPost": {
+      "title": "Utwórz post",
+      "postButton": "Post",
+      "placeholder": "Co się dzieje?",
+      "links": "Linki",
+      "addPhoto": "Dodaj zdjęcie",
+      "addCamera": "Kamera",
+      "addGallery": "Galeria",
+      "removeImage": "Usuń obraz",
+      "removeLink": "Usuń link",
+      "postError": "Wystąpił błąd podczas udostępniania posta.",
+      "contentRequired": "Proszę wprowadzić treść posta.",
+      "warning": "Ostrzeżenie",
+      "error": "Błąd",
+      "loading": "Udostępnianie...",
+      "imageFormatWarning": "Obsługiwane formaty: PNG, SVG, JPEG, GIF"
+    },
+    "loading": {
+      "homeData": "Ładowanie danych strony głównej...",
+      "stories": "Ładowanie historii...",
+      "groups": "Ładowanie grup...",
+      "topics": "Ładowanie tematów...",
+      "posts": "Ładowanie postów...",
+      "creating": "Tworzenie...",
+      "sharing": "Udostępnianie..."
+    },
+    "errors": {
+      "homeDataLoadFailed": "Nie udało się załadować danych strony głównej",
+      "storiesLoadFailed": "Nie udało się załadować historii",
+      "groupsLoadFailed": "Nie udało się załadować grup",
+      "topicsLoadFailed": "Nie udało się załadować tematów",
+      "postsLoadFailed": "Nie udało się załadować postów",
+      "storyCreateFailed": "Nie udało się utworzyć historii",
+      "postCreateFailed": "Nie udało się utworzyć posta",
+      "photoSelectionFailed": "Wybór zdjęcia nie powiódł się",
+      "cameraAccessFailed": "Dostęp do kamery nie powiódł się",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera"
+    },
+    "success": {
+      "homeDataRefreshed": "Dane strony głównej zostały pomyślnie odświeżone",
+      "storyCreated": "Historia została pomyślnie utworzona",
+      "postCreated": "Post został pomyślnie utworzony",
+      "photoSelected": "Zdjęcie zostało pomyślnie wybrane"
+    },
+    "validation": {
+      "postContentRequired": "Treść posta jest wymagana",
+      "storyImageRequired": "Zdjęcie jest wymagane dla historii",
+      "contentMinLength": "Treść musi mieć co najmniej 1 znak",
+      "contentMaxLength": "Treść może mieć maksymalnie 1000 znaków"
+    },
+    "actions": {
+      "createPost": "Utwórz post",
+      "createStory": "Utwórz historię",
+      "sharePost": "Udostępnij post",
+      "shareStory": "Udostępnij historię",
+      "addPhoto": "Dodaj zdjęcie",
+      "addCamera": "Dodaj kamerę",
+      "addGallery": "Dodaj z galerii",
+      "removeImage": "Usuń obraz",
+      "removeLink": "Usuń link",
+      "close": "Zamknij",
+      "cancel": "Anuluj"
+    },
+    "notifications": {
+      "refreshSuccess": "Dane strony głównej zostały pomyślnie odświeżone",
+      "refreshError": "Wystąpił błąd podczas odświeżania danych strony głównej"
+    }
+  },
+  "match": {
+    "title": "Poznaj ludzi o\npodobnych zainteresowaniach!",
+    "subtitle": "EduSocial to innowacyjna platforma społecznościowa zaprojektowana dla\nstudentów uczących się w międzynarodowych szkołach w Polsce.",
+    "form": {
+      "courseQuestion": "Jaki temat będziesz studiować?",
+      "courseInput": "Wprowadź nazwę tematu",
+      "savedTopics": "Zapisane tematy"
+    },
+    "findMatchesButton": "Znajdź odpowiednie dopasowania",
+    "resultScreen": {
+      "noMatchesFound": "Nie znaleziono jeszcze dopasowań",
+      "addCourseButton": "Dodaj kurs"
+    },
+    "matchCard": {
+      "online": "Online",
+      "education": "Edukacja",
+      "about": "O sobie",
+      "matchedTopics": "Tematy dopasowane z tobą",
+      "noSchoolInfo": "Brak informacji o szkole",
+      "noDepartment": "Brak wydziału",
+      "noAboutInfo": "Brak informacji",
+      "grade": "Klasa",
+      "actions": {
+        "follow": "Obserwuj",
+        "following": "Obserwujesz",
+        "message": "wiadomość",
+        "next": "Pomiń",
+        "followAction": "Obserwuj"
+      }
+    },
+    "dragActions": {
+      "follow": "Obserwuj",
+      "next": "Pomiń"
+    },
+    "loading": {
+      "findingMatches": "Wyszukiwanie dopasowań...",
+      "addingCourses": "Dodawanie kursów...",
+      "following": "Obserwowanie..."
+    },
+    "validation": {
+      "topicRequired": "Musisz dodać co najmniej jeden temat",
+      "topicMinLength": "Nazwa tematu musi mieć co najmniej 2 znaki",
+      "topicMaxLength": "Nazwa tematu może mieć maksymalnie 50 znaków",
+      "topicAlreadyExists": "Ten temat został już dodany"
+    },
+    "errors": {
+      "courseAlreadyAdded": "kurs został już dodany lub nie można go było dodać.",
+      "courseAddFailed": "Nie udało się dodać kursu",
+      "topicAddFailed": "Nie udało się dodać tematu",
+      "topicRemoveFailed": "Nie udało się usunąć tematu",
+      "followFailed": "Operacja obserwowania nie powiodła się",
+      "matchesLoadFailed": "Nie udało się załadować dopasowań",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "generalError": "Wystąpił błąd"
+    },
+    "success": {
+      "coursesSaved": "Kursy zostały zapisane w Twoim profilu!",
+      "topicAdded": "Temat został pomyślnie dodany",
+      "topicRemoved": "Temat został pomyślnie usunięty",
+      "userFollowed": "obserwowany!",
+      "followSuccess": "Operacja obserwowania zakończona sukcesem"
+    },
+    "card": {
+      "follow": "Obserwuj",
+      "skip": "Pomiń",
+      "next": "Pomiń",
+      "online": "Online",
+      "education": "Edukacja",
+      "noSchoolInfo": "Brak informacji o szkole",
+      "noDepartment": "Brak wydziału",
+      "grade": "Klasa",
+      "about": "O sobie",
+      "noInfoYet": "Brak informacji",
+      "matchedTopics": "Tematy dopasowane z tobą",
+      "following": "Obserwujesz",
+      "sendFollowRequest": "Wyślij prośbę o obserwowanie",
+      "pendingApproval": "Oczekuje na zatwierdzenie",
+      "message": "Wiadomość"
+    }
+  },
+  "notifications": {
+    "title": "Powiadomienia",
+    "today": "Dzisiaj",
+    "yesterday": "Wczoraj",
+    "lastWeek": "Ostatnie 7 dni",
+    "earlier": "Wcześniej",
+    "grouping": {
+      "today": "Dzisiaj",
+      "yesterday": "Wczoraj",
+      "lastWeek": "Ostatnie 7 dni",
+      "older": "Wcześniej"
+    },
+    "timeAgo": {
+      "justNow": "właśnie teraz",
+      "minutesAgo": "minut temu",
+      "hoursAgo": "godzin temu",
+      "daysAgo": "dni temu",
+      "weeksAgo": "tygodni temu",
+      "monthsAgo": "miesięcy temu",
+      "yearsAgo": "lat temu"
+    },
+    "types": {
+      "newMessage": "Nowa wiadomość",
+      "groupMessage": "Wiadomość grupowa",
+      "newComment": "Nowy komentarz",
+      "newLike": "Nowe polubienie",
+      "newFollow": "Nowy obserwujący",
+      "followRequest": "Prośba o obserwowanie",
+      "groupJoinRequest": "Prośba o dołączenie do grupy",
+      "eventInvitation": "Zaproszenie na wydarzenie",
+      "systemNotification": "Powiadomienie systemowe"
+    },
+    "notificationTypes": {
+      "followRequest": "Prośba o obserwowanie",
+      "followJoinRequest": "Prośba o obserwowanie i dołączenie",
+      "postLike": "Polubienie posta",
+      "postComment": "Komentarz do posta",
+      "groupJoinRequest": "Prośba o dołączenie do grupy",
+      "groupJoin": "Dołączenie do grupy",
+      "createGroupEvent": "Utwórz wydarzenie grupowe",
+      "groupAccept": "Akceptacja grupy"
+    },
+    "messages": {
+      "likedPost": "polubił Twój post",
+      "commentedPost": "skomentował Twój post",
+      "startedFollowing": "zaczął Cię obserwować",
+      "wantsToFollow": "chce Cię obserwować",
+      "wantsToJoinGroup": "chce dołączyć do Twojej grupy",
+      "group": "grupa",
+      "sentMessage": "wysłał Ci wiadomość",
+      "sentGroupMessage": "wysłał wiadomość w Twojej grupie",
+      "invitedToEvent": "zaprosił Cię na wydarzenie",
+      "followRequest": "chce Cię obserwować",
+      "postLiked": "polubił Twój post",
+      "postCommented": "skomentował Twój post",
+      "groupJoinRequest": "chce dołączyć do Twojej grupy",
+      "groupJoined": "dołączył do Twojej grupy",
+      "eventCreated": "utworzył wydarzenie grupowe",
+      "groupAccepted": "Twoja prośba o dołączenie do grupy została zaakceptowana"
+    },
+    "actions": {
+      "accept": "Akceptuj",
+      "decline": "Odrzuć",
+      "accepted": "Zaakceptowano",
+      "rejected": "Odrzucono",
+      "follow": "Obserwuj",
+      "unfollow": "Przestań obserwować",
+      "close": "Zamknij",
+      "sendMessage": "Wyślij wiadomość"
+    },
+    "loading": {
+      "notifications": "Ładowanie powiadomień...",
+      "refreshing": "Odświeżanie powiadomień...",
+      "refreshed": "Powiadomienia zostały pomyślnie odświeżone",
+      "accepting": "Akceptowanie...",
+      "declining": "Odrzucanie...",
+      "following": "Obserwowanie...",
+      "unfollowing": "Przestawanie obserwować..."
+    },
+    "errors": {
+      "notificationsLoadFailed": "Nie udało się załadować powiadomień",
+      "followRequestFailed": "Nie udało się zaakceptować prośby o obserwowanie",
+      "groupJoinRequestFailed": "Nie udało się przetworzyć prośby o dołączenie do grupy",
+      "followFailed": "Operacja obserwowania nie powiodła się",
+      "unfollowFailed": "Operacja przestania obserwować nie powiodła się",
+      "eventCreateRequestFailed": "Nie udało się zaakceptować prośby o utworzenie wydarzenia",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "generalError": "Wystąpił błąd"
+    },
+    "success": {
+      "notificationsRefreshed": "Powiadomienia zostały pomyślnie odświeżone",
+      "followRequestAccepted": "Prośba o obserwowanie została zaakceptowana",
+      "followRequestDeclined": "Prośba o obserwowanie została odrzucona",
+      "groupJoinRequestAccepted": "Prośba o dołączenie do grupy została zaakceptowana",
+      "groupJoinRequestDeclined": "Prośba o dołączenie do grupy została odrzucona",
+      "userFollowed": "Użytkownik obserwowany",
+      "userUnfollowed": "Użytkownik nie jest już obserwowany",
+      "eventCreateRequestAccepted": "Prośba o utworzenie wydarzenia została zaakceptowana",
+      "eventCreateRequestDeclined": "Prośba o utworzenie wydarzenia została odrzucona"
+    },
+    "validation": {
+      "userIdRequired": "ID użytkownika jest wymagane",
+      "groupIdRequired": "ID grupy jest wymagane",
+      "eventIdRequired": "ID wydarzenia jest wymagane",
+      "decisionRequired": "Decyzja jest wymagana"
+    },
+    "debug": {
+      "buildingButton": "Tworzenie przycisku dla powiadomienia:",
+      "notificationType": "Typ:",
+      "isFollowing": "Czy obserwuje:",
+      "isFollowingPending": "Czy obserwowanie oczekuje:",
+      "isAccepted": "Czy zaakceptowano:",
+      "isRejected": "Czy odrzucono:",
+      "status": "Status:",
+      "groupId": "ID grupy:",
+      "senderUserId": "ID użytkownika nadawcy:",
+      "message": "Wiadomość:",
+      "groupJoinRequestButton": "Tworzenie przycisku prośby o dołączenie do grupy dla powiadomienia:",
+      "groupIdNull": "ID grupy jest null, przycisk nie jest pokazywany",
+      "requestAccepted": "Prośba już zaakceptowana, pokazywany przycisk 'Zaakceptowano'",
+      "requestRejected": "Prośba odrzucona, pokazywany przycisk 'Odrzucono'",
+      "requestPending": "Prośba oczekuje, pokazywane przyciski akceptuj/odrzuć"
+    }
+  },
+  "slidingNotifications": {
+    "newMessage": "Nowa wiadomość",
+    "groupMessage": "Wiadomość grupowa",
+    "newComment": "Nowy komentarz",
+    "newLike": "Nowe polubienie",
+    "newFollow": "Nowy obserwujący",
+    "followRequest": "Prośba o obserwowanie",
+    "groupJoinRequest": "Prośba o dołączenie do grupy",
+    "eventInvitation": "Zaproszenie na wydarzenie",
+    "systemNotification": "Powiadomienie systemowe",
+    "unknown": "Nieznane"
+  },
+  "groupChat": {
+    "errors": {
+      "loadFailed": "Nie udało się załadować czatu grupowego",
+      "messageSendFailed": "Nie udało się wysłać wiadomości",
+      "joinFailed": "Nie udało się dołączyć do grupy",
+      "leaveFailed": "Nie udało się opuścić grupę",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "tryAgain": "Spróbuj ponownie",
+      "retry": "Ponów",
+      "connectionLost": "Utracono połączenie",
+      "reconnecting": "Łączenie ponowne...",
+      "connectionRestored": "Połączenie przywrócone"
+    },
+    "messages": {
+      "loading": "Ładowanie wiadomości...",
+      "noMessages": "Brak wiadomości",
+      "sendMessage": "Wyślij wiadomość",
+      "typeMessage": "Napisz wiadomość...",
+      "sending": "Wysyłanie...",
+      "sent": "Wysłano",
+      "failed": "Nie udało się",
+      "messagePinned": "Wiadomość została pomyślnie przypięta",
+      "messageUnpinned": "Przypięcie wiadomości zostało usunięte",
+      "pinError": "Błąd przypinania/odpinania wiadomości",
+      "tryAgain": "Spróbuj ponownie"
+    },
+    "actions": {
+      "joinGroup": "Dołącz do grupy",
+      "leaveGroup": "Opuść grupę",
+      "viewMembers": "Zobacz członków",
+      "groupInfo": "Informacje o grupie",
+      "shareGroup": "Udostępnij grupę",
+      "muteGroup": {
+        "muted": "Grupa wyciszona",
+        "unmuted": "Powiadomienia grupy włączone",
+        "mutedDesc": "Nie będziesz otrzymywać powiadomień z tej grupy",
+        "unmutedDesc": "Będziesz otrzymywać powiadomienia z tej grupy"
+      },
+      "dialogs": {
+        "leaveGroup": {
+          "title": "Opuść grupę",
+          "message": "Czy na pewno chcesz opuścić tę grupę? Ta czynność nie może zostać cofnięta.",
+          "confirm": "Opuść"
+        }
+      },
+      "pinnedMessages": {
+        "title": "Przypięte wiadomości",
+        "showMore": "pokaż więcej wiadomości",
+        "showLess": "Pokaż mniej",
+        "noPinnedMessages": "Brak przypiętych wiadomości",
+        "unpinMessage": "Odepnij",
+        "navigateToMessage": "Przejdź do wiadomości",
+        "emptyState": "Brak przypiętych wiadomości"
+      }
+    }
+  },
+  "notificationSettings": {
+    "title": "Ustawienia powiadomień",
+    "status": {
+      "title": "Status powiadomień",
+      "deviceId": "ID urządzenia",
+      "serviceActive": "Usługa powiadomień aktywna",
+      "serviceInactive": "Usługa powiadomień nie połączona",
+      "connectionError": "Błąd połączenia"
+    },
+    "permissions": {
+      "title": "Uprawnienia powiadomień",
+      "notificationPermission": "Uprawnienie powiadomień"
+    },
+    "types": {
+      "title": "Typy powiadomień",
+      "postNotifications": "Powiadomienia o postach (polubienia, komentarze)",
+      "messageNotifications": "Powiadomienia o wiadomościach (prywatne i grupowe czaty)",
+      "groupNotifications": "Powiadomienia grupowe (prośby o dołączenie)",
+      "eventNotifications": "Powiadomienia o wydarzeniach (zaproszenia)",
+      "followNotifications": "Powiadomienia o obserwowaniu (prośby)",
+      "systemNotifications": "Powiadomienia systemowe"
+    },
+    "test": {
+      "title": "Operacje testowe",
+      "platformTest": "Testowe powiadomienie platformy",
+      "onesignalTest": "Testowe powiadomienie OneSignal",
+      "localTest": "Lokalne testowe powiadomienie",
+      "simpleTest": "Proste testowe powiadomienie",
+      "checkConfig": "Sprawdź konfigurację",
+      "showPlayerId": "Pokaż Player ID"
+    },
+    "messages": {
+      "playerId": "Player ID",
+      "playerIdError": "Nie udało się pobrać Player ID",
+      "settingsSaved": "Ustawienia zostały pomyślnie zapisane",
+      "settingsError": "Nie udało się zapisać ustawień",
+      "permissionGranted": "Uprawnienie powiadomień przyznane",
+      "permissionGrantedDesc": "Możesz teraz otrzymywać powiadomienia",
+      "permissionDenied": "Uprawnienie powiadomień odrzucone",
+      "permissionDeniedDesc": "Musisz przyznać uprawnienie w ustawieniach, aby otrzymywać powiadomienia",
+      "permissionRequired": "Wymagane uprawnienie powiadomień",
+      "permissionRequiredDesc": "Musisz najpierw przyznać uprawnienie powiadomień, aby korzystać z tej funkcji",
+      "settingsRedirect": "Przekierowanie do ustawień",
+      "settingsRedirectDesc": "Możesz wyłączyć uprawnienia powiadomień w ustawieniach urządzenia",
+      "settingsOpenError": "Nie udało się otworzyć ustawień",
+      "settingsOpenErrorDesc": "Musisz ręcznie otworzyć ustawienia urządzenia",
+      "manualSettingsInstruction": "Sprawdź powiadomienia aplikacji w ustawieniach urządzenia"
+    },
+    "dialogs": {
+      "permissionRequired": {
+        "title": "Wymagane uprawnienie powiadomień",
+        "message": "Aby włączyć ten typ powiadomień, musisz najpierw przyznać uprawnienie powiadomień z urządzenia. Czy chcesz przyznać uprawnienie?",
+        "grant": "Przyznaj uprawnienie"
+      },
+      "disablePermission": {
+        "title": "Wyłącz uprawnienie powiadomień",
+        "message": "Aby wyłączyć uprawnienie powiadomień, musisz przejść do ustawień urządzenia. Czy chcesz otworzyć ustawienia?",
+        "openSettings": "Otwórz ustawienia"
+      }
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "tabbar": {
+      "posts": "Posty",
+      "entries": "Wpisy"
+    },
+    "editProfile": {
+      "title": "Edytuj profil",
+      "username": "Nazwa użytkownika",
+      "name": "Imię",
+      "surname": "Nazwisko",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "birthday": "Data urodzenia",
+      "bio": "Biografia",
+      "socialMediaAccounts": "Konta mediów społecznościowych",
+      "schoolAndDepartment": "Informacje o szkole i wydziale",
+      "courses": "Kursy",
+      "notificationSettings": "Ustawienia powiadomień",
+      "emailNotification": "Powiadomienia e-mail",
+      "mobileNotification": "Powiadomienia mobilne",
+      "languageSelection": "Wybór języka",
+      "accountType": "Typ konta",
+      "accountTypeSelection": "Wybór typu konta",
+      "schoolSelection": "Wybór szkoły",
+      "departmentSelection": "Wybór wydziału",
+      "saveProfile": "Zapisz profil",
+      "profileUpdated": "Profil został pomyślnie zaktualizowany",
+      "profileUpdateFailed": "Nie udało się zaktualizować profilu",
+      "addLesson": "Dodaj kurs",
+      "enterLessonName": "Wprowadź nazwę kursu...",
+      "lessonAdded": "Kurs został pomyślnie dodany",
+      "lessonRemoved": "Kurs usunięty z listy",
+      "lessonNameEmpty": "Nazwa kursu nie może być pusta",
+      "lessonAlreadyExists": "Ten kurs został już dodany",
+      "lessonAddError": "Wystąpił błąd podczas dodawania kursu",
+      "lessonRemoveError": "Wystąpił błąd podczas usuwania kursu",
+      "imageFormatWarning": "Obsługiwane formaty: PNG, SVG, JPEG, GIF"
+    },
+    "mainProfile": {
+      "editProfile": "Edytuj profil",
+      "refreshLoading": "Odświeżanie danych profilu...",
+      "refreshSuccess": "Dane profilu zostały pomyślnie odświeżone",
+      "noEntriesFound": "Nie znaleziono wpisów.",
+      "noPostsFound": "Nie znaleziono postów.",
+      "shareText": {
+        "topicInfo": "Brak informacji o temacie",
+        "categoryInfo": "Brak kategorii",
+        "appLink": "Otwórz aplikację: edusocial://app",
+        "appStore": "App Store: https://apps.apple.com/app/edusocial/id123456789",
+        "playStore": "Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app",
+        "hashtags": "#EduSocial #Edukacja"
+      }
+    },
+    "peopleProfile": {
+      "loading": "Ładowanie profilu użytkownika...",
+      "loadError": "Nie udało się załadować profilu użytkownika.",
+      "notFound": "Profil użytkownika nie został znaleziony.",
+      "actions": {
+        "follow": "Obserwuj",
+        "unfollow": "Przestań obserwować",
+        "pendingApproval": "Oczekuje na zatwierdzenie",
+        "sendMessage": "Wyślij wiadomość"
+      },
+      "lockedContent": {
+        "title": "Ta zawartość jest prywatna",
+        "description": "Aby zobaczyć zawartość tego użytkownika,\nmusisz najpierw wysłać prośbę o obserwowanie."
+      },
+      "noPostsFound": "Nie znaleziono postów.",
+      "noEntriesFound": "Nie znaleziono wpisów.",
+      "entriesLoading": "Ładowanie wpisów...",
+      "shareText": {
+        "topicInfo": "Brak informacji o temacie",
+        "categoryInfo": "Brak kategorii",
+        "appLink": "Otwórz aplikację: edusocial://app",
+        "appStore": "App Store: https://apps.apple.com/app/edusocial/id123456789",
+        "playStore": "Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app",
+        "hashtags": "#EduSocial #Edukacja"
+      }
+    },
+    "followers": {
+      "title": "Obserwujący",
+      "sendMessage": "Wyślij wiadomość",
+      "searchPlaceholder": "Szukaj obserwujących..."
+    },
+    "following": {
+      "title": "Obserwowani",
+      "sendMessage": "Wyślij wiadomość",
+      "searchPlaceholder": "Szukaj obserwowanych..."
+    },
+    "loading": {
+      "profile": "Ładowanie profilu...",
+      "posts": "Ładowanie postów...",
+      "entries": "Ładowanie wpisów...",
+      "followers": "Ładowanie obserwujących...",
+      "following": "Ładowanie obserwowanych...",
+      "saving": "Zapisywanie...",
+      "refreshing": "Odświeżanie..."
+    },
+    "errors": {
+      "profileLoadFailed": "Nie udało się załadować profilu",
+      "postsLoadFailed": "Nie udało się załadować postów",
+      "entriesLoadFailed": "Nie udało się załadować wpisów",
+      "followersLoadFailed": "Nie udało się załadować obserwujących",
+      "followingLoadFailed": "Nie udało się załadować obserwowanych",
+      "profileUpdateFailed": "Nie udało się zaktualizować profilu",
+      "followFailed": "Operacja obserwowania nie powiodła się",
+      "unfollowFailed": "Operacja przestania obserwować nie powiodła się",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "generalError": "Wystąpił błąd"
+    },
+    "success": {
+      "profileLoaded": "Profil został pomyślnie załadowany",
+      "profileUpdated": "Profil został pomyślnie zaktualizowany",
+      "followSuccess": "Użytkownik obserwowany",
+      "unfollowSuccess": "Użytkownik nie jest już obserwowany",
+      "followRequestSent": "Prośba o obserwowanie została wysłana"
+    },
+    "validation": {
+      "usernameRequired": "Nazwa użytkownika jest wymagana",
+      "nameRequired": "Imię jest wymagane",
+      "surnameRequired": "Nazwisko jest wymagane",
+      "emailRequired": "E-mail jest wymagany",
+      "emailInvalid": "Proszę wprowadzić prawidłowy adres e-mail",
+      "phoneInvalid": "Proszę wprowadzić prawidłowy numer telefonu",
+      "birthdayInvalid": "Proszę wprowadzić prawidłową datę urodzenia"
+    },
+    "debug": {
+      "profileLoading": "ProfileController.loadProfile() wywołane",
+      "profileLoaded": "Dane profilu zostały pomyślnie załadowane:",
+      "profileLoadError": "Błąd ładowania profilu:",
+      "postsLoading": "ProfileController.fetchProfilePosts() wywołane",
+      "postsLoaded": "Posty profilu zostały pomyślnie załadowane:",
+      "postsLoadError": "Błąd ładowania postów profilu:",
+      "userPostsFiltered": "Własne posty użytkownika:",
+      "entriesProcessing": "Liczba wpisów:",
+      "entriesLoaded": "Wpisy użytkownika załadowane",
+      "entriesNotFound": "Wpisy użytkownika nie znalezione",
+      "relatedDataUpdating": "Aktualizowanie powiązanych danych...",
+      "appBarUpdateError": "Błąd aktualizacji AppBar:",
+      "storyUpdateError": "Błąd aktualizacji historii:",
+      "topicUserLoading": "Pobieranie informacji dla użytkownika tematu: user_id =",
+      "userDataLoaded": "Informacje użytkownika załadowane:",
+      "userDataError": "Nie udało się pobrać informacji użytkownika: user_id =",
+      "topicUserIdNotFound": "Topic user_id nie znalezione, używany oryginalny wpis",
+      "entriesProcessed": "Wszystkie wpisy przetworzone z informacjami użytkownika",
+      "entriesProcessingError": "Błąd przetwarzania wpisów:",
+      "userInfoMissing": "Brak informacji użytkownika, nie można przekierować na stronę profilu"
+    },
+    "fallbackTexts": {
+      "noSchoolInfo": "Brak informacji o szkole",
+      "noDepartmentInfo": "Brak informacji o wydziale",
+      "invalidDate": "Nieprawidłowa data",
+      "profileInfoNotAvailable": "Informacje profilu niedostępne."
+    },
+    "details": {
+      "personalInfo": "Informacje osobiste",
+      "birthDate": "Data urodzenia",
+      "email": "Adres e-mail",
+      "courses": "Ukończone kursy",
+      "school": "Szkoła",
+      "joinedGroups": "Dołączone grupy"
+    },
+    "header": {
+      "posts": "Posty",
+      "followers": "Obserwujący",
+      "following": "Obserwowani"
+    },
+    "emptyStates": {
+      "noPostsTitle": "Brak postów",
+      "noPostsDescription": "Udostępnij swój pierwszy post, aby znajomi mogli Cię poznać!",
+      "noEntriesTitle": "Nie udostępniono jeszcze wpisów",
+      "noEntriesDescription": "Możesz dzielić się swoimi przemyśleniami ze społecznością, publikując wpisy."
+    }
+  },
+  "search": {
+    "title": "Szukaj",
+    "searchField": {
+      "placeholder": "Szukaj...",
+      "hint": "Szukaj ludzi, grup lub wydarzeń"
+    },
+    "tabs": {
+      "people": "Ludzie",
+      "groups": "Grupy",
+      "events": "Wydarzenia"
+    },
+    "people": {
+      "online": "Online",
+      "offline": "Offline",
+      "noResults": "Nie znaleziono ludzi",
+      "loading": "Szukanie ludzi..."
+    },
+    "groups": {
+      "join": "Dołącz",
+      "pendingApproval": "Oczekuje na zatwierdzenie",
+      "memberCount": "członków",
+      "noResults": "Nie znaleziono grup",
+      "loading": "Szukanie grup...",
+      "groupSelected": "Grupa wybrana",
+      "redirectingToGroup": "przekierowanie do grupy.",
+      "notMember": "Nie jesteś członkiem tej grupy",
+      "groupDetail": {
+        "noParticipants": "Nie znaleziono uczestników",
+        "created": "Utworzono",
+        "participantCount": "Liczba uczestników",
+        "document": "Dokument",
+        "groupEvents": "Wydarzenia grupowe",
+        "tabs": {
+          "documents": "Dokumenty",
+          "links": "Linki",
+          "photos": "Zdjęcia"
+        },
+        "bottomSheet": {
+          "leaveGroup": "Opuść grupę",
+          "report": "Zgłoś",
+          "createEvent": "Utwórz wydarzenie"
+        },
+        "emptyStates": {
+          "documents": "W tej grupie nie udostępniono jeszcze dokumentów",
+          "links": "W tej grupie nie udostępniono jeszcze linków",
+          "photos": "W tej grupie nie udostępniono jeszcze zdjęć"
+        }
+      }
+    },
+    "events": {
+      "noResults": "Nie znaleziono wydarzeń",
+      "loading": "Szukanie wydarzeń...",
+      "shared": "Udostępniono",
+      "eventShared": "wydarzenie udostępnione.",
+      "locationError": "Nie można otworzyć lokalizacji:",
+      "error": "Błąd",
+      "viewLocation": "Zobacz lokalizację",
+      "notification": {
+        "title": "Powiadomienie",
+        "message": "Powiadomienie o wydarzeniu zostało ustawione."
+      }
+    },
+    "event": {
+      "eventCard": {
+        "viewLocation": "Zobacz lokalizację"
+      }
+    },
+    "loading": {
+      "searching": "Szukanie...",
+      "loadingResults": "Ładowanie wyników...",
+      "fetchingData": "Pobieranie danych..."
+    },
+    "errors": {
+      "searchFailed": "Wyszukiwanie nie powiodło się",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "generalError": "Wystąpił błąd",
+      "joinRequestFailed": "Nie można wysłać prośby o dołączenie do grupy. Spróbuj ponownie.",
+      "locationOpenFailed": "Nie można otworzyć lokalizacji"
+    },
+    "success": {
+      "joinRequestSent": "Twoja prośba o dołączenie do grupy została wysłana.",
+      "searchCompleted": "Wyszukiwanie zakończone"
+    },
+    "debug": {
+      "searchResultsLoaded": "Wyniki wyszukiwania załadowane:",
+      "usersCount": "Użytkownicy:",
+      "groupsCount": "Grupy:",
+      "eventsCount": "Wydarzenia:",
+      "groupMembershipStatus": "Status członkostwa w grupie:",
+      "groupTapped": "Grupa dotknięta:",
+      "isMember": "Czy jest członkiem:",
+      "groupId": "ID grupy:",
+      "navigatingToGroupChat": "Przechodzenie do czatu grupowego ID:",
+      "userNotMember": "Użytkownik nie jest członkiem tej grupy",
+      "searchError": "Błąd wyszukiwania:"
+    },
+    "fallbackTexts": {
+      "noGroupImage": "Brak obrazu grupy",
+      "noUserImage": "Brak obrazu użytkownika",
+      "noEventImage": "Brak obrazu wydarzenia"
+    }
+  },
+  "common": {
+    "success": "Sukces",
+    "error": "Błąd",
+    "warning": "Ostrzeżenie",
+    "buttons": {
+      "ok": "OK",
+      "cancel": "Anuluj",
+      "yes": "Tak",
+      "no": "Nie",
+      "close": "Zamknij",
+      "back": "Wstecz",
+      "continue": "Kontynuuj",
+      "confirm": "Potwierdź",
+      "reject": "Odrzuć",
+      "giveUp": "Zrezygnuj",
+      "save": "Zapisz",
+      "update": "Zaktualizuj",
+      "delete": "Usuń",
+      "edit": "Edytuj",
+      "share": "Udostępnij",
+      "send": "Wyślij",
+      "add": "Dodaj",
+      "remove": "Usuń",
+      "search": "Szukaj",
+      "refresh": "Odśwież",
+      "loading": "Ładowanie...",
+      "sending": "Wysyłanie...",
+      "saving": "Zapisywanie...",
+      "deleting": "Usuwanie...",
+      "updating": "Aktualizowanie...",
+      "creating": "Tworzenie...",
+      "joining": "Dołączanie...",
+      "leaving": "Opuszczanie...",
+      "following": "Obserwowanie...",
+      "unfollowing": "Przestawanie obserwować...",
+      "retry": "Spróbuj ponownie",
+      "postShared": "udostępnił post",
+      "entryShared": "udostępnił wpis",
+      "links": "Linki"
+    },
+    "cancel": "Anuluj",
+    "messages": {
+      "success": "Sukces",
+      "error": "Błąd",
+      "warning": "Ostrzeżenie",
+      "info": "Informacja",
+      "copySuccess": "Tekst skopiowany do schowka",
+      "linkOpenFailed": "Nie udało się otworzyć linku. Spróbuj ponownie.",
+      "linkNotSupported": "Ten link nie może zostać otwarty",
+      "featureComingSoon": "Ta funkcja zostanie dodana wkrótce",
+      "reportFeatureComingSoon": "Funkcja zgłaszania zostanie dodana wkrótce",
+      "operationSuccess": "Operacja zakończona sukcesem",
+      "operationFailed": "Operacja nie powiodła się",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "generalError": "Wystąpił błąd",
+      "tryAgain": "Spróbuj ponownie",
+      "noData": "Nie znaleziono danych",
+      "noResults": "Nie znaleziono wyników",
+      "loading": "Ładowanie...",
+      "pleaseWait": "Proszę czekać...",
+      "connectionError": "Błąd połączenia",
+      "timeoutError": "Błąd przekroczenia czasu",
+      "permissionDenied": "Odmowa dostępu",
+      "fileNotFound": "Plik nie został znaleziony",
+      "invalidInput": "Nieprawidłowe dane wejściowe",
+      "requiredField": "To pole jest wymagane",
+      "invalidFormat": "Nieprawidłowy format",
+      "tooShort": "Za krótkie",
+      "tooLong": "Za długie",
+      "alreadyExists": "Już istnieje",
+      "notFound": "Nie znaleziono",
+      "accessDenied": "Dostęp zabroniony",
+      "sessionExpired": "Sesja wygasła",
+      "maintenanceMode": "Tryb konserwacji",
+      "updateRequired": "Wymagana aktualizacja",
+      "missingInfo": "Brakujące informacje",
+      "fillAllFields": "Proszę wypełnić wszystkie pola",
+      "groupCreatedSuccessfully": "Grupa została pomyślnie utworzona",
+      "groupCreationFailed": "Nie udało się utworzyć grupy",
+      "postCreatedSuccessfully": "Post został pomyślnie udostępniony",
+      "postCreationFailed": "Nie udało się udostępnić posta",
+      "courseAlreadyAdded": "kurs już dodany lub nie można było dodać",
+      "courseSavedToProfile": "Kursy zapisane w Twoim profilu!",
+      "userFollowed": "obserwowany!",
+      "followRequestSent": "prośba o obserwowanie wysłana!",
+      "followOperationFailed": "Operacja obserwowania nie powiodła się",
+      "connectionErrorMessage": "Błąd połączenia",
+      "tryAgainButton": "Spróbuj ponownie",
+      "messageSendFailed": "Nie udało się wysłać wiadomości",
+      "mediaSendFailed": "Nie udało się wysłać mediów",
+      "imageNotLoaded": "Nie udało się załadować obrazu",
+      "documentCouldNotOpen": "Nie udało się otworzyć dokumentu",
+      "linkCouldNotOpen": "Nie udało się otworzyć linku",
+      "retryMessage": "Spróbuj ponownie",
+      "ok": "OK"
+    },
+    "dialogs": {
+      "confirmTitle": "Potwierdzenie",
+      "confirmMessage": "Czy na pewno chcesz wykonać tę akcję?",
+      "deleteTitle": "Potwierdzenie usunięcia",
+      "deleteMessage": "Czy na pewno chcesz usunąć ten element?",
+      "logoutTitle": "Wyloguj",
+      "logoutMessage": "Czy na pewno chcesz wylogować się ze swojego konta?",
+      "unsavedChangesTitle": "Niezapisane zmiany",
+      "unsavedChangesMessage": "Masz niezapisane zmiany. Czy na pewno chcesz wyjść?",
+      "errorTitle": "Błąd",
+      "warningTitle": "Ostrzeżenie",
+      "infoTitle": "Informacja",
+      "successTitle": "Sukces"
+    },
+    "validation": {
+      "required": "To pole jest wymagane",
+      "invalidEmail": "Proszę wprowadzić prawidłowy adres e-mail",
+      "invalidPhone": "Proszę wprowadzić prawidłowy numer telefonu",
+      "invalidUrl": "Proszę wprowadzić prawidłowy URL",
+      "minLength": "Musi mieć co najmniej {min} znaków",
+      "maxLength": "Może mieć maksymalnie {max} znaków",
+      "passwordMismatch": "Hasła nie pasują do siebie",
+      "invalidFormat": "Nieprawidłowy format",
+      "alreadyExists": "Ta wartość jest już używana",
+      "notFound": "Nie znaleziono",
+      "invalidDate": "Nieprawidłowa data",
+      "futureDate": "Proszę wybrać przyszłą datę",
+      "pastDate": "Proszę wybrać przeszłą datę",
+      "invalidTime": "Nieprawidłowy czas",
+      "invalidNumber": "Proszę wprowadzić prawidłową liczbę",
+      "positiveNumber": "Proszę wprowadzić liczbę dodatnią",
+      "integerOnly": "Proszę wprowadzić tylko liczby całkowite"
+    },
+    "time": {
+      "justNow": "właśnie teraz",
+      "minutesAgo": "min temu",
+      "hoursAgo": "godz. temu",
+      "daysAgo": "dni temu",
+      "weeksAgo": "tyg. temu",
+      "monthsAgo": "mies. temu",
+      "yearsAgo": "lat temu",
+      "yesterday": "wczoraj",
+      "today": "dzisiaj",
+      "tomorrow": "jutro"
+    },
+    "status": {
+      "online": "Online",
+      "offline": "Offline",
+      "away": "Nieobecny",
+      "busy": "Zajęty",
+      "invisible": "Niewidoczny"
+    },
+    "file": {
+      "size": "Rozmiar",
+      "type": "Typ",
+      "name": "Nazwa",
+      "date": "Data",
+      "bytes": "bajtów",
+      "kilobytes": "KB",
+      "megabytes": "MB",
+      "gigabytes": "GB",
+      "unknown": "Nieznany"
+    },
+    "navigation": {
+      "back": "Wstecz",
+      "next": "Dalej",
+      "previous": "Poprzedni",
+      "skip": "Pomiń",
+      "finish": "Zakończ",
+      "done": "Gotowe",
+      "close": "Zamknij",
+      "cancel": "Anuluj",
+      "confirm": "Potwierdź"
+    },
+    "actions": {
+      "about": "O aplikacji",
+      "report": "Zgłoś",
+      "delete": "Usuń"
+    },
+    "info": {
+      "info": "Informacja",
+      "reportFeatureComingSoon": "Funkcja zgłaszania zostanie dodana wkrótce"
+    },
+    "report": {
+      "dialog": {
+        "title": "Zgłoś",
+        "message": "Czy na pewno chcesz zgłosić ten post? Twoje zgłoszenie zostanie przekazane do naszego zespołu moderacyjnego.",
+        "cancel": "Anuluj",
+        "confirm": "Zgłoś"
+      },
+      "success": {
+        "title": "✅ Zgłoszono",
+        "message": "Post został pomyślnie zgłoszony. Rozpoczęto proces weryfikacji."
+      },
+      "error": {
+        "title": "❌ Nie udało się wysłać zgłoszenia",
+        "message": "Operacja zgłaszania nie mogła zostać ukończona. Spróbuj ponownie.",
+        "networkTitle": "⚠️ Błąd połączenia",
+        "networkMessage": "Sprawdź swoje połączenie internetowe i spróbuj ponownie."
+      }
+    }
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "buttons": {
+      "editProfile": "Edytuj profil",
+      "privacyPolicy": "Polityka prywatności",
+      "notificationSettings": "Ustawienia powiadomień",
+      "logout": "Wyloguj"
+    },
+    "logoutDialog": {
+      "title": "Wyloguj",
+      "message": "Czy na pewno chcesz wylogować się ze swojego konta?",
+      "cancel": "Anuluj",
+      "confirm": "Wyloguj"
+    },
+    "loading": {
+      "loggingOut": "Wylogowywanie...",
+      "savingSettings": "Zapisywanie ustawień...",
+      "loadingSettings": "Ładowanie ustawień..."
+    },
+    "errors": {
+      "logoutFailed": "Wylogowanie nie powiodło się",
+      "settingsLoadFailed": "Nie udało się załadować ustawień",
+      "settingsSaveFailed": "Nie udało się zapisać ustawień",
+      "networkError": "Błąd połączenia sieciowego",
+      "serverError": "Wystąpił błąd serwera",
+      "generalError": "Wystąpił błąd"
+    },
+    "success": {
+      "logoutSuccess": "Pomyślnie wylogowano",
+      "settingsSaved": "Ustawienia zostały pomyślnie zapisane",
+      "settingsLoaded": "Ustawienia zostały pomyślnie załadowane"
+    },
+    "validation": {
+      "settingsRequired": "Ustawienia są wymagane",
+      "invalidSettings": "Nieprawidłowe ustawienia"
+    },
+    "debug": {
+      "settingsLoading": "Ładowanie ustawień...",
+      "settingsSaving": "Zapisywanie ustawień...",
+      "logoutProcess": "Rozpoczęto proces wylogowania",
+      "logoutSuccess": "Proces wylogowania zakończony sukcesem",
+      "logoutError": "Błąd procesu wylogowania:"
+    },
+    "navigation": {
+      "goToEditProfile": "Przekierowanie do strony edycji profilu",
+      "goToPrivacyPolicy": "Przekierowanie do strony polityki prywatności",
+      "goToNotificationSettings": "Przekierowanie do strony ustawień powiadomień"
+    }
+  },
+  "post": {
+    "createPost": {
+      "share": "Post",
+      "placeholder": "Co się dzieje?",
+      "links": "Linki",
+      "error": "Wystąpił błąd podczas udostępniania posta.",
+      "emptyContent": "Proszę wprowadzić treść posta."
+    }
+  },
+  "story": {
+    "userStoryCard": {
+      "you": "@Ty"
+    },
+    "addStory": {
+      "title": "Udostępnij historię",
+      "selectFromGallery": "Wybierz z galerii",
+      "nearby": "W pobliżu",
+      "share": "Udostępnij",
+      "selectPhotoWarning": "Proszę wybrać zdjęcie",
+      "shareError": "Wystąpił błąd podczas udostępniania historii",
+      "photoSelectionError": "Wystąpił błąd podczas wybierania zdjęcia",
+      "cameraError": "Wystąpił błąd podczas otwierania kamery"
+    },
+    "viewer": {
+      "noImage": "Nie udało się załadować obrazu"
+    }
+  },
+  "auth": {
+    "logout": {
+      "title": "Wyloguj",
+      "confirmation": "Czy na pewno chcesz wylogować się ze swojego konta?",
+      "logout": "Wyloguj"
+    }
+  },
+  "comments": {
+    "title": "Komentarze",
+    "noComments": "Brak komentarzy",
+    "input": {
+      "placeholder": "Napisz komentarz..."
+    },
+    "reply": {
+      "replyTo": "Odpowiedz:",
+      "replyPlaceholder": "Napisz swoją odpowiedź...",
+      "replyButton": "Odpowiedz",
+      "cancelReply": "Anuluj odpowiedź",
+      "replySent": "Odpowiedź została pomyślnie wysłana",
+      "replyFailed": "Nie udało się wysłać odpowiedzi",
+      "replyError": "Wystąpił błąd podczas wysyłania odpowiedzi",
+      "showReplies": "Pokaż odpowiedzi",
+      "hideReplies": "Pokaż mniej",
+      "replyCount": "odpowiedź",
+      "replyCountPlural": "odpowiedzi"
+    },
+    "edit": {
+      "editButton": "Edytuj",
+      "editPlaceholder": "Edytuj komentarz...",
+      "editingComment": "Edytujesz komentarz",
+      "cancelEdit": "Anuluj edycję"
+    },
+    "delete": {
+      "deleteButton": "Usuń",
+      "deleteConfirmTitle": "Usuń komentarz",
+      "deleteConfirmMessage": "Czy na pewno chcesz usunąć ten komentarz?",
+      "deleteConfirmButton": "Usuń",
+      "cancelButton": "Anuluj"
+    }
+  },
+  "share": {
+    "title": "Udostępnij",
+    "platforms": {
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn"
+    },
+    "actions": {
+      "copy": "Kopiuj"
+    },
+    "subjects": {
+      "whatsapp": "Udostępnij przez WhatsApp",
+      "telegram": "Udostępnij przez Telegram",
+      "twitter": "Udostępnij przez Twitter",
+      "facebook": "Udostępnij przez Facebook",
+      "linkedin": "Udostępnij przez LinkedIn"
+    },
+    "copySuccess": "Tekst skopiowany do schowka",
+    "notification": {
+      "accepted": "Zaakceptowano",
+      "rejected": "Odrzucono",
+      "accept": "Akceptuj",
+      "decline": "Odrzuć"
+    },
+    "time": {
+      "justNow": "właśnie teraz",
+      "minute": "min",
+      "hour": "godz",
+      "day": "d",
+      "week": "tyg",
+      "month": "mies",
+      "year": "r"
+    }
+  },
+  "notification": {
+    "accepted": "Zaakceptowano",
+    "rejected": "Odrzucono",
+    "accept": "Akceptuj",
+    "decline": "Odrzuć"
+  },
+  "entryDetail": {
+    "noCategory": "Brak kategorii",
+    "noTopicInfo": "Brak informacji o temacie",
+    "commentPlaceholder": "Udostępnij wpis na ten temat"
+  },
+  "verification": {
+    "title": "Weryfikacja konta",
+    "documentSelection": {
+      "title": "Wybierz typ dokumentu",
+      "passport": "Paszport",
+      "passportSubtitle": "Tylko paszporty UE",
+      "idCard": "Dowód osobisty",
+      "idCardSubtitle": "Akceptujemy dowody osobiste UE",
+      "driverLicense": "Prawo jazdy",
+      "driverLicenseSubtitle": "Akceptujemy prawa jazdy UE"
+    },
+    "documentUpload": {
+      "title": "Prześlij dokument",
+      "passport": "Paszport",
+      "passportSubtitle": "Tylko paszporty UE",
+      "id_card": "Dowód osobisty",
+      "idCardSubtitle": "Akceptujemy dowody osobiste UE",
+      "driverLicense": "Prawo jazdy",
+      "driverLicenseSubtitle": "Akceptujemy prawa jazdy UE",
+      "description": "Prześlij swój paszport, dowód osobisty lub prawo jazdy, aby zweryfikować swoje dane",
+      "uploadArea": {
+        "passport": "Skan paszportu",
+        "id_card": "Skan dowodu osobistego",
+        "driverLicense": "Skan prawa jazdy",
+        "uploadFile": "Prześlij plik",
+        "changeFile": "Zmień plik",
+        "fileUploaded": "Plik został pomyślnie przesłany"
+      },
+      "imageFormatWarning": "Obsługiwane formaty: PNG, SVG, JPEG, GIF"
+    },
+    "actions": {
+      "verify": "Zweryfikuj",
+      "upload": "Prześlij",
+      "change": "Zmień",
+      "remove": "Usuń"
+    },
+    "messages": {
+      "verificationSuccess": "Weryfikacja została pomyślnie przesłana",
+      "verificationFailed": "Weryfikacja nie powiodła się",
+      "fileUploadSuccess": "Plik został pomyślnie przesłany",
+      "fileUploadFailed": "Przesyłanie pliku nie powiodło się",
+      "fileUploadError": "Błąd przesyłania pliku",
+      "fileRemoved": "Plik został pomyślnie usunięty"
+    },
+    "validation": {
+      "documentTypeRequired": "Proszę wybrać typ dokumentu",
+      "fileRequired": "Proszę przesłać dokument",
+      "fileSizeLimit": "Rozmiar pliku musi być mniejszy niż 10MB",
+      "fileTypeNotSupported": "Typ pliku nie jest obsługiwany. Proszę przesłać JPG, PNG lub PDF"
+    },
+    "snackbar": {
+      "success": "Sukces",
+      "error": "Błąd",
+      "warning": "Ostrzeżenie",
+      "info": "Informacja"
+    }
+  }
+}

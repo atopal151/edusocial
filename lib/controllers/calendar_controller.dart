@@ -455,8 +455,6 @@ class CalendarController extends GetxController {
                         debugPrint("🎨 Seçilen Renk Debug:");
                         debugPrint("  - Seçilen Color: ${selectedColor.value}");
                         debugPrint("  - Hex Kodu: $colorHex");
-                        debugPrint(
-                            "  - RGB: R=${selectedColor.value.red}, G=${selectedColor.value.green}, B=${selectedColor.value.blue}");
 
                         final reminder = Reminder(
                           id: existing?.id ?? 0,

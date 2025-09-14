@@ -1,11 +1,11 @@
 {
   "signup": {
     "title": "Meet People with\nSimilar Interests!",
-    "subtitle": "EduSocial is an innovative social platform designed\nfor students studying at international schools\nin Poland.",
+    "subtitle": "EduSocial is an innovative social platform designed for students studying at international schools in Poland.",
     "form": {
       "title": "Sign Up",
-      "name": "First Name",
-      "surname": "Last Name",
+      "name": "Name",
+      "surname": "Surname",
       "username": "Username",
       "email": "Email",
       "password": "Password",
@@ -18,15 +18,15 @@
       "link": "Sign In."
     },
     "validation": {
-      "nameRequired": "First name is required",
-      "surnameRequired": "Last name is required",
+      "nameRequired": "Name field is required",
+      "surnameRequired": "Surname field is required",
       "usernameRequired": "Username is required",
       "usernameMinLength": "Username must be at least 3 characters",
-      "emailRequired": "Email is required",
+      "emailRequired": "Email field is required",
       "emailInvalid": "Please enter a valid email address",
-      "passwordRequired": "Password is required",
+      "passwordRequired": "Password field is required",
       "passwordMinLength": "Password must be at least 6 characters",
-      "confirmPasswordRequired": "Confirm password is required",
+      "confirmPasswordRequired": "Confirm password field is required",
       "passwordsNotMatch": "Passwords do not match",
       "privacyPolicyRequired": "You must accept the privacy policy"
     },
@@ -34,7 +34,7 @@
       "signupFailed": "Sign up failed",
       "networkError": "Network connection error",
       "usernameExists": "This username is already taken",
-      "emailExists": "This email is already registered",
+      "emailExists": "This email address is already in use",
       "serverError": "Server error occurred"
     },
     "success": {
@@ -76,10 +76,10 @@
     }
   },
   "forgotPassword": {
-    "title": "Forgot Password?",
+    "title": "Forgot Your Password?",
     "subtitle": "Enter your email address and we'll send you a link to reset your password.",
     "form": {
-      "title": "Reset Password",
+      "title": "Password Reset",
       "email": "Email address",
       "sendButton": "Send Reset Link"
     },
@@ -98,7 +98,7 @@
     "backToLogin": "Back to Login"
   },
   "resetPassword": {
-    "title": "Reset Password",
+    "title": "Password Reset",
     "subtitle": "Enter your new password below.",
     "form": {
       "title": "New Password",
@@ -117,7 +117,7 @@
       "message": "Your password has been successfully reset."
     },
     "errors": {
-      "resetFailed": "Failed to reset password",
+      "resetFailed": "Password reset failed",
       "networkError": "Network connection error",
       "invalidRequest": "Invalid reset request"
     }
@@ -125,13 +125,13 @@
   "step1": {
     "header": {
       "title": "Complete Your School Information",
-      "subtitle": "Make the platform personalized for you by adding your school, department and class!"
+      "subtitle": "Add your school, department and class to make the platform personalized for you!"
     },
     "form": {
       "school": "School",
       "department": "Department"
     },
-    "warning": "If you do not fill in your membership correctly, your account may be permanently closed.",
+    "warning": "If you do not fill out your membership correctly, your account may be permanently closed.",
     "continueButton": "Continue",
     "loading": {
       "schools": "Loading schools...",
@@ -146,50 +146,50 @@
       "departmentsLoadFailed": "Failed to load departments",
       "networkError": "Network connection error",
       "serverError": "Server error occurred",
-      "schoolUpdateFailed": "Failed to save school and department information"
+      "schoolUpdateFailed": "School and department information could not be saved"
     },
     "snackbars": {
       "missingInfo": "Missing Information",
-      "schoolSelectionRequired": "Please complete school and department selection."
+      "schoolSelectionRequired": "Please complete your school and department selection."
     }
   },
   "step2": {
     "header": {
       "title": "Complete Your Information",
-      "subtitle": "Make the platform personalized for you by adding your school, department and class!"
+      "subtitle": "Add your school, department and class to make the platform personalized for you!"
     },
     "form": {
-      "courseQuestion": "What courses are you taking?",
-      "courseInput": "Enter course name",
-      "savedCourses": "Saved Courses",
+      "courseQuestion": "What subjects are you taking?",
+      "courseInput": "Enter subject name",
+      "savedCourses": "Saved Subjects",
       "addButton": "Add"
     },
-    "warning": "If you do not fill in your membership correctly, your account may be permanently closed.",
+    "warning": "If you do not fill out your membership correctly, your account may be permanently closed.",
     "continueButton": "Continue",
     "validation": {
-      "courseRequired": "You must add at least one course",
-      "courseMinLength": "Course name must be at least 2 characters",
-      "courseMaxLength": "Course name can be maximum 50 characters",
-      "courseAlreadyExists": "This course is already added"
+      "courseRequired": "You must add at least one subject",
+      "courseMinLength": "Subject name must be at least 2 characters",
+      "courseMaxLength": "Subject name can be at most 50 characters",
+      "courseAlreadyExists": "This subject has already been added"
     },
     "errors": {
-      "courseAddFailed": "Failed to add course",
-      "courseRemoveFailed": "Failed to remove course",
+      "courseAddFailed": "Failed to add subject",
+      "courseRemoveFailed": "Failed to remove subject",
       "networkError": "Network connection error",
       "serverError": "Server error occurred"
     },
     "success": {
-      "courseAdded": "Course added successfully",
-      "courseRemoved": "Course removed successfully"
+      "courseAdded": "Subject successfully added",
+      "courseRemoved": "Subject successfully removed"
     }
   },
   "step3": {
     "header": {
       "title": "Complete Your Information",
-      "subtitle": "Make the platform personalized for you by adding your school, department and class!"
+      "subtitle": "Add your school, department and class to make the platform personalized for you!"
     },
     "groupsSection": {
-      "title": "Groups You Want to Join"
+      "title": "Groups You Would Like to Join"
     },
     "groupActions": {
       "joined": "Joined",
@@ -209,7 +209,7 @@
     "errors": {
       "groupsLoadFailed": "Failed to load groups",
       "joinGroupFailed": "Failed to join group",
-      "completeOnboardingFailed": "Failed to complete account",
+      "completeOnboardingFailed": "Account completion failed",
       "networkError": "Network connection error",
       "serverError": "Server error occurred",
       "groupAlreadyJoined": "You are already a member of this group",
@@ -219,12 +219,12 @@
     "success": {
       "title": "Success",
       "groupJoined": "Successfully joined the group",
-      "joinRequestSent": "Group join request sent",
-      "onboardingCompleted": "Your account has been completed successfully!",
+      "joinRequestSent": "Your join request has been sent",
+      "onboardingCompleted": "Your account has been successfully completed!",
       "welcomeMessage": "Welcome to EduSocial!"
     },
     "snackbars": {
-      "joinRequestFailed": "Failed to send group join request. Please try again later."
+      "joinRequestFailed": "Failed to send join request. Please try again later."
     }
   },
   "calendar": {
@@ -281,13 +281,13 @@
       "operationFailed": "Operation failed"
     },
     "success": {
-      "reminderSaved": "Reminder saved successfully",
-      "reminderDeleted": "Reminder deleted successfully",
-      "reminderUpdated": "Reminder updated successfully",
+      "reminderSaved": "Reminder successfully saved",
+      "reminderDeleted": "Reminder successfully deleted",
+      "reminderUpdated": "Reminder successfully updated",
       "reminderAdded": "Reminder added"
     },
     "emptyState": {
-      "title": "No reminders yet",
+      "title": "You don't have any reminders yet",
       "subtitle": "Start by adding a new reminder"
     },
     "reminderDetail": {
@@ -301,7 +301,7 @@
       "close": "Close",
       "error": {
         "title": "Error",
-        "message": "Failed to load reminder."
+        "message": "Failed to get reminder."
       }
     }
   },
@@ -313,7 +313,7 @@
   },
   "groupChatDetail": {
     "appBar": {
-      "memberCount": "members"
+      "memberCount": "member"
     },
     "emptyState": {
       "title": "No messages yet",
@@ -321,20 +321,20 @@
     },
     "loading": {
       "messages": "Loading messages...",
-      "groupData": "Loading group data...",
+      "groupData": "Loading group information...",
       "sending": "Sending..."
     },
     "errors": {
-      "groupLoadFailed": "Failed to load group data",
+      "groupLoadFailed": "Failed to load group information",
       "messagesLoadFailed": "Failed to load messages",
       "messageSendFailed": "Failed to send message",
       "networkError": "Network connection error",
       "serverError": "Server error occurred",
-      "groupDataLoadFailed": "Group data could not be loaded",
+      "groupDataLoadFailed": "Failed to load group data",
       "pleaseRetry": "Please try again"
     },
     "success": {
-      "messageSent": "Message sent successfully"
+      "messageSent": "Message successfully sent"
     },
     "actions": {
       "more": "More",
@@ -349,7 +349,7 @@
         "people": "People",
         "groups": "Groups"
       },
-      "refreshSuccess": "Personal messages refreshed successfully"
+      "refreshSuccess": "Personal messages successfully refreshed"
     },
     "chatDetail": {
       "onlineStatus": {
@@ -372,7 +372,7 @@
         "links": "Links",
         "photos": "Photos"
       },
-      "documentInfo": "Mb •"
+      "documentInfo": "MB •"
     },
     "messageInput": {
       "placeholder": "Write a message...",
@@ -381,7 +381,7 @@
       "removeFile": "Remove file"
     },
     "chatDetailBottom": {
-      "placeholder": "Write a message... (Links are automatically detected)",
+      "placeholder": "Write message... (Links are automatically detected)",
       "send": "Send"
     },
     "loading": {
@@ -399,10 +399,10 @@
       "serverError": "Server error occurred"
     },
     "success": {
-      "messageSent": "Message sent successfully",
-      "fileUploaded": "File uploaded successfully",
-      "imageUploaded": "Image uploaded successfully",
-      "documentUploaded": "Document uploaded successfully"
+      "messageSent": "Message successfully sent",
+      "fileUploaded": "File successfully uploaded",
+      "imageUploaded": "Image successfully uploaded",
+      "documentUploaded": "Document successfully uploaded"
     },
     "actions": {
       "more": "More",
@@ -427,17 +427,17 @@
       "audio": "Audio"
     },
     "poll": {
-      "title": "Write a poll question",
+      "title": "Write poll question",
       "option": "Add option",
       "addOption": "Add Option",
       "send": "Send Poll"
     },
-                "survey": {
-              "title": "Write survey title",
-              "addChoice": "Add choice",
-              "multipleChoice": "Multiple selection",
-              "send": "Send Survey"
-            },
+    "survey": {
+      "title": "Write survey title",
+      "addChoice": "Add option",
+      "multipleChoice": "Multiple choice",
+      "send": "Send Survey"
+    },
     "dateSeparator": {
       "today": "Today",
       "yesterday": "Yesterday"
@@ -447,24 +447,24 @@
       "messagePlaceholder": "Write a message..."
     },
     "document": {
-      "cannotOpen": "Document could not be opened",
-      "openError": "An error occurred while opening the document",
+      "cannotOpen": "Document cannot be opened",
+      "openError": "Error occurred while opening document",
       "clickToDownload": "Click to download"
     },
     "link": {
-      "cannotOpen": "Link could not be opened. Please try again.",
+      "cannotOpen": "Link cannot be opened. Please try again.",
       "cannotOpenThis": "This link cannot be opened",
       "openError": "An error occurred while opening the link"
     },
     "dialogs": {
       "clearMessages": {
         "title": "Clear Messages",
-        "message": "Are you sure you want to clear all messages from this chat? This action cannot be undone.",
+        "message": "Are you sure you want to clear all messages in this chat? This action cannot be undone.",
         "confirm": "Clear"
       },
       "report": {
         "title": "Report User",
-        "message": "Are you sure you want to report this user? This action will be reviewed by our team.",
+        "message": "Are you sure you want to report this user? This will be reviewed by our team.",
         "confirm": "Report"
       }
     }
@@ -474,17 +474,30 @@
       "searchPlaceholder": "Search entries",
       "newTopicButton": "+ Create New Topic",
       "noEntriesFound": "No entries found to display.",
-      "refreshSuccess": "Entry data refreshed successfully",
+      "refreshSuccess": "Entry data successfully refreshed",
       "refreshLoading": "Refreshing entry data...",
       "allCategories": "All Categories",
-      "categories": "categories",
+      "categories": "category",
       "all": "All",
-      "entries": "entries"
+      "entries": "entry"
     },
     "entryDetail": {
       "noCategory": "No Category",
-      "noTopicInfo": "No Topic Information",
-      "commentPlaceholder": "Share an entry to this topic"
+      "noTopicInfo": "No Topic Info",
+      "commentPlaceholder": "Share an entry on this topic",
+      "sendComment": "Send comment",
+      "entryCount": "Entry Count",
+      "shareText": {
+        "topicTitle": "Topic Title",
+        "category": "Category",
+        "author": "Author",
+        "entryContent": "Entry Content",
+        "aboutTopic": "About Topic",
+        "downloadApp": "Download EduSocial App:",
+        "openApp": "Open App",
+        "appStore": "App Store",
+        "playStore": "Play Store"
+      }
     },
     "entryCard": {
       "share": "Share",
@@ -513,17 +526,17 @@
       "commentsLoadFailed": "Failed to load comments",
       "entrySendFailed": "Failed to send entry",
       "topicCreateFailed": "Failed to create topic",
-      "voteFailed": "Vote failed",
+      "voteFailed": "Voting failed",
       "networkError": "Network connection error",
       "serverError": "Server error occurred",
       "entryNotFound": "No entry found for this topic",
       "generalError": "An error occurred"
     },
     "success": {
-      "entrySent": "Entry sent successfully",
-      "topicCreated": "Topic created successfully",
+      "entrySent": "Entry successfully sent",
+      "topicCreated": "Topic successfully created",
       "voteRecorded": "Vote recorded",
-      "commentSent": "Comment sent successfully"
+      "commentSent": "Comment successfully sent"
     },
     "validation": {
       "titleRequired": "Topic title is required",
@@ -531,8 +544,8 @@
       "categoryRequired": "Category selection is required",
       "titleMinLength": "Topic title must be at least 3 characters",
       "contentMinLength": "Entry content must be at least 10 characters",
-      "titleMaxLength": "Topic title can be maximum 100 characters",
-      "contentMaxLength": "Entry content can be maximum 1000 characters"
+      "titleMaxLength": "Topic title can be at most 100 characters",
+      "contentMaxLength": "Entry content can be at most 1000 characters"
     },
     "actions": {
       "share": "Share",
@@ -560,20 +573,20 @@
       "title": "Create Event",
       "eventTitle": "Event Title",
       "eventTitleHint": "Enter event title",
-      "eventDescription": "Event Description", 
+      "eventDescription": "Event Description",
       "eventDescriptionHint": "Describe your event",
-      "eventBanner": "Event Banner",
-      "bannerHint": "Tap to select banner image",
+      "eventBanner": "Event Cover Photo",
+      "bannerHint": "Click to select cover photo",
       "location": "Location",
       "locationHint": "Event location or Google Maps link",
       "startDate": "Start Date",
       "startTime": "Start Time",
-      "endDate": "End Date", 
+      "endDate": "End Date",
       "endTime": "End Time",
       "selectDateTime": "Select",
       "createButton": "Create Event",
       "success": {
-        "created": "Event created successfully!"
+        "created": "Event successfully created!"
       },
       "validation": {
         "titleRequired": "Event title is required",
@@ -587,26 +600,35 @@
       "title": "Edit Event",
       "updateButton": "Update Event",
       "success": {
-        "updated": "Event updated successfully!"
+        "updated": "Event successfully updated!"
       },
       "error": {
-        "updateFailed": "Error updating event"
+        "updateFailed": "An error occurred while updating the event",
+        "createFailed": "Event could not be created"
+      },
+      "validation": {
+        "titleRequired": "Event title is required",
+        "descriptionRequired": "Event description is required",
+        "locationRequired": "Event location is required",
+        "startDateTimeRequired": "Start date and time are required",
+        "endDateTimeRequired": "End date and time are required",
+        "endTimeAfterStart": "End time must be after start time",
+        "groupRequired": "Group selection is required"
       }
     },
     "locationPicker": {
       "title": "Select Location",
       "selectedLocation": "Selected Location",
-      "tapToSelect": "Tap on map to select location",
+      "tapToSelect": "Tap on the map to select location",
       "currentLocation": "My Location",
       "confirmLocation": "Confirm"
     },
-  
     "eventCard": {
       "share": "Share",
       "viewLocation": "View Location",
       "notification": "Notification",
       "notificationSet": "Event notification set.",
-      "expired": "Event Time Expired",
+      "expired": "Event Expired",
       "more": "More",
       "shareText": {
         "downloadApp": "Download EduSocial App:",
@@ -626,13 +648,13 @@
       "participants": "Participants",
       "join": "Join",
       "leave": "Leave",
-      "until": "Finish",
       "share": "Share",
-      "setReminder": "Reminder",
       "report": "Report",
+      "until": "Until",
+      "setReminder": "Reminder",
       "joinEvent": "Join",
       "expired": "This Event Has Ended",
-      "retry": "Retry"
+      "retry": "Try Again"
     },
     "loading": {
       "events": "Loading events...",
@@ -649,7 +671,7 @@
       "serverError": "Server error occurred"
     },
     "success": {
-      "eventShared": "Event shared successfully",
+      "eventShared": "Event successfully shared",
       "joinedEvent": "Successfully joined the event",
       "leftEvent": "Successfully left the event",
       "notificationSet": "Event notification set"
@@ -663,37 +685,56 @@
       "setNotification": "Set Notification",
       "removeNotification": "Remove Notification"
     },
+    "reminder": {
+      "success": "Event reminder successfully set",
+      "error": "Error occurred while setting reminder"
+    },
+    "invitation": {
+      "accepted": "Event invitation accepted",
+      "declined": "Event invitation declined",
+      "error": "Error occurred while responding to invitation",
+      "alreadyResponded": "You have already responded to this event"
+    },
+    "share": {
+      "success": "Event successfully shared"
+    },
+    "location": {
+      "viewing": "Viewing location information"
+    },
     "notifications": {
       "reminder": {
-        "success": "Event reminder set successfully",
-        "error": "Error setting reminder"
+        "success": "Event reminder successfully set",
+        "error": "Error occurred while setting reminder"
       },
       "invitation": {
         "accepted": "Event invitation accepted",
         "declined": "Event invitation declined",
-        "error": "Error responding to invitation",
+        "error": "Error occurred while responding to invitation",
         "alreadyResponded": "You have already responded to this event"
       },
       "share": {
-        "success": "Event shared successfully"
+        "success": "Event successfully shared"
       },
       "location": {
         "viewing": "Viewing location information"
       },
       "shared": "Shared",
       "locationView": "View Location",
-      "locationInfo": "location information is being displayed for."
+      "locationInfo": "viewing location information."
     }
   },
   "groups": {
     "groupList": {
       "createGroupButton": "Create New Group",
-      "myGroups": "My Groups",
+      "myGroups": "Your Groups",
       "allGroups": "All Groups",
       "joined": "Joined",
       "pending": "Pending Approval",
       "join": "Join",
       "loading": "Loading groups...",
+      "groupSelected": "Group Selected",
+      "redirectingToGroup": "redirecting to group.",
+      "notMember": "You are not a member of this group",
       "noGroups": "You haven't joined any groups yet",
       "joinGroupsBelow": "Join groups from the list below"
     },
@@ -703,7 +744,7 @@
       "groupName": "Group Name",
       "groupDescription": "Group Description",
       "groupArea": "Group Area",
-      "privacySetting": "Requires join request\nto enter the group.",
+      "privacySetting": "Require join request to enter the group.",
       "cancel": "Cancel",
       "createGroup": "Create Group",
       "loading": {
@@ -713,7 +754,7 @@
       "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
     },
     "groupDetail": {
-      "title": "Group Details",
+      "title": "Group Detail",
       "noParticipants": "No participants found",
       "created": "Created",
       "participantCount": "Participant Count",
@@ -728,22 +769,21 @@
         "report": "Report",
         "createEvent": "Create Event"
       },
-      
       "emptyStates": {
         "documents": "No documents added yet",
         "links": "No links added yet",
         "photos": "No photos added yet"
       },
-      "documentInfo": "Mb •",
+      "documentInfo": "MB •",
       "documentPrefix": "Document -"
     },
     "dialogs": {
-        "leaveGroup": {
-          "title": "Leave Group",
-          "message": "Are you sure you want to leave this group? This action cannot be undone.",
-          "confirm": "Leave"
-        }
-      },
+      "leaveGroup": {
+        "title": "Leave Group",
+        "message": "Are you sure you want to leave the group?",
+        "confirm": "Leave Group"
+      }
+    },
     "groupParticipants": {
       "title": "Group Participants",
       "noParticipants": "No participants yet",
@@ -756,7 +796,7 @@
       "report": "Report",
       "delete": "Delete",
       "edit": "Edit",
-      "messages": "Messages"
+      "messages": "Message"
     },
     "loading": {
       "groups": "Loading groups...",
@@ -778,10 +818,10 @@
       "serverError": "Server error occurred"
     },
     "success": {
-      "groupCreated": "Group created successfully",
+      "groupCreated": "Group successfully created",
       "joinedGroup": "Successfully joined the group",
       "leftGroup": "Successfully left the group",
-      "groupShared": "Group shared successfully",
+      "groupShared": "Group successfully shared",
       "requestSent": "Request sent",
       "joinRequestSent": "Your join request has been sent"
     },
@@ -791,8 +831,8 @@
       "areaRequired": "Group area selection is required",
       "nameMinLength": "Group name must be at least 3 characters",
       "descriptionMinLength": "Group description must be at least 10 characters",
-      "nameMaxLength": "Group name can be maximum 50 characters",
-      "descriptionMaxLength": "Group description can be maximum 500 characters"
+      "nameMaxLength": "Group name can be at most 50 characters",
+      "descriptionMaxLength": "Group description can be at most 500 characters"
     },
     "actions": {
       "createGroup": "Create Group",
@@ -831,7 +871,7 @@
     },
     "pinnedMessages": {
       "title": "Pinned Messages",
-      "showMore": "more messages",
+      "showMore": "show more messages",
       "showLess": "Show less",
       "noPinnedMessages": "No pinned messages",
       "unpinMessage": "Unpin message",
@@ -841,11 +881,11 @@
   },
   "home": {
     "homeScreen": {
-      "suggestedGroups": "Groups You Might Like",
-      "hotTopics": "Trending Topics",
-      "refreshSuccess": "Home data refreshed successfully",
-      "refreshLoading": "Refreshing home data...",
-      "refreshError": "Error refreshing home data"
+      "suggestedGroups": "Groups You Might Be Interested In",
+      "hotTopics": "Hot Topics",
+      "refreshSuccess": "Home page data successfully refreshed",
+      "refreshLoading": "Refreshing home page data...",
+      "refreshError": "Error refreshing home page data"
     },
     "groupSuggestion": {
       "joined": "Joined",
@@ -853,7 +893,7 @@
       "joinGroup": "Join Group"
     },
     "hotTopics": {
-      "noTopics": "No trending topics found"
+      "noTopics": "No hot topics found"
     },
     "postHome": {
       "noPosts": "No posts found to display",
@@ -869,14 +909,21 @@
         "cameraError": "An error occurred while opening camera",
         "shareError": "An error occurred while sharing story",
         "selectPhotoWarning": "Please select a photo",
-        "storiesShared": "stories shared successfully",
+        "storiesShared": "story successfully shared",
         "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
       },
       "myStoryList": {
         "you": "@You"
       },
       "storyViewer": {
-        "noImage": "No Image"
+        "noImage": "No image",
+        "timeAgo": {
+          "justNow": "just now",
+          "minutesAgo": "min ago",
+          "hoursAgo": "hours ago",
+          "yesterday": "yesterday",
+          "daysAgo": "days ago"
+        }
       },
       "myStoryViewer": {
         "timeAgo": {
@@ -898,7 +945,7 @@
       "addGallery": "Gallery",
       "removeImage": "Remove image",
       "removeLink": "Remove link",
-      "postError": "Error occurred while sharing post.",
+      "postError": "An error occurred while sharing the post.",
       "contentRequired": "Please enter post content.",
       "warning": "Warning",
       "error": "Error",
@@ -906,7 +953,7 @@
       "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
     },
     "loading": {
-      "homeData": "Loading home data...",
+      "homeData": "Loading home page data...",
       "stories": "Loading stories...",
       "groups": "Loading groups...",
       "topics": "Loading topics...",
@@ -915,7 +962,7 @@
       "sharing": "Sharing..."
     },
     "errors": {
-      "homeDataLoadFailed": "Failed to load home data",
+      "homeDataLoadFailed": "Failed to load home page data",
       "storiesLoadFailed": "Failed to load stories",
       "groupsLoadFailed": "Failed to load groups",
       "topicsLoadFailed": "Failed to load topics",
@@ -928,16 +975,16 @@
       "serverError": "Server error occurred"
     },
     "success": {
-      "homeDataRefreshed": "Home data refreshed successfully",
-      "storyCreated": "Story created successfully",
-      "postCreated": "Post created successfully",
-      "photoSelected": "Photo selected successfully"
+      "homeDataRefreshed": "Home page data successfully refreshed",
+      "storyCreated": "Story successfully created",
+      "postCreated": "Post successfully created",
+      "photoSelected": "Photo successfully selected"
     },
     "validation": {
       "postContentRequired": "Post content is required",
       "storyImageRequired": "Photo is required for story",
       "contentMinLength": "Content must be at least 1 character",
-      "contentMaxLength": "Content can be maximum 1000 characters"
+      "contentMaxLength": "Content can be at most 1000 characters"
     },
     "actions": {
       "createPost": "Create Post",
@@ -953,16 +1000,16 @@
       "cancel": "Cancel"
     },
     "notifications": {
-      "refreshSuccess": "Home data refreshed successfully",
-      "refreshError": "Error occurred while refreshing home data"
+      "refreshSuccess": "Home page data successfully refreshed",
+      "refreshError": "Error occurred while refreshing home page data"
     }
   },
   "match": {
-    "title": "Meet People with \n Similar Interests!",
-    "subtitle": "EduSocial is an innovative social platform designed for \n students studying at international schools in Poland.",
+    "title": "Meet People with\nSimilar Interests!",
+    "subtitle": "EduSocial is an innovative social platform designed for\nstudents studying at international schools in Poland.",
     "form": {
-      "courseQuestion": "What subject will you study?",
-      "courseInput": "Enter subject name",
+      "courseQuestion": "What Topic Will You Study?",
+      "courseInput": "Enter topic name",
       "savedTopics": "Saved Topics"
     },
     "findMatchesButton": "Find Suitable Matches",
@@ -974,7 +1021,7 @@
       "online": "Online",
       "education": "Education",
       "about": "About",
-      "matchedTopics": "Topics that match with you",
+      "matchedTopics": "Topics matched with you",
       "noSchoolInfo": "No school information",
       "noDepartment": "No department",
       "noAboutInfo": "No information yet",
@@ -983,13 +1030,13 @@
         "follow": "Follow",
         "following": "Following",
         "message": "message",
-        "next": "Next",
+        "next": "Skip",
         "followAction": "Follow"
       }
     },
     "dragActions": {
       "follow": "Follow",
-      "next": "Next"
+      "next": "Skip"
     },
     "loading": {
       "findingMatches": "Finding matches...",
@@ -999,11 +1046,11 @@
     "validation": {
       "topicRequired": "You must add at least one topic",
       "topicMinLength": "Topic name must be at least 2 characters",
-      "topicMaxLength": "Topic name can be maximum 50 characters",
-      "topicAlreadyExists": "This topic is already added"
+      "topicMaxLength": "Topic name can be at most 50 characters",
+      "topicAlreadyExists": "This topic has already been added"
     },
     "errors": {
-      "courseAlreadyAdded": "course is already added or could not be added.",
+      "courseAlreadyAdded": "course has already been added or could not be added.",
       "courseAddFailed": "Failed to add course",
       "topicAddFailed": "Failed to add topic",
       "topicRemoveFailed": "Failed to remove topic",
@@ -1015,22 +1062,22 @@
     },
     "success": {
       "coursesSaved": "Courses saved to your profile!",
-      "topicAdded": "Topic added successfully",
-      "topicRemoved": "Topic removed successfully",
+      "topicAdded": "Topic successfully added",
+      "topicRemoved": "Topic successfully removed",
       "userFollowed": "followed!",
       "followSuccess": "Follow operation successful"
     },
     "card": {
       "follow": "Follow",
       "skip": "Skip",
-      "next": "Next",
+      "next": "Skip",
       "online": "Online",
       "education": "Education",
-      "noSchoolInfo": "No school info",
+      "noSchoolInfo": "No school information",
       "noDepartment": "No department",
       "grade": "Grade",
       "about": "About",
-      "noInfoYet": "No info yet",
+      "noInfoYet": "No information yet",
       "matchedTopics": "Topics matched with you",
       "following": "Following",
       "sendFollowRequest": "Send Follow Request",
@@ -1040,6 +1087,10 @@
   },
   "notifications": {
     "title": "Notifications",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "lastWeek": "Last 7 Days",
+    "earlier": "Earlier",
     "grouping": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -1048,21 +1099,23 @@
     },
     "timeAgo": {
       "justNow": "just now",
-      "minutesAgo": "min",
-      "hoursAgo": "h",
-      "daysAgo": "d",
-      "weeksAgo": "w",
-      "monthsAgo": "m",
-      "yearsAgo": "y"
+      "minutesAgo": "minutes ago",
+      "hoursAgo": "hours ago",
+      "daysAgo": "days ago",
+      "weeksAgo": "weeks ago",
+      "monthsAgo": "months ago",
+      "yearsAgo": "years ago"
     },
-    "actions": {
-      "accept": "Accept",
-      "decline": "Decline",
-      "accepted": "Accepted",
-      "rejected": "Rejected",
-      "follow": "Follow",
-      "unfollow": "Unfollow",
-      "close": "Close"
+    "types": {
+      "newMessage": "New Message",
+      "groupMessage": "Group Message",
+      "newComment": "New Comment",
+      "newLike": "New Like",
+      "newFollow": "New Follower",
+      "followRequest": "Follow Request",
+      "groupJoinRequest": "Group Join Request",
+      "eventInvitation": "Event Invitation",
+      "systemNotification": "System Notification"
     },
     "notificationTypes": {
       "followRequest": "Follow Request",
@@ -1072,9 +1125,18 @@
       "groupJoinRequest": "Group Join Request",
       "groupJoin": "Group Join",
       "createGroupEvent": "Create Group Event",
-      "groupAccept": "Group Acceptance"
+      "groupAccept": "Group Accept"
     },
     "messages": {
+      "likedPost": "liked your post",
+      "commentedPost": "commented on your post",
+      "startedFollowing": "started following you",
+      "wantsToFollow": "wants to follow you",
+      "wantsToJoinGroup": "wants to join your group",
+      "group": "group",
+      "sentMessage": "sent you a message",
+      "sentGroupMessage": "sent a message in your group",
+      "invitedToEvent": "invited you to an event",
       "followRequest": "wants to follow you",
       "postLiked": "liked your post",
       "postCommented": "commented on your post",
@@ -1083,10 +1145,20 @@
       "eventCreated": "created a group event",
       "groupAccepted": "your group request was accepted"
     },
+    "actions": {
+      "accept": "Accept",
+      "decline": "Decline",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "follow": "Follow",
+      "unfollow": "Unfollow",
+      "close": "Close",
+      "sendMessage": "Send Message"
+    },
     "loading": {
       "notifications": "Loading notifications...",
       "refreshing": "Refreshing notifications...",
-      "refreshed": "Notifications refreshed successfully",
+      "refreshed": "Notifications successfully refreshed",
       "accepting": "Accepting...",
       "declining": "Declining...",
       "following": "Following...",
@@ -1104,7 +1176,7 @@
       "generalError": "An error occurred"
     },
     "success": {
-      "notificationsRefreshed": "Notifications refreshed successfully",
+      "notificationsRefreshed": "Notifications successfully refreshed",
       "followRequestAccepted": "Follow request accepted",
       "followRequestDeclined": "Follow request declined",
       "groupJoinRequestAccepted": "Group join request accepted",
@@ -1115,10 +1187,10 @@
       "eventCreateRequestDeclined": "Event creation request declined"
     },
     "validation": {
-      "userIdRequired": "User ID required",
-      "groupIdRequired": "Group ID required",
-      "eventIdRequired": "Event ID required",
-      "decisionRequired": "Decision required"
+      "userIdRequired": "User ID is required",
+      "groupIdRequired": "Group ID is required",
+      "eventIdRequired": "Event ID is required",
+      "decisionRequired": "Decision is required"
     },
     "debug": {
       "buildingButton": "Building button for notification:",
@@ -1133,9 +1205,139 @@
       "message": "Message:",
       "groupJoinRequestButton": "Building group join request button for notification:",
       "groupIdNull": "Group ID is null, not showing button",
-      "requestAccepted": "Request is already accepted, showing 'Accepted' button",
-      "requestRejected": "Request is rejected, showing 'Rejected' button",
-      "requestPending": "Request is pending, showing accept/decline buttons"
+      "requestAccepted": "Request already accepted, showing 'Accepted' button",
+      "requestRejected": "Request rejected, showing 'Rejected' button",
+      "requestPending": "Request pending, showing accept/decline buttons"
+    }
+  },
+  "slidingNotifications": {
+    "newMessage": "New Message",
+    "groupMessage": "Group Message",
+    "newComment": "New Comment",
+    "newLike": "New Like",
+    "newFollow": "New Follower",
+    "followRequest": "Follow Request",
+    "groupJoinRequest": "Group Join Request",
+    "eventInvitation": "Event Invitation",
+    "systemNotification": "System Notification",
+    "unknown": "Unknown"
+  },
+  "groupChat": {
+    "errors": {
+      "loadFailed": "Group chat could not be loaded",
+      "messageSendFailed": "Message could not be sent",
+      "joinFailed": "Failed to join group",
+      "leaveFailed": "Failed to leave group",
+      "networkError": "Network connection error",
+      "serverError": "Server error occurred",
+      "tryAgain": "Try Again",
+      "retry": "Retry",
+      "connectionLost": "Connection lost",
+      "reconnecting": "Reconnecting...",
+      "connectionRestored": "Connection restored"
+    },
+    "messages": {
+      "loading": "Loading messages...",
+      "noMessages": "No messages yet",
+      "sendMessage": "Send message",
+      "typeMessage": "Type a message...",
+      "sending": "Sending...",
+      "sent": "Sent",
+      "failed": "Failed",
+      "messagePinned": "Message successfully pinned",
+      "messageUnpinned": "Message unpinned",
+      "pinError": "Message pin/unpin failed",
+      "tryAgain": "Please try again"
+    },
+    "actions": {
+      "joinGroup": "Join Group",
+      "leaveGroup": "Leave Group",
+      "viewMembers": "View Members",
+      "groupInfo": "Group Info",
+      "shareGroup": "Share Group",
+      "muteGroup": {
+        "muted": "Group Muted",
+        "unmuted": "Group Notifications On",
+        "mutedDesc": "You will not receive notifications from this group",
+        "unmutedDesc": "You will receive notifications from this group"
+      },
+      "dialogs": {
+        "leaveGroup": {
+          "title": "Leave Group",
+          "message": "Are you sure you want to leave this group? This action cannot be undone.",
+          "confirm": "Leave"
+        }
+      },
+      "pinnedMessages": {
+        "title": "Pinned Messages",
+        "showMore": "show more messages",
+        "showLess": "Show less",
+        "noPinnedMessages": "No pinned messages",
+        "unpinMessage": "Unpin",
+        "navigateToMessage": "Go to message",
+        "emptyState": "No pinned messages yet"
+      }
+    }
+  },
+  "notificationSettings": {
+    "title": "Notification Settings",
+    "status": {
+      "title": "Notification Status",
+      "deviceId": "Device ID",
+      "serviceActive": "Notification Service Active",
+      "serviceInactive": "Notification Service Not Connected",
+      "connectionError": "Connection Error"
+    },
+    "permissions": {
+      "title": "Notification Permissions",
+      "notificationPermission": "Notification Permission"
+    },
+    "types": {
+      "title": "Notification Types",
+      "postNotifications": "Post Notifications (Likes, Comments)",
+      "messageNotifications": "Message Notifications (Private & Group Chat)",
+      "groupNotifications": "Group Notifications (Join Requests)",
+      "eventNotifications": "Event Notifications (Invitations)",
+      "followNotifications": "Follow Notifications (Requests)",
+      "systemNotifications": "System Notifications"
+    },
+    "test": {
+      "title": "Test Operations",
+      "platformTest": "Platform Test Notification",
+      "onesignalTest": "OneSignal Test Notification",
+      "localTest": "Local Test Notification",
+      "simpleTest": "Simple Test Notification",
+      "checkConfig": "Check Configuration",
+      "showPlayerId": "Show Player ID"
+    },
+    "messages": {
+      "playerId": "Player ID",
+      "playerIdError": "Player ID could not be retrieved",
+      "settingsSaved": "Settings saved successfully",
+      "settingsError": "Settings could not be saved",
+      "permissionGranted": "Notification permission granted",
+      "permissionGrantedDesc": "You can now receive notifications",
+      "permissionDenied": "Notification permission denied",
+      "permissionDeniedDesc": "You need to grant permission from settings to receive notifications",
+      "permissionRequired": "Notification permission required",
+      "permissionRequiredDesc": "You need to grant notification permission first to use this feature",
+      "settingsRedirect": "Redirecting to Settings",
+      "settingsRedirectDesc": "You can disable notification permissions from device settings",
+      "settingsOpenError": "Settings Could Not Be Opened",
+      "settingsOpenErrorDesc": "You need to manually open device settings",
+      "manualSettingsInstruction": "Please check app notifications from device settings"
+    },
+    "dialogs": {
+      "permissionRequired": {
+        "title": "Notification Permission Required",
+        "message": "To enable this notification type, you first need to grant notification permission from the device. Would you like to grant permission?",
+        "grant": "Grant Permission"
+      },
+      "disablePermission": {
+        "title": "Disable Notification Permission",
+        "message": "To disable notification permission, you need to go to device settings. Would you like to open settings?",
+        "openSettings": "Open Settings"
+      }
     }
   },
   "profile": {
@@ -1144,26 +1346,11 @@
       "posts": "Posts",
       "entries": "Entries"
     },
-    "mainProfile": {
-      "editProfile": "Edit Profile",
-      "refreshLoading": "Refreshing profile data...",
-      "refreshSuccess": "Profile data refreshed successfully",
-      "noEntriesFound": "No entries found.",
-      "noPostsFound": "No posts found.",
-      "shareText": {
-        "topicInfo": "No Topic Information",
-        "categoryInfo": "No Category",
-        "appLink": "Open App: edusocial://app",
-        "appStore": "App Store: https://apps.apple.com/app/edusocial/id123456789",
-        "playStore": "Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app",
-        "hashtags": "#EduSocial #Education"
-      }
-    },
     "editProfile": {
       "title": "Edit Profile",
       "username": "Username",
-      "name": "Name",
-      "surname": "Surname",
+      "name": "First Name",
+      "surname": "Last Name",
       "email": "Email",
       "phone": "Phone",
       "birthday": "Birthday",
@@ -1181,20 +1368,35 @@
       "departmentSelection": "Department Selection",
       "saveProfile": "Save Profile",
       "profileUpdated": "Profile updated successfully",
-      "profileUpdateFailed": "Profile update failed",
-      "addLesson": "Add Lesson",
-      "enterLessonName": "Enter lesson name...",
-      "lessonAdded": "Lesson added successfully",
-      "lessonRemoved": "Lesson removed from list",
-      "lessonNameEmpty": "Lesson name cannot be empty",
-      "lessonAlreadyExists": "This lesson already exists",
-      "lessonAddError": "Error adding lesson",
-      "lessonRemoveError": "Error removing lesson",
+      "profileUpdateFailed": "Profile could not be updated",
+      "addLesson": "Add Course",
+      "enterLessonName": "Enter course name...",
+      "lessonAdded": "Course added successfully",
+      "lessonRemoved": "Course removed from list",
+      "lessonNameEmpty": "Course name cannot be empty",
+      "lessonAlreadyExists": "This course has already been added",
+      "lessonAddError": "Error occurred while adding course",
+      "lessonRemoveError": "Error occurred while removing course",
       "imageFormatWarning": "Supported formats: PNG, SVG, JPEG, GIF"
+    },
+    "mainProfile": {
+      "editProfile": "Edit Profile",
+      "refreshLoading": "Refreshing profile data...",
+      "refreshSuccess": "Profile data refreshed successfully",
+      "noEntriesFound": "No entries found.",
+      "noPostsFound": "No posts found.",
+      "shareText": {
+        "topicInfo": "No Topic Information",
+        "categoryInfo": "No Category",
+        "appLink": "Open App: edusocial://app",
+        "appStore": "App Store: https://apps.apple.com/app/edusocial/id123456789",
+        "playStore": "Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app",
+        "hashtags": "#EduSocial #Education"
+      }
     },
     "peopleProfile": {
       "loading": "Loading user profile...",
-      "loadError": "Failed to load user profile.",
+      "loadError": "User profile could not be loaded.",
       "notFound": "User profile not found.",
       "actions": {
         "follow": "Follow",
@@ -1204,7 +1406,7 @@
       },
       "lockedContent": {
         "title": "This content is private",
-        "description": "To see this user's content,\nyou need to send a follow request first."
+        "description": "To view this user's content,\nyou need to send a follow request first."
       },
       "noPostsFound": "No posts found.",
       "noEntriesFound": "No entries found.",
@@ -1238,12 +1440,12 @@
       "refreshing": "Refreshing..."
     },
     "errors": {
-      "profileLoadFailed": "Failed to load profile",
-      "postsLoadFailed": "Failed to load posts",
-      "entriesLoadFailed": "Failed to load entries",
-      "followersLoadFailed": "Failed to load followers",
-      "followingLoadFailed": "Failed to load following",
-      "profileUpdateFailed": "Failed to update profile",
+      "profileLoadFailed": "Profile could not be loaded",
+      "postsLoadFailed": "Posts could not be loaded",
+      "entriesLoadFailed": "Entries could not be loaded",
+      "followersLoadFailed": "Followers could not be loaded",
+      "followingLoadFailed": "Following could not be loaded",
+      "profileUpdateFailed": "Profile could not be updated",
       "followFailed": "Follow operation failed",
       "unfollowFailed": "Unfollow operation failed",
       "networkError": "Network connection error",
@@ -1259,12 +1461,12 @@
     },
     "validation": {
       "usernameRequired": "Username is required",
-      "nameRequired": "Name is required",
-      "surnameRequired": "Surname is required",
+      "nameRequired": "First name is required",
+      "surnameRequired": "Last name is required",
       "emailRequired": "Email is required",
       "emailInvalid": "Please enter a valid email address",
       "phoneInvalid": "Please enter a valid phone number",
-      "birthdayInvalid": "Please enter a valid birthday"
+      "birthdayInvalid": "Please enter a valid birth date"
     },
     "debug": {
       "profileLoading": "ProfileController.loadProfile() called",
@@ -1274,17 +1476,17 @@
       "postsLoaded": "Profile posts loaded successfully:",
       "postsLoadError": "Profile posts loading error:",
       "userPostsFiltered": "User's own posts:",
-      "entriesProcessing": "Entries count:",
+      "entriesProcessing": "Number of entries:",
       "entriesLoaded": "User's entries loaded",
       "entriesNotFound": "User's entries not found",
       "relatedDataUpdating": "Updating related data...",
       "appBarUpdateError": "AppBar update error:",
       "storyUpdateError": "Story update error:",
-      "topicUserLoading": "Loading user info for topic: user_id =",
-      "userDataLoaded": "User data loaded:",
-      "userDataError": "Failed to get user data: user_id =",
+      "topicUserLoading": "Fetching info for topic user: user_id =",
+      "userDataLoaded": "User information loaded:",
+      "userDataError": "Could not get user information: user_id =",
       "topicUserIdNotFound": "Topic user_id not found, using original entry",
-      "entriesProcessed": "All entries processed with user data",
+      "entriesProcessed": "All entries processed with user information",
       "entriesProcessingError": "Entries processing error:",
       "userInfoMissing": "User information missing, cannot redirect to profile page"
     },
@@ -1292,7 +1494,7 @@
       "noSchoolInfo": "No school information",
       "noDepartmentInfo": "No department information",
       "invalidDate": "Invalid Date",
-      "profileInfoNotAvailable": "Profile information could not be retrieved."
+      "profileInfoNotAvailable": "Profile information not available."
     },
     "details": {
       "personalInfo": "Personal Information",
@@ -1311,14 +1513,14 @@
       "noPostsTitle": "No posts yet",
       "noPostsDescription": "Share your first post to let your friends get to know you!",
       "noEntriesTitle": "No entries shared yet",
-      "noEntriesDescription": "Share entries to express your thoughts with the community."
+      "noEntriesDescription": "You can share your thoughts with the community by posting entries."
     }
   },
   "search": {
     "title": "Search",
     "searchField": {
       "placeholder": "Search...",
-      "hint": "Search for people, groups, or events"
+      "hint": "Search for people, groups or events"
     },
     "tabs": {
       "people": "People",
@@ -1329,14 +1531,14 @@
       "online": "Online",
       "offline": "Offline",
       "noResults": "No people found",
-      "loading": "Searching people..."
+      "loading": "Searching for people..."
     },
     "groups": {
       "join": "Join",
       "pendingApproval": "Pending Approval",
       "memberCount": "members",
       "noResults": "No groups found",
-      "loading": "Searching groups...",
+      "loading": "Searching for groups...",
       "groupSelected": "Group Selected",
       "redirectingToGroup": "redirecting to group.",
       "notMember": "You are not a member of this group",
@@ -1351,6 +1553,11 @@
           "links": "Links",
           "photos": "Photos"
         },
+        "bottomSheet": {
+          "leaveGroup": "Leave Group",
+          "report": "Report",
+          "createEvent": "Create Event"
+        },
         "emptyStates": {
           "documents": "No documents shared in this group yet",
           "links": "No links shared in this group yet",
@@ -1360,10 +1567,10 @@
     },
     "events": {
       "noResults": "No events found",
-      "loading": "Searching events...",
+      "loading": "Searching for events...",
       "shared": "Shared",
       "eventShared": "event shared.",
-      "locationError": "Could not open location:",
+      "locationError": "Location could not be opened:",
       "error": "Error",
       "viewLocation": "View Location",
       "notification": {
@@ -1386,11 +1593,11 @@
       "networkError": "Network connection error",
       "serverError": "Server error occurred",
       "generalError": "An error occurred",
-      "joinRequestFailed": "Failed to send join request. Please try again.",
-      "locationOpenFailed": "Could not open location"
+      "joinRequestFailed": "Could not send group join request. Please try again.",
+      "locationOpenFailed": "Location could not be opened"
     },
     "success": {
-      "joinRequestSent": "Your join request has been sent.",
+      "joinRequestSent": "Your group join request has been sent.",
       "searchCompleted": "Search completed"
     },
     "debug": {
@@ -1402,7 +1609,7 @@
       "groupTapped": "Group tapped:",
       "isMember": "Is member:",
       "groupId": "Group ID:",
-      "navigatingToGroupChat": "Navigating to group chat with ID:",
+      "navigatingToGroupChat": "Navigating to group chat ID:",
       "userNotMember": "User is not a member of this group",
       "searchError": "Search error:"
     },
@@ -1410,55 +1617,6 @@
       "noGroupImage": "No group image",
       "noUserImage": "No user image",
       "noEventImage": "No event image"
-    }
-  },
-  "settings": {
-    "title": "Settings",
-    "buttons": {
-      "editProfile": "Edit Profile",
-      "privacyPolicy": "Privacy Policy",
-      "notificationSettings": "Notification Settings",
-      "logout": "Logout"
-    },
-    "logoutDialog": {
-      "title": "Logout",
-      "message": "Are you sure you want to logout from your account?",
-      "cancel": "Cancel",
-      "confirm": "Logout"
-    },
-    "loading": {
-      "loggingOut": "Logging out...",
-      "savingSettings": "Saving settings...",
-      "loadingSettings": "Loading settings..."
-    },
-    "errors": {
-      "logoutFailed": "Failed to logout",
-      "settingsLoadFailed": "Failed to load settings",
-      "settingsSaveFailed": "Failed to save settings",
-      "networkError": "Network connection error",
-      "serverError": "Server error occurred",
-      "generalError": "An error occurred"
-    },
-    "success": {
-      "logoutSuccess": "Successfully logged out",
-      "settingsSaved": "Settings saved successfully",
-      "settingsLoaded": "Settings loaded successfully"
-    },
-    "validation": {
-      "settingsRequired": "Settings required",
-      "invalidSettings": "Invalid settings"
-    },
-    "debug": {
-      "settingsLoading": "Loading settings...",
-      "settingsSaving": "Saving settings...",
-      "logoutProcess": "Logout process started",
-      "logoutSuccess": "Logout process successful",
-      "logoutError": "Logout process error:"
-    },
-    "navigation": {
-      "goToEditProfile": "Navigating to edit profile page",
-      "goToPrivacyPolicy": "Navigating to privacy policy page",
-      "goToNotificationSettings": "Navigating to notification settings page"
     }
   },
   "common": {
@@ -1496,9 +1654,7 @@
       "leaving": "Leaving...",
       "following": "Following...",
       "unfollowing": "Unfollowing...",
-      "accepting": "Accepting...",
-      "declining": "Declining...",
-      "retry": "Retry",
+      "retry": "Try Again",
       "postShared": "shared a post",
       "entryShared": "shared an entry",
       "links": "Links"
@@ -1512,8 +1668,8 @@
       "copySuccess": "Text copied to clipboard",
       "linkOpenFailed": "Link could not be opened. Please try again.",
       "linkNotSupported": "This link cannot be opened",
-      "featureComingSoon": "This feature will be available soon",
-      "reportFeatureComingSoon": "Report feature will be available soon",
+      "featureComingSoon": "This feature will be added soon",
+      "reportFeatureComingSoon": "Report feature will be added soon",
       "operationSuccess": "Operation successful",
       "operationFailed": "Operation failed",
       "networkError": "Network connection error",
@@ -1540,12 +1696,12 @@
       "maintenanceMode": "Maintenance mode",
       "updateRequired": "Update required",
       "missingInfo": "Missing Information",
-      "fillAllFields": "Please fill in all fields",
+      "fillAllFields": "Please fill all fields",
       "groupCreatedSuccessfully": "Group created successfully",
-      "groupCreationFailed": "Group creation failed",
+      "groupCreationFailed": "Group could not be created",
       "postCreatedSuccessfully": "Post shared successfully",
       "postCreationFailed": "Post could not be shared",
-      "courseAlreadyAdded": "course is already added or could not be added",
+      "courseAlreadyAdded": "course already added or could not be added",
       "courseSavedToProfile": "Courses saved to your profile!",
       "userFollowed": "followed!",
       "followRequestSent": "follow request sent!",
@@ -1561,7 +1717,7 @@
       "ok": "OK"
     },
     "dialogs": {
-      "confirmTitle": "Confirm",
+      "confirmTitle": "Confirmation",
       "confirmMessage": "Are you sure you want to perform this action?",
       "deleteTitle": "Delete Confirmation",
       "deleteMessage": "Are you sure you want to delete this item?",
@@ -1571,7 +1727,7 @@
       "unsavedChangesMessage": "You have unsaved changes. Are you sure you want to exit?",
       "errorTitle": "Error",
       "warningTitle": "Warning",
-      "infoTitle": "Info",
+      "infoTitle": "Information",
       "successTitle": "Success"
     },
     "validation": {
@@ -1591,16 +1747,16 @@
       "invalidTime": "Invalid time",
       "invalidNumber": "Please enter a valid number",
       "positiveNumber": "Please enter a positive number",
-      "integerOnly": "Please enter only integers"
+      "integerOnly": "Please enter integers only"
     },
     "time": {
       "justNow": "just now",
       "minutesAgo": "min ago",
-      "hoursAgo": "h ago",
-      "daysAgo": "d ago",
-      "weeksAgo": "w ago",
-      "monthsAgo": "mo ago",
-      "yearsAgo": "y ago",
+      "hoursAgo": "hours ago",
+      "daysAgo": "days ago",
+      "weeksAgo": "weeks ago",
+      "monthsAgo": "months ago",
+      "yearsAgo": "years ago",
       "yesterday": "yesterday",
       "today": "today",
       "tomorrow": "tomorrow"
@@ -1640,8 +1796,8 @@
       "delete": "Delete"
     },
     "info": {
-      "info": "Info",
-      "reportFeatureComingSoon": "Report feature coming soon"
+      "info": "Information",
+      "reportFeatureComingSoon": "Report feature will be added soon"
     },
     "report": {
       "dialog": {
@@ -1652,14 +1808,63 @@
       },
       "success": {
         "title": "✅ Reported",
-        "message": "Post has been successfully reported. Review process has been initiated."
+        "message": "Post successfully reported. Review process has been initiated."
       },
       "error": {
-        "title": "❌ Report Failed",
+        "title": "❌ Report Could Not Be Sent",
         "message": "Report operation could not be completed. Please try again.",
         "networkTitle": "⚠️ Connection Error",
         "networkMessage": "Please check your internet connection and try again."
       }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "buttons": {
+      "editProfile": "Edit Profile",
+      "privacyPolicy": "Privacy Policy",
+      "notificationSettings": "Notification Settings",
+      "logout": "Logout"
+    },
+    "logoutDialog": {
+      "title": "Logout",
+      "message": "Are you sure you want to logout from your account?",
+      "cancel": "Cancel",
+      "confirm": "Logout"
+    },
+    "loading": {
+      "loggingOut": "Logging out...",
+      "savingSettings": "Saving settings...",
+      "loadingSettings": "Loading settings..."
+    },
+    "errors": {
+      "logoutFailed": "Logout failed",
+      "settingsLoadFailed": "Settings could not be loaded",
+      "settingsSaveFailed": "Settings could not be saved",
+      "networkError": "Network connection error",
+      "serverError": "Server error occurred",
+      "generalError": "An error occurred"
+    },
+    "success": {
+      "logoutSuccess": "Successfully logged out",
+      "settingsSaved": "Settings saved successfully",
+      "settingsLoaded": "Settings loaded successfully"
+    },
+    "validation": {
+      "settingsRequired": "Settings required",
+      "invalidSettings": "Invalid settings"
+    },
+    "debug": {
+      "settingsLoading": "Loading settings...",
+      "settingsSaving": "Saving settings...",
+      "logoutProcess": "Logout process initiated",
+      "logoutSuccess": "Logout process successful",
+      "logoutError": "Logout process error:"
+    },
+    "navigation": {
+      "goToEditProfile": "Redirecting to profile edit page",
+      "goToPrivacyPolicy": "Redirecting to privacy policy page",
+      "goToNotificationSettings": "Redirecting to notification settings page"
     }
   },
   "post": {
@@ -1704,11 +1909,11 @@
     },
     "reply": {
       "replyTo": "Reply to:",
-      "replyPlaceholder": "Type your reply...",
+      "replyPlaceholder": "Write your reply...",
       "replyButton": "Reply",
       "cancelReply": "Cancel reply",
       "replySent": "Reply sent successfully",
-      "replyFailed": "Failed to send reply",
+      "replyFailed": "Reply could not be sent",
       "replyError": "An error occurred while sending reply",
       "showReplies": "Show replies",
       "hideReplies": "Show less",
@@ -1717,8 +1922,8 @@
     },
     "edit": {
       "editButton": "Edit",
-      "editPlaceholder": "Edit your comment...",
-      "editingComment": "Editing comment",
+      "editPlaceholder": "Edit comment...",
+      "editingComment": "You are editing comment",
       "cancelEdit": "Cancel edit"
     },
     "delete": {
@@ -1742,13 +1947,28 @@
       "copy": "Copy"
     },
     "subjects": {
-      "whatsapp": "Share via WhatsApp",
-      "telegram": "Share via Telegram",
-      "twitter": "Share via Twitter",
-      "facebook": "Share via Facebook",
-      "linkedin": "Share via LinkedIn"
+      "whatsapp": "Share with WhatsApp",
+      "telegram": "Share with Telegram",
+      "twitter": "Share with Twitter",
+      "facebook": "Share with Facebook",
+      "linkedin": "Share with LinkedIn"
     },
-    "copySuccess": "Text copied to clipboard"
+    "copySuccess": "Text copied to clipboard",
+    "notification": {
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "time": {
+      "justNow": "just now",
+      "minute": "min",
+      "hour": "h",
+      "day": "d",
+      "week": "w",
+      "month": "m",
+      "year": "y"
+    }
   },
   "notification": {
     "accepted": "Accepted",
@@ -1756,153 +1976,31 @@
     "accept": "Accept",
     "decline": "Decline"
   },
-  "slidingNotifications": {
-    "newMessage": "New Message",
-    "groupMessage": "Group Message",
-    "newComment": "New Comment",
-    "newLike": "New Like",
-    "newFollow": "New Follower",
-    "followRequest": "Follow Request",
-    "groupJoinRequest": "Group Join Request",
-    "eventInvitation": "Event Invitation",
-    "systemNotification": "System Notification",
-    "unknown": "Unknown"
-  },
-  "groupChat": {
-    "errors": {
-      "loadFailed": "Failed to load group chat",
-      "messageSendFailed": "Failed to send message",
-      "joinFailed": "Failed to join group",
-      "leaveFailed": "Failed to leave group",
-      "networkError": "Network connection error",
-      "serverError": "Server error occurred",
-      "tryAgain": "Try Again",
-      "retry": "Retry",
-      "connectionLost": "Connection lost",
-      "reconnecting": "Reconnecting...",
-      "connectionRestored": "Connection restored"
-    },
-    "messages": {
-      "loading": "Loading messages...",
-      "noMessages": "No messages yet",
-      "sendMessage": "Send a message",
-      "typeMessage": "Type a message...",
-      "sending": "Sending...",
-      "sent": "Sent",
-      "failed": "Failed to send",
-      "messagePinned": "Message pinned successfully",
-      "messageUnpinned": "Message unpinned successfully",
-      "pinError": "Failed to pin/unpin message",
-      "tryAgain": "Please try again"
-    },
-    "actions": {
-      "joinGroup": "Join Group",
-      "leaveGroup": "Leave Group",
-      "viewMembers": "View Members",
-      "groupInfo": "Group Info",
-      "shareGroup": "Share Group",
-      "muteGroup": {
-        "muted": "Group Muted",
-        "unmuted": "Group Notifications On",
-        "mutedDesc": "You won't receive notifications from this group",
-        "unmutedDesc": "You will receive notifications from this group"
-      },
-      "dialogs": {
-        "leaveGroup": {
-          "title": "Leave Group",
-          "message": "Are you sure you want to leave this group? This action cannot be undone.",
-          "confirm": "Leave"
-        }
-      },
-      "pinnedMessages": {
-        "title": "Pinned Messages",
-        "showMore": "more messages",
-        "showLess": "Show less",
-        "noPinnedMessages": "No pinned messages",
-        "unpinMessage": "Unpin message",
-        "navigateToMessage": "Go to message",
-        "emptyState": "No pinned messages yet"
-      }
-    }
-  },
-  "notificationSettings": {
-    "title": "Notification Settings",
-    "status": {
-      "title": "Notification Status",
-      "deviceId": "Device ID",
-      "serviceActive": "Notification Service Active",
-      "serviceInactive": "Notification Service Inactive",
-      "connectionError": "Connection Error"
-    },
-    "permissions": {
-      "title": "Notification Permissions",
-      "notificationPermission": "Notification Permission"
-    },
-    "types": {
-      "title": "Notification Types",
-      "postNotifications": "Post Notifications (Likes, Comments)",
-      "messageNotifications": "Message Notifications (Private & Group Chat)",
-      "groupNotifications": "Group Notifications (Join Requests)",
-      "eventNotifications": "Event Notifications (Invitations)",
-      "followNotifications": "Follow Notifications (Requests)",
-      "systemNotifications": "System Notifications"
-    },
-    "test": {
-      "title": "Test Operations",
-      "platformTest": "Platform Test Notification",
-      "onesignalTest": "OneSignal Test Notification",
-      "localTest": "Local Test Notification",
-      "simpleTest": "Simple Test Notification",
-      "checkConfig": "Check Configuration",
-      "showPlayerId": "Show Player ID"
-    },
-    "messages": {
-      "playerId": "Player ID",
-      "playerIdError": "Could not get Player ID",
-      "settingsSaved": "Settings saved successfully",
-      "settingsError": "Failed to save settings",
-      "permissionGranted": "Notification permission granted",
-      "permissionGrantedDesc": "You can now receive notifications",
-      "permissionDenied": "Notification permission denied",
-      "permissionDeniedDesc": "You need to grant permission from settings to receive notifications",
-      "permissionRequired": "Notification permission required",
-      "permissionRequiredDesc": "You need to grant notification permission first to use this feature",
-      "settingsRedirect": "Redirecting to Settings",
-      "settingsRedirectDesc": "You can disable notification permissions from device settings",
-      "settingsOpenError": "Settings Could Not Be Opened",
-      "settingsOpenErrorDesc": "You need to open device settings manually",
-      "manualSettingsInstruction": "Please check app notifications from device settings"
-    },
-    "dialogs": {
-      "permissionRequired": {
-        "title": "Notification Permission Required",
-        "message": "To enable this notification type, you need to grant notification permission from your device first. Would you like to grant permission?",
-        "grant": "Grant Permission"
-      },
-      "disablePermission": {
-        "title": "Disable Notification Permission",
-        "message": "To disable notification permission, you need to go to device settings. Would you like to open settings?",
-        "openSettings": "Open Settings"
-      }
-    }
+  "entryDetail": {
+    "noCategory": "No Category",
+    "noTopicInfo": "No Topic Information",
+    "commentPlaceholder": "Share an entry on this topic"
   },
   "verification": {
-    "title": "ID Verification",
+    "title": "Account Verification",
     "documentSelection": {
       "title": "Select Document Type",
       "passport": "Passport",
-      "passportSubtitle": "EU Passports only",
+      "passportSubtitle": "EU Passports Only",
       "idCard": "ID Card",
       "idCardSubtitle": "We accept EU ID cards",
       "driverLicense": "Driver's License",
-      "driverLicenseSubtitle": "We accept EU Driver License's"
+      "driverLicenseSubtitle": "We accept EU Driver's licenses"
     },
     "documentUpload": {
       "title": "Upload Document",
       "passport": "Passport",
+      "passportSubtitle": "EU Passports Only",
       "id_card": "ID Card",
+      "idCardSubtitle": "We accept EU ID cards",
       "driverLicense": "Driver's License",
-      "description": "Take a passport, ID card or driver's license to check your information",
+      "driverLicenseSubtitle": "We accept EU Driver's licenses",
+      "description": "Upload your passport, ID card, or driver's license to verify your information",
       "uploadArea": {
         "passport": "Passport Scan",
         "id_card": "ID Card Scan",
@@ -1927,18 +2025,17 @@
       "fileUploadError": "File upload error",
       "fileRemoved": "File removed successfully"
     },
-            "validation": {
-          "documentTypeRequired": "Please select a document type",
-          "fileRequired": "Please upload a document",
-          "fileSizeLimit": "File size must be less than 10MB",
-          "fileTypeNotSupported": "File type not supported. Please upload JPG, PNG or PDF"
-        },
-        "snackbar": {
-          "success": "Success",
-          "error": "Error",
-          "warning": "Warning",
-          "info": "Information"
-        }
+    "validation": {
+      "documentTypeRequired": "Please select a document type",
+      "fileRequired": "Please upload a document",
+      "fileSizeLimit": "File size must be smaller than 10MB",
+      "fileTypeNotSupported": "File type not supported. Please upload JPG, PNG or PDF"
+    },
+    "snackbar": {
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Information"
+    }
   }
-
 }

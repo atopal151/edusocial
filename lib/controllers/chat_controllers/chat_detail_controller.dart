@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:edusocial/components/print_full_text.dart';
 import 'package:edusocial/controllers/profile_controller.dart';
 import 'package:edusocial/models/chat_models/detail_document_model.dart';
 import 'package:edusocial/services/chat_service.dart';
