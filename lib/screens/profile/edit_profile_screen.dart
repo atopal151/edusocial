@@ -186,6 +186,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             isExpanded: true,
+                 dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            elevation: 8,
             value: controller.accountType.value.isNotEmpty
                 ? controller.accountType.value
                 : null,
@@ -228,13 +231,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: Color(0xffffffff),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(50),
+          
+         
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<int>(
             isExpanded: true,
             value: controller.selectedLanguageId.value,
+            dropdownColor: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            elevation: 8,
             hint: Text(
               languageService.tr("profile.editProfile.languageSelection"),
               style: GoogleFonts.inter(
@@ -243,17 +251,170 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 color: Color(0xff9ca3ae),
               ),
             ),
+            selectedItemBuilder: (BuildContext context) {
+              return controller.languages.map<Widget>((language) {
+                return Row(
+                  children: [
+                    // Seçili dil için bayrak
+                    if (language.imageFullPath != null)
+                      Container(
+                        width: 24,
+                        height: 16,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: Image.network(
+                            language.imageFullPath!,
+                            fit: BoxFit.cover,
+                            width: 24,
+                            height: 16,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 24,
+                                height: 16,
+                                color: const Color(0xFFF3F4F6),
+                                child: const Icon(
+                                  Icons.flag,
+                                  size: 12,
+                                  color: Color(0xFF9CA3AF),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 24,
+                        height: 16,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.flag,
+                          size: 12,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    // Seçili dil adı
+                    Expanded(
+                      child: Text(
+                        language.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 13.28,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff414751),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }).toList();
+            },
             items: controller.languages.map((language) {
               return DropdownMenuItem<int>(
                 value: language.id,
-                child: Text(
-                  language.name,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 13.28,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xff414751),
-                  ),
+                child: Row(
+                  children: [
+                    // Bayrak resmi
+                    if (language.imageFullPath != null)
+                      Container(
+                        width: 24,
+                        height: 16,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: Image.network(
+                            language.imageFullPath!,
+                            fit: BoxFit.cover,
+                            width: 24,
+                            height: 16,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 24,
+                                height: 16,
+                                color: const Color(0xFFF3F4F6),
+                                child: const Icon(
+                                  Icons.flag,
+                                  size: 12,
+                                  color: Color(0xFF9CA3AF),
+                                ),
+                              );
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: 24,
+                                height: 16,
+                                color: const Color(0xFFF3F4F6),
+                                child: const Center(
+                                  child: SizedBox(
+                                    width: 8,
+                                    height: 8,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1,
+                                      color: Color(0xFF9CA3AF),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 24,
+                        height: 16,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: const Color(0xFFE5E7EB),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.flag,
+                          size: 12,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    // Dil adı
+                    Expanded(
+                      child: Text(
+                        language.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 13.28,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff414751),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
             }).toList(),

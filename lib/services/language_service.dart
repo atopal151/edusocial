@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:get_storage/get_storage.dart';
+import '../utils/constants.dart';
+import '../components/print_full_text.dart';
 
 class LanguageService extends GetxService {
   static const String _languageKey = 'selected_language';
@@ -135,5 +139,89 @@ class LanguageService extends GetxService {
       // Profilde dil yoksa varsayılan dili kullan
       await changeLanguage(_defaultLanguage);
     }
+  }
+
+  /// API'den desteklenen dilleri çek
+  Future<void> fetchLanguagesFromAPI() async {
+    try {
+      final token = GetStorage().read("token");
+      if (token == null) {
+        debugPrint('❌ Token bulunamadı, languages API çağrısı yapılamıyor');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/languages"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
+
+      debugPrint('🌐 Languages API Status Code: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        printFullText('🌐 Languages API Response: ${response.body}');
+        
+        // JSON parsing
+        try {
+          final jsonData = json.decode(response.body);
+          printFullText('🌐 Languages API Parsed JSON: ${json.encode(jsonData)}');
+        } catch (e) {
+          debugPrint('❌ Languages API JSON parsing error: $e');
+        }
+      } else {
+        debugPrint('❌ Languages API Error: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('❌ Languages API Exception: $e');
+    }
+  }
+
+  /// API'den frontend dil verilerini çek
+  Future<void> fetchFrontendLanguageFromAPI() async {
+    try {
+      final token = GetStorage().read("token");
+      if (token == null) {
+        debugPrint('❌ Token bulunamadı, json-language API çağrısı yapılamıyor');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/json-language"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
+
+      debugPrint('🌐 Frontend Language API Status Code: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        printFullText('🌐 Frontend Language API Response: ${response.body}');
+        
+        // JSON parsing
+        try {
+          final jsonData = json.decode(response.body);
+          printFullText('🌐 Frontend Language API Parsed JSON: ${json.encode(jsonData)}');
+        } catch (e) {
+          debugPrint('❌ Frontend Language API JSON parsing error: $e');
+        }
+      } else {
+        debugPrint('❌ Frontend Language API Error: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('❌ Frontend Language API Exception: $e');
+    }
+  }
+
+  /// Her iki API'yi de çağır ve debug et
+  Future<void> debugLanguageAPIs() async {
+    debugPrint('🚀 Language API Debug başlatılıyor...');
+    
+    await fetchLanguagesFromAPI();
+    await fetchFrontendLanguageFromAPI();
+    
+    debugPrint('✅ Language API Debug tamamlandı');
   }
 } 

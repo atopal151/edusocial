@@ -19,8 +19,7 @@ import 'package:edusocial/controllers/notification_controller.dart';
 import '../controllers/nav_bar_controller.dart';
 import '../controllers/chat_controllers/chat_controller.dart';
 import '../controllers/global_sliding_notification_controller.dart';
-import '../services/socket_services.dart';
-import '../services/translation_service.dart';
+import '../services/socket_services.dart'; 
 import '../services/language_service.dart';
 
 class InitialBindings extends Bindings {
@@ -38,8 +37,7 @@ class InitialBindings extends Bindings {
     Get.put(StoryController(), permanent: true);
     Get.put(SocketService(), permanent: true);
     Get.put(NotificationController(), permanent: true);
-    Get.put(GlobalSlidingNotificationController(), permanent: true);
-    Get.put(TranslationService(), permanent: true);
+    Get.put(GlobalSlidingNotificationController(), permanent: true); 
     Get.put(LanguageService(), permanent: true);
     
     // Socket durumunu kontrol et (binding'ler yüklendikten sonra)

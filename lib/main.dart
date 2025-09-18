@@ -58,6 +58,11 @@ void main() async {
   // Debug: Dil servisinin yüklenip yüklenmediğini kontrol et
   final languageService = Get.find<LanguageService>();
   debugPrint('Mevcut dil: ${languageService.currentLanguage.value}');
+  
+  // Debug: Language API'lerini test et
+  if (token != null) {
+    languageService.debugLanguageAPIs();
+  }
 
   runApp(MyApp(initialRoute: Routes.main));
 }
