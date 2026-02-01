@@ -348,8 +348,16 @@ class ChatServices {
       var streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      //debugPrint('📥 Response status: ${response.statusCode}');
-      //debugPrint('📥 Response body: ${response.body}');
+      // API'dan gelen ham send message response datasını printfulltext ile yazdır
+      printFullText('📤 =======================================');
+      printFullText('📤 [ChatService] Send Message API Response');
+      printFullText('📤 =======================================');
+      printFullText('📤 URL: $url');
+      printFullText('📤 Receiver ID: $receiverId');
+      printFullText('📤 Conversation ID: $conversationId');
+      printFullText('📤 Status Code: ${response.statusCode}');
+      printFullText('📤 Response Body: ${response.body}');
+      printFullText('📤 =======================================');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint("✅ Mesaj başarıyla gönderildi!");
@@ -413,7 +421,13 @@ class ChatServices {
       );
 
       // API'dan gelen ham online friends response datasını printfulltext ile yazdır
-      //printFullText('👥 [ChatService] Online Friends API Response: ${response.body}');
+      printFullText('👥 =======================================');
+      printFullText('👥 [ChatService] Online Friends API Response');
+      printFullText('👥 =======================================');
+      printFullText('👥 URL: $url');
+      printFullText('👥 Status Code: ${response.statusCode}');
+      printFullText('👥 Response Body: ${response.body}');
+      printFullText('👥 =======================================');
       
       final body = jsonDecode(response.body);
       final dataList = body['data'] as List<dynamic>;
@@ -465,6 +479,17 @@ class ChatServices {
       operation: 'Fetch Conversation Messages',
     );
 
+    // API'dan gelen ham conversation messages response datasını printfulltext ile yazdır
+    printFullText('💬 =======================================');
+    printFullText('💬 [ChatService] Conversation Messages API Response');
+    printFullText('💬 =======================================');
+    printFullText('💬 URL: $uri');
+    printFullText('💬 Conversation ID: $conversationId');
+    printFullText('💬 Limit: $limit, Offset: $offset');
+    printFullText('💬 Status Code: ${response.statusCode}');
+    printFullText('💬 Response Body: ${response.body}');
+    printFullText('💬 =======================================');
+
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];
 
@@ -498,7 +523,13 @@ class ChatServices {
       );
 
       // API'dan gelen ham chat list response datasını printfulltext ile yazdır
-     //printFullText('💬 [ChatService] Chat List API Response: ${response.body}');
+      printFullText('💬 =======================================');
+      printFullText('💬 [ChatService] Chat List API Response');
+      printFullText('💬 =======================================');
+      printFullText('💬 URL: ${AppConstants.baseUrl}/conversation');
+      printFullText('💬 Status Code: ${response.statusCode}');
+      printFullText('💬 Response Body: ${response.body}');
+      printFullText('💬 =======================================');
       
       final body = jsonDecode(response.body);
 
@@ -539,6 +570,16 @@ class ChatServices {
           'Accept': 'application/json',
         },
       );
+
+      // API'dan gelen ham user details response datasını printfulltext ile yazdır
+      printFullText('👤 =======================================');
+      printFullText('👤 [ChatService] User Details API Response');
+      printFullText('👤 =======================================');
+      printFullText('👤 URL: $url');
+      printFullText('👤 User ID: $userId');
+      printFullText('👤 Status Code: ${response.statusCode}');
+      printFullText('👤 Response Body: ${response.body}');
+      printFullText('👤 =======================================');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

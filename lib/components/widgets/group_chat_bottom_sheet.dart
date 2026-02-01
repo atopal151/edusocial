@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import '../../services/language_service.dart';
-import '../../services/onesignal_service.dart';
+import '../../notification/onesignal_service.dart';
 import '../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../controllers/group_controller/group_controller.dart';
 

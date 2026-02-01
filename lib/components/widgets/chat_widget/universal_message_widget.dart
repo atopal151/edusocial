@@ -74,34 +74,17 @@ class UniversalMessageWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (!message.isMe) ...[
-              GestureDetector(
-                onTap: () {
-                  controller.pinMessage(message.id);
+            Builder(
+              builder: (builderContext) => GestureDetector(
+                onLongPress: () {
+                  _showMessageMenu(builderContext);
                 },
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  child: Icon(
-                    message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                    size: 12,
-                    color: message.isPinned 
-                        ? Colors.orange.shade600 // Sarı pin ikonu (group chat ile aynı)
-                        : const Color(0xff9ca3ae),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-            ],
-            GestureDetector(
-              onLongPress: () {
-                _showPinOptions(context);
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.75,
-                    ),
+                child: Stack(
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      ),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
                       color: message.isMe 
@@ -175,24 +158,7 @@ class UniversalMessageWidget extends StatelessWidget {
                 ],
               ),
             ),
-            if (message.isMe) ...[
-              const SizedBox(width: 4),
-              GestureDetector(
-                onTap: () {
-                  controller.pinMessage(message.id);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                                  child: Icon(
-                  message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  size: 12,
-                  color: message.isPinned 
-                      ? Colors.orange.shade600 // Sarı pin ikonu (group chat ile aynı)
-                      : const Color(0xff9ca3ae),
-                ),
-                ),
-              ),
-            ],
+          ),
           ],
         ),
       ),
@@ -592,34 +558,109 @@ class UniversalMessageWidget extends StatelessWidget {
     }
   }
 
-  void _showPinOptions(BuildContext context) {
-    showModalBottomSheet(
+  void _showMessageMenu(BuildContext context) {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    
+    if (renderBox == null) return;
+    
+    final Offset position = renderBox.localToGlobal(Offset.zero);
+    final Size size = renderBox.size;
+    final screenSize = MediaQuery.of(context).size;
+    
+    final menuWidth = 200.0;
+    final menuHeight = 56.0;
+    
+    final left = position.dx + size.width / 2 - menuWidth / 2;
+    final top = position.dy + size.height + 8;
+    
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(
-                  message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-                  color: message.isPinned ? const Color(0xff414751) : const Color(0xff9ca3ae),
-                ),
-                title: Text(
-                  message.isPinned ? 'Pin Kaldır' : 'Mesajı Sabitle',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+      barrierColor: Colors.transparent,
+      barrierDismissible: true,
+      barrierLabel: 'Message menu',
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder: (BuildContext dialogContext, Animation<double> animation, Animation<double> secondaryAnimation) {
+        return Stack(
+          children: [
+            // Tıklanabilir arka plan - menüyü kapatmak için
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(dialogContext),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+            // Menü widget'ı
+            Positioned(
+              left: left.clamp(8.0, screenSize.width - menuWidth - 8),
+              top: top.clamp(8.0, screenSize.height - menuHeight - 8),
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: menuWidth,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(5),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 2),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withAlpha(2),
+                        blurRadius: 4,
+                        spreadRadius: 0.5,
+                        offset: const Offset(0, -1),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withAlpha(2),
+                        blurRadius: 4,
+                        spreadRadius: 0.5,
+                        offset: const Offset(2, 0),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withAlpha(2),
+                        blurRadius: 4,
+                        spreadRadius: 0.5,
+                        offset: const Offset(-2, 0),
+                      ),
+                    ],
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(dialogContext);
+                      controller.pinMessage(message.id);
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          Icon(
+                            message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                            size: 20,
+                            color: message.isPinned 
+                                ? const Color(0xff414751) 
+                                : const Color(0xff9ca3ae),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            message.isPinned ? 'Remove Pin' : 'Pin the message',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xff000000),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.pinMessage(message.id);
-                },
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

@@ -37,6 +37,43 @@ class PostModel {
     this.isVerified,
   });
 
+  static String _getProfileImageUrl(Map<String, dynamic> user) {
+    // Önce avatar_url'i kontrol et
+    if (user['avatar_url'] != null && user['avatar_url'].toString().isNotEmpty) {
+      final avatarUrl = user['avatar_url'].toString();
+      if (avatarUrl.startsWith('http')) {
+        return avatarUrl;
+      }
+      // Relative path ise storage ile birleştir
+      if (avatarUrl.startsWith('/storage/') || avatarUrl.startsWith('storage/')) {
+        return "https://stageapi.edusocial.pl/${avatarUrl.replaceFirst('/', '')}";
+      }
+      if (avatarUrl.startsWith('/')) {
+        return "https://stageapi.edusocial.pl$avatarUrl";
+      }
+      return "https://stageapi.edusocial.pl/storage/$avatarUrl";
+    }
+    
+    // avatar_url yoksa avatar'ı kontrol et
+    if (user['avatar'] != null && user['avatar'].toString().isNotEmpty) {
+      final avatar = user['avatar'].toString();
+      if (avatar.startsWith('http')) {
+        return avatar;
+      }
+      // Relative path ise storage ile birleştir
+      if (avatar.startsWith('/storage/') || avatar.startsWith('storage/')) {
+        return "https://stageapi.edusocial.pl/${avatar.replaceFirst('/', '')}";
+      }
+      if (avatar.startsWith('/')) {
+        return "https://stageapi.edusocial.pl$avatar";
+      }
+      return "https://stageapi.edusocial.pl/storage/$avatar";
+    }
+    
+    // Default avatar
+    return "https://stageapi.edusocial.pl/images/static/avatar.png";
+  }
+
   factory PostModel.fromJson(Map<String, dynamic> json) {
     
     final user = json['user'] ?? {};
@@ -60,19 +97,15 @@ class PostModel {
       id: json['id'] ?? 0,
       slug: json['slug'] ?? '',
       status: json['status'] ?? '',
-      profileImage: user['avatar'] != null
-          ? (user['avatar'].toString().startsWith('http')
-              ? user['avatar']
-              : "${AppConstants.baseUrl}/${user['avatar']}")
-          : "${AppConstants.baseUrl}/images/static/avatar.png",
-      name: user['full_name'] ?? '',
+      profileImage: _getProfileImageUrl(user),
+      name: user['name'] ?? user['full_name'] ?? '',
       surname: user['surname'] ?? '', 
       username: user['username'] ?? '',
       postDate: json['created_at'] ?? '',
       postDescription: json['content'] ?? '',
       mediaUrls: mediaUrls,
-      likeCount: json['likes_count'] ?? 0,
-      commentCount: json['comments_count'] ?? 0,
+      likeCount: json['like_count'] ?? json['likes_count'] ?? 0,
+      commentCount: json['comment_count'] ?? json['comments_count'] ?? 0,
       isOwner: json['is_owner'] ?? false,
           isLiked: json['is_liked_by_user'] ?? false,  links: (json['links'] as List?)
               ?.map((e) => e['link']?.toString() ?? '')

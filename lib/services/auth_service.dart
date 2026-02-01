@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
-import 'onesignal_service.dart';
+import '../notification/onesignal_service.dart';
 
 class AuthService {
   static final GetStorage _box = GetStorage();
@@ -32,10 +32,19 @@ class AuthService {
         if (token != null) {
           _box.write('token', token);
           debugPrint("Token başarıyla kaydedildi: $token",wrapWidth: 1024);
-          
-          // Token kaydedildikten sonra bekleyen Player ID'yi gönder
-          _sendPendingPlayerIdAfterLogin();
-          
+
+          // OneSignal external user login
+          try {
+            final user = data['data']['user'];
+            final userId = user?['id']?.toString();
+            if (userId != null && userId.isNotEmpty) {
+              final oneSignal = Get.find<OneSignalService>();
+              oneSignal.loginUser(userId);
+            }
+          } catch (e) {
+            debugPrint("OneSignal login skip: $e");
+          }
+
           return data['data']['user']; // 🛑 Kullanıcı bilgilerini döndür
         }
       }
@@ -111,8 +120,6 @@ class AuthService {
           _box.write('token', token);
           
           // Token kaydedildikten sonra bekleyen Player ID'yi gönder
-          _sendPendingPlayerIdAfterLogin();
-          
           return data['data']['user']; // 🛑 Kullanıcı bilgilerini döndür
         }
       }
@@ -247,20 +254,6 @@ class AuthService {
       debugPrint("💥 Şifre sıfırlama hatası: $e");
       lastErrorMessage = "Ağ bağlantısı hatası oluştu.";
       return false;
-    }
-  }
-
-  // Token kaydedildikten sonra bekleyen Player ID'yi gönder
-  void _sendPendingPlayerIdAfterLogin() {
-    try {
-      // OneSignalService'i al ve bekleyen Player ID'yi gönder
-      final oneSignalService = Get.find<OneSignalService>();
-      Future.delayed(Duration(seconds: 1), () {
-        oneSignalService.sendPendingPlayerId();
-      });
-      debugPrint("🔄 Bekleyen Player ID gönderimi başlatıldı");
-    } catch (e) {
-      debugPrint("❌ OneSignalService bulunamadı: $e");
     }
   }
 

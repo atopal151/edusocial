@@ -711,25 +711,18 @@ class GroupChatDetailController extends GetxController {
     
   }
 
-  /// Group chat'e girdiğinde socket durumunu kontrol et
+  /// Group chat'e girdiğinde socket durumunu kontrol et ve gruba join ol
   void onGroupChatEntered() {
     debugPrint('🚪 Group chat\'e girildi, socket durumu kontrol ediliyor...');
     checkGroupChatSocketConnection();
     
-    // Group chat'e girdiğinde gruba join ol
-    if (_socketService.isConnected.value) {
-      
-      final joinData = {
-        'group_id': currentGroupId.value,
-      };
-      
-      
-      _socketService.sendMessage('group:join', joinData);
-      
-      debugPrint('✅ group:join event\'i başarıyla gönderildi!');
-    } else {
-      debugPrint('❌ Socket bağlantısı yok! group:join gönderilemedi.');
-      debugPrint('🔍 Socket durumu: ${_socketService.isConnected.value}');
+    // ÖNEMLİ: Kullanıcı grubu GERÇEKTEN açtığında group:join event'ini gönder
+    // Bu sayede backend mesajları okundu olarak işaretleyebilir
+    // Uygulama başlatıldığında sadece subscribe yapılıyor, join yapılmıyor
+    if (currentGroupId.value.isNotEmpty) {
+      debugPrint('👥 Kullanıcı grubu açtı, group:join event\'i gönderiliyor: ${currentGroupId.value}');
+      _socketService.sendMessage('group:join', {'group_id': currentGroupId.value});
+      debugPrint('✅ group:join event\'i gönderildi - Backend mesajları okundu olarak işaretleyebilir');
     }
   }
 
@@ -1652,14 +1645,8 @@ class GroupChatDetailController extends GetxController {
           // Ensure we stay at bottom after refresh
           scrollToBottomForNewMessage();
           
-          // Grup listesini de yenile (mesaj gönderildiği için liste güncellenmeli)
-          try {
-            final chatController = Get.find<ChatController>();
-            await chatController.fetchGroupList();
-            debugPrint("✅ Grup listesi mesaj gönderildikten sonra yenilendi");
-          } catch (e) {
-            debugPrint("⚠️ Grup listesi yenilenirken hata: $e");
-          }
+          // NOT: fetchGroupList() kaldırıldı - grup listesi socket'ten anlık güncelleniyor
+          // Mesaj gönderildiğinde socket event'i tetiklenir ve unread count otomatik güncellenir
         });
       } else {
         Get.snackbar(
@@ -2135,14 +2122,24 @@ class GroupChatDetailController extends GetxController {
     // Chat liste controller'ın group message listener'ını tekrar başlat (Artık gerekli değil - sürekli aktif)
     debugPrint('▶️ ChatController group message listener artık başlatılmıyor - sürekli aktif');
     
-    // Grup listesini yenile (ekran kapatılırken)
-    try {
-      final chatController = Get.find<ChatController>();
-      chatController.fetchGroupList();
-      debugPrint("✅ Grup listesi ekran kapatılırken yenilendi");
-    } catch (e) {
-      debugPrint("⚠️ Grup listesi yenilenirken hata: $e");
+    // Group chat'ten çıkıldığında gruptan leave ol
+    if (_socketService.isConnected.value && currentGroupId.value.isNotEmpty) {
+      try {
+        final leaveData = {
+          'group_id': currentGroupId.value,
+        };
+        
+        _socketService.sendMessage('group:leave', leaveData);
+        debugPrint('✅ group:leave event\'i başarıyla gönderildi! (Group ID: ${currentGroupId.value})');
+      } catch (e) {
+        debugPrint('❌ group:leave gönderilirken hata: $e');
+      }
+    } else {
+      debugPrint('⚠️ Socket bağlantısı yok veya group ID boş! group:leave gönderilemedi.');
     }
+    
+    // NOT: fetchGroupList() kaldırıldı - grup listesi socket'ten anlık güncelleniyor
+    // Ekran kapatıldığında gereksiz API çağrısı yapılmıyor
     
     // Socket listener guard'ı reset et
     _isSocketListenerSetup = false;
@@ -2222,8 +2219,8 @@ class GroupChatDetailController extends GetxController {
         
         // Hata bildirimi göster
         Get.snackbar(
-          '❌ Hata',
-          'Pin/Unpin işlemi başarısız oldu',
+          '❌ Error',
+          'Pin/Unpin operation failed',
           snackPosition: SnackPosition.TOP,
           duration: Duration(seconds: 2),
           backgroundColor: Colors.red.shade100,
@@ -2234,9 +2231,20 @@ class GroupChatDetailController extends GetxController {
       debugPrint('❌ [GroupChatDetailController] Pin/Unpin işlemi hatası: $e');
       
       // Hata bildirimi göster
+      String errorMessage = 'An error occurred during pin/unpin operation';
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('yönetici') || 
+          errorString.contains('admin') || 
+          errorString.contains('yetki') ||
+          errorString.contains('permission') ||
+          errorString.contains('authorized') ||
+          errorString.contains('unauthorized')) {
+        errorMessage = 'Only group administrators can pin messages';
+      }
+      
       Get.snackbar(
-        '❌ Hata',
-        'Pin/Unpin işlemi sırasında hata oluştu: $e',
+        '❌ Error',
+        errorMessage,
         snackPosition: SnackPosition.TOP,
         duration: Duration(seconds: 2),
         backgroundColor: Colors.red.shade100,

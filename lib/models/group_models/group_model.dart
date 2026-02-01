@@ -50,8 +50,10 @@ class GroupModel {
   });
 
   factory GroupModel.fromJson(Map<String, dynamic> json) {
-    // API'dan gelen unread_messages_total_count'u kullan
-    final unreadCount = json['unread_messages_total_count'] ?? json['unread_count'] ?? 0;
+    // API'dan gelen unread_message_count, unread_messages_total_count veya unread_count'u kullan
+    final unreadCount = json['unread_message_count'] ?? 
+                        json['unread_messages_total_count'] ?? 
+                        json['unread_count'] ?? 0;
     
     return GroupModel(
       id: json['id'].toString(),

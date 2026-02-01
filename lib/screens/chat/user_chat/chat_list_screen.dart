@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../components/user_appbar/user_appbar.dart';
 import '../../../controllers/chat_controllers/chat_controller.dart';
 import '../../../controllers/group_controller/group_controller.dart';
-import '../../../controllers/profile_controller.dart';
 import '../../../services/language_service.dart';
 import '../../../components/widgets/verification_badge.dart';
 
@@ -52,7 +51,7 @@ class _ChatListScreenState extends State<ChatListScreen>
   }
 
 
-  /// Chat verilerini yenile
+  /// Chat verilerini yenileæç
   Future<void> _refreshChatData() async {
     debugPrint("🔄 Chat verileri yenileniyor...");
     try {
@@ -101,6 +100,41 @@ class _ChatListScreenState extends State<ChatListScreen>
             color: Color(0xff9ca3ae),
           );
         },
+      ),
+    );
+  }
+
+  /// Okunmamış mesaj göstergesi: sayı varsa badge, yoksa kırmızı nokta
+  Widget _buildUnreadIndicator({required bool hasUnread, required int unreadCount}) {
+    if (!hasUnread) {
+      return const SizedBox(width: 8, height: 8);
+    }
+
+    if (unreadCount > 0) {
+      final displayText = unreadCount > 99 ? '99+' : unreadCount.toString();
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: const Color(0xffff565f),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          displayText,
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: const Color(0xffff565f),
+        borderRadius: BorderRadius.circular(4),
       ),
     );
   }
@@ -239,10 +273,10 @@ class _ChatListScreenState extends State<ChatListScreen>
                   color: Color(0xff272727),
                 ),
                 tabs: [
-                  // Kişisel Mesajlar Tab'ı (API'den gelen unread count ile)
+                  // Kişisel Mesajlar Tab'ı (Sadece private chat unread count ile)
                   Obx(() {
-                    final profileController = Get.find<ProfileController>();
-                    final unreadCount = profileController.unreadMessagesTotalCount.value;
+                    // People sekmesi sadece private chat unread count'unu gösterir
+                    final unreadCount = chatController.privateUnreadCount;
                     final peopleText = languageService.tr("chat.chatList.tabs.people");
                     return Tab(
                       child: Row(
@@ -450,21 +484,10 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 8),
-                            // Kırmızı nokta sadece hasUnreadMessages=true olan chat'ler için göster
-                            chat.hasUnreadMessages 
-                                ? Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffff565f),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  )
-                                : SizedBox(
-                                    width: 8,
-                                    height: 8,
-                                    // Boş container (görünmez)
-                                  ),
+                            _buildUnreadIndicator(
+                              hasUnread: chat.hasUnreadMessages,
+                              unreadCount: chat.unreadCount,
+                            ),
                           ],
                         ),
                       ],
@@ -567,21 +590,10 @@ class _ChatListScreenState extends State<ChatListScreen>
                                   fontSize: 10, color: Colors.grey),
                             ),
                             const SizedBox(height: 8),
-                            // Kırmızı nokta sadece hasUnreadMessages=true olan gruplar için göster
-                            group.hasUnreadMessages 
-                                ? Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffff565f),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  )
-                                : SizedBox(
-                                    width: 8,
-                                    height: 8,
-                                    // Boş container (görünmez)
-                                  ),
+                            _buildUnreadIndicator(
+                              hasUnread: group.hasUnreadMessages,
+                              unreadCount: group.unreadCount,
+                            ),
                           ],
                         ),
                       ],

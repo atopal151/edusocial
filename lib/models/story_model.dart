@@ -29,12 +29,22 @@ class StoryModel {
     final user = json["user"] ?? {};
     final stories = json["stories"] ?? [];
 
+    // API name/surname/username alanları opsiyonel; boşsa name'e düş
+    final rawName = (user["name"] ?? "").toString();
+    final rawSurname = (user["surname"] ?? "").toString();
+    final rawUsername = (user["username"] ?? "").toString();
+
+    final resolvedUsername =
+        rawUsername.isNotEmpty ? rawUsername : rawName; // username yoksa ad kullan
+    final resolvedName = rawName;
+    final resolvedSurname = rawSurname;
+
     return StoryModel(
       id: user["id"].toString(),
       userId: user["id"],
-      username: user["name"] ?? "",
-      name: user["name"] ?? "",
-      surname: user["surname"] ?? "",
+      username: resolvedUsername,
+      name: resolvedName,
+      surname: resolvedSurname,
       profileImage: user["avatar"] ?? "",
       hasStory: stories.isNotEmpty,
       isViewed: (user["is_showed"] ?? false) == true,
@@ -47,4 +57,18 @@ class StoryModel {
           : DateTime.now(),
     );
   }
+
+  /// Log ve debug için modelin JSON karşılığı
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "userId": userId,
+        "username": username,
+        "name": name,
+        "surname": surname,
+        "profileImage": profileImage,
+        "isViewed": isViewed.value,
+        "storyUrls": storyUrls,
+        "createdat": createdat.toIso8601String(),
+        "hasStory": hasStory,
+      };
 }

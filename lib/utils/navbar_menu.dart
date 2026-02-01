@@ -25,7 +25,6 @@ class _NavbarMenuState extends State<NavbarMenu> {
 
   Widget _buildNavItem(int index) {
     bool isSelected = controller.selectedIndex.value == index;
-    final unreadCount = profileController.unreadMessagesTotalCount.value;
     
     return GestureDetector(
       onTap: () {
@@ -54,24 +53,31 @@ class _NavbarMenuState extends State<NavbarMenu> {
                     BlendMode.srcIn,
                   ),
                 ),
-                // Chat ikonu için badge göster
-                if (index == 3 && unreadCount > 0) // Chat index'i
-                  Positioned(
-                    right: -8,
-                    top: -8,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Color(0xffff565f),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
+                // Chat ikonu için badge göster (private chat + grup chat unread count)
+                if (index == 3) // Chat index'i
+                  Obx(() {
+                    // ChatController'dan toplam unread count al (private + grup)
+                    final totalUnreadCount = chatController.totalUnreadCountValue;
+                    if (totalUnreadCount > 0) {
+                      return Positioned(
+                        right: -8,
+                        top: -8,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: Color(0xffff565f),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 2,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
+                      );
+                    }
+                    return SizedBox.shrink();
+                  }),
               ],
             ),
           ],

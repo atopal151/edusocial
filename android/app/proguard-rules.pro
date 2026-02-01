@@ -6,6 +6,10 @@
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
 
+# OneSignal
+-keep class com.onesignal.** { *; }
+-dontwarn com.onesignal.**
+
 # Socket.IO rules
 -keep class io.socket.** { *; }
 -keep class io.socket.client.** { *; }

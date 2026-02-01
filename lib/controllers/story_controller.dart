@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:edusocial/components/print_full_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/story_model.dart';
@@ -24,6 +25,7 @@ class StoryController extends GetxController {
 
       final allStories = await StoryService.fetchStories();
       debugPrint("📦 API'den ${allStories.length} story alındı");
+      printFullText('📦 API\'den ${allStories} story alındı');
       
       final currentUserIdStr = profileController.userId.value.trim();
 

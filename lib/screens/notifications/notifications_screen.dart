@@ -4,6 +4,7 @@ import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/controllers/notification_controller.dart';
 import 'package:edusocial/models/notification_model.dart';
 import 'package:edusocial/services/socket_services.dart';
+import 'package:edusocial/screens/profile/people_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -395,31 +396,116 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ],
       ),
-      title: Text.rich(
-        TextSpan(
-          children: [
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Sadece message'ı göster (zaten "@ayhan liked your post." içeriyor)
+          Text.rich(
             TextSpan(
-              text: "@${n.userName} ",
-              style:
-                  GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 12),
+              children: [
+                TextSpan(
+                  text: "${n.message} ",
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w400, fontSize: 12),
+                ),
+                TextSpan(
+                  text: " ${_shortTimeAgo(n.timestamp)}",
+                  style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
+                ),
+              ],
             ),
-            TextSpan(
-              text: "${n.message} ",
-              style:
-                  GoogleFonts.inter(fontWeight: FontWeight.w400, fontSize: 12),
-            ),
-            TextSpan(
-              text: " ${_timeAgo(n.timestamp)}",
-              style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
+          ),
+          // Post bilgilerini göster (eğer varsa) - tek satırda
+          if (n.postData != null && n.postData!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.article, size: 14, color: Colors.grey[600]),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        if (n.postData!['content'] != null)
+                          TextSpan(
+                            text: n.postData!['content'].toString(),
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[800],
+                            ),
+                          ),
+                        if (n.postData!['human_diff_created_at'] != null) ...[
+                          const TextSpan(text: ' '),
+                          TextSpan(
+                            text: _shortenTime(n.postData!['human_diff_created_at'].toString()),
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
+        ],
       ),
       trailing: _buildTrailingButton(n),
       onTap: () {
-        // İstenirse detay ekranına yönlendirme yapılabilir
+        _handleNotificationTap(n);
       },
     );
+  }
+
+  /// Bildirim tıklandığında yönlendirme yap
+  void _handleNotificationTap(NotificationModel notification) {
+    debugPrint('🔔 Bildirim tıklandı: ${notification.type}, Post ID: ${notification.postId}');
+    
+    switch (notification.type) {
+      case 'post-like':
+      case 'post-comment':
+        // Post detay ekranına yönlendir
+        if (notification.postId != null && notification.postId!.isNotEmpty) {
+          Get.toNamed('/post_detail', arguments: {'post_id': notification.postId});
+        } else {
+          debugPrint('❌ Post ID bulunamadı');
+        }
+        break;
+      case 'follow-request':
+      case 'follow-request-accepted':
+      case 'user.folow.start':
+      case 'follow-start':
+      case 'follow-join-request':
+        // Kullanıcı profil sayfasına yönlendir
+        if (notification.userName.isNotEmpty) {
+          debugPrint('🔔 [NotificationScreen] Takip isteği bildirimi - Username: ${notification.userName}');
+          Get.to(() => PeopleProfileScreen(username: notification.userName));
+        } else {
+          debugPrint('❌ [NotificationScreen] Username bulunamadı - senderUserId: ${notification.senderUserId}');
+        }
+        break;
+      case 'group-join-request':
+      case 'group-join':
+        // Grup detay sayfasına yönlendir
+        if (notification.groupId != null && notification.groupId!.isNotEmpty) {
+          Get.toNamed('/groupDetailScreen', arguments: {'group_id': notification.groupId});
+        }
+        break;
+      case 'create-group-event':
+        // Etkinlik detay sayfasına yönlendir
+        if (notification.eventId != null && notification.eventId!.isNotEmpty) {
+          Get.toNamed('/eventDetail', arguments: {'eventId': notification.eventId});
+        }
+        break;
+      default:
+        debugPrint('⚠️ Bilinmeyen bildirim tipi: ${notification.type}');
+        break;
+    }
   }
 
   Widget? _buildTrailingButton(NotificationModel notif) {
@@ -681,6 +767,55 @@ class _NotificationScreenState extends State<NotificationScreen> {
     if (diff.inDays < 30) return "${(diff.inDays / 7).floor()}${languageService.tr("notifications.timeAgo.weeksAgo")}";
     if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}${languageService.tr("notifications.timeAgo.monthsAgo")}";
     return "${(diff.inDays / 365).floor()}${languageService.tr("notifications.timeAgo.yearsAgo")}";
+  }
+
+  /// Bildirim zamanını kısaltır (örn: "2days ago" -> "2d")
+  String _shortTimeAgo(DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date);
+
+    if (diff.inMinutes < 1) return 'now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
+    if (diff.inHours < 24) return '${diff.inHours}h';
+    if (diff.inDays < 7) return '${diff.inDays}d';
+    if (diff.inDays < 30) return '${(diff.inDays / 7).floor()}w';
+    if (diff.inDays < 365) return '${(diff.inDays / 30).floor()}m';
+    return '${(diff.inDays / 365).floor()}y';
+  }
+
+  /// Tarih string'ini kısaltır (örn: "4 months" -> "4m")
+  String _shortenTime(String timeString) {
+    if (timeString.isEmpty) return '';
+    
+    // Sayıyı ve birimi ayır
+    final regex = RegExp(r'(\d+)\s*(minute|hour|day|week|month|year)', caseSensitive: false);
+    final match = regex.firstMatch(timeString);
+    
+    if (match != null) {
+      final number = match.group(1) ?? '';
+      final unit = match.group(2)?.toLowerCase() ?? '';
+      
+      // Birimi kısalt
+      String shortUnit = '';
+      if (unit.contains('minute')) {
+        shortUnit = 'm';
+      } else if (unit.contains('hour')) {
+        shortUnit = 'h';
+      } else if (unit.contains('day')) {
+        shortUnit = 'd';
+      } else if (unit.contains('week')) {
+        shortUnit = 'w';
+      } else if (unit.contains('month')) {
+        shortUnit = 'm';
+      } else if (unit.contains('year')) {
+        shortUnit = 'y';
+      }
+      
+      return '$number$shortUnit';
+    }
+    
+    // Eğer regex eşleşmezse, orijinal string'i döndür
+    return timeString;
   }
   
 }

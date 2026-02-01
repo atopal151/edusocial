@@ -47,8 +47,8 @@ class GroupUniversalMessageWidget extends StatelessWidget {
       
       // Hata bildirimi göster
       Get.snackbar(
-        '❌ Hata',
-        'Pin/Unpin işlemi sırasında hata oluştu: $e',
+        '❌ Error',
+        'An error occurred during pin/unpin operation',
         snackPosition: SnackPosition.TOP,
         duration: Duration(seconds: 2),
         backgroundColor: Colors.red.shade100,
@@ -151,20 +151,6 @@ class GroupUniversalMessageWidget extends StatelessWidget {
                 ),
               ),
             
-            // Admin pin/unpin butonu - sadece admin için göster
-            if (controller.isCurrentUserAdmin)
-              GestureDetector(
-                onTap: () => _handlePinMessage(),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 4.0),
-                  child: Icon(
-                    message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                    size: 14,
-                    color: message.isPinned ? Colors.orange : Colors.grey[400],
-                  ),
-                ),
-              ),
-            
             if (message.isSentByMe)
               InkWell(
                 onTap: () {
@@ -199,13 +185,20 @@ class GroupUniversalMessageWidget extends StatelessWidget {
           ),
           child: Align(
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: Stack(
-              children: [
-                Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.7,
-                  ),
-                  padding: const EdgeInsets.all(12),
+            child: Builder(
+              builder: (builderContext) => GestureDetector(
+                onLongPress: controller.isCurrentUserAdmin
+                    ? () {
+                        _showMessageMenu(builderContext);
+                      }
+                    : null,
+                child: Stack(
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.7,
+                      ),
+                      padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: message.isSentByMe 
                         ? const Color(0xFFff7c7c) // Kırmızı
@@ -271,6 +264,8 @@ class GroupUniversalMessageWidget extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
           ),
         ),
       ],
@@ -599,5 +594,111 @@ class GroupUniversalMessageWidget extends StatelessWidget {
     }
   }
 
-
+  void _showMessageMenu(BuildContext context) {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    
+    if (renderBox == null) return;
+    
+    final Offset position = renderBox.localToGlobal(Offset.zero);
+    final Size size = renderBox.size;
+    final screenSize = MediaQuery.of(context).size;
+    
+    final menuWidth = 200.0;
+    final menuHeight = 56.0;
+    
+    final left = position.dx + size.width / 2 - menuWidth / 2;
+    final top = position.dy + size.height + 8;
+    
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      barrierDismissible: true,
+      barrierLabel: 'Message menu',
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder: (BuildContext dialogContext, Animation<double> animation, Animation<double> secondaryAnimation) {
+        return Stack(
+          children: [
+            // Tıklanabilir arka plan - menüyü kapatmak için
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(dialogContext),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+            // Menü widget'ı
+            Positioned(
+              left: left.clamp(8.0, screenSize.width - menuWidth - 8),
+              top: top.clamp(8.0, screenSize.height - menuHeight - 8),
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: menuWidth,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(5),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 2),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withAlpha(2),
+                        blurRadius: 4,
+                        spreadRadius: 0.5,
+                        offset: const Offset(0, -1),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withAlpha(2),
+                        blurRadius: 4,
+                        spreadRadius: 0.5,
+                        offset: const Offset(2, 0),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withAlpha(2),
+                        blurRadius: 4,
+                        spreadRadius: 0.5,
+                        offset: const Offset(-2, 0),
+                      ),
+                    ],
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(dialogContext);
+                      _handlePinMessage();
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          Icon(
+                            message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                            size: 20,
+                            color: message.isPinned 
+                                ? const Color(0xff414751) 
+                                : const Color(0xff9ca3ae),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            message.isPinned ? 'Remove Pin' : 'Pin Message',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xff000000),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

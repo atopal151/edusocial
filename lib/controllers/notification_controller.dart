@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
+import 'package:get_storage/get_storage.dart';
 import '../services/socket_services.dart';
-import '../services/onesignal_service.dart';
+import '../notification/onesignal_service.dart';
 import '../services/language_service.dart';
 import 'dart:async';
 import '../components/print_full_text.dart';
@@ -464,6 +465,14 @@ class NotificationController extends GetxController {
           final userData = notificationFullData['user'] as Map<String, dynamic>?;
           final postData = notificationFullData['post'] as Map<String, dynamic>?;
           
+          // Self notification guard: skip if sender is current user
+          final currentUserId = GetStorage().read('user_id')?.toString();
+          final senderId = userData?['id']?.toString();
+          if (currentUserId != null && senderId != null && currentUserId == senderId) {
+            debugPrint('🚫 NotificationController: self notification skipped (user_id=$currentUserId)');
+            return;
+          }
+
           final userName = userData?['name'] ?? 'Bilinmeyen';
           //final userAvatar = userData?['avatar_url'] ?? userData?['profile_image'] ?? '';
           
@@ -491,24 +500,11 @@ class NotificationController extends GetxController {
               title = _languageService.tr('slidingNotifications.newMessage');
           }
           
-          // OneSignal bildirimi gönder - doğru tip ile
-          // Bildirim tipini belirle
-          String type = 'notification';
-          if (notificationType.startsWith('post-')) {
-            type = 'post';
-          } else if (notificationType.startsWith('follow-')) {
-            type = 'follow';
-          } else if (notificationType.startsWith('group-')) {
-            type = 'group';
-          }
-          
-          debugPrint('📱 Bildirim tipi belirlendi: $type (notificationType: $notificationType)');
-          
           _oneSignalService.sendLocalNotification(
             title,
             message,
             {
-              'type': type,
+              'type': notificationType,
               'notification_data': notificationData,
               ...data,
             },

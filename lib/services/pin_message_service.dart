@@ -116,7 +116,19 @@ class PinMessageService extends GetxService {
         return true;
       } else {
         debugPrint('❌ [PinMessageService] Group message pin/unpin failed: ${response.statusCode} - ${response.data}');
-        return false;
+        
+        // Check if error message contains admin/permission related text
+        String? errorMessage;
+        if (response.data is Map<String, dynamic>) {
+          errorMessage = response.data['message'] ?? response.data['error'] ?? response.data['msg'];
+          if (errorMessage != null) {
+            // Store error message for controller to use
+            debugPrint('📌 [PinMessageService] Error message from API: $errorMessage');
+          }
+        }
+        
+        // Throw exception with error message so controller can catch it
+        throw Exception(errorMessage ?? 'Pin/Unpin operation failed');
       }
       
     } catch (e) {

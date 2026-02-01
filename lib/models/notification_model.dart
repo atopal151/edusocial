@@ -20,6 +20,8 @@ class NotificationModel {
   final bool isFollowing;
   final bool isFollowingPending;
   final bool isRejected;
+  final Map<String, dynamic>? postData;
+  final String? postId;
 
   NotificationModel({
     required this.id,
@@ -38,6 +40,8 @@ class NotificationModel {
     this.isFollowing = false,
     this.isFollowingPending = false,
     this.isRejected = false,
+    this.postData,
+    this.postId,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -246,6 +250,22 @@ class NotificationModel {
     final rawIsRead = json['is_read'];
     final isReadValue = rawIsRead == true || rawIsRead == 1;
     
+    // Post bilgilerini al
+    final post = fullData['post'] ?? {};
+    Map<String, dynamic>? postDataMap;
+    String? postIdValue;
+    if (post.isNotEmpty && post is Map) {
+      postDataMap = Map<String, dynamic>.from(post);
+      // Post ID'sini al
+      if (post['id'] != null) {
+        postIdValue = post['id'].toString();
+      }
+    }
+    
+    // Eğer post ID postData'da yoksa, eventData'dan al
+    if (postIdValue == null && eventData['post_id'] != null) {
+      postIdValue = eventData['post_id'].toString();
+    }
 
     return NotificationModel(
       id: json['id'].toString(),
@@ -264,6 +284,8 @@ class NotificationModel {
       isFollowing: isFollowing,
       isFollowingPending: isFollowingPending,
       isRejected: isRejected,
+      postData: postDataMap,
+      postId: postIdValue,
     );
   }
 
@@ -285,6 +307,8 @@ class NotificationModel {
       'isFollowing': isFollowing,
       'isFollowingPending': isFollowingPending,
       'isRejected': isRejected,
+      'postData': postData,
+      'postId': postId,
     };
   }
 }

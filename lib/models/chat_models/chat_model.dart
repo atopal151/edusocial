@@ -11,6 +11,7 @@ class ChatModel {
   final bool isOnline;
   LastMessage? lastMessage;
   bool hasUnreadMessages; // Okunmamış mesaj var mı?
+  int unreadCount; // Okunmamış mesaj sayısı
   final bool? isVerified; // Hesap doğrulama durumu
 
   ChatModel({
@@ -23,6 +24,7 @@ class ChatModel {
     required this.isOnline,
     this.lastMessage,
     this.hasUnreadMessages = false,
+    this.unreadCount = 0,
     this.isVerified,
   });
 
@@ -38,6 +40,11 @@ class ChatModel {
       lastMessage: json['last_message'] != null
           ? LastMessage.fromJson(json['last_message'])
           : null,
+      unreadCount: (json['unread_count'] ??
+              json['unread_messages_total_count'] ??
+              json['unread_messages_count'] ??
+              0)
+          .toInt(),
       hasUnreadMessages: false, // Başlangıçta false
       isVerified: json['is_verified'],
     );
@@ -53,6 +60,7 @@ class ChatModel {
       'is_online': isOnline,
       'last_message': lastMessage?.toJson(),
       'has_unread_messages': hasUnreadMessages,
+      'unread_count': unreadCount,
       'is_verified': isVerified,
     };
   }

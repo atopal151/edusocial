@@ -134,36 +134,14 @@ class GroupServices {
         },
       );
 
-      /*printFullText("📥 USER GROUPS API RESPONSE:");
-      printFullText("Status Code: ${response.statusCode}");
-      printFullText("Response Body: ${response.body}");*/
-
-      // Her grubun detayını ayrı ayrı yazdır
-      /*if (response.statusCode == 200) {
-        //final jsonBody = json.decode(response.body);
-        //final List<dynamic> data = jsonBody['data'] ?? [];
-
-        /*printFullText("🔍 USER GROUPS - TOPLAM ${data.length} GRUP:");
-        for (int i = 0; i < data.length; i++) {
-          final group = data[i];
-
-         /* printFullText("""
-📋 USER GROUP ${i + 1}:
-  - ID: ${group['id']}
-  - Name: ${group['name']}
-  - Description: ${group['description']}
-  - Is Private: ${group['is_private']}
-  - Is Founder: ${group['is_founder']}
-  - Is Member: ${group['is_member']}
-  - Is Pending: ${group['is_pending']}
-  - User Count: ${group['user_count_with_admin']}
-  - Message Count: ${group['message_count']}
-  - Created At: ${group['created_at']}
-  - Updated At: ${group['updated_at']}
-  ---
-""");*/
-        }*/
-      }*/
+      // API'dan gelen ham grup listesi response datasını printfulltext ile yazdır
+      printFullText('👥 =======================================');
+      printFullText('👥 [GroupService] User Groups API Response');
+      printFullText('👥 =======================================');
+      printFullText('👥 URL: $uri');
+      printFullText('👥 Status Code: ${response.statusCode}');
+      printFullText('👥 Response Body: ${response.body}');
+      printFullText('👥 =======================================');
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);

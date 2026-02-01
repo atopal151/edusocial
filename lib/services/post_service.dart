@@ -110,9 +110,28 @@ class PostServices {
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
+        debugPrint("🔍 [PostService] Post Detail Response: $body");
         final data = body['data'];
-        return PostModel.fromJson(data);
+        if (data == null) {
+          debugPrint("❌ [PostService] Post data is null");
+          return null;
+        }
+        
+        // API yanıtında data içinde 'post' objesi var
+        final postData = data['post'];
+        if (postData == null) {
+          debugPrint("❌ [PostService] Post object is null in data");
+          return null;
+        }
+        
+        // Map<String, dynamic>'e cast et
+        final postJson = Map<String, dynamic>.from(postData);
+        debugPrint("🔍 [PostService] Post Data: $postJson");
+        final post = PostModel.fromJson(postJson);
+        debugPrint("✅ [PostService] Post Model Created - ID: ${post.id}, User: ${post.username}");
+        return post;
       } else {
+        debugPrint("❌ [PostService] Post Detail Failed: ${response.statusCode} - ${response.body}");
         return null;
       }
     } catch (e) {

@@ -13,6 +13,7 @@ import '../models/entry_model.dart';
 import '../models/user_model.dart';
 import '../models/people_profile_model.dart';
 import '../services/profile_service.dart';
+import '../notification/onesignal_service.dart';
 import 'package:get_storage/get_storage.dart';
 
 class ProfileController extends GetxController {
@@ -162,6 +163,18 @@ String formatSimpleDate(String dateStr) {
       profile.value = profileData;
       userId.value = profileData.id.toString();
       
+      // GetStorage'a user_id kaydet ve OneSignal'e login yap
+      final userIdStr = profileData.id.toString();
+      if (userIdStr.isNotEmpty) {
+        box.write('user_id', userIdStr);
+        try {
+          final oneSignal = Get.find<OneSignalService>();
+          await oneSignal.loginUser(userIdStr);
+          debugPrint('✅ OneSignal login completed for user_id: $userIdStr');
+        } catch (e) {
+          debugPrint('⚠️ OneSignal login error: $e');
+        }
+      }
       
       // Temel veriler
       fullName.value = "${profileData.name} ${profileData.surname}";

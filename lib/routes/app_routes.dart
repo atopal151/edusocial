@@ -25,6 +25,7 @@ import 'package:edusocial/screens/groups/create_group_screen.dart';
 import 'package:edusocial/screens/groups/group_list_screen.dart';
 import 'package:edusocial/screens/groups/grup_detail_screen.dart';
 import 'package:edusocial/screens/home/post/create_post_screen.dart';
+import 'package:edusocial/screens/home/post/post_detail_screen.dart';
 import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/notifications/notifications_screen.dart';
@@ -93,6 +94,7 @@ class Routes {
   static const String notifications = '/notifications';
   static const String createGroup = '/createGroup';
   static const String createPost = '/create_post';
+  static const String postDetail = '/post_detail';
   static const String notificationSettings = '/notification_settings';
   static const String verification = '/verification';
   static const String verificationUpload = '/verification_upload';
@@ -260,6 +262,10 @@ class Routes {
     GetPage(
       name: createPost,
       page: () => CreatePostScreen(),
+    ),
+    GetPage(
+      name: postDetail,
+      page: () => const PostDetailScreen(),
     ),
     GetPage(
       name: notificationSettings,

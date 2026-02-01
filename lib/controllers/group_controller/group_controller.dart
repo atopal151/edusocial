@@ -302,10 +302,22 @@ class GroupController extends GetxController {
           chatGroup.lastMessageTime = userGroup.humanCreatedAt;
           chatGroup.isAdmin = userGroup.isFounder; // Admin durumunu güncelle
           
-          // hasUnreadMessages durumunu da güncelle
-          userGroup.hasUnreadMessages = chatGroup.hasUnreadMessages;
+          // Socket'ten gelen anlık değeri koru: API'den gelen değer sadece daha büyükse veya mevcut değer 0 ise kullan
+          // Bu sayede socket'ten gelen güncel veri API'nin gecikmeli cevabıyla ezilmez
+          final currentUnreadCount = chatGroup.unreadCount;
+          final apiUnreadCount = userGroup.unreadCount;
           
-          debugPrint("🔄 Grup senkronize edildi: ${userGroup.name} (ID: ${userGroup.id}) - isAdmin: ${userGroup.isFounder} - hasUnreadMessages: ${userGroup.hasUnreadMessages}");
+          // API'den gelen değer mevcut socket değerinden büyükse veya mevcut değer 0 ise API'yi kullan
+          // Aksi halde socket'ten gelen daha yeni değeri koru
+          if (apiUnreadCount > currentUnreadCount || currentUnreadCount == 0) {
+            chatGroup.unreadCount = apiUnreadCount;
+            chatGroup.hasUnreadMessages = apiUnreadCount > 0;
+            userGroup.hasUnreadMessages = chatGroup.hasUnreadMessages;
+            debugPrint("🔄 Grup senkronize edildi (API öncelikli): ${userGroup.name} (ID: ${userGroup.id}) - API: $apiUnreadCount, Mevcut: $currentUnreadCount -> Final: ${chatGroup.unreadCount}");
+          } else {
+            userGroup.hasUnreadMessages = chatGroup.hasUnreadMessages;
+            debugPrint("🔄 Grup korundu (Socket öncelikli): ${userGroup.name} (ID: ${userGroup.id}) - Socket: $currentUnreadCount, API: $apiUnreadCount -> Final: $currentUnreadCount");
+          }
         } else {
           // Yeni grup ekle
           final newChatGroup = GroupChatModel(
@@ -314,7 +326,8 @@ class GroupController extends GetxController {
             groupImage: userGroup.avatarUrl,
             lastMessage: userGroup.description,
             lastMessageTime: userGroup.humanCreatedAt,
-            hasUnreadMessages: false, // Başlangıçta false
+            unreadCount: userGroup.unreadCount,
+            hasUnreadMessages: userGroup.unreadCount > 0,
             isAdmin: userGroup.isFounder, // Kurucu bilgisini admin olarak aktar
           );
           

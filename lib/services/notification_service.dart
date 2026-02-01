@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:edusocial/components/print_full_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -24,10 +25,12 @@ class NotificationService {
       );
 
       if (response.statusCode == 200) {
-        // API'dan gelen ham notification response datasını printfulltext ile yazdır
-        //printFullText('🔔 [NotificationService] Notifications API Response: ${response.body}');
+        // API'dan gelen ham notification response datasını debug print ile yazdır
+       
         
         final jsonBody = jsonDecode(response.body);
+        
+      
 
         final postNotifs = jsonBody['data']?['post_notifications'] ?? [];
         final invitationNotifs = jsonBody['data']?['invitation_notifications'] ?? [];
@@ -39,6 +42,8 @@ class NotificationService {
           ...invitationNotifs,
           ...followerNotifs
         ];
+        
+        debugPrint('🔔 [NotificationService] Total Notifications: ${allNotifs.length}');
 
         // Bildirimleri created_at tarihine göre sırala (en yeni en üstte)
         allNotifs.sort((a, b) {

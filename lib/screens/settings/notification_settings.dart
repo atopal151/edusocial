@@ -2,7 +2,7 @@ import 'package:edusocial/components/user_appbar/back_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../services/onesignal_service.dart';
+import '../../notification/onesignal_service.dart';
 import '../../services/language_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_settings/app_settings.dart';

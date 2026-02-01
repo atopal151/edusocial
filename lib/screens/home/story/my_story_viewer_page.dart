@@ -227,23 +227,22 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${story.name} ${story.surname}".trim().isNotEmpty 
-                              ? "${story.name} ${story.surname}".trim() 
-                              : story.username,
+                          (() {
+                            final fullName = "${story.name} ${story.surname}".trim();
+                            return fullName.isNotEmpty ? fullName : story.username;
+                          })(),
                           style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                         Row(
                           children: [
-                            if ("${story.name} ${story.surname}".trim().isNotEmpty)
-                              Text(
-                                '@${story.username}',
-                                style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),
-                              ),
-                            if ("${story.name} ${story.surname}".trim().isNotEmpty)
-                              Text(
-                                ' • ',
-                                style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),
-                              ),
+                            Text(
+                              '@${story.username.isNotEmpty ? story.username : story.name}',
+                              style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),
+                            ),
+                            Text(
+                              ' • ',
+                              style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),
+                            ),
                             Text(
                               timeAgo(story.createdat),
                               style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),

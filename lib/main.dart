@@ -7,7 +7,7 @@ import 'routes/app_routes.dart';
 import 'services/language_service.dart';
 import 'services/auth_service.dart';
 import 'services/api_service.dart';
-import 'services/onesignal_service.dart';
+import 'notification/onesignal_service.dart';
 import 'services/socket_services.dart';
 import 'services/pin_message_service.dart';
 import 'services/verification_service.dart';
@@ -29,7 +29,8 @@ void main() async {
 
   // ApiService'i başlat
   Get.put(ApiService());
-  
+
+
   // AuthService'i başlat
   Get.put(AuthService());
   
@@ -37,7 +38,7 @@ void main() async {
   Get.put(LanguageService());
   
   // OneSignalService'i başlat
-  Get.put(OneSignalService());
+  final oneSignal = Get.put(OneSignalService());
   
   // SocketService'i başlat
   Get.put(SocketService());
@@ -53,6 +54,20 @@ void main() async {
   final token = GetStorage().read('token');
   if (token != null) {
     socketService.connect(token);
+  }
+
+  // Mevcut oturum için OneSignal external user login
+  // Subscription ready olana kadar kısa bir delay ekle
+  final storedUserId = GetStorage().read('user_id')?.toString();
+  if (storedUserId != null && storedUserId.isNotEmpty) {
+    Future.delayed(Duration(seconds: 2), () async {
+      try {
+        await oneSignal.loginUser(storedUserId);
+        debugPrint('✅ OneSignal login from main.dart completed for user_id: $storedUserId');
+      } catch (e) {
+        debugPrint('⚠️ OneSignal login from main.dart error: $e');
+      }
+    });
   }
   
   // Debug: Dil servisinin yüklenip yüklenmediğini kontrol et

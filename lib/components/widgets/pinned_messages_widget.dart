@@ -119,7 +119,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                   Text(
                     _languageService.tr('groups.pinnedMessages.title'),
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xff414751),
                     ),
@@ -128,7 +128,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                   Text(
                     '${pinnedMessages.length}',
                     style: GoogleFonts.inter(
-                      fontSize: 12,
+                      fontSize: 10,
                       color: const Color(0xff9ca3ae),
                     ),
                   ),
@@ -219,7 +219,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                 Text(
                   _languageService.tr('groups.pinnedMessages.title'),
                   style: GoogleFonts.inter(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xff414751),
                   ),
@@ -228,7 +228,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                 Text(
                   '${pinnedMessages.length}',
                   style: GoogleFonts.inter(
-                    fontSize: 12,
+                    fontSize: 10,
                     color: const Color(0xff9ca3ae),
                   ),
                 ),
@@ -280,7 +280,9 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
 
   Widget _buildPinnedMessageItem(MessageModel message) {
     final profileImage = message.senderAvatarUrl;
-    final username = message.sender.name;
+    final name = message.sender.name;
+    final surname = message.sender.surname;
+    final displayName = '$name $surname'.trim();
     final content = message.message;
     final timestamp = DateTime.tryParse(message.createdAt) ?? DateTime.now();
 
@@ -305,7 +307,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                     : null,
                 child: (profileImage == null || profileImage.isEmpty || profileImage.endsWith('/0'))
                     ? Text(
-                        username.isNotEmpty ? username[0].toUpperCase() : '?',
+                        name.isNotEmpty ? name[0].toUpperCase() : '?',
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -320,7 +322,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '@$username',
+                      displayName.isNotEmpty ? displayName : '@${message.sender.username}',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -375,7 +377,9 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   }
 
   Widget _buildGroupPinnedMessageItem(GroupMessageModel message) {
-    final username = message.username;
+    final name = message.name;
+    final surname = message.surname;
+    final displayName = '$name $surname'.trim();
     final content = message.content;
     final timestamp = message.timestamp;
     final controller = Get.find<GroupChatDetailController>();
@@ -411,7 +415,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                     : null,
                 child: (message.profileImage.isEmpty || message.profileImage.endsWith('/0'))
                     ? Text(
-                        username.isNotEmpty ? username[0].toUpperCase() : '?',
+                        name.isNotEmpty ? name[0].toUpperCase() : '?',
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -426,7 +430,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '@$username',
+                      displayName.isNotEmpty ? displayName : '@${message.username}',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "502134987902",
+    "project_id": "edusocial-push",
+    "storage_bucket": "edusocial-push.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:502134987902:android:db97eb66638238bdd9cc2f",
+        "android_client_info": {
+          "package_name": "com.monegon.edusocial"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc0a9jX48oDYvqt0OdKIOfh6DJUSB3JJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

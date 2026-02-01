@@ -5,19 +5,69 @@ import 'dart:io';
 import '../../controllers/chat_controllers/group_chat_detail_controller.dart';
 import '../../services/language_service.dart';
 
-Widget buildGroupMessageInputField() {
-  final GroupChatDetailController controller = Get.find();
-  final LanguageService languageService = Get.find<LanguageService>();
-  TextEditingController messageController = TextEditingController();
+class GroupMessageInputField extends StatefulWidget {
+  const GroupMessageInputField({super.key});
 
-  return Container(
-    decoration: BoxDecoration(
-      color: Color(0xfffafafa),
-      borderRadius: BorderRadius.all(Radius.circular(15)),
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
+  @override
+  State<GroupMessageInputField> createState() => _GroupMessageInputFieldState();
+}
+
+class _GroupMessageInputFieldState extends State<GroupMessageInputField> {
+  late TextEditingController messageController;
+
+  @override
+  void initState() {
+    super.initState();
+    messageController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    messageController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildFilePreview(File file) {
+    final fileName = file.path.toLowerCase();
+
+    if (fileName.endsWith('.jpg') ||
+        fileName.endsWith('.jpeg') ||
+        fileName.endsWith('.png') ||
+        fileName.endsWith('.gif') ||
+        fileName.endsWith('.webp')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.file(
+          file,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              Icon(Icons.image, color: Colors.grey[400]),
+        ),
+      );
+    } else if (fileName.endsWith('.pdf')) {
+      return Icon(Icons.picture_as_pdf, color: Colors.red[400], size: 30);
+    } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+      return Icon(Icons.description, color: Colors.blue[400], size: 30);
+    } else if (fileName.endsWith('.txt')) {
+      return Icon(Icons.text_snippet, color: Colors.grey[400], size: 30);
+    } else {
+      return Icon(Icons.insert_drive_file, color: Colors.grey[400], size: 30);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final GroupChatDetailController controller = Get.find();
+    final LanguageService languageService = Get.find<LanguageService>();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xfffafafa),
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
         // Seçilen dosyaların önizlemesi
            Obx(() {
             if (controller.selectedFiles.isNotEmpty) {
@@ -214,35 +264,12 @@ Widget buildGroupMessageInputField() {
             )),
           ],
         ),
-      ],
-    ),
-  );
-}
-
-Widget _buildFilePreview(File file) {
-  final fileName = file.path.toLowerCase();
-
-  if (fileName.endsWith('.jpg') ||
-      fileName.endsWith('.jpeg') ||
-      fileName.endsWith('.png') ||
-      fileName.endsWith('.gif') ||
-      fileName.endsWith('.webp')) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.file(
-        file,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-            Icon(Icons.image, color: Colors.grey[400]),
+        ],
       ),
     );
-  } else if (fileName.endsWith('.pdf')) {
-    return Icon(Icons.picture_as_pdf, color: Colors.red[400], size: 30);
-  } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-    return Icon(Icons.description, color: Colors.blue[400], size: 30);
-  } else if (fileName.endsWith('.txt')) {
-    return Icon(Icons.text_snippet, color: Colors.grey[400], size: 30);
-  } else {
-    return Icon(Icons.insert_drive_file, color: Colors.grey[400], size: 30);
   }
+}
+
+Widget buildGroupMessageInputField() {
+  return GroupMessageInputField();
 }

@@ -14,18 +14,29 @@ class StoryService {
 
   static Future<List<StoryModel>> fetchStories() async {
     try {
+      final url = "${AppConstants.baseUrl}/timeline/stories";
+      
       final response = await http.get(
-        Uri.parse("${AppConstants.baseUrl}/timeline/stories"),
+        Uri.parse(url),
         headers: {
           "Authorization": "Bearer ${box.read('token')}",
         },
       );
+      
+      debugPrint("📡 Story API Status Code: ${response.statusCode}");
+      printFullText('🔍 Story API Response (full): ${response.body}');
+      
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         final List data = body["data"];
+        
+        debugPrint("📦 Story count: ${data.length}");
         printFullText('🔍 Story API Response: ${response.body}');
+        
         return data.map((json) => StoryModel.fromJson(json)).toList();
       } else {
+        debugPrint("❌ Story API başarısız: ${response.statusCode}");
+        debugPrint("❌ Response body: ${response.body}");
         return [];
       }
     } catch (e) {
@@ -38,12 +49,17 @@ class StoryService {
     final token = GetStorage().read('token');
 
     try {
+      final url = "${AppConstants.baseUrl}/timeline/stories/$userId";
+      
       final response = await http.get(
-        Uri.parse("${AppConstants.baseUrl}/timeline/stories/$userId"),
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $token',
         },
       );
+
+      debugPrint("📡 Story API Status Code (by userId): ${response.statusCode}");
+      printFullText('🔍 Story API Response (by userId - full): ${response.body}');
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
@@ -52,9 +68,14 @@ class StoryService {
 
         // Eğer data doğrudan stories listesi ise:
         final stories = userBlock["stories"] ?? [];
+        
+        debugPrint("📦 Story count (by userId): ${stories.length}");
+        printFullText('🔍 Story API Response (by userId): ${response.body}');
 
         return stories.map<String>((item) => item["path"].toString()).toList();
       } else {
+        debugPrint("❌ fetchStoriesByUserId başarısız: ${response.statusCode}");
+        debugPrint("❌ Response body: ${response.body}");
         return [];
       }
     } catch (e) {

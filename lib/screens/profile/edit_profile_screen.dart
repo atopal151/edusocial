@@ -8,6 +8,7 @@ import '../../components/buttons/custom_button.dart';
 import '../../components/input_fields/custom_textfield_step2.dart';
 import '../../controllers/profile_update_controller.dart';
 import '../../services/language_service.dart';
+import '../../models/language_model.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -239,7 +240,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: DropdownButtonHideUnderline(
           child: DropdownButton<int>(
             isExpanded: true,
-            value: controller.selectedLanguageId.value,
+            value: controller.selectedLanguageId.value != null &&
+                    controller.languages.any((lang) => lang.id == controller.selectedLanguageId.value)
+                ? controller.selectedLanguageId.value
+                : null,
             dropdownColor: Colors.white,
             borderRadius: BorderRadius.circular(12),
             elevation: 8,
@@ -325,7 +329,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 );
               }).toList();
             },
-            items: controller.languages.map((language) {
+            items: controller.languages
+                .fold<Map<int, LanguageModel>>({}, (map, language) {
+                  // Duplicate id'leri kaldır - ilk olanı tut
+                  if (!map.containsKey(language.id)) {
+                    map[language.id] = language;
+                  }
+                  return map;
+                })
+                .values
+                .map((language) {
               return DropdownMenuItem<int>(
                 value: language.id,
                 child: Row(
