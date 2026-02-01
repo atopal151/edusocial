@@ -420,9 +420,10 @@ class _ChatListScreenState extends State<ChatListScreen>
                                           color: Color(0xff414751)),
                                     ),
                                   ),
+                                  const SizedBox(width: 2),
                                   VerificationBadge(
                                     isVerified: chat.isVerified ?? false,
-                                    size: 12.0,
+                                    size: 14.0,
                                   ),
                                 ],
                               ),

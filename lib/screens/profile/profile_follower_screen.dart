@@ -169,6 +169,7 @@ class _ProfileFollowerScreenState extends State<ProfileFollowerScreen> {
                             color: Color(0xff414751)),
                       ),
                     ),
+                    SizedBox(width: 2),
                     VerificationBadge(
                       isVerified: user['is_verified'] ?? false,
                       size: 14.0,

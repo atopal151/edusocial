@@ -173,9 +173,10 @@ class _ProfileFollowingScreenState extends State<ProfileFollowingScreen> {
                                     color: Color(0xff414751)),
                               ),
                             ),
+                            SizedBox(width: 2),
                             VerificationBadge(
                               isVerified: user['is_verified'] ?? false,
-                              size: 12.0,
+                              size: 14.0,
                             ),
                           ],
                         ),

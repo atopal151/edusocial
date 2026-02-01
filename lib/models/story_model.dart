@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 class StoryModel {
   final String id;
   final int userId;
-   String username;
-   String profileImage;
+  String username;
+  String name;
+  String surname;
+  String profileImage;
   RxBool isViewed;
   List<String> storyUrls;
   DateTime createdat;
@@ -14,6 +16,8 @@ class StoryModel {
     required this.id,
     required this.userId,
     required this.username,
+    required this.name,
+    required this.surname,
     required this.profileImage,
     required bool isViewed,
     required this.storyUrls,
@@ -29,6 +33,8 @@ class StoryModel {
       id: user["id"].toString(),
       userId: user["id"],
       username: user["name"] ?? "",
+      name: user["name"] ?? "",
+      surname: user["surname"] ?? "",
       profileImage: user["avatar"] ?? "",
       hasStory: stories.isNotEmpty,
       isViewed: (user["is_showed"] ?? false) == true,

@@ -105,6 +105,20 @@ class EntryController extends GetxController {
       }
       allDisplayEntries.assignAll(preparedEntries);
       
+      // Debug: Ekrana gönderilen entry'lerin tarih bilgilerini yazdır
+      if (preparedEntries.isEmpty) {
+        debugPrint('ℹ️ Hazırlanan entry bulunamadı, tarih bilgisi yazdırılmadı.');
+      } else {
+        debugPrint('🕒 Hazırlanan entry tarih listesi (${preparedEntries.length} adet):');
+        for (final item in preparedEntries) {
+          final entry = item.entry;
+          debugPrint(
+            '• ID: ${entry.id} | topic: ${item.topicName ?? "-"} | category: ${item.categoryTitle} | human_created_at: ${entry.humancreatedat} | created_at: ${entry.createdat?.toIso8601String() ?? "null"}',
+          );
+          
+        }
+      }
+      
       // CATEGORY MANAGEMENT: Seçilen kategoriye göre filtrele
       applyCategoryFilter();
       

@@ -34,6 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   // Seçili ToggleTabBar'ı kontrol eden değişken
   final RxInt selectedTabIndex = 0.obs;
+  final RxBool isAboutExpanded = false.obs;
 
   @override
   void initState() {
@@ -186,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   displacement: 40.0,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    child: buildProfileDetails(),
+                    child: _buildAboutSection(),
                   ),
                 ),
               ],
@@ -310,6 +311,85 @@ ${languageService.tr("profile.mainProfile.shareText.hashtags")}
             ),
           );
         },
+      );
+    });
+  }
+
+  /// About detaylarını açılır/kapanır kart olarak gösterir
+  Widget _buildAboutSection() {
+    final LanguageService languageService = Get.find<LanguageService>();
+
+    return Obx(() {
+      final aboutText = languageService.tr("profile.details.about");
+      final aboutTitle =
+          aboutText == "profile.details.about" ? "About" : aboutText;
+
+      return Container(
+        color: const Color(0xfffafafa),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GestureDetector(
+                onTap: () {
+                  isAboutExpanded.value = !isAboutExpanded.value;
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffffffff),
+                    borderRadius: BorderRadius.circular(16),
+                 
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        aboutTitle,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xfff3f4f6),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.all(6),
+                        child: AnimatedRotation(
+                          turns: isAboutExpanded.value ? 0.5 : 0,
+                          duration: const Duration(milliseconds: 200),
+                          child: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 20,
+                            color: Color(0xffbfc3c9),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 220),
+              crossFadeState: isAboutExpanded.value
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              firstChild: const SizedBox.shrink(),
+              secondChild: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: buildProfileDetails(wrapWithScroll: false),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       );
     });
   }

@@ -6,7 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../services/language_service.dart';
 import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
+import '../../../controllers/profile_controller.dart';
 import '../../dialogs/image_preview_dialog.dart';
+import '../verification_badge.dart';
 
 class GroupUniversalMessageWidget extends StatelessWidget {
   final GroupMessageModel message;
@@ -95,25 +97,47 @@ class GroupUniversalMessageWidget extends StatelessWidget {
               : MainAxisAlignment.start,
           children: [
             if (!message.isSentByMe)
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 6.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage: (message.profileImage.isNotEmpty &&
-                          !message.profileImage.endsWith('/0'))
-                      ? NetworkImage(message.profileImage)
-                      : null,
-                  child: (message.profileImage.isEmpty ||
-                          message.profileImage.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
+              InkWell(
+                onTap: () {
+                  final ProfileController profileController = Get.find<ProfileController>();
+                  profileController.getToPeopleProfileScreen(message.username);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 6.0),
+                  child: CircleAvatar(
+                    radius: 12,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: (message.profileImage.isNotEmpty &&
+                            !message.profileImage.endsWith('/0'))
+                        ? NetworkImage(message.profileImage)
+                        : null,
+                    child: (message.profileImage.isEmpty ||
+                            message.profileImage.endsWith('/0'))
+                        ? const Icon(Icons.person, color: Colors.white, size: 14)
+                        : null,
+                  ),
                 ),
               ),
             
-            Text(
-              '@${message.username}',
-              style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
+            InkWell(
+              onTap: () {
+                final ProfileController profileController = Get.find<ProfileController>();
+                profileController.getToPeopleProfileScreen(message.username);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '@${message.username}',
+                    style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
+                  ),
+                  const SizedBox(width: 4),
+                  VerificationBadge(
+                    isVerified: message.isVerified,
+                    size: 12,
+                  ),
+                ],
+              ),
             ),
             
             // Pin iconu - mesaj pinlendiğinde göster (admin olmayan kullanıcılar için)
@@ -142,19 +166,25 @@ class GroupUniversalMessageWidget extends StatelessWidget {
               ),
             
             if (message.isSentByMe)
-              Padding(
-                padding: const EdgeInsets.only(left: 6.0, right: 8.0),
-                child: CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage: (message.profileImage.isNotEmpty &&
-                          !message.profileImage.endsWith('/0'))
-                      ? NetworkImage(message.profileImage)
-                      : null,
-                  child: (message.profileImage.isEmpty ||
-                          message.profileImage.endsWith('/0'))
-                      ? const Icon(Icons.person, color: Colors.white, size: 14)
-                      : null,
+              InkWell(
+                onTap: () {
+                  final ProfileController profileController = Get.find<ProfileController>();
+                  profileController.getToPeopleProfileScreen(message.username);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 6.0, right: 8.0),
+                  child: CircleAvatar(
+                    radius: 12,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: (message.profileImage.isNotEmpty &&
+                            !message.profileImage.endsWith('/0'))
+                        ? NetworkImage(message.profileImage)
+                        : null,
+                    child: (message.profileImage.isEmpty ||
+                            message.profileImage.endsWith('/0'))
+                        ? const Icon(Icons.person, color: Colors.white, size: 14)
+                        : null,
+                  ),
                 ),
               ),
           ],

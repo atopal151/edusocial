@@ -413,7 +413,7 @@ class ChatServices {
       );
 
       // API'dan gelen ham online friends response datasını printfulltext ile yazdır
-      printFullText('👥 [ChatService] Online Friends API Response: ${response.body}');
+      //printFullText('👥 [ChatService] Online Friends API Response: ${response.body}');
       
       final body = jsonDecode(response.body);
       final dataList = body['data'] as List<dynamic>;
@@ -498,7 +498,7 @@ class ChatServices {
       );
 
       // API'dan gelen ham chat list response datasını printfulltext ile yazdır
-      printFullText('💬 [ChatService] Chat List API Response: ${response.body}');
+     //printFullText('💬 [ChatService] Chat List API Response: ${response.body}');
       
       final body = jsonDecode(response.body);
 

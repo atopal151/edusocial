@@ -84,6 +84,7 @@ class UserListItem extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xff414751))),
                         ),
+                        SizedBox(width: 2),
                         VerificationBadge(
                           isVerified: user.isVerified ?? false,
                           size: 14.0,

@@ -8,6 +8,7 @@ class GroupMessageModel {
   final GroupMessageType messageType;
   final DateTime timestamp;
   final bool isSentByMe;
+  final bool isVerified;
   final List<String>? pollOptions;
   final String? additionalText;
   final String name;
@@ -35,6 +36,7 @@ class GroupMessageModel {
     required this.messageType,
     required this.timestamp,
     required this.isSentByMe,
+    this.isVerified = false,
     this.pollOptions,
     this.additionalText,
     this.links,
@@ -55,6 +57,7 @@ class GroupMessageModel {
     GroupMessageType? messageType,
     DateTime? timestamp,
     bool? isSentByMe,
+    bool? isVerified,
     List<String>? pollOptions,
     String? additionalText,
     String? name,
@@ -77,6 +80,7 @@ class GroupMessageModel {
       messageType: messageType ?? this.messageType,
       timestamp: timestamp ?? this.timestamp,
       isSentByMe: isSentByMe ?? this.isSentByMe,
+      isVerified: isVerified ?? this.isVerified,
       pollOptions: pollOptions ?? this.pollOptions,
       additionalText: additionalText ?? this.additionalText,
       name: name ?? this.name,
@@ -146,6 +150,10 @@ class GroupMessageModel {
     final bool isPinned = json['is_pinned'] == true;
 
 
+    // Sender bilgisi (doğrulama için)
+    final Map<String, dynamic>? sender =
+        json['sender'] != null ? Map<String, dynamic>.from(json['sender']) : null;
+
     return GroupMessageModel(
       id: json['id']?.toString() ?? '',
       senderId: json['sender_id']?.toString() ?? '',
@@ -154,6 +162,7 @@ class GroupMessageModel {
       messageType: messageType,
       timestamp: timestamp,
       isSentByMe: json['is_sent_by_me'] == true || json['is_me'] == true,
+      isVerified: _computeIsVerified(sender ?? json),
       pollOptions: pollOptions,
       additionalText: json['additional_text'],
       name: json['sender']?['name'] ?? json['name'] ?? '',
@@ -168,5 +177,38 @@ class GroupMessageModel {
       surveyData: surveyData,
       isPinned: isPinned,
     );
+  }
+
+  // Değişken tipte gelebilen doğrulama alanlarını güvenle bool'a çevirir
+  static bool _computeIsVerified(Map<String, dynamic> source) {
+    bool? pick(dynamic value) {
+      if (value is bool) return value;
+      if (value is num) return value == 1;
+      if (value is String) {
+        final lower = value.toLowerCase();
+        if (lower == 'true' || lower == '1') return true;
+        if (lower == 'false' || lower == '0') return false;
+      }
+      return null;
+    }
+
+    final candidates = [
+      pick(source['is_verified']),
+      pick(source['verified']),
+      pick(source['account_verified']),
+      pick(source['document_verified']),
+      pick(source['identity_verified']),
+    ];
+
+    final status = source['verification_status']?.toString().toLowerCase();
+    final level = source['verification_level']?.toString().toLowerCase();
+    final type = source['verification_type']?.toString().toLowerCase();
+    final stringVerified =
+        status == 'verified' || level == 'verified' || type == 'verified';
+
+    for (final val in candidates) {
+      if (val != null) return val;
+    }
+    return stringVerified;
   }
 }

@@ -137,6 +137,41 @@ class GroupChatDetailController extends GetxController {
     return url;
   }
 
+  // Kullanıcı doğrulamasını çoklu alandan hesaplar
+  bool _computeIsVerified(Map<String, dynamic>? source) {
+    if (source == null) return false;
+
+    bool? pick(dynamic value) {
+      if (value is bool) return value;
+      if (value is num) return value == 1;
+      if (value is String) {
+        final lower = value.toLowerCase();
+        if (lower == 'true' || lower == '1') return true;
+        if (lower == 'false' || lower == '0') return false;
+      }
+      return null;
+    }
+
+    final candidates = [
+      pick(source['is_verified']),
+      pick(source['verified']),
+      pick(source['account_verified']),
+      pick(source['document_verified']),
+      pick(source['identity_verified']),
+    ];
+
+    final status = source['verification_status']?.toString().toLowerCase();
+    final level = source['verification_level']?.toString().toLowerCase();
+    final type = source['verification_type']?.toString().toLowerCase();
+    final stringVerified =
+        status == 'verified' || level == 'verified' || type == 'verified';
+
+    for (final val in candidates) {
+      if (val != null) return val;
+    }
+    return stringVerified;
+  }
+
   // Mesaj içeriğinde link var mı kontrol et
   bool hasLinksInText(String text) {
     return urlRegex.hasMatch(text);
@@ -638,6 +673,7 @@ class GroupChatDetailController extends GetxController {
         surname: userData?['surname'] ?? '',
         username: userData?['username'] ?? '',
         profileImage: userData?['avatar_url'] ?? '',
+        isVerified: _computeIsVerified(userData),
         content: content,
         messageType: messageType,
         timestamp: DateTime.parse(messageData['created_at'] ?? DateTime.now().toIso8601String()),
@@ -754,6 +790,7 @@ class GroupChatDetailController extends GetxController {
                   surname: user['surname'] ?? '',
                   username: user['username'] ?? user['name'] ?? '',
                   profileImage: user['avatar_url'] ?? '',
+                  isVerified: _computeIsVerified(user),
                   content: messageData['content'],
                   messageType: messageData['type'],
                   timestamp: DateTime.parse(chat.createdAt),

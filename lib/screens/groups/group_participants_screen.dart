@@ -115,6 +115,7 @@ class _GroupParticipantsScreenState extends State<GroupParticipantsScreen> {
                         ),
                       ),
                     ),
+                    SizedBox(width: 2),
                     VerificationBadge(
                       isVerified: user['is_verified'] ?? false,
                       size: 14.0,

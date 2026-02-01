@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../components/dialogs/profile_image_preview_dialog.dart';
 import '../../controllers/profile_controller.dart';
 import '../../routes/app_routes.dart';
@@ -130,16 +132,33 @@ Widget buildProfileHeader() {
             )),
       const SizedBox(height: 20),
 
+      /// Sosyal medya kısayolları
+      Obx(() {
+        final links = _buildSocialButtons();
+        if (links.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: links,
+          ),
+        );
+      }),
+      const SizedBox(height: 16),
+
       // Gönderi / Takipçi / Takip Edilen
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-
-      const SizedBox(width: 50),
+          const SizedBox(width: 50),
           Expanded(
             child: _buildProfileInfo(languageService.tr("profile.header.posts"), controller.postCount),
           ),
-         
+          const SizedBox(width: 12),
+          Container(width: 1, height: 28, color: const Color(0xffe5e7eb)),
+          const SizedBox(width: 12),
           Expanded(
             child: InkWell(
               onTap: () {
@@ -151,7 +170,9 @@ Widget buildProfileHeader() {
               child: _buildProfileInfo(languageService.tr("profile.header.followers"), controller.filteredFollowers),
             ),
           ),
-         
+          const SizedBox(width: 12),
+          Container(width: 1, height: 28, color: const Color(0xffe5e7eb)),
+          const SizedBox(width: 12),
           Expanded(
             child: InkWell(
               onTap: () {
@@ -163,13 +184,124 @@ Widget buildProfileHeader() {
               child: _buildProfileInfo(languageService.tr("profile.header.following"), controller.filteredFollowing),
             ),
           ),
-
-      const SizedBox(width: 50),
+          const SizedBox(width: 50),
         ],
       ),
       const SizedBox(height: 20),
     ],
   );
+}
+
+List<Widget> _buildSocialButtons() {
+  final profile = controller.profile.value;
+  if (profile == null) return [];
+
+  final List<_SocialLink> socials = [
+    _SocialLink(
+      handle: profile.facebook,
+      baseUrl: "https://facebook.com/",
+      asset: "images/icons/social_icon/facebook.svg",
+      color: const Color(0xFF1877F2),
+    ),
+    _SocialLink(
+      handle: profile.linkedin,
+      baseUrl: "https://www.linkedin.com/in/",
+      asset: "images/icons/social_icon/linkedin.svg",
+      color: const Color(0xFF0A66C2),
+    ),
+    _SocialLink(
+      handle: profile.instagram,
+      baseUrl: "https://www.instagram.com/",
+      asset: "images/icons/social_icon/instagram.svg",
+      color: const Color(0xFFE1306C),
+    ),
+    _SocialLink(
+      handle: profile.twitter,
+      baseUrl: "https://x.com/",
+      asset: "images/icons/social_icon/xsocial.svg",
+      color: const Color(0xFF000000),
+    ),
+    _SocialLink(
+      handle: profile.tiktok,
+      baseUrl: "https://www.tiktok.com/@",
+      asset: "images/icons/social_icon/tiktok.svg",
+      color: const Color(0xFFE60053), // kırmızı arka plan rengi
+      allowColorFilter: false, // çok renkli icon, boyama yapma
+    ),
+  ];
+
+  return socials
+      .where((link) => link.handle != null && link.handle!.trim().isNotEmpty)
+      .map((link) => _SocialIconButton(link: link))
+      .toList();
+}
+
+class _SocialLink {
+  final String? handle;
+  final String baseUrl;
+  final String asset;
+  final Color color;
+  final bool allowColorFilter;
+
+  _SocialLink({
+    required this.handle,
+    required this.baseUrl,
+    required this.asset,
+    required this.color,
+    this.allowColorFilter = true,
+  });
+
+  Uri? get uri {
+    if (handle == null) return null;
+    String value = handle!.trim();
+    if (value.isEmpty) return null;
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      return Uri.tryParse(value);
+    }
+    if (value.startsWith("@")) {
+      value = value.substring(1);
+    }
+    return Uri.tryParse("$baseUrl$value");
+  }
+}
+
+class _SocialIconButton extends StatelessWidget {
+  final _SocialLink link;
+
+  const _SocialIconButton({required this.link});
+
+  @override
+  Widget build(BuildContext context) {
+    final uri = link.uri;
+    if (uri == null) return const SizedBox.shrink();
+
+    return InkWell(
+      onTap: () async {
+        final canOpen = await canLaunchUrl(uri);
+        if (canOpen) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        width: 30,
+        height: 30,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: link.color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: SvgPicture.asset(
+          link.asset,
+          width: 16,
+          height: 16,
+          colorFilter: link.allowColorFilter
+              ? ColorFilter.mode(link.color, BlendMode.srcIn)
+              : null,
+        ),
+      ),
+    );
+  }
 }
 
 Widget _buildProfileInfo(String title, RxInt value) {

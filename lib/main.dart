@@ -59,10 +59,7 @@ void main() async {
   final languageService = Get.find<LanguageService>();
   debugPrint('Mevcut dil: ${languageService.currentLanguage.value}');
   
-  // Debug: Language API'lerini test et
-  if (token != null) {
-    languageService.debugLanguageAPIs();
-  }
+
 
   runApp(MyApp(initialRoute: Routes.main));
 }
@@ -86,7 +83,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// GetX çeviri sınıfı
+// GetX çeviri sınıfı - API entegrasyonu ile uyumlu
 class GetTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys {
@@ -94,36 +91,62 @@ class GetTranslations extends Translations {
       final languageService = Get.find<LanguageService>();
       final translations = languageService.translations;
       
-      // GetX formatına dönüştür
-      Map<String, Map<String, String>> result = {};
-      _flattenMap(translations, '', result);
+      if (translations.isEmpty) {
+        debugPrint('⚠️ Çeviriler henüz yüklenmedi, varsayılan çeviriler kullanılıyor');
+        return _getDefaultTranslations();
+      }
       
+      // GetX formatına dönüştür - tüm desteklenen diller için
+      Map<String, Map<String, String>> result = {};
+      
+      // Her desteklenen dil için çeviri haritası oluştur
+      for (String langCode in LanguageService.supportedLanguages.keys) {
+        result[langCode] = {};
+        _flattenMap(translations, '', result, langCode);
+      }
+      
+      debugPrint('✅ GetX çevirileri hazırlandı: ${result.keys.toList()}');
       return result;
     } catch (e) {
-      debugPrint('LanguageService bulunamadı, varsayılan çeviriler kullanılıyor: $e');
-      // Varsayılan boş çeviriler döndür
-      return {
-        'en': {},
-        'tr': {},  
-      };
+      debugPrint('❌ LanguageService bulunamadı, varsayılan çeviriler kullanılıyor: $e');
+      return _getDefaultTranslations();
     }
   }
   
-  void _flattenMap(Map<String, dynamic> map, String prefix, Map<String, Map<String, String>> result) {
+  /// Varsayılan çeviri haritası - API'dan veri gelene kadar
+  Map<String, Map<String, String>> _getDefaultTranslations() {
+    return {
+      'en': {
+        'loading': 'Loading...',
+        'error': 'Error',
+        'common.buttons.loading': 'Loading...',
+        'common.messages.loading': 'Loading...',
+        'common.messages.error': 'Error'
+      },
+      'tr': {
+        'loading': 'Yükleniyor...',
+        'error': 'Hata',
+        'common.buttons.loading': 'Yükleniyor...',
+        'common.messages.loading': 'Yükleniyor...',
+        'common.messages.error': 'Hata'
+      },  
+    };
+  }
+  
+  void _flattenMap(Map<String, dynamic> map, String prefix, Map<String, Map<String, String>> result, String languageCode) {
     map.forEach((key, value) {
       final fullKey = prefix.isEmpty ? key : '$prefix.$key';
       
       if (value is Map<String, dynamic>) {
-        _flattenMap(value, fullKey, result);
+        _flattenMap(value, fullKey, result, languageCode);
       } else {
         try {
-          final languageCode = Get.find<LanguageService>().currentLanguage.value;
           if (!result.containsKey(languageCode)) {
             result[languageCode] = {};
           }
           result[languageCode]![fullKey] = value.toString();
         } catch (e) {
-          debugPrint('Çeviri hatası: $e');
+          debugPrint('❌ Çeviri ekleme hatası ($fullKey): $e');
         }
       }
     });

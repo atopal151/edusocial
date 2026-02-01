@@ -32,23 +32,24 @@ class PostCard extends StatefulWidget {
   final String slug;
   final bool? isVerified; // Hesap doğrulama durumu
 
-  const PostCard(
-      {super.key,
-      required this.profileImage,
-      required this.postId,
-      required this.userName,
-      required this.name,
-      required this.surname,
-      required this.postDate,
-      required this.postDescription,
-      required this.mediaUrls,
-      required this.likeCount,
-      required this.commentCount,
-      required this.isLiked,
-      required this.isOwner,
+  const PostCard({
+    super.key,
+    required this.profileImage,
+    required this.postId,
+    required this.userName,
+    required this.name,
+    required this.surname,
+    required this.postDate,
+    required this.postDescription,
+    required this.mediaUrls,
+    required this.likeCount,
+    required this.commentCount,
+    required this.isLiked,
+    required this.isOwner,
     required this.links,
     required this.slug,
-    this.isVerified,});
+    this.isVerified,
+  });
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -75,16 +76,18 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
 
     // 🆕 Double tap animation setup
     _doubleTapAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1200), // 🔧 600ms → 1200ms uzatıldı
+      duration:
+          const Duration(milliseconds: 1200), // 🔧 600ms → 1200ms uzatıldı
       vsync: this,
     );
-    
+
     _doubleTapAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _doubleTapAnimationController,
-      curve: Curves.easeInOutBack, // 🔧 elasticOut → easeInOutBack (daha uzun görünür)
+      curve: Curves
+          .easeInOutBack, // 🔧 elasticOut → easeInOutBack (daha uzun görünür)
     ));
 
     // Animation listener
@@ -101,7 +104,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   @override
   void dispose() {
     _pageController.dispose(); // bellek sızıntısını önler
-    _doubleTapAnimationController.dispose(); // 🆕 Animation controller'ı dispose et
+    _doubleTapAnimationController
+        .dispose(); // 🆕 Animation controller'ı dispose et
     super.dispose();
   }
 
@@ -113,20 +117,20 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         if (parts.length >= 2) {
           final datePart = parts[0]; // 2025-05-28
           final timePart = parts[1]; // 22:37:10.000000Z
-          
+
           // Tarih kısmını parçala
           final dateParts = datePart.split('-');
           if (dateParts.length >= 3) {
             final year = dateParts[0];
             final month = dateParts[1];
             final day = dateParts[2];
-            
+
             // Saat kısmını parçala
             final timeParts = timePart.split(':');
             if (timeParts.length >= 2) {
               final hour = timeParts[0];
               final minute = timeParts[1];
-              
+
               // "gg.aa.yyyy hh:mm" formatında döndür
               return "$day.$month.$year $hour:$minute";
             }
@@ -179,11 +183,14 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           opacity = 1.0;
         } else {
           // Son %30'da yavaşça kaybolur (1 → 0)
-          opacity = (1.0 - ((_doubleTapAnimation.value - 0.7) / 0.3)).clamp(0.0, 1.0);
+          opacity =
+              (1.0 - ((_doubleTapAnimation.value - 0.7) / 0.3)).clamp(0.0, 1.0);
         }
 
         return Transform.scale(
-          scale: 0.5 + (_doubleTapAnimation.value * 0.5), // 🔧 Daha yumuşak scale (0.5 → 1.0)
+          scale: 0.5 +
+              (_doubleTapAnimation.value *
+                  0.5), // 🔧 Daha yumuşak scale (0.5 → 1.0)
           child: Opacity(
             opacity: opacity,
             child: Icon(
@@ -212,12 +219,12 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         onDoubleTap: _handleDoubleTapLike,
         behavior: HitTestBehavior.translucent,
         child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 🔹 Profil ve açıklama kısmı
-              Padding(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 🔹 Profil ve açıklama kısmı
+                Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,54 +234,66 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                           InkWell(
                               onTap: () {
                                 if (widget.isOwner == false) {
-                                  profileController
-                                      .getToPeopleProfileScreen(widget.userName);
+                                  profileController.getToPeopleProfileScreen(
+                                      widget.userName);
                                 }
                               },
                               child: CircleAvatar(
                                 radius: 20,
-                                backgroundColor: Color(0xfffafafa), // Gri arkaplan
+                                backgroundColor:
+                                    Color(0xfffafafa), // Gri arkaplan
                                 backgroundImage: widget.profileImage.isNotEmpty
                                     ? NetworkImage(widget.profileImage)
                                     : null, // Eğer profil resmi varsa kullan
                                 child: widget.profileImage.isEmpty
-                                    ? const Icon(Icons.person, color: Color(0xffffffff))
+                                    ? const Icon(Icons.person,
+                                        color: Color(0xffffffff))
                                     : null, // Profil resmi yoksa ikon
                               )),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        widget.userName.isNotEmpty ? '@${widget.userName}' : '${widget.name} ${widget.surname}',
-                                        style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 12,
-                                          color: const Color(0xff414751),
+                            child: InkWell(
+                              onTap: () {
+                                if (widget.isOwner == false) {
+                                  profileController.getToPeopleProfileScreen(
+                                      widget.userName);
+                                }
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Name + Surname (üstte)
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          '${widget.name} ${widget.surname}',
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                            color: const Color(0xff414751),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                    VerificationBadge(
-                                      isVerified: widget.isVerified ?? false,
-                                      size: 14.0,
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  _formatDate(widget.postDate),
-                                  style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                    color: const Color(0xff9CA3AE),
+                                      VerificationBadge(
+                                        isVerified: widget.isVerified ?? false,
+                                        size: 14.0,
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                  // Username (altta)
+                                  Text(
+                                    '@${widget.userName}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color(0xff9CA3AE),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           InkWell(
@@ -287,7 +306,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                     borderRadius: BorderRadius.vertical(
                                         top: Radius.circular(25)),
                                   ),
-                                  builder: (_) => TreePointBottomSheet(postId: widget.postId),
+                                  builder: (_) => TreePointBottomSheet(
+                                      postId: widget.postId),
                                 );
                               }
                               if (widget.isOwner == true) {
@@ -336,34 +356,32 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                             
                               ...widget.links.map(
                                 (link) => InkWell(
                                   onTap: () async {
                                     try {
-                                      
                                       // URL'yi temizle ve kontrol et
                                       String cleanLink = link.trim();
-                                      if (!cleanLink.startsWith('http://') && !cleanLink.startsWith('https://')) {
+                                      if (!cleanLink.startsWith('http://') &&
+                                          !cleanLink.startsWith('https://')) {
                                         cleanLink = 'https://$cleanLink';
                                       }
-                                      
-                                      
+
                                       final Uri url = Uri.parse(cleanLink);
-                                      
+
                                       // URL'nin açılabilir olup olmadığını kontrol et
                                       final canLaunch = await canLaunchUrl(url);
-                                      
+
                                       if (canLaunch) {
-                                        final result = await launchUrl(
-                                          url, 
-                                          mode: LaunchMode.externalApplication
-                                        );
-                                        
+                                        final result = await launchUrl(url,
+                                            mode:
+                                                LaunchMode.externalApplication);
+
                                         if (!result && mounted) {
                                           CustomSnackbar.show(
                                             title: "Hata",
-                                            message: "Link açılamadı. Lütfen tekrar deneyin.",
+                                            message:
+                                                "Link açılamadı. Lütfen tekrar deneyin.",
                                             type: SnackbarType.error,
                                           );
                                         }
@@ -371,7 +389,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                         if (mounted) {
                                           CustomSnackbar.show(
                                             title: "Hata",
-                                            message: "Bu link açılamıyor: $cleanLink",
+                                            message:
+                                                "Bu link açılamıyor: $cleanLink",
                                             type: SnackbarType.error,
                                           );
                                         }
@@ -380,14 +399,16 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                                       if (mounted) {
                                         CustomSnackbar.show(
                                           title: "Hata",
-                                          message: "Link açılırken bir hata oluştu: ${e.toString()}",
+                                          message:
+                                              "Link açılırken bir hata oluştu: ${e.toString()}",
                                           type: SnackbarType.error,
                                         );
                                       }
                                     }
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 2),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 2),
                                     child: Text(
                                       link,
                                       style: GoogleFonts.inter(
@@ -408,9 +429,9 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                   ),
                 ),
 
-              // 🔹 Slider Alanı - Double tap eklenmiş
-              if (widget.mediaUrls.isNotEmpty)
-                Column(
+                // 🔹 Slider Alanı - Double tap eklenmiş
+                if (widget.mediaUrls.isNotEmpty)
+                  Column(
                     children: [
                       SizedBox(
                         height: 200,
@@ -439,128 +460,157 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                           },
                         ),
                       ),
-                     
                     ],
                   ),
 
-              // 🔹 Alt butonlar (like, yorum, paylaş)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          isLiked = !isLiked;
-                          likeCount += isLiked ? 1 : -1;
-                        });
-                        postController.toggleLike(widget.postId.toString());
-                      },
-                      child: SvgPicture.asset(
-                        "images/icons/post_like.svg",
-                        colorFilter: ColorFilter.mode(
-                          isLiked ? Colors.red : Color(0xff9ca3ae),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      likeCount.toString(),
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff414751),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          builder: (_) => DraggableScrollableSheet(
-                            initialChildSize: 0.95,
-                            maxChildSize: 0.95,
-                            minChildSize: 0.95,
-                            expand: false,
-                            builder: (context, controller) => CommentBottomSheet(
-                              postId: widget.postId.toString(),
-                              onCommentAdded: () {
-                                // Yorum eklendiğinde comment count'u artır
-                                setState(() {
-                                  commentCount++;
-                                });
-                                
-                                // Badge sayısı otomatik güncellenir - fetchNotifications() kaldırıldı
-                              },
+                // 🔹 Alt butonlar (like, yorum, paylaş)
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            isLiked = !isLiked;
+                            likeCount += isLiked ? 1 : -1;
+                          });
+                          postController.toggleLike(widget.postId.toString());
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          constraints:
+                              const BoxConstraints(minWidth: 15, minHeight: 15),
+                          child: SvgPicture.asset(
+                            "images/icons/post_like.svg",
+                            colorFilter: ColorFilter.mode(
+                              isLiked ? Colors.red : Color(0xff9ca3ae),
+                              BlendMode.srcIn,
                             ),
                           ),
-                        );
-                      },
-                      child: SvgPicture.asset(
-                        "images/icons/post_chat.svg",
-                        colorFilter: const ColorFilter.mode(
-                            Color(0xff9ca3ae), BlendMode.srcIn),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      commentCount.toString(),
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff414751),
+                      Text(
+                        likeCount.toString(),
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff414751),
+                        ),
                       ),
-                    ),
-                    const Spacer(),
-                    InkWell(
-                      onTap: () {
-                        final languageService = Get.find<LanguageService>();
-                        String shareText = "${widget.userName} ${languageService.tr("common.buttons.postShared")}:\n\n${widget.postDescription}";
-                        
-                        // Eğer linkler varsa onları da ekle
-                        if (widget.links.isNotEmpty) {
-                          shareText += "\n\n${languageService.tr("common.buttons.links")}:\n";
-                          for (String link in widget.links) {
-                            shareText += "$link\n";
+                      const SizedBox(width: 10),
+                      InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            context: context,
+                            builder: (_) => DraggableScrollableSheet(
+                              initialChildSize: 0.95,
+                              maxChildSize: 0.95,
+                              minChildSize: 0.95,
+                              expand: false,
+                              builder: (context, controller) =>
+                                  CommentBottomSheet(
+                                postId: widget.postId.toString(),
+                                onCommentAdded: () {
+                                  // Yorum eklendiğinde comment count'u artır
+                                  setState(() {
+                                    commentCount++;
+                                  });
+
+                                  // Badge sayısı otomatik güncellenir - fetchNotifications() kaldırıldı
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          constraints:
+                              const BoxConstraints(minWidth: 15, minHeight: 15),
+                          child: SvgPicture.asset(
+                            "images/icons/post_chat.svg",
+                            colorFilter: const ColorFilter.mode(
+                                Color(0xff9ca3ae), BlendMode.srcIn),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        commentCount.toString(),
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff414751),
+                        ),
+                      ),
+                      const Spacer(),
+                      InkWell(
+                        onTap: () {
+                          final languageService = Get.find<LanguageService>();
+                          String shareText =
+                              "${widget.userName} ${languageService.tr("common.buttons.postShared")}:\n\n${widget.postDescription}";
+
+                          // Eğer linkler varsa onları da ekle
+                          if (widget.links.isNotEmpty) {
+                            shareText +=
+                                "\n\n${languageService.tr("common.buttons.links")}:\n";
+                            for (String link in widget.links) {
+                              shareText += "$link\n";
+                            }
                           }
-                        }
-                        
-                        // Sistem varsayılanı share sheet'ini kullan
-                        Share.share(shareText);
-                      },
-                      child: SvgPicture.asset(
-                        "images/icons/share.svg",
-                        colorFilter: const ColorFilter.mode(
-                            Color(0xff9ca3ae), BlendMode.srcIn),
+
+                          // Sistem varsayılanı share sheet'ini kullan
+                          Share.share(shareText);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          constraints:
+                              const BoxConstraints(minWidth: 15, minHeight: 15),
+                          child: SvgPicture.asset(
+                            "images/icons/share.svg",
+                            colorFilter: const ColorFilter.mode(
+                                Color(0xff9ca3ae), BlendMode.srcIn),
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      Get.find<LanguageService>().tr("common.buttons.share"),
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xff414751),
+                      const SizedBox(width: 5),
+                      Text(
+                        Get.find<LanguageService>().tr("common.buttons.share"),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff414751),
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+                // 🔹 Paylaşım tarihi (beğeni/yorum butonlarının altında)
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    _formatDate(widget.postDate),
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xff9CA3AE),
                     ),
-                  ],
+                  ),
+                ),
+              ],
+            ),
+
+            // 🆕 Double tap kalp animasyonu
+            if (_showDoubleTapHeart)
+              Positioned.fill(
+                child: Center(
+                  child: _buildDoubleTapHeart(),
                 ),
               ),
-            ],
-          ),
-          
-          // 🆕 Double tap kalp animasyonu
-          if (_showDoubleTapHeart)
-            Positioned.fill(
-              child: Center(
-                child: _buildDoubleTapHeart(),
-              ),
-            ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

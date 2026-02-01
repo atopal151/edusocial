@@ -16,6 +16,7 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
   final StoryController storyController = Get.find<StoryController>();
   int _storyIndex = 0;
   AnimationController? _animationController;
+  bool _isPaused = false;
 
   @override
   void initState() {
@@ -54,11 +55,27 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
   }
 
   void _pauseStory() {
-    _animationController?.stop();
+    if (!_isPaused) {
+      _isPaused = true;
+      _animationController?.stop();
+      debugPrint("📱 My Story paused");
+    }
   }
 
   void _resumeStory() {
-    _animationController?.forward();
+    if (_isPaused) {
+      _isPaused = false;
+      _animationController?.forward();
+      debugPrint("📱 My Story resumed");
+    }
+  }
+
+  void _togglePause() {
+    if (_isPaused) {
+      _resumeStory();
+    } else {
+      _pauseStory();
+    }
   }
 
   void nextStory() {
@@ -126,9 +143,17 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
     return Scaffold(
       backgroundColor: Colors.black,
       body: GestureDetector(
+        // Long press için (gerçek cihazlarda)
         onLongPressStart: (_) => _pauseStory(),
         onLongPressEnd: (_) => _resumeStory(),
-        onTapDown: (details) {
+        // Pan için (emülatörde daha iyi çalışır)
+        onPanStart: (_) => _pauseStory(),
+        onPanEnd: (_) => _resumeStory(),
+        onPanCancel: () => _resumeStory(),
+        // Double tap ile pause/resume (emülatör için alternatif)
+        onDoubleTap: _togglePause,
+        onTapUp: (details) {
+          // onTapUp kullanarak long press ile çakışmayı önlüyoruz
           final width = MediaQuery.of(context).size.width;
           if (details.globalPosition.dx < width / 2) {
             previousStory();
@@ -182,25 +207,51 @@ class _MyStoryViewerPageState extends State<MyStoryViewerPage>
               right: 16,
               child: Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Color(0xffffffff),
-                    backgroundImage: NetworkImage(story.profileImage),
+                  GestureDetector(
+                    onTap: () {
+                      // Kendi profil sayfasına yönlendir
+                      Get.toNamed('/profile');
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: Color(0xffffffff),
+                      backgroundImage: NetworkImage(story.profileImage),
+                    ),
                   ),
                   const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        story.username,
-                        style:
-                            GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
-                      Text(
-                        timeAgo(story.createdat),
-                        style: GoogleFonts.inter(
-                            color: Color(0xffffffff), fontSize: 10, fontWeight: FontWeight.w400),
-                      ),
-                    ],
+                  GestureDetector(
+                    onTap: () {
+                      // Kendi profil sayfasına yönlendir
+                      Get.toNamed('/profile');
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${story.name} ${story.surname}".trim().isNotEmpty 
+                              ? "${story.name} ${story.surname}".trim() 
+                              : story.username,
+                          style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        Row(
+                          children: [
+                            if ("${story.name} ${story.surname}".trim().isNotEmpty)
+                              Text(
+                                '@${story.username}',
+                                style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),
+                              ),
+                            if ("${story.name} ${story.surname}".trim().isNotEmpty)
+                              Text(
+                                ' • ',
+                                style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),
+                              ),
+                            Text(
+                              timeAgo(story.createdat),
+                              style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   const Spacer(),
                   IconButton(

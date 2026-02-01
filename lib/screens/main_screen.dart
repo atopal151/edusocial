@@ -205,9 +205,9 @@ class MainScreen extends StatelessWidget {
               index: navigationController.selectedIndex.value,
               children: [
                 HomeScreen(),
-                ChatListScreen(),
-                MatchResultScreen(),
                 EntryScreen(),
+                MatchResultScreen(),
+                ChatListScreen(),
                 ProfileScreen(),
               ],
             );

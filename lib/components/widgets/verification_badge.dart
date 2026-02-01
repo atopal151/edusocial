@@ -20,31 +20,11 @@ class VerificationBadge extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      margin: margin ?? const EdgeInsets.only(left: 4),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: color ?? const Color(0xFF1DA1F2), // Twitter/Instagram mavi rengi
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(10),
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Icon(
-          Icons.verified,
-          size: size * 0.7,
-          color: Colors.white,
-        ),
+    return SizedBox(
+      child: Icon(
+        Icons.verified,
+        size: size * 1,
+        color: color ?? const Color(0xFF1DA1F2),
       ),
     );
   }
@@ -95,6 +75,7 @@ class VerifiedNameDisplay extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            SizedBox(width: 2),
             VerificationBadge(
               isVerified: isVerified,
               size: badgeSize,

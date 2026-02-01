@@ -224,13 +224,29 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                                         const SizedBox(width: 8),
                                         Obx(() {
                                           final ProfileController profileController = Get.find<ProfileController>();
-                                          return Text(
-                                            profileController.username.value,
-                                            style: GoogleFonts.inter(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                profileController.fullName.value.isNotEmpty 
+                                                    ? profileController.fullName.value 
+                                                    : profileController.username.value,
+                                                style: GoogleFonts.inter(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              if (profileController.fullName.value.isNotEmpty)
+                                                Text(
+                                                  profileController.username.value,
+                                                  style: GoogleFonts.inter(
+                                                    color: Colors.white70,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                            ],
                                           );
                                         }),
                                         const Spacer(),

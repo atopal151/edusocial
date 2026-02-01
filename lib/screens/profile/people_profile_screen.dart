@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/cards/person_entry_card.dart';
 import '../../components/cards/post_card.dart';
@@ -18,6 +19,7 @@ import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../services/language_service.dart';
+import '../../models/people_profile_model.dart';
 
 class PeopleProfileScreen extends StatefulWidget {
   final String username;
@@ -35,6 +37,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
 
   late TabController _tabController;
   final RxInt selectedTabIndex = 0.obs;
+  final RxBool isAboutExpanded = false.obs;
 
   /// Profil verilerini yenile
   Future<void> _refreshProfile() async {
@@ -93,56 +96,70 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                     buildPeopleProfileHeader(controller),
                     const SizedBox(height: 20),
 
+                    /// Sosyal medya kısayolları (sadece takip ediyorsa veya kendi profiliyse)
+                    _buildSocialLinks(profile),
+                    const SizedBox(height: 16),
+
                     /// Takip ve Mesaj Gönder Butonları
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Obx(() => SizedBox(
-                              width: 140,
-                              child: CustomButton(
-                                height: 40,
-                                borderRadius: 5,
-                                text: controller.isFollowingPending.value
-                                    ? languageService.tr(
-                                        "profile.peopleProfile.actions.pendingApproval")
-                                    : controller.isFollowing.value
-                                        ? languageService.tr(
-                                            "profile.peopleProfile.actions.unfollow")
-                                        : languageService.tr(
-                                            "profile.peopleProfile.actions.follow"),
-                                onPressed: () {
-                                  if (!controller.isFollowingPending.value) {
-                                    if (controller.isFollowing.value) {
-                                      controller.unfollowUser(profile.id);
-                                    } else if (controller
-                                        .isFollowingPending.value) {
-                                      //controller.unfollowUser(profile.id);
-                                      //kontrol edilecek
-                                    } else {
-                                      controller.followUser(profile.id);
-                                    }
+                        Obx(() {
+                          final isPending = controller.isFollowingPending.value;
+                          final isFollowing = controller.isFollowing.value;
+
+                          final String buttonText = isPending
+                              ? languageService
+                                  .tr("profile.peopleProfile.actions.pendingApproval")
+                              : isFollowing
+                                  ? languageService
+                                      .tr("profile.peopleProfile.actions.unfollow")
+                                  : languageService
+                                      .tr("profile.peopleProfile.actions.follow");
+
+                          final Color bgColor = isPending
+                              ? const Color(0xFFFF8C00)
+                              : isFollowing
+                                  ? const Color(0xffffffff) // unfollow: beyaz arka plan
+                                  : const Color(0xffffffff); // follow: beyaz arka plan
+
+                          final Color txtColor = isPending
+                              ? const Color(0xffffffff)
+                              : isFollowing
+                                  ? const Color(0xFFEF5050) // unfollow: kırmızı metin
+                                  : const Color(0xFF28A745); // follow: yeşil metin
+
+                          final Color? borderColor = isFollowing
+                              ? const Color(0xFFEF5050) // unfollow outline kırmızı
+                              : const Color(0xFF28A745); // follow outline yeşil
+
+                          final double? borderWidth = isFollowing ? 1 : 1;
+
+                          return SizedBox(
+                            width: 140,
+                            child: CustomButton(
+                              height: 40,
+                              borderRadius: 5,
+                              text: buttonText,
+                              onPressed: () {
+                                if (!isPending) {
+                                  if (isFollowing) {
+                                    controller.unfollowUser(profile.id);
+                                  } else if (controller.isFollowingPending.value) {
+                                    // kontrol
+                                  } else {
+                                    controller.followUser(profile.id);
                                   }
-                                },
-                                backgroundColor: controller
-                                        .isFollowingPending.value
-                                    ? const Color(
-                                        0xFFFF8C00) // Onay bekliyor durumunda turuncu
-                                    : controller.isFollowing.value
-                                        ? const Color(
-                                            0xfff4f4f5) // Unfollow durumunda gri
-                                        : const Color(
-                                            0xFFEF5050), // Follow durumunda kırmızı
-                                textColor: controller.isFollowingPending.value
-                                    ? const Color(
-                                        0xffffffff) // Onay bekliyor durumunda beyaz metin
-                                    : controller.isFollowing.value
-                                        ? const Color(
-                                            0xff414751) // Unfollow durumunda koyu gri metin
-                                        : const Color(
-                                            0xffffffff), // Follow durumunda beyaz metin
-                                isLoading: controller.isFollowLoading,
-                              ),
-                            )),
+                                }
+                              },
+                              backgroundColor: bgColor,
+                              textColor: txtColor,
+                              borderColor: borderColor,
+                              borderWidth: borderWidth,
+                              isLoading: controller.isFollowLoading,
+                            ),
+                          );
+                        }),
                         const SizedBox(width: 10),
                         SizedBox(
                           width: 140,
@@ -234,7 +251,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                   displacement: 40.0,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    child: _buildProfileDetails(),
+                    child: _buildAboutSection(),
                   ),
                 ),
               ],
@@ -418,6 +435,83 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
     return buildPeopleProfileDetails(profile);
   }
 
+  /// About detaylarını açılır/kapanır kart olarak gösterir
+  Widget _buildAboutSection() {
+    final LanguageService languageService = Get.find<LanguageService>();
+    final aboutText = languageService.tr("profile.details.about");
+    final aboutTitle =
+        aboutText == "profile.details.about" ? "About" : aboutText;
+
+    return Obx(() {
+      return Container(
+        color: const Color(0xfffafafa),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: GestureDetector(
+                onTap: () {
+                  isAboutExpanded.value = !isAboutExpanded.value;
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffffffff),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        aboutTitle,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff414751),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xfff3f4f6),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        padding: const EdgeInsets.all(6),
+                        child: AnimatedRotation(
+                          turns: isAboutExpanded.value ? 0.5 : 0,
+                          duration: const Duration(milliseconds: 200),
+                          child: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 20,
+                            color: Color(0xffbfc3c9),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 220),
+              crossFadeState: isAboutExpanded.value
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              firstChild: const SizedBox.shrink(),
+              secondChild: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: _buildProfileDetails(),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      );
+    });
+  }
+
   // Kilitli içerik widget'ı
   Widget _buildLockedContent() {
     final LanguageService languageService = Get.find<LanguageService>();
@@ -463,5 +557,130 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
             ],
           ),
         ));
+  }
+
+  /// Sosyal medya butonlarını gösterir
+  Widget _buildSocialLinks(PeopleProfileModel profile) {
+    final bool canShow = controller.isFollowing.value || profile.isSelf == true;
+    if (!canShow) return const SizedBox.shrink();
+
+    final List<_SocialLink> socials = [
+      _SocialLink(
+        handle: profile.facebook,
+        baseUrl: "https://facebook.com/",
+        asset: "images/icons/social_icon/facebook.svg",
+        color: const Color(0xFF1877F2),
+      ),
+      _SocialLink(
+        handle: profile.linkedin,
+        baseUrl: "https://www.linkedin.com/in/",
+        asset: "images/icons/social_icon/linkedin.svg",
+        color: const Color(0xFF0A66C2),
+      ),
+      _SocialLink(
+        handle: profile.instagram,
+        baseUrl: "https://www.instagram.com/",
+        asset: "images/icons/social_icon/instagram.svg",
+        color: const Color(0xFFE1306C),
+      ),
+      _SocialLink(
+        handle: profile.twitter,
+        baseUrl: "https://x.com/",
+        asset: "images/icons/social_icon/xsocial.svg",
+        color: const Color(0xFF000000),
+      ),
+      _SocialLink(
+        handle: profile.tiktok,
+        baseUrl: "https://www.tiktok.com/@",
+        asset: "images/icons/social_icon/tiktok.svg",
+        color: const Color(0xFFE60053), // TikTok için kırmızı arka plan
+        allowColorFilter: false, // çok renkli icon, boyama yapma
+      ),
+    ];
+
+    final links = socials
+        .where((link) => link.handle != null && link.handle!.trim().isNotEmpty)
+        .map((link) => _SocialIconButton(link: link))
+        .toList();
+
+    if (links.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        alignment: WrapAlignment.center,
+        children: links,
+      ),
+    );
+  }
+}
+
+class _SocialLink {
+  final String? handle;
+  final String baseUrl;
+  final String asset;
+  final Color color;
+  final bool allowColorFilter;
+
+  _SocialLink({
+    required this.handle,
+    required this.baseUrl,
+    required this.asset,
+    required this.color,
+    this.allowColorFilter = true,
+  });
+
+  Uri? get uri {
+    if (handle == null) return null;
+    String value = handle!.trim();
+    if (value.isEmpty) return null;
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      return Uri.tryParse(value);
+    }
+    if (value.startsWith("@")) {
+      value = value.substring(1);
+    }
+    return Uri.tryParse("$baseUrl$value");
+  }
+}
+
+class _SocialIconButton extends StatelessWidget {
+  final _SocialLink link;
+
+  const _SocialIconButton({required this.link});
+
+  @override
+  Widget build(BuildContext context) {
+    final uri = link.uri;
+    if (uri == null) return const SizedBox.shrink();
+
+    return InkWell(
+      onTap: () async {
+        final canOpen = await canLaunchUrl(uri);
+        if (canOpen) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      borderRadius: BorderRadius.circular(50),
+      child: Container(
+        width: 30,
+        height: 30,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: link.color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: SvgPicture.asset(
+          link.asset,
+          width: 16,
+          height: 16,
+          colorFilter: link.allowColorFilter
+              ? ColorFilter.mode(link.color, BlendMode.srcIn)
+              : null,
+        ),
+      ),
+    );
   }
 }

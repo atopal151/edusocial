@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 import '../../../models/chat_models/group_message_model.dart';
 import '../../../controllers/chat_controllers/group_chat_detail_controller.dart';
+import '../../../controllers/profile_controller.dart';
+import '../verification_badge.dart';
 
 class GroupSurveyMessageWidget extends StatefulWidget {
   final GroupMessageModel message;
@@ -42,40 +45,68 @@ class _GroupSurveyMessageWidgetState extends State<GroupSurveyMessageWidget> {
                 : MainAxisAlignment.start,
             children: [
               if (!message.isSentByMe)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 6.0),
-                  child: CircleAvatar(
-                    radius: 12,
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage: (message.profileImage.isNotEmpty &&
-                            !message.profileImage.endsWith('/0'))
-                        ? NetworkImage(message.profileImage)
-                        : null,
-                    child: (message.profileImage.isEmpty ||
-                            message.profileImage.endsWith('/0'))
-                        ? const Icon(Icons.person, color: Colors.white, size: 14)
-                        : null,
+                InkWell(
+                  onTap: () {
+                    final ProfileController profileController = Get.find<ProfileController>();
+                    profileController.getToPeopleProfileScreen(message.username);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 6.0),
+                    child: CircleAvatar(
+                      radius: 12,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: (message.profileImage.isNotEmpty &&
+                              !message.profileImage.endsWith('/0'))
+                          ? NetworkImage(message.profileImage)
+                          : null,
+                      child: (message.profileImage.isEmpty ||
+                              message.profileImage.endsWith('/0'))
+                          ? const Icon(Icons.person, color: Colors.white, size: 14)
+                          : null,
+                    ),
                   ),
                 ),
         
-              Text(
-                '@${message.username}',
-                style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
+              InkWell(
+                onTap: () {
+                  final ProfileController profileController = Get.find<ProfileController>();
+                  profileController.getToPeopleProfileScreen(message.username);
+                },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '@${message.username}',
+                    style: const TextStyle(fontSize: 10, color: Color(0xff414751)),
+                  ),
+                  const SizedBox(width: 4),
+                  VerificationBadge(
+                    isVerified: message.isVerified,
+                    size: 12,
+                  ),
+                ],
+              ),
               ),
               if (message.isSentByMe)
-                Padding(
-                  padding: const EdgeInsets.only(left: 6.0, right: 8.0),
-                  child: CircleAvatar(
-                    radius: 12,
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage: (message.profileImage.isNotEmpty &&
-                            !message.profileImage.endsWith('/0'))
-                        ? NetworkImage(message.profileImage)
-                        : null,
-                    child: (message.profileImage.isEmpty ||
-                            message.profileImage.endsWith('/0'))
-                        ? const Icon(Icons.person, color: Colors.white, size: 14)
-                        : null,
+                InkWell(
+                  onTap: () {
+                    final ProfileController profileController = Get.find<ProfileController>();
+                    profileController.getToPeopleProfileScreen(message.username);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 6.0, right: 8.0),
+                    child: CircleAvatar(
+                      radius: 12,
+                      backgroundColor: Colors.grey[300],
+                      backgroundImage: (message.profileImage.isNotEmpty &&
+                              !message.profileImage.endsWith('/0'))
+                          ? NetworkImage(message.profileImage)
+                          : null,
+                      child: (message.profileImage.isEmpty ||
+                              message.profileImage.endsWith('/0'))
+                          ? const Icon(Icons.person, color: Colors.white, size: 14)
+                          : null,
+                    ),
                   ),
                 ),
             ],

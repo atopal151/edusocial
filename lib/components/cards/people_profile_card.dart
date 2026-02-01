@@ -156,7 +156,9 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
             Expanded(
               child: _buildProfileInfo(languageService.tr("profile.header.posts"), profile.posts.length),
             ),
-            
+            const SizedBox(width: 12),
+            Container(width: 1, height: 28, color: const Color(0xffe5e7eb)),
+            const SizedBox(width: 12),
             Expanded(
               child: InkWell(
                 onTap: () {
@@ -168,6 +170,9 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
                 child: _buildProfileInfo(languageService.tr("profile.header.followers"), profile.followerCount),
               ),
             ),
+            const SizedBox(width: 12),
+            Container(width: 1, height: 28, color: const Color(0xffe5e7eb)),
+            const SizedBox(width: 12),
             Expanded(
               child: InkWell(
                 onTap: () {

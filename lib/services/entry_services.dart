@@ -37,23 +37,23 @@ class EntryServices {
 
       if (response.statusCode == 200) {
         // HAM JSON YANITINI LOG'LA
-        debugPrint("🔥 HAM API YANITI:");
-        debugPrint("🔥 Status Code: ${response.statusCode}");
-        debugPrint("🔥 Response Headers: ${response.headers}");
-        printFullText("🔥 Raw Response Body: ${response.body}");
+        //debugPrint("🔥 HAM API YANITI:");
+        //debugPrint("🔥 Status Code: ${response.statusCode}");
+        //debugPrint("🔥 Response Headers: ${response.headers}");
+        //printFullText("🔥 Raw Response Body: ${response.body}");
         
         final jsonBody = jsonDecode(response.body);
         
         // JSON PARSE EDİLMİŞ HALİNİ LOG'LA
-        debugPrint("🔥 JSON Parse Edilmiş Yanıt:");
-        printFullText("🔥 JSON Body: $jsonBody");
+        //debugPrint("🔥 JSON Parse Edilmiş Yanıt:");
+        //printFullText("🔥 JSON Body: $jsonBody");
         
         if (jsonBody != null && jsonBody["data"] != null) {
           final data = jsonBody["data"];
           
-          debugPrint("🔥 Data Alanı:");
-          debugPrint("🔥 Data: $data");
-          debugPrint("🔥 Data Type: ${data.runtimeType}");
+          //debugPrint("🔥 Data Alanı:");
+          //debugPrint("🔥 Data: $data");
+          //debugPrint("🔥 Data Type: ${data.runtimeType}");
 
           if (data is Map<String, dynamic>) {
             final result = TopicEntryResponse.fromJson(data);
@@ -84,7 +84,7 @@ class EntryServices {
   Future<List<TopicCategoryModel>> fetchTopicCategories() async {
     try {
       final response = await dio.get('/topic-categories');
-      //debugPrint("📥 Topic Categories Raw Response: ${response.data}");
+      //printFullText("📥 RAW /topic-categories: ${response.data}");
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['data'] ?? [];

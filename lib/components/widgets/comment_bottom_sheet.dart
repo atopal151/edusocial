@@ -2,13 +2,17 @@ import 'package:edusocial/components/widgets/general_loading_indicator.dart';
 import 'package:edusocial/utils/date_format.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../controllers/comment_controller.dart';
+import '../../controllers/profile_controller.dart';
 import '../../services/language_service.dart';
 import '../../models/comment_model.dart';
 import '../../services/auth_service.dart';
+import '../../services/people_profile_services.dart';
+import '../snackbars/custom_snackbar.dart';
 
 class CommentBottomSheet extends StatefulWidget {
   final String postId;
@@ -84,7 +88,12 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
       replyingTo = comment;
       editingComment = null; // Düzenleme modunu iptal et
     });
-    messageController.clear();
+    // Text field'a kullanıcı adını otomatik yaz (kalın gösterim için özel format)
+    messageController.text = '@${comment.userName} ';
+    // Cursor'u metnin sonuna getir
+    messageController.selection = TextSelection.fromPosition(
+      TextPosition(offset: messageController.text.length),
+    );
   }
 
   // Yanıtlama modunu iptal et
@@ -177,6 +186,151 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
       return languageService.tr("comments.reply.replyCount");
     } else {
       return languageService.tr("comments.reply.replyCountPlural");
+    }
+  }
+
+  /// Mention'ları kalın gösterecek RichText widget'ı oluştur
+  Widget _buildCommentText(String content) {
+    final RegExp mentionRegex = RegExp(r'@\w+');
+    final List<TextSpan> spans = [];
+    int lastEnd = 0;
+
+    for (final Match match in mentionRegex.allMatches(content)) {
+      // Mention'dan önceki normal metin
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(
+          text: content.substring(lastEnd, match.start),
+          style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
+        ));
+      }
+
+      // Mention metni (kalın ve tıklanabilir)
+      final mentionText = match.group(0)!;
+      final username = mentionText.substring(1); // @ işaretini kaldır
+      
+      spans.add(TextSpan(
+        text: mentionText,
+        style: GoogleFonts.inter(
+          fontSize: 12, 
+          color: Color(0xff007bff), // Mavi renk (tıklanabilir göstermek için)
+          fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => _handleMentionTap(username),
+      ));
+
+      lastEnd = match.end;
+    }
+
+    // Son mention'dan sonraki normal metin
+    if (lastEnd < content.length) {
+      spans.add(TextSpan(
+        text: content.substring(lastEnd),
+        style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+    );
+  }
+
+  /// Yanıtlarda mention'ları kalın gösterecek RichText widget'ı oluştur
+  Widget _buildReplyText(String content) {
+    final RegExp mentionRegex = RegExp(r'@\w+');
+    final List<TextSpan> spans = [];
+    int lastEnd = 0;
+
+    for (final Match match in mentionRegex.allMatches(content)) {
+      // Mention'dan önceki normal metin
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(
+          text: content.substring(lastEnd, match.start),
+          style: GoogleFonts.inter(fontSize: 11, color: Color(0xff9ca3ae)),
+        ));
+      }
+
+      // Mention metni (kalın ve tıklanabilir)
+      final mentionText = match.group(0)!;
+      final username = mentionText.substring(1); // @ işaretini kaldır
+      
+      spans.add(TextSpan(
+        text: mentionText,
+        style: GoogleFonts.inter(
+          fontSize: 11, 
+          color: Color(0xffef5050), // Mavi renk (tıklanabilir göstermek için)
+          fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline,
+        ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => _handleMentionTap(username),
+      ));
+
+      lastEnd = match.end;
+    }
+
+    // Son mention'dan sonraki normal metin
+    if (lastEnd < content.length) {
+      spans.add(TextSpan(
+        text: content.substring(lastEnd),
+        style: GoogleFonts.inter(fontSize: 11, color: Color(0xff9ca3ae)),
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+    );
+  }
+
+  /// Mention'a tıklandığında profil kontrolü ve yönlendirme
+  void _handleMentionTap(String username) async {
+    try {
+      final ProfileController profileController = Get.find<ProfileController>();
+      
+      // Kullanıcı var mı kontrol et
+      final userExists = await _checkUserExists(username);
+      
+      if (userExists) {
+        // Kullanıcı varsa profile git
+        profileController.getToPeopleProfileScreen(username);
+      } else {
+        // Kullanıcı yoksa hata mesajı göster
+        final languageService = Get.find<LanguageService>();
+        CustomSnackbar.show(
+          title: languageService.tr("common.error"),
+          message: "@$username ${languageService.tr("common.error")}",
+          type: SnackbarType.error,
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ Mention tap error: $e');
+      final languageService = Get.find<LanguageService>();
+      CustomSnackbar.show(
+        title: languageService.tr("common.error"),
+        message: languageService.tr("common.error"),
+        type: SnackbarType.error,
+      );
+    }
+  }
+
+  /// Kullanıcının var olup olmadığını kontrol et
+  Future<bool> _checkUserExists(String username) async {
+    try {
+      // Basit validasyon
+      if (username.isEmpty || username.length < 3) {
+        return false;
+      }
+      
+      // API ile kullanıcı varlığını kontrol et
+      final userProfile = await PeopleProfileService.fetchUserByUsername(username);
+      
+      // Eğer profil verisi döndüyse kullanıcı var demektir
+      return userProfile != null;
+    } catch (e) {
+      debugPrint('❌ User existence check error: $e');
+      // Hata durumunda false döndür (kullanıcı yok sayılsın)
+      return false;
     }
   }
 
@@ -427,13 +581,19 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Profil resmi
-          CircleAvatar(
-            backgroundColor: Color(0xfffafafa),
-            radius: 16,
-            backgroundImage: NetworkImage(
-              comment.userAvatar.isNotEmpty
-                  ? comment.userAvatar
-                  : "${AppConstants.baseUrl}/images/static/avatar.png",
+          InkWell(
+            onTap: () {
+              final ProfileController profileController = Get.find<ProfileController>();
+              profileController.getToPeopleProfileScreen(comment.userName);
+            },
+            child: CircleAvatar(
+              backgroundColor: Color(0xfffafafa),
+              radius: 16,
+              backgroundImage: NetworkImage(
+                comment.userAvatar.isNotEmpty
+                    ? comment.userAvatar
+                    : "${AppConstants.baseUrl}/images/static/avatar.png",
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -444,11 +604,17 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                 Row( 
                   children: [
                     Expanded(
-                      child: Text(
-                        "@${comment.userName}", // @ işareti eklendi
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
+                      child: InkWell(
+                        onTap: () {
+                          final ProfileController profileController = Get.find<ProfileController>();
+                          profileController.getToPeopleProfileScreen(comment.userName);
+                        },
+                        child: Text(
+                          "@${comment.userName}", // @ işareti eklendi
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
@@ -462,10 +628,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  comment.content,
-                  style: GoogleFonts.inter(fontSize: 12, color: Color(0xff9ca3ae)),
-                ),
+                _buildCommentText(comment.content),
                 const SizedBox(height: 8),
                 // Yanıtla, Düzenle ve Sil butonları
                 Row(
@@ -563,12 +726,18 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 12,
-            backgroundImage: NetworkImage(
-              reply.userAvatar.isNotEmpty
-                  ? reply.userAvatar
-                  : "${AppConstants.baseUrl}/images/static/avatar.png",
+          InkWell(
+            onTap: () {
+              final ProfileController profileController = Get.find<ProfileController>();
+              profileController.getToPeopleProfileScreen(reply.userName);
+            },
+            child: CircleAvatar(
+              radius: 12,
+              backgroundImage: NetworkImage(
+                reply.userAvatar.isNotEmpty
+                    ? reply.userAvatar
+                    : "${AppConstants.baseUrl}/images/static/avatar.png",
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -579,11 +748,17 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        "@${reply.userName}",
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                      child: InkWell(
+                        onTap: () {
+                          final ProfileController profileController = Get.find<ProfileController>();
+                          profileController.getToPeopleProfileScreen(reply.userName);
+                        },
+                        child: Text(
+                          "@${reply.userName}",
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
@@ -597,10 +772,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  reply.content,
-                  style: GoogleFonts.inter(fontSize: 11, color: Color(0xff9ca3ae)),
-                ),
+                _buildReplyText(reply.content),
                 const SizedBox(height: 6),
                 Row(
                   children: [
@@ -800,13 +972,20 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
               textInputAction: TextInputAction.send,
               enableSuggestions: true,
               autocorrect: true,
-                             decoration: InputDecoration(
-                                      hintText: editingComment != null
-                         ? languageService.tr("comments.edit.editPlaceholder")
-                         : replyingTo != null 
-                             ? languageService.tr("comments.reply.replyPlaceholder")
-                             : languageService.tr("comments.input.placeholder"),
-                hintStyle: TextStyle(color: Color(0xff9ca3ae), fontSize: 13.28),
+              style: GoogleFonts.inter(
+                fontSize: 13.28,
+                color: Color(0xff414751),
+              ),
+              decoration: InputDecoration(
+                hintText: editingComment != null
+                    ? languageService.tr("comments.edit.editPlaceholder")
+                    : replyingTo != null 
+                        ? languageService.tr("comments.reply.replyPlaceholder")
+                        : languageService.tr("comments.input.placeholder"),
+                hintStyle: GoogleFonts.inter(
+                  color: Color(0xff9ca3ae), 
+                  fontSize: 13.28,
+                ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               ),

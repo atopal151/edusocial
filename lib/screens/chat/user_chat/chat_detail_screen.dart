@@ -188,6 +188,7 @@ class ChatDetailScreen extends StatelessWidget {
                                 color: Color(0xff272727)),
                           ),
                         ),
+                        SizedBox(width: 2),
                         VerificationBadge(
                           isVerified: controller.isVerified.value,
                           size: 14.0,

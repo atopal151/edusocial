@@ -145,6 +145,11 @@ flutter:
     - images/icons/driverLicenseimage.svg
     - images/icons/profile_icon_settings.svg
     - images/icons/delete.svg
+    - images/icons/social_icon/facebook.svg
+    - images/icons/social_icon/instagram.svg
+    - images/icons/social_icon/linkedin.svg
+    - images/icons/social_icon/tiktok.svg
+    - images/icons/social_icon/xsocial.svg
     - images/mask_group.png
     - images/ch_group.png
     - images/profile_user.png

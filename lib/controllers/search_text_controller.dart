@@ -75,6 +75,9 @@ class SearchTextController extends GetxController {
       debugPrint('🔍 Groups: ${allGroups.length}');
       debugPrint('🔍 Events: ${allEvents.length}');
       
+      for(var user in allUsers) {
+        debugPrint('🔍 User: ${user.name} - isVerified: ${user.isVerified}');
+      }
       // Debug group membership status
       for (var group in allGroups) {
         debugPrint('🔍 Group: ${group.name} - isMember: ${group.isMember} - isPending: ${group.isPending}');

@@ -76,14 +76,34 @@ class MyStoryList extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4),
-              Text(
-                profileController.username.value.isNotEmpty
-                    ? profileController.username.value
-                    : languageService.tr("story.myStoryList.you"),
-                style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xff272727)),
+              Column(
+                children: [
+                  Text(
+                    profileController.fullName.value.isNotEmpty 
+                        ? profileController.fullName.value
+                        : profileController.username.value.isNotEmpty
+                            ? profileController.username.value
+                            : languageService.tr("story.myStoryList.you"),
+                    style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff272727)),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (profileController.fullName.value.isNotEmpty && profileController.username.value.isNotEmpty)
+                    Text(
+                      profileController.username.value,
+                      style: GoogleFonts.inter(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff9ca3ae)),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
               ),
             ],
           ),

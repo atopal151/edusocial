@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/entry_model.dart';
 import '../../services/language_service.dart';
 import 'package:get/get.dart';
+import '../../controllers/profile_controller.dart';
 import '../widgets/verification_badge.dart';
 
 class EntryCommentCard extends StatelessWidget {
@@ -153,16 +154,23 @@ class EntryCommentCard extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Flexible(
-                                  child: Text(
-                                    '@${entry.user.username}',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xff414751)),
+                                  child: InkWell(
+                                    onTap: () {
+                                      final ProfileController profileController = Get.find<ProfileController>();
+                                      profileController.getToPeopleProfileScreen(entry.user.username);
+                                    },
+                                    child: Text(
+                                      '@${entry.user.username}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xff414751)),
+                                    ),
                                   ),
                                 ),
+                                SizedBox(width: 2),
                                 VerificationBadge(
                                   isVerified: entry.user.isVerified ?? false,
-                                  size: 12.0,
+                                  size: 14.0,
                                 ),
                               ],
                             ),
@@ -181,11 +189,16 @@ class EntryCommentCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      CircleAvatar(
-                        radius: 12,
-                                        backgroundColor: Color(0xfffafafa),
-
-                        backgroundImage: NetworkImage(entry.user.avatarUrl),
+                      InkWell(
+                        onTap: () {
+                          final ProfileController profileController = Get.find<ProfileController>();
+                          profileController.getToPeopleProfileScreen(entry.user.username);
+                        },
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: Color(0xfffafafa),
+                          backgroundImage: NetworkImage(entry.user.avatarUrl),
+                        ),
                       ),
                     ],
                   ),

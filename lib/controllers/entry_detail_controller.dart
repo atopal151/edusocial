@@ -10,6 +10,10 @@ class EntryDetailController extends GetxController {
 
   // Entry'ye yapılan yorumları tutan liste
   var entryComments = <EntryModel>[].obs;
+  // Konunun ilk (ana) entry'si
+  var mainEntry = Rxn<EntryModel>();
+  // Yorumların yüklenme durumu
+  var isCommentsLoading = false.obs;
 
   // Topic belirleme (detay sayfasına giderken atanır)
   void setCurrentTopic(TopicModel? topic) {
@@ -18,48 +22,58 @@ class EntryDetailController extends GetxController {
 
   Future<void> fetchEntryComments() async {
     debugPrint("🔄 EntryDetailController: Yorumlar çekiliyor...");
-    if (currentTopic.value?.id != null) {
-      final response = await EntryServices.fetchEntriesByTopicId(currentTopic.value!.id);
-      debugPrint("📥 EntryDetailController: fetchEntriesByTopicId yanıtı: ${response?.topic.name} - entries count: ${response?.entries.length}");
-      if (response != null && response.entries.isNotEmpty) {
-        // İlk entry ana entry, geri kalanlar yorumlar
-        final comments = response.entries.skip(1).toList();
-        
-        // Debug: Sıralama öncesi yorumları yazdır
-        debugPrint("📝 Sıralama öncesi yorumlar:");
-        for (int i = 0; i < comments.length; i++) {
-          final comment = comments[i];
-          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.createdat}, Upvotes: ${comment.upvotescount}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
-        }
-        
-        // Yorumları tarihe göre sırala (en yeni en üstte)
-        comments.sort((a, b) {
-          final dateA = a.createdat;
-          final dateB = b.createdat;
+    try {
+      isCommentsLoading.value = true;
+      if (currentTopic.value?.id != null) {
+        final response = await EntryServices.fetchEntriesByTopicId(currentTopic.value!.id);
+        debugPrint("📥 EntryDetailController: fetchEntriesByTopicId yanıtı: ${response?.topic.name} - entries count: ${response?.entries.length}");
+        if (response != null && response.entries.isNotEmpty) {
+          // İlk entry'yi (konunun ana entry'si) sakla
+          mainEntry.value = response.entries.first;
+
+          // İlk entry ana entry, geri kalanlar yorumlar
+          final comments = response.entries.skip(1).toList();
           
-          if (dateA == null && dateB == null) return 0;
-          if (dateA == null) return 1; // null değerler sona
-          if (dateB == null) return -1;
+          // Debug: Sıralama öncesi yorumları yazdır
+          debugPrint("📝 Sıralama öncesi yorumlar:");
+          for (int i = 0; i < comments.length; i++) {
+            final comment = comments[i];
+            debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.createdat}, Upvotes: ${comment.upvotescount}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
+          }
           
-          return dateB.compareTo(dateA); // En yeni en üstte
-        });
-        
-        // Debug: Sıralama sonrası yorumları yazdır
-        debugPrint("📝 Sıralama sonrası yorumlar:");
-        for (int i = 0; i < comments.length; i++) {
-          final comment = comments[i];
-          debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.createdat}, Upvotes: ${comment.upvotescount}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
+          // Yorumları tarihe göre sırala (en yeni en üstte)
+          comments.sort((a, b) {
+            final dateA = a.createdat;
+            final dateB = b.createdat;
+            
+            if (dateA == null && dateB == null) return 0;
+            if (dateA == null) return 1; // null değerler sona
+            if (dateB == null) return -1;
+            
+            return dateB.compareTo(dateA); // En yeni en üstte
+          });
+          
+          // Debug: Sıralama sonrası yorumları yazdır
+          debugPrint("📝 Sıralama sonrası yorumlar:");
+          for (int i = 0; i < comments.length; i++) {
+            final comment = comments[i];
+            debugPrint("  [$i] ID: ${comment.id}, Created: ${comment.createdat}, Upvotes: ${comment.upvotescount}, Content: ${comment.content.substring(0, comment.content.length > 20 ? 20 : comment.content.length)}...");
+          }
+          
+          entryComments.value = comments;
+          debugPrint("✅ EntryDetailController: Yorumlar tarihe göre sıralandı, yeni yorum sayısı: ${entryComments.length}");
+        } else {
+          debugPrint("⚠️ EntryDetailController: Yorum bulunamadı veya yanıt boş.");
+          mainEntry.value = null;
+          entryComments.clear(); // Eğer yorum yoksa listeyi temizle
         }
-        
-        entryComments.value = comments;
-        debugPrint("✅ EntryDetailController: Yorumlar tarihe göre sıralandı, yeni yorum sayısı: ${entryComments.length}");
       } else {
-        debugPrint("⚠️ EntryDetailController: Yorum bulunamadı veya yanıt boş.");
-        entryComments.clear(); // Eğer yorum yoksa listeyi temizle
+        debugPrint("❌ EntryDetailController: currentTopic ID null, yorumlar çekilemedi.");
+        mainEntry.value = null;
+        entryComments.clear();
       }
-    } else {
-      debugPrint("❌ EntryDetailController: currentTopic ID null, yorumlar çekilemedi.");
-      entryComments.clear();
+    } finally {
+      isCommentsLoading.value = false;
     }
   }
 

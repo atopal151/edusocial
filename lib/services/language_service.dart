@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -31,8 +30,27 @@ class LanguageService extends GetxService {
   Future<void> _loadSavedLanguage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final savedLanguage = prefs.getString(_languageKey) ?? _defaultLanguage;
-      await changeLanguage(savedLanguage);
+      final savedLanguage = prefs.getString(_languageKey);
+      
+      if (savedLanguage != null) {
+        // Local'de kaydedilmiş dil var, onu kullan
+        await changeLanguage(savedLanguage);
+      } else {
+        // Local'de kaydedilmiş dil yok, kullanıcının API'dan dil tercihini kontrol et
+        final token = GetStorage().read("token");
+        if (token != null) {
+          // Kullanıcı giriş yapmış, API'dan dil tercihini al
+          final userLanguage = await _getUserLanguageFromAPI();
+          if (userLanguage != null && supportedLanguages.containsKey(userLanguage)) {
+            await changeLanguage(userLanguage);
+          } else {
+            await changeLanguage(_defaultLanguage);
+          }
+        } else {
+          // Kullanıcı giriş yapmamış, varsayılan dili kullan
+          await changeLanguage(_defaultLanguage);
+        }
+      }
     } catch (e) {
       debugPrint('Dil yükleme hatası: $e');
       await changeLanguage(_defaultLanguage);
@@ -58,26 +76,93 @@ class LanguageService extends GetxService {
       currentLanguage.value = languageCode;
       await _saveLanguage(languageCode);
       
+      // Kullanıcı giriş yapmışsa API'ya da dil tercihini kaydet
+      await _saveLanguageToAPI(languageCode);
+      
       debugPrint('Dil değiştirildi: $languageCode');
     } catch (e) {
       debugPrint('Dil değiştirme hatası: $e');
     }
   }
 
-  /// Çeviri dosyasını yükle
+  /// Çeviri dosyasını yükle - Sadece API'dan
   Future<void> _loadTranslations(String languageCode) async {
     try {
-      final jsonString = await rootBundle.loadString('assets/translations/$languageCode.json');
-      final Map<String, dynamic> loadedTranslations = json.decode(jsonString);
-      translations.value = loadedTranslations;
-    } catch (e) {
-      debugPrint('Çeviri dosyası yükleme hatası: $e');
-      // Hata durumunda varsayılan dili yükle
-      if (languageCode != _defaultLanguage) {
-        await _loadTranslations(_defaultLanguage);
+      // API'dan çeviri verilerini al
+      final apiTranslations = await _loadTranslationsFromAPI(languageCode);
+      
+      if (apiTranslations != null && apiTranslations.isNotEmpty) {
+        // API'dan başarıyla veri alındı
+        translations.value = apiTranslations;
+        debugPrint('✅ Çeviriler API\'dan yüklendi: $languageCode');
+      } else {
+        // API'dan veri alınamazsa boş çeviri haritası kullan
+        debugPrint('❌ API\'dan çeviri alınamadı, boş çeviri haritası kullanılıyor');
+        translations.value = <String, dynamic>{};
       }
+    } catch (e) {
+      debugPrint('❌ Çeviri yükleme genel hatası: $e');
+      // Hata durumunda boş çeviri haritası kullan
+      translations.value = <String, dynamic>{};
     }
   }
+
+  /// API'dan çeviri verilerini yükle - Timeout ve retry ile
+  Future<Map<String, dynamic>?> _loadTranslationsFromAPI(String languageCode) async {
+    const int maxRetries = 3;
+    const Duration timeout = Duration(seconds: 10);
+    
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        debugPrint('🔄 API çağrısı deneme $attempt/$maxRetries');
+        final token = GetStorage().read("token");
+        
+        http.Response response;
+        
+        if (token != null) {
+          // Kullanıcı girişi var - authenticated API kullan
+          debugPrint('🔐 Authenticated kullanıcı için API çağrısı yapılıyor...');
+          response = await http.get(
+            Uri.parse("${AppConstants.baseUrl}/json-language"),
+            headers: {
+              "Authorization": "Bearer $token",
+              "Accept": "application/json",
+            },
+          ).timeout(timeout);
+        } else {
+          // Kullanıcı girişi yok - no-auth API kullan
+          debugPrint('🌐 No-auth API çağrısı yapılıyor...');
+          response = await http.get(
+            Uri.parse("${AppConstants.baseUrl}/json-language-noauth"),
+            headers: {
+              "Accept": "application/json",
+            },
+          ).timeout(timeout);
+        }
+        
+        if (response.statusCode == 200) {
+          final jsonData = json.decode(response.body);
+          final translations = jsonData['translations'] as Map<String, dynamic>?;
+          debugPrint('✅ API\'dan çeviriler başarıyla alındı (deneme $attempt)');
+          return translations;
+        } else {
+          debugPrint('❌ API hatası: ${response.statusCode} (deneme $attempt)');
+          if (attempt < maxRetries) {
+            await Future.delayed(Duration(seconds: attempt * 2)); // Exponential backoff
+          }
+        }
+      } catch (e) {
+        debugPrint('❌ API çağrısı hatası (deneme $attempt): $e');
+        if (attempt < maxRetries) {
+          await Future.delayed(Duration(seconds: attempt * 2)); // Exponential backoff
+        }
+      }
+    }
+    
+    debugPrint('❌ $maxRetries deneme sonrası API\'dan çeviri alınamadı');
+    return null;
+  }
+
 
   /// Dil kodundan locale oluştur
   Locale _getLocaleFromCode(String languageCode) {
@@ -100,9 +185,46 @@ class LanguageService extends GetxService {
     }
   }
 
-  /// Çeviri al
+  /// API'ya dil tercihini kaydet
+  Future<void> _saveLanguageToAPI(String languageCode) async {
+    try {
+      final token = GetStorage().read("token");
+      if (token == null) {
+        debugPrint('❌ Token bulunamadı, dil tercihi API\'ya kaydedilemiyor');
+        return;
+      }
+
+      final response = await http.put(
+        Uri.parse("${AppConstants.baseUrl}/profile/language"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: json.encode({
+          "language": languageCode,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('✅ Dil tercihi API\'ya kaydedildi: $languageCode');
+      } else {
+        debugPrint('❌ Dil tercihi API kaydetme hatası: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('❌ Dil tercihi API kaydetme hatası: $e');
+    }
+  }
+
+  /// Çeviri al - Sadece API'dan gelen verilerle
   String tr(String key) {
     try {
+      // Çeviriler yüklenmemişse key'i döndür
+      if (translations.isEmpty) {
+        debugPrint('⚠️ Çeviriler henüz yüklenmedi: $key');
+        return key;
+      }
+
       final keys = key.split('.');
       dynamic value = translations;
       
@@ -110,13 +232,14 @@ class LanguageService extends GetxService {
         if (value is Map && value.containsKey(k)) {
           value = value[k];
         } else {
+          debugPrint('⚠️ Çeviri anahtarı bulunamadı: $key');
           return key; // Anahtar bulunamadıysa anahtarı döndür
         }
       }
       
       return value?.toString() ?? key;
     } catch (e) {
-      debugPrint('Çeviri hatası ($key): $e');
+      debugPrint('❌ Çeviri hatası ($key): $e');
       return key;
     }
   }
@@ -136,9 +259,48 @@ class LanguageService extends GetxService {
     if (profileLanguage != null && profileLanguage.isNotEmpty) {
       await changeLanguage(profileLanguage);
     } else {
-      // Profilde dil yoksa varsayılan dili kullan
-      await changeLanguage(_defaultLanguage);
+      // Profilde dil yoksa API'dan kullanıcının dil tercihini al
+      final userLanguage = await _getUserLanguageFromAPI();
+      if (userLanguage != null && userLanguage.isNotEmpty) {
+        await changeLanguage(userLanguage);
+      } else {
+        // API'dan da dil alınamazsa varsayılan dili kullan
+        await changeLanguage(_defaultLanguage);
+      }
     }
+  }
+
+  /// API'dan kullanıcının dil tercihini al
+  Future<String?> _getUserLanguageFromAPI() async {
+    try {
+      final token = GetStorage().read("token");
+      if (token == null) {
+        debugPrint('❌ Token bulunamadı, kullanıcı dil tercihi alınamıyor');
+        return null;
+      }
+
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/me"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        final userData = jsonData['data'] as Map<String, dynamic>?;
+        final userLanguage = userData?['language'] as String?;
+        
+        debugPrint('✅ Kullanıcı dil tercihi API\'dan alındı: $userLanguage');
+        return userLanguage;
+      } else {
+        debugPrint('❌ Kullanıcı dil tercihi API hatası: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('❌ Kullanıcı dil tercihi alma hatası: $e');
+    }
+    return null;
   }
 
   /// API'den desteklenen dilleri çek
@@ -158,7 +320,7 @@ class LanguageService extends GetxService {
         },
       );
 
-      debugPrint('🌐 Languages API Status Code: ${response.statusCode}');
+      //debugPrint('🌐 Languages API Status Code: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         printFullText('🌐 Languages API Response: ${response.body}');
@@ -195,7 +357,7 @@ class LanguageService extends GetxService {
         },
       );
 
-      debugPrint('🌐 Frontend Language API Status Code: ${response.statusCode}');
+      //debugPrint('🌐 Frontend Language API Status Code: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         printFullText('🌐 Frontend Language API Response: ${response.body}');
@@ -215,13 +377,44 @@ class LanguageService extends GetxService {
     }
   }
 
+  /// API'den frontend dil verilerini çek (No Auth)
+  Future<void> fetchFrontendNoAuthLanguageFromAPI() async {
+    try {
+      final response = await http.get(
+        Uri.parse("${AppConstants.baseUrl}/json-language-noauth"),
+        headers: {
+          "Accept": "application/json",
+        },
+      );
+
+      //debugPrint('🌐 Frontend No-Auth Language API Status Code: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        printFullText('🌐 Frontend No-Auth Language API Response: ${response.body}');
+        
+        // JSON parsing
+        try {
+          final jsonData = json.decode(response.body);
+          printFullText('🌐 Frontend No-Auth Language API Parsed JSON: ${json.encode(jsonData)}');
+        } catch (e) {
+          debugPrint('❌ Frontend No-Auth Language API JSON parsing error: $e');
+        }
+      } else {
+        debugPrint('❌ Frontend No-Auth Language API Error: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('❌ Frontend No-Auth Language API Exception: $e');
+    }
+  }
+/*
   /// Her iki API'yi de çağır ve debug et
   Future<void> debugLanguageAPIs() async {
     debugPrint('🚀 Language API Debug başlatılıyor...');
     
     await fetchLanguagesFromAPI();
     await fetchFrontendLanguageFromAPI();
+    await fetchFrontendNoAuthLanguageFromAPI();
     
-    debugPrint('✅ Language API Debug tamamlandı');
-  }
+    debuPrint('✅ Language API Debug tamamlandı');
+  }*/
 } 

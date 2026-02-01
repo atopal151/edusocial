@@ -23,6 +23,7 @@ class _StoryViewerPageState extends State<StoryViewerPage>
   int _currentIndex = 0;
   int _storyIndex = 0;
   AnimationController? _animationController;
+  bool _isPaused = false;
 
   @override
   void initState() {
@@ -105,6 +106,31 @@ class _StoryViewerPageState extends State<StoryViewerPage>
       Get.back();
     }
   }
+
+  void _pauseStory() {
+    if (!_isPaused) {
+      _isPaused = true;
+      _animationController?.stop();
+      debugPrint("📱 Story paused");
+    }
+  }
+
+  void _resumeStory() {
+    if (_isPaused) {
+      _isPaused = false;
+      _animationController?.forward();
+      debugPrint("📱 Story resumed");
+    }
+  }
+
+  void _togglePause() {
+    if (_isPaused) {
+      _resumeStory();
+    } else {
+      _pauseStory();
+    }
+  }
+
     String timeAgo(DateTime date) {
       final now = DateTime.now();
       final difference = now.difference(date);
@@ -146,7 +172,8 @@ class _StoryViewerPageState extends State<StoryViewerPage>
             final isCurrent = index == _currentIndex;
       
             return GestureDetector(
-              onTapDown: (details) {
+              onTapUp: (details) {
+                // onTapUp kullanarak long press ile çakışmayı önlüyoruz
                 final width = MediaQuery.of(context).size.width;
                 if (details.globalPosition.dx < width / 2) {
                   previousStory();
@@ -154,8 +181,15 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                   nextStory();
                 }
               },
-              onLongPressStart: (_) => _animationController?.stop(),
-              onLongPressEnd: (_) => _animationController?.forward(),
+              // Double tap ile pause/resume (emülatör için alternatif)
+              onDoubleTap: _togglePause,
+              // Long press için (gerçek cihazlarda)
+              onLongPressStart: (_) => _pauseStory(),
+              onLongPressEnd: (_) => _resumeStory(),
+              // Pan için (emülatörde daha iyi çalışır)
+              onPanStart: (_) => _pauseStory(),
+              onPanEnd: (_) => _resumeStory(),
+              onPanCancel: () => _resumeStory(),
               child: Stack(
                 children: [
                   Positioned.fill(
@@ -204,20 +238,51 @@ class _StoryViewerPageState extends State<StoryViewerPage>
                     right: 16,
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          backgroundColor: Color(0xffffffff),
-                          backgroundImage: NetworkImage(story.profileImage),
+                        GestureDetector(
+                          onTap: () {
+                            // Profil sayfasına yönlendir
+                            Get.toNamed('/profile', arguments: {'userId': story.userId});
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Color(0xffffffff),
+                            backgroundImage: NetworkImage(story.profileImage),
+                          ),
                         ),
                         SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(story.username,
-                                style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600)),
-                            Text(timeAgo(story.createdat), style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 10, fontWeight: FontWeight.w400)),
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                            // Profil sayfasına yönlendir
+                            Get.toNamed('/profile', arguments: {'userId': story.userId});
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "${story.name} ${story.surname}".trim().isNotEmpty 
+                                        ? "${story.name} ${story.surname}".trim() 
+                                        : story.username,
+                                    style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 16, fontWeight: FontWeight.w600)
+                                  ),
+                                  SizedBox(width: 10),
+                                   Text(
+                          timeAgo(story.createdat),
+                          style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400)
                         ),
-                        Spacer(),
+                                ],
+                              ),
+                              Text(
+                                "${story.name} ${story.surname}".trim().isNotEmpty 
+                                    ? '@${story.username}' 
+                                    : timeAgo(story.createdat),
+                                style: GoogleFonts.inter(color: Color(0xffffffff), fontSize: 12, fontWeight: FontWeight.w400)
+                              ),
+                            ],
+                          ),
+                        ),
+        Spacer(),                         
+                        SizedBox(width: 8),
                         IconButton(
                           icon: Icon(Icons.close, color: Color(0xffffffff)),
                           onPressed: () => Get.back(),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:edusocial/components/print_full_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:http/http.dart' as http;
@@ -22,6 +23,7 @@ class StoryService {
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         final List data = body["data"];
+        printFullText('🔍 Story API Response: ${response.body}');
         return data.map((json) => StoryModel.fromJson(json)).toList();
       } else {
         return [];

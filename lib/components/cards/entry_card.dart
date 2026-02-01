@@ -31,6 +31,14 @@ class EntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // En son oy verme zamanını bul (created_at bazlı)
+    final DateTime? lastVoteCreatedAt = entry.votes.isNotEmpty
+        ? entry.votes
+            .where((v) => v.createdat != null)
+            .map((v) => v.createdat!)
+            .fold<DateTime?>(null, (prev, dt) => prev == null ? dt : (dt.isAfter(prev) ? dt : prev))
+        : null;
+
     return InkWell(
       onTap: () {
         onPressed();
@@ -89,34 +97,44 @@ class EntryCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
 
-                // Kullanıcı Adı ve Tarih
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            "@${entry.user.username}",
-                            style: GoogleFonts.inter(
+                // İsim Soyisim ve Username
+                InkWell(
+                  onTap: onPressedProfile,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name + Surname (üstte)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              '${entry.user.name} ${entry.user.surname}',
+                              style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
-                                color: Color(0xff414751)),
+                                color: const Color(0xff414751),
+                              ),
+                            ),
                           ),
+                          SizedBox(width: 2),
+                          VerificationBadge(
+                            isVerified: entry.user.isVerified ?? false,
+                            size: 14.0,
+                          ),
+                        ],
+                      ),
+                      // Username (altta)
+                      Text(
+                        '@${entry.user.username}',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xff9CA3AE),
                         ),
-                        VerificationBadge(
-                          isVerified: entry.user.isVerified ?? false,
-                          size: 12.0,
-                        ),
-                      ],
-                    ),
-                    Text(
-                      formatSimpleDateClock(entry.createdat.toString()),
-                      style: GoogleFonts.inter(
-                          color: Color(0xff9ca3ae), fontSize: 10),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
                 const Spacer(),
               ],
@@ -242,6 +260,21 @@ class EntryCard extends StatelessWidget {
                   ),
                 )
               ],
+            ),
+            
+            // 🔹 Paylaşım tarihi (oy verme butonlarının altında)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                lastVoteCreatedAt != null
+                    ? formatSimpleDateClock(lastVoteCreatedAt.toIso8601String())
+                    : '',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xff9CA3AE),
+                ),
+              ),
             ),
           ],
         ),

@@ -28,14 +28,14 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   final EntryController entryController = Get.find<EntryController>();
   final TextEditingController commentController = TextEditingController();
   final LanguageService languageService = Get.find<LanguageService>();
-  
+
   // TopicsController'ı bul (eğer varsa)
   TopicsController? _topicsController;
 
   @override
   void initState() {
     super.initState();
-    
+
     // TopicsController'ı bul (eğer varsa)
     try {
       _topicsController = Get.find<TopicsController>();
@@ -43,7 +43,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     } catch (e) {
       debugPrint("⚠️ TopicsController bulunamadı: $e");
     }
-    
+
     // Eğer entry'nin bir topic'i varsa, onu ayarla.
     if (widget.entry.topic != null) {
       entryDetailController.setCurrentTopic(widget.entry.topic!);
@@ -63,15 +63,20 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   void dispose() {
     debugPrint(
         "⚠️ EntryDetailScreen dispose: Widget yok ediliyor ve yorumlar temizleniyor.");
-    entryDetailController.entryComments
-        .clear(); // Yorum listesini doğrudan burada temizle
-    
-    // TopicsController loading state'ini sıfırla
-    if (_topicsController != null) {
-      _topicsController!.resetTopicLoadingState();
-      debugPrint("🔄 EntryDetailScreen dispose: TopicsController loading state sıfırlandı");
-    }
-    
+
+    // Widget tree kilitliyken observable güncellemelerini engelle
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Yorum listesini temizle
+      entryDetailController.entryComments.clear();
+
+      // TopicsController loading state'ini sıfırla
+      if (_topicsController != null) {
+        _topicsController!.resetTopicLoadingState();
+        debugPrint(
+            "🔄 EntryDetailScreen dispose: TopicsController loading state sıfırlandı");
+      }
+    });
+
     super.dispose();
   }
 
@@ -108,7 +113,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Text(
-                      widget.entry.topic?.category?.title ?? languageService.tr("entryDetail.noCategory"),
+                      widget.entry.topic?.category?.title ??
+                          languageService.tr("entryDetail.noCategory"),
                       style: GoogleFonts.inter(
                           fontSize: 12, color: const Color(0xff272727)),
                     ),
@@ -118,7 +124,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
                 // Topic Başlığı
                 Text(
-                  widget.entry.topic?.name ?? languageService.tr("entryDetail.noTopicInfo"),
+                  widget.entry.topic?.name ??
+                      languageService.tr("entryDetail.noTopicInfo"),
                   style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -130,15 +137,47 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           ),
 
           // Yorumlar Listesi (Entry'ler)
+          // Ana entry (ilk entry) - yorumların üstünde göster
+          Obx(() {
+            final main = entryDetailController.mainEntry.value ?? widget.entry;
+            final topic = main.topic ?? widget.entry.topic;
+            final categoryTitle = topic?.category?.title ??
+                languageService.tr("entryDetail.noCategory");
+            final topicName = topic?.name ?? "Konu Bilgisi Yok";
+
+            return EntryCommentCard(
+              entry: main,
+              onDownvote: () => entryController.voteEntry(main.id, "down"),
+              onUpvote: () => entryController.voteEntry(main.id, "up"),
+              onShare: () {
+                final String shareText = """
+📝 **$topicName** (#${main.id})
+
+🏷️ $categoryTitle
+
+💬 **Entry:**
+${main.content}
+
+📲 App Store: https://apps.apple.com/app/edusocial/id123456789
+📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
+
+""";
+                Share.share(shareText);
+              },
+              onPressed: () {},
+            );
+          }),
+
           Expanded(
             child: Obx(() {
-              if (entryDetailController.entryComments.isEmpty) {
+              if (entryDetailController.isCommentsLoading.value) {
                 return Center(
                     child: GeneralLoadingIndicator(
                   size: 32,
                   showIcon: false,
                 ));
               }
+
               return RefreshIndicator(
                 color: Color(0xFFef5050),
                 backgroundColor: Color(0xfffafafa),
@@ -154,7 +193,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       entry: comment,
                       onDownvote: () =>
                           entryController.voteEntry(comment.id, "down"),
-                      onUpvote: () => entryController.voteEntry(comment.id, "up"),
+                      onUpvote: () =>
+                          entryController.voteEntry(comment.id, "up"),
                       onShare: () {
                         // Konunun ilk entry'sini bul
                         String firstEntryContent = "";
@@ -165,8 +205,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
                         // Konu bilgilerini al
                         final topic = widget.entry.topic;
-                        final categoryTitle =
-                            topic?.category?.title ?? languageService.tr("entryDetail.noCategory");
+                        final categoryTitle = topic?.category?.title ??
+                            languageService.tr("entryDetail.noCategory");
                         final topicName = topic?.name ?? "Konu Bilgisi Yok";
                         final entryCount =
                             entryDetailController.entryComments.length;
@@ -200,7 +240,6 @@ $firstEntryContent
             }),
           ),
 
-
           // Entry Paylaşım kısmı
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -213,7 +252,8 @@ $firstEntryContent
                     child: TextField(
                       controller: commentController,
                       decoration: InputDecoration(
-                        hintText: languageService.tr("entry.entryDetail.commentPlaceholder"),
+                        hintText: languageService
+                            .tr("entry.entryDetail.commentPlaceholder"),
                         hintStyle: GoogleFonts.inter(
                             color: const Color(0xff9ca3ae), fontSize: 13.28),
                         border: OutlineInputBorder(
@@ -228,53 +268,54 @@ $firstEntryContent
                   ),
                   const SizedBox(width: 10),
                   Obx(() => IconButton(
-                    icon: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFFFF7743), Color(0xFFEF5050)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+                        icon: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFFFF7743), Color(0xFFEF5050)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          child: Center(
+                            child: entryController.isSendingEntry.value
+                                ? SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                    ),
+                                  )
+                                : SvgPicture.asset(
+                                    'images/icons/send_icon.svg',
+                                    width: 18,
+                                    height: 18,
+                                    colorFilter: const ColorFilter.mode(
+                                        Colors.white, BlendMode.srcIn),
+                                  ),
+                          ),
                         ),
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
-                      child: Center(
-                        child: entryController.isSendingEntry.value
-                            ? SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : SvgPicture.asset(
-                                'images/icons/send_icon.svg',
-                                width: 18,
-                                height: 18,
-                                colorFilter: const ColorFilter.mode(
-                                    Colors.white, BlendMode.srcIn),
-                              ),
-                      ),
-                    ),
-                    onPressed: entryController.isSendingEntry.value
-                        ? null
-                        : () {
-                            if (commentController.text.isNotEmpty) {
-                              entryController
-                                  .sendEntryToTopic(
-                                widget.entry.topic?.id ?? 0,
-                                commentController.text,
-                              )
-                                  .then((_) {
-                                entryDetailController.fetchEntryComments();
-                                commentController.clear();
-                              });
-                            }
-                          },
-                  )),
+                        onPressed: entryController.isSendingEntry.value
+                            ? null
+                            : () {
+                                if (commentController.text.isNotEmpty) {
+                                  entryController
+                                      .sendEntryToTopic(
+                                    widget.entry.topic?.id ?? 0,
+                                    commentController.text,
+                                  )
+                                      .then((_) {
+                                    entryDetailController.fetchEntryComments();
+                                    commentController.clear();
+                                  });
+                                }
+                              },
+                      )),
                 ],
               ),
             ),
