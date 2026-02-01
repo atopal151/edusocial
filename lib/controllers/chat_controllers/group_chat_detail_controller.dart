@@ -688,7 +688,13 @@ class GroupChatDetailController extends GetxController {
       messages.add(newMessage);
       debugPrint('✅ [GroupChatDetailController] Yeni grup mesajı eklendi: ID ${newMessage.id}, Content: "${newMessage.content}"');
       debugPrint('✅ [GroupChatDetailController] Toplam grup mesaj sayısı: ${messages.length}');
-      
+
+      // Bizim gönderdiğimiz mesaj socket'ten gelince loading'i kapat
+      if (newMessage.isSentByMe) {
+        isSendingMessage.value = false;
+        debugPrint('✅ [GroupChatDetailController] Kendi mesajımız socket\'ten geldi, loading kapatıldı.');
+      }
+
       // Yeni mesaj eklendiğinde en alta git
       WidgetsBinding.instance.addPostFrameCallback((_) {
         scrollToBottomForNewMessage();
@@ -1586,17 +1592,15 @@ class GroupChatDetailController extends GetxController {
     debugPrint('🔌 Group Message Subscription aktif: ${!_groupMessageSubscription.isPaused}');
     
     isSendingMessage.value = true;
-    
+
     try {
       bool success;
-      
+
       if (text.isNotEmpty && hasLinksInText(text)) {
         debugPrint('🔗 Links detected in text, processing...');
-        
         final urls = extractUrlsFromText(text);
         final nonLinkText = extractNonLinkText(text);
         final normalizedUrls = urls.map((url) => normalizeUrl(url)).toList();
-        
         success = await _groupServices.sendGroupMessage(
           groupId: currentGroupId.value,
           message: nonLinkText,
@@ -1611,59 +1615,37 @@ class GroupChatDetailController extends GetxController {
           links: null,
         );
       }
-      
+
       if (success) {
         selectedFiles.clear();
-        
-        // Socket üzerinden mesaj gelip gelmediğini kontrol et
-        debugPrint('✅ Mesaj başarıyla gönderildi, socket üzerinden gelmesi bekleniyor...');
-        
-        // Socket üzerinden mesaj gelmesi için kısa bir süre bekle
-        bool socketMessageReceived = false;
-        final originalMessageCount = messages.length;
-        
-        // 2 saniye boyunca socket mesajını bekle
-        for (int i = 0; i < 20; i++) {
-          await Future.delayed(Duration(milliseconds: 100));
-          if (messages.length > originalMessageCount) {
-            debugPrint('✅ Socket üzerinden yeni mesaj geldi!');
-            socketMessageReceived = true;
-            break;
-          }
-        }
-        
-        if (!socketMessageReceived) {
-          debugPrint('⚠️ Socket üzerinden mesaj gelmedi, API\'den yeniden yüklenecek...');
-        }
-        
-        // FIXED: Immediate scroll for better UX, then refresh
+        debugPrint('✅ Mesaj API\'ye gönderildi, socket\'ten gelmesi bekleniyor.');
         scrollToBottomForNewMessage();
-        
-        // OPTIMIZE: Reduced refresh delay
         Future.delayed(Duration(milliseconds: 300), () async {
           await refreshMessagesOptimized();
-          // Ensure we stay at bottom after refresh
           scrollToBottomForNewMessage();
-          
-          // NOT: fetchGroupList() kaldırıldı - grup listesi socket'ten anlık güncelleniyor
-          // Mesaj gönderildiğinde socket event'i tetiklenir ve unread count otomatik güncellenir
+        });
+        // Loading sadece socket'ten mesaj gelince kapatılacak; socket gelmezse 8 sn sonra fallback
+        Future.delayed(Duration(seconds: 8), () {
+          if (isSendingMessage.value) {
+            isSendingMessage.value = false;
+            debugPrint('⚠️ Socket mesajı gelmedi, loading fallback ile kapatıldı.');
+          }
         });
       } else {
         Get.snackbar(
           _languageService.tr('groupChat.errors.messageSendFailed'),
           _languageService.tr('groupChat.errors.tryAgain'),
-          snackPosition: SnackPosition.BOTTOM
+          snackPosition: SnackPosition.BOTTOM,
         );
+        isSendingMessage.value = false;
       }
-      
     } catch (e) {
       debugPrint('💥 Message sending error: $e');
       Get.snackbar(
         _languageService.tr('groupChat.errors.messageSendFailed'),
         _languageService.tr('groupChat.errors.tryAgain'),
-        snackPosition: SnackPosition.BOTTOM
+        snackPosition: SnackPosition.BOTTOM,
       );
-    } finally {
       isSendingMessage.value = false;
     }
   }
@@ -1685,30 +1667,33 @@ class GroupChatDetailController extends GetxController {
       
       if (success) {
         selectedFiles.clear();
-        
-        // FIXED: Same scroll behavior for media
         scrollToBottomForNewMessage();
-        
         Future.delayed(Duration(milliseconds: 300), () async {
           await refreshMessagesOptimized();
           scrollToBottomForNewMessage();
+        });
+        // Loading sadece socket'ten mesaj gelince kapatılacak
+        Future.delayed(Duration(seconds: 8), () {
+          if (isSendingMessage.value) {
+            isSendingMessage.value = false;
+            debugPrint('⚠️ Socket mesajı gelmedi (media), loading fallback ile kapatıldı.');
+          }
         });
       } else {
         Get.snackbar(
           _languageService.tr('groupChat.errors.messageSendFailed'),
           _languageService.tr('groupChat.errors.tryAgain'),
-          snackPosition: SnackPosition.BOTTOM
+          snackPosition: SnackPosition.BOTTOM,
         );
+        isSendingMessage.value = false;
       }
-      
     } catch (e) {
       debugPrint('💥 Media sending error: $e');
       Get.snackbar(
         _languageService.tr('groupChat.errors.messageSendFailed'),
         _languageService.tr('groupChat.errors.tryAgain'),
-        snackPosition: SnackPosition.BOTTOM
+        snackPosition: SnackPosition.BOTTOM,
       );
-    } finally {
       isSendingMessage.value = false;
     }
   }

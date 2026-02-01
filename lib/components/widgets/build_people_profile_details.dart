@@ -1,6 +1,7 @@
 import 'package:edusocial/components/cards/group_suggestion_card.dart';
 import 'package:edusocial/components/widgets/course_chip.dart';
 import 'package:edusocial/models/people_profile_model.dart';
+import 'package:edusocial/utils/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -101,24 +102,10 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                           width: 20,
                           height: 20,
                         ),
-                        label: languageService.tr("profile.details.birthDate"),
-                        value: profileData.birthDate,
-                      ),
-                      _buildPersonalInfo(
-                        icon: SvgPicture.asset(
-                          "images/icons/profile_tab_icon.svg",
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xff414751),
-                            BlendMode.srcIn,
-                          ),
-                          width: 20,
-                          height: 20,
-                        ),
-                        label: languageService.tr("profile.details.email"),
-                        value: profileData.email,
+                        label: languageService.tr("groups.groupList.joined"),
+                        value: formatSimpleDate(profileData.createdAt),
                       ),
                       const SizedBox(width: 10),
-                      const SizedBox(height: 10),
                       if (profileData.language != null &&
                           profileData.language is Map &&
                           profileData.language['name'] != null)
@@ -135,6 +122,39 @@ Widget buildPeopleProfileDetails(PeopleProfileModel profileData) {
                           label: "Dil",
                           value: profileData.language['name'],
                         ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildPersonalInfo(
+                        icon: SvgPicture.asset(
+                          "images/icons/document_icon.svg",
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xff414751),
+                            BlendMode.srcIn,
+                          ),
+                          width: 20,
+                          height: 20,
+                        ),
+                        label: languageService.tr("entry.entryDetail.topic"),
+                        value: profileData.topicCount.toString(),
+                      ),
+                      _buildPersonalInfo(
+                        icon: SvgPicture.asset(
+                          "images/icons/entry.svg",
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xff414751),
+                            BlendMode.srcIn,
+                          ),
+                          width: 20,
+                          height: 20,
+                        ),
+                        label: languageService.tr("entry.entryDetail.entryCount"),
+                        value: profileData.entryCount.toString(),
+                      ),
+                      const SizedBox(width: 10),
                     ],
                   ),
                   const SizedBox(height: 20),

@@ -39,6 +39,8 @@ class PeopleProfileModel {
   final int unreadMessagesTotalCount;
   final int followingCount;
   final int followerCount;
+  final int topicCount;
+  final int entryCount;
   final bool isSelf;
   final List<PostModel> posts;
   final List<EntryModel> entries;
@@ -101,6 +103,8 @@ class PeopleProfileModel {
     required this.unreadMessagesTotalCount,
     required this.followingCount,
     required this.followerCount,
+    required this.topicCount,
+    required this.entryCount,
     required this.isSelf,
     required this.posts,
     required this.entries,
@@ -163,6 +167,8 @@ class PeopleProfileModel {
       unreadMessagesTotalCount: json['unread_messages_total_count'] ?? 0,
       followingCount: json['following_count'] ?? 0,
       followerCount: json['follower_count'] ?? 0,
+      topicCount: json['topic_count'] ?? 0,
+      entryCount: json['entry_count'] ?? 0,
       isSelf: json['is_self'] ?? false,
       posts: (json['posts'] as List?)?.map((e) {
             return PostModel.fromJsonForProfile(

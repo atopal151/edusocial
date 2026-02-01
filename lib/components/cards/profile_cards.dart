@@ -164,12 +164,19 @@ Widget _buildProfileDetailsContent(
                         width: 20,
                         height: 20,
                       ),
-                      label: languageService.tr("profile.details.birthDate"),
-                      value: formatSimpleDate(profileData.birthDate),
+                      label: languageService.tr("groups.groupList.joined"),
+                      value: formatSimpleDate(profileData.createdAt),
                     ),
+                    const SizedBox(width: 10),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     _buildPersonalInfo(
                       icon: SvgPicture.asset(
-                        "images/icons/profile_tab_icon.svg",
+                        "images/icons/document_icon.svg",
                         colorFilter: ColorFilter.mode(
                           Color(0xff414751),
                           BlendMode.srcIn,
@@ -177,12 +184,23 @@ Widget _buildProfileDetailsContent(
                         width: 20,
                         height: 20,
                       ),
-                      label: languageService.tr("profile.details.email"),
-                      value: profileData.email,
+                      label: languageService.tr("entry.entryDetail.topic"),
+                      value: profileData.topicCount.toString(),
                     ),
-                    const SizedBox(
-                      width: 10,
+                    _buildPersonalInfo(
+                      icon: SvgPicture.asset(
+                        "images/icons/entry.svg",
+                        colorFilter: ColorFilter.mode(
+                          Color(0xff414751),
+                          BlendMode.srcIn,
+                        ),
+                        width: 20,
+                        height: 20,
+                      ),
+                      label: languageService.tr("entry.entryDetail.entryCount"),
+                      value: profileData.entryCount.toString(),
                     ),
+                    const SizedBox(width: 10),
                   ],
                 ),
                 const SizedBox(height: 20),

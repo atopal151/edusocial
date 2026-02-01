@@ -399,7 +399,7 @@ class OptimizedMessageListView extends StatelessWidget {
 
       return ListView.builder(
         controller: controller.scrollController,
-        padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 100),
+        padding: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
         itemCount: messageList.length,
         // OPTIMIZE: Caching for better scroll performance
         cacheExtent: 1000,

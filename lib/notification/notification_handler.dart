@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
+import '../routes/app_routes.dart';
 import '../screens/profile/people_profile_screen.dart';
 import '../services/people_profile_services.dart';
 import 'notification_renderer.dart';
@@ -184,21 +185,108 @@ class NotificationHandler {
     }
   }
 
+  /// Mesaj bildirimi için conversation_id çıkarır (data, data.data, notification_data)
+  dynamic _extractConversationId(Map<String, dynamic> data) {
+    final id = data['conversation_id'] ?? data['conversationId'];
+    if (id != null) return id;
+    if (data['data'] is Map) {
+      final d = data['data'] as Map;
+      return d['conversation_id'] ?? d['conversationId'];
+    }
+    if (data['notification_data'] is Map) {
+      final n = data['notification_data'] as Map;
+      return n['conversation_id'] ?? n['conversationId'];
+    }
+    return null;
+  }
+
+  /// Mesaj bildirimi için sender_id (gönderen kullanıcı id) çıkarır
+  dynamic _extractSenderId(Map<String, dynamic> data) {
+    final id = data['sender_id'] ?? data['senderId'];
+    if (id != null) return id;
+    final sender = _extractSenderMap(data);
+    if (sender != null) return sender['id'];
+    if (data['data'] is Map) {
+      final d = data['data'] as Map;
+      return d['sender_id'] ?? d['senderId'];
+    }
+    if (data['notification_data'] is Map) {
+      final n = data['notification_data'] as Map;
+      return n['sender_id'] ?? n['senderId'];
+    }
+    return null;
+  }
+
+  /// Mesaj bildirimi için sender objesini çıkarır (name, username, avatar_url, is_online, is_verified)
+  Map<String, dynamic>? _extractSenderMap(Map<String, dynamic> data) {
+    if (data['sender'] is Map) return data['sender'] as Map<String, dynamic>;
+    if (data['data'] is Map) {
+      final d = data['data'] as Map;
+      if (d['sender'] is Map) return d['sender'] as Map<String, dynamic>;
+    }
+    if (data['notification_data'] is Map) {
+      final n = data['notification_data'] as Map;
+      if (n['sender'] is Map) return n['sender'] as Map<String, dynamic>;
+      final full = n['notification_full_data'];
+      if (full is Map && full['user'] is Map) return full['user'] as Map<String, dynamic>;
+    }
+    return null;
+  }
+
+  /// Sender adı: name + surname veya name
+  String? _extractSenderName(Map<String, dynamic>? sender, Map<String, dynamic> data) {
+    if (sender != null) {
+      final name = sender['name']?.toString();
+      final surname = sender['surname']?.toString();
+      if (name != null && surname != null) return '$name $surname'.trim();
+      if (name != null) return name;
+    }
+    final n = data['sender_name'] ?? data['senderName'];
+    if (n != null) return n.toString();
+    return null;
+  }
+
   Future<void> _route(Map<String, dynamic> data) async {
     final type = _resolveType(data);
 
     switch (type) {
       case 'message':
-        final conversationId = data['conversation_id'] ?? data['id'];
-        if (conversationId != null) {
-          Get.toNamed('/chat-detail', arguments: {'conversation_id': conversationId});
+      case 'text':
+        // Mesaj bildirimi: sohbet listesine (chat tab) git, sonra ilgili sohbet detayına aç
+        final conversationId = _extractConversationId(data);
+        final senderId = _extractSenderId(data);
+        final sender = _extractSenderMap(data);
+        final name = _extractSenderName(sender, data);
+        final username = (sender?['username'] ?? data['sender_username'])?.toString() ?? '';
+        final avatarUrl = (sender?['avatar_url'] ?? sender?['avatar'])?.toString() ?? '';
+        final isOnline = (sender?['is_online'] ?? data['sender_is_online']) == true;
+        final isVerified = (sender?['is_verified'] ?? data['sender_is_verified']) == true;
+
+        if (conversationId != null && senderId != null) {
+          debugPrint('🔔 [NotificationHandler] Mesaj bildirimi - conversation_id: $conversationId, sender_id: $senderId');
+          // Önce ana ekrana git ve chat sekmesini seç (geri basınca sohbet listesine dönülsün)
+          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
+          Future.delayed(const Duration(milliseconds: 150), () {
+            Get.toNamed(Routes.chatDetail, arguments: {
+              'userId': senderId is int ? senderId : int.tryParse(senderId.toString()),
+              'conversationId': conversationId,
+              'name': name ?? 'Bilinmeyen',
+              'username': username,
+              'avatarUrl': avatarUrl,
+              'isOnline': isOnline,
+              'isVerified': isVerified,
+            });
+          });
+        } else {
+          debugPrint('❌ [NotificationHandler] Mesaj bildirimi - conversation_id veya sender_id eksik');
+          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
         }
         break;
       case 'group':
       case 'group_message':
         final groupId = data['group_id'] ?? data['id'];
         if (groupId != null) {
-          Get.toNamed('/group-detail', arguments: {'group_id': groupId});
+          Get.toNamed(Routes.groupChatDetail, arguments: {'group_id': groupId});
         }
         break;
       case 'post-like':

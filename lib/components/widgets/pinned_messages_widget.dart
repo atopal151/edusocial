@@ -88,90 +88,55 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
         final pinnedMessages = controller.messages.where((msg) => msg.isPinned).toList();
 
         if (pinnedMessages.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white),
-            child: Row(
-              children: [
-                Icon(Icons.push_pin, size: 16, color: Color(0xff9ca3ae)),
-                SizedBox(width: 8),
-                Text(
-                  _languageService.tr('groups.pinnedMessages.emptyState'),
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xff9ca3ae),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return const SizedBox.shrink();
         }
 
         return Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(color: Colors.white),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Text(
-                    _languageService.tr('groups.pinnedMessages.title'),
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xff414751),
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${pinnedMessages.length}',
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      color: const Color(0xff9ca3ae),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              if (_isExpanded)
-                ...pinnedMessages.map((message) => _buildPinnedMessageItem(message))
-              else
-                ...pinnedMessages.take(1).map((message) => _buildPinnedMessageItem(message)),
-              
-              if (pinnedMessages.length > 1)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isExpanded = !_isExpanded;
-                      });
-                    },
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => setState(() => _isExpanded = !_isExpanded),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                          size: 16,
-                          color: const Color(0xff6b7280),
+                          Icons.push_pin,
+                          size: 12,
+                          color: Color(0xFFef5050),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          _isExpanded 
-                              ? _languageService.tr('groups.pinnedMessages.showLess')
-                              : '${pinnedMessages.length - 1} ${_languageService.tr('groups.pinnedMessages.showMore')}',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff6b7280),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            '${_languageService.tr('groups.pinnedMessages.title')} (${pinnedMessages.length})',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xff414751),
+                            ),
                           ),
+                        ),
+                        Icon(
+                          _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                          size: 22,
+                          color: Color(0xff9ca3ae),
                         ),
                       ],
                     ),
                   ),
                 ),
+              ),
+              if (_isExpanded) ...[
+                const SizedBox(height: 8),
+                ...pinnedMessages.map((message) => _buildPinnedMessageItem(message)),
+              ],
             ],
           ),
         );
@@ -188,90 +153,55 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
       final pinnedMessages = controller.messages.where((msg) => msg.isPinned).toList();
 
       if (pinnedMessages.isEmpty) {
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Colors.white),
-          child: Row(
-            children: [
-              Icon(Icons.push_pin, size: 16, color: Color(0xff9ca3ae)),
-              SizedBox(width: 8),
-              Text(
-                _languageService.tr('groups.pinnedMessages.emptyState'),
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xff9ca3ae),
-                ),
-              ),
-            ],
-          ),
-        );
+        return const SizedBox.shrink();
       }
 
       return Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(color: Colors.white),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text(
-                  _languageService.tr('groups.pinnedMessages.title'),
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff414751),
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '${pinnedMessages.length}',
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    color: const Color(0xff9ca3ae),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            if (_isExpanded)
-              ...pinnedMessages.map((message) => _buildGroupPinnedMessageItem(message))
-            else
-              ...pinnedMessages.take(1).map((message) => _buildGroupPinnedMessageItem(message)),
-            
-            if (pinnedMessages.length > 1)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isExpanded = !_isExpanded;
-                    });
-                  },
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => setState(() => _isExpanded = !_isExpanded),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        size: 16,
-                        color: const Color(0xff6b7280),
+                        Icons.push_pin,
+                        size: 18,
+                        color: Color(0xFFef5050),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _isExpanded 
-                            ? _languageService.tr('groups.pinnedMessages.showLess')
-                            : '${pinnedMessages.length - 1} ${_languageService.tr('groups.pinnedMessages.showMore')}',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xff6b7280),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${_languageService.tr('groups.pinnedMessages.title')} (${pinnedMessages.length})',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xff414751),
+                          ),
                         ),
+                      ),
+                      Icon(
+                        _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        size: 22,
+                        color: Color(0xff9ca3ae),
                       ),
                     ],
                   ),
                 ),
               ),
+            ),
+            if (_isExpanded) ...[
+              const SizedBox(height: 8),
+              ...pinnedMessages.map((message) => _buildGroupPinnedMessageItem(message)),
+            ],
           ],
         ),
       );

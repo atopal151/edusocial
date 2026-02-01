@@ -483,6 +483,7 @@
     },
     "entryDetail": {
       "noCategory": "Brak kategorii",
+      "topic": "Topic",
       "noTopicInfo": "Brak informacji o temacie",
       "commentPlaceholder": "Podziel się wpisem na ten temat",
       "sendComment": "Wyślij komentarz",

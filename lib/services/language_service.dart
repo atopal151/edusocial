@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -14,10 +15,12 @@ class LanguageService extends GetxService {
   final RxString currentLanguage = _defaultLanguage.obs;
   final RxMap<String, dynamic> translations = <String, dynamic>{}.obs;
   
-  // Desteklenen diller
+  // Desteklenen diller (API ve asset dil dosyaları ile uyumlu)
   static const Map<String, String> supportedLanguages = {
     'tr': 'Türkçe',
     'en': 'English',
+    'pl': 'Polski',
+    'uk': 'Українська',
   };
 
   @override
@@ -85,25 +88,66 @@ class LanguageService extends GetxService {
     }
   }
 
-  /// Çeviri dosyasını yükle - Sadece API'dan
+  /// Çeviri dosyasını yükle - API + asset birleştirilir (eksik anahtarlar asset'ten tamamlanır)
   Future<void> _loadTranslations(String languageCode) async {
     try {
-      // API'dan çeviri verilerini al
       final apiTranslations = await _loadTranslationsFromAPI(languageCode);
-      
+      final assetTranslations = await _loadTranslationsFromAssets(languageCode);
+
       if (apiTranslations != null && apiTranslations.isNotEmpty) {
-        // API'dan başarıyla veri alındı
-        translations.value = apiTranslations;
-        debugPrint('✅ Çeviriler API\'dan yüklendi: $languageCode');
+        if (assetTranslations != null && assetTranslations.isNotEmpty) {
+          // API + asset birleştir: API öncelikli, eksik anahtarlar asset'ten eklenir (dil alanı okunabilsin)
+          translations.value = _deepMerge(assetTranslations, apiTranslations);
+          debugPrint('✅ Çeviriler API + asset birleştirilerek yüklendi: $languageCode');
+        } else {
+          translations.value = apiTranslations;
+          debugPrint('✅ Çeviriler API\'dan yüklendi: $languageCode');
+        }
+        return;
+      }
+
+      if (assetTranslations != null && assetTranslations.isNotEmpty) {
+        translations.value = assetTranslations;
+        debugPrint('✅ Çeviriler asset\'ten yüklendi: $languageCode');
       } else {
-        // API'dan veri alınamazsa boş çeviri haritası kullan
-        debugPrint('❌ API\'dan çeviri alınamadı, boş çeviri haritası kullanılıyor');
         translations.value = <String, dynamic>{};
       }
     } catch (e) {
       debugPrint('❌ Çeviri yükleme genel hatası: $e');
-      // Hata durumunda boş çeviri haritası kullan
       translations.value = <String, dynamic>{};
+    }
+  }
+
+  /// Asset üzerine API değerlerini yazar; API'da yoksa asset değeri kalır (eksik anahtarlar tamamlanır)
+  Map<String, dynamic> _deepMerge(Map<String, dynamic> base, Map<String, dynamic> overlay) {
+    final result = Map<String, dynamic>.from(base);
+    for (final entry in overlay.entries) {
+      if (entry.value is Map<String, dynamic> && result[entry.key] is Map<String, dynamic>) {
+        result[entry.key] = _deepMerge(
+          Map<String, dynamic>.from(result[entry.key] as Map),
+          entry.value as Map<String, dynamic>,
+        );
+      } else {
+        result[entry.key] = entry.value;
+      }
+    }
+    return result;
+  }
+
+  /// Asset'teki dil dosyasından çeviri yükle (API yapısı ile uyumlu)
+  Future<Map<String, dynamic>?> _loadTranslationsFromAssets(String languageCode) async {
+    try {
+      final path = 'assets/translations/$languageCode.json';
+      final String jsonString = await rootBundle.loadString(path);
+      //printFullText('📁 [LanguageService] Dil asset ham veri ($path): $jsonString');
+      final Map<String, dynamic> data = json.decode(jsonString) as Map<String, dynamic>;
+      return data;
+    } catch (e) {
+      debugPrint('❌ Asset çeviri yükleme hatası ($languageCode): $e');
+      if (languageCode != _defaultLanguage) {
+        return _loadTranslationsFromAssets(_defaultLanguage);
+      }
+      return null;
     }
   }
 
@@ -141,6 +185,8 @@ class LanguageService extends GetxService {
         }
         
         if (response.statusCode == 200) {
+          final endpoint = token != null ? 'json-language' : 'json-language-noauth';
+          printFullText('🌐 [LanguageService] Dil API ham veri ($endpoint): ${response.body}');
           final jsonData = json.decode(response.body);
           final translations = jsonData['translations'] as Map<String, dynamic>?;
           debugPrint('✅ API\'dan çeviriler başarıyla alındı (deneme $attempt)');
@@ -169,6 +215,10 @@ class LanguageService extends GetxService {
     switch (languageCode) {
       case 'tr':
         return const Locale('tr', 'TR');
+      case 'pl':
+        return const Locale('pl', 'PL');
+      case 'uk':
+        return const Locale('uk', 'UA');
       case 'en':
       default:
         return const Locale('en', 'US');
@@ -290,8 +340,16 @@ class LanguageService extends GetxService {
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         final userData = jsonData['data'] as Map<String, dynamic>?;
-        final userLanguage = userData?['language'] as String?;
-        
+        final language = userData?['language'];
+
+        // API dil bilgisi obje { "id", "code", "name" } veya string olabilir
+        String? userLanguage;
+        if (language is Map && language.containsKey('code')) {
+          userLanguage = language['code']?.toString();
+        } else if (language is String) {
+          userLanguage = language;
+        }
+
         debugPrint('✅ Kullanıcı dil tercihi API\'dan alındı: $userLanguage');
         return userLanguage;
       } else {

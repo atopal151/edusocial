@@ -483,6 +483,7 @@
     },
     "entryDetail": {
       "noCategory": "Kategori Yok",
+      "topic": "Topic",
       "noTopicInfo": "Konu Bilgisi Yok",
       "commentPlaceholder": "Bu konuya entry paylaşın",
       "sendComment": "Yorum gönder",

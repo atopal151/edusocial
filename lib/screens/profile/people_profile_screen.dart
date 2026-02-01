@@ -13,7 +13,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../components/buttons/custom_button.dart';
 import '../../components/cards/person_entry_card.dart';
 import '../../components/cards/post_card.dart';
-import '../../components/profile_tabbar/profile_tabbar.dart';
 import '../../components/profile_tabbar/toggle_tab_bar.dart';
 import '../../controllers/entry_controller.dart';
 import '../../controllers/post_controller.dart';
@@ -29,13 +28,11 @@ class PeopleProfileScreen extends StatefulWidget {
   State<PeopleProfileScreen> createState() => _PeopleProfileScreenState();
 }
 
-class _PeopleProfileScreenState extends State<PeopleProfileScreen>
-    with SingleTickerProviderStateMixin {
+class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
   final PeopleProfileController controller = Get.put(PeopleProfileController());
   final PostController postController = Get.put(PostController());
   final EntryController entryController = Get.put(EntryController());
 
-  late TabController _tabController;
   final RxInt selectedTabIndex = 0.obs;
   final RxBool isAboutExpanded = false.obs;
 
@@ -49,7 +46,6 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     controller.loadUserProfileByUsername(widget.username);
   }
 
@@ -85,9 +81,7 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
           );
         }
 
-        return DefaultTabController(
-          length: 2,
-          child: NestedScrollView(
+        return NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
               SliverToBoxAdapter(
                 child: Column(
@@ -203,62 +197,46 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen>
                     ),
 
                     const SizedBox(height: 20),
-
-                    /// TabBar
-                    ProfileTabBar(tabController: _tabController),
                   ],
                 ),
               ),
             ],
-            body: TabBarView(
-              controller: _tabController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                RefreshIndicator(
-                  onRefresh: _refreshProfile,
-                  color: const Color(0xFFef5050),
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  strokeWidth: 2.0,
-                  displacement: 40.0,
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Container(
-                          color: const Color(0xfffafafa),
-                          child: ToggleTabBar(
-                            selectedIndex: selectedTabIndex,
-                            onTabChanged: (index) {
-                              selectedTabIndex.value = index;
-                            },
-                          ),
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Obx(() {
-                          return selectedTabIndex.value == 0
-                              ? _buildPosts()
-                              : _buildEntries();
-                        }),
-                      ),
-                    ],
-                  ),
-                ),
-                RefreshIndicator(
-                  onRefresh: _refreshProfile,
-                  color: const Color(0xFFef5050),
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  strokeWidth: 2.0,
-                  displacement: 40.0,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+            body: RefreshIndicator(
+              onRefresh: _refreshProfile,
+              color: const Color(0xFFef5050),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              strokeWidth: 2.0,
+              displacement: 40.0,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  /// About bölümü üstte - açılıp kapanabilir
+                  SliverToBoxAdapter(
                     child: _buildAboutSection(),
                   ),
-                ),
-              ],
+                  /// Grid içeriği (Postlar / Entryler) altta
+                  SliverToBoxAdapter(
+                    child: Container(
+                      color: const Color(0xfffafafa),
+                      child: ToggleTabBar(
+                        selectedIndex: selectedTabIndex,
+                        onTabChanged: (index) {
+                          selectedTabIndex.value = index;
+                        },
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Obx(() {
+                      return selectedTabIndex.value == 0
+                          ? _buildPosts()
+                          : _buildEntries();
+                    }),
+                  ),
+                ],
+              ),
             ),
-          ),
         );
       }),
     );

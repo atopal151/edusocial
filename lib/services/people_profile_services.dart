@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:edusocial/components/print_full_text.dart';
 import 'package:edusocial/models/people_profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
@@ -22,7 +23,7 @@ class PeopleProfileService {
 
       if (response.statusCode == 200) {
         // API'dan gelen ham people profile response datasını printfulltext ile yazdır
-        //printFullText('👥 [PeopleProfileService] User Profile API Response: ${response.body}');
+        printFullText('👥 [PeopleProfileService] User Profile API Response: ${response.body}');
         
         final body = jsonDecode(response.body);
         

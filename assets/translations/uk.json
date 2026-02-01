@@ -483,6 +483,7 @@
     },
     "entryDetail": {
       "noCategory": "Без категорії",
+      "topic": "Topic",
       "noTopicInfo": "Немає інформації про тему",
       "commentPlaceholder": "Поділіться записом на цю тему",
       "sendComment": "Надіслати коментар",

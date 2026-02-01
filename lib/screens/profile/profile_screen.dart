@@ -7,7 +7,6 @@ import '../../components/cards/person_entry_card.dart';
 import '../../components/cards/post_card.dart';
 import '../../components/cards/profile_cards.dart';
 import '../../components/cards/profile_header.dart';
-import '../../components/profile_tabbar/profile_tabbar.dart';
 import '../../components/profile_tabbar/toggle_tab_bar.dart';
 import '../../components/widgets/empty_state_widget.dart';
 import '../../controllers/entry_controller.dart';
@@ -24,23 +23,14 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with SingleTickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileController controller = Get.put(ProfileController());
   final PostController postController = Get.put(PostController());
   final EntryController entryController = Get.put(EntryController());
-  // TabController
-  late TabController _tabController;
 
   // Seçili ToggleTabBar'ı kontrol eden değişken
   final RxInt selectedTabIndex = 0.obs;
   final RxBool isAboutExpanded = false.obs;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
 
   /// Profil verilerini yenile
   Future<void> _refreshProfile() async {
@@ -96,104 +86,79 @@ class _ProfileScreenState extends State<ProfileScreen>
           )
         ],
       ),
-      body: DefaultTabController(
-        length: 2,
-        child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) => [
-              SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    buildProfileHeader(),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: 200,
-                      child: CustomButton(
-                        height: 40,
-                        borderRadius: 5,
-                        text: languageService.tr("profile.mainProfile.editProfile"),
-                        onPressed: () {
-                          controller.getToSettingScreen();
-                        },
-                        backgroundColor: const Color(0xfff4f4f5),
-                        textColor: const Color(0xff414751),
-                        icon: SvgPicture.asset(
-                          "images/icons/profile_edit_icon.svg",
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xff414751),
-                            BlendMode.srcIn,
-                          ),
-                          width: 20,
-                          height: 20,
-                        ),
-                        isLoading: controller.isPrLoading,
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                buildProfileHeader(),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 200,
+                  child: CustomButton(
+                    height: 40,
+                    borderRadius: 5,
+                    text: languageService.tr("profile.mainProfile.editProfile"),
+                    onPressed: () {
+                      controller.getToSettingScreen();
+                    },
+                    backgroundColor: const Color(0xfff4f4f5),
+                    textColor: const Color(0xff414751),
+                    icon: SvgPicture.asset(
+                      "images/icons/profile_edit_icon.svg",
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xff414751),
+                        BlendMode.srcIn,
                       ),
-                    ),
-                    SizedBox(
+                      width: 20,
                       height: 20,
                     ),
-
-                    /// **✅ Üst TabBar (İkonlu)**
-                    ProfileTabBar(tabController: _tabController),
-                  ],
-                ),
-              ),
-            ],
-            body: TabBarView(
-              controller: _tabController,
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                /// **📌 Grid View Sekmesi - ToggleTabBar ile göster**
-                RefreshIndicator(
-                  onRefresh: _refreshProfile,
-                  color: const Color(0xFFEF5050),
-                  backgroundColor: Color(0xfffafafa),
-                  elevation: 0,
-                  strokeWidth: 2.0,
-                  displacement: 40.0,
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Container(
-                          color: Color(0xfffafafa),
-                          child: ToggleTabBar(
-                            selectedIndex: selectedTabIndex,
-                            onTabChanged: (index) {
-                              selectedTabIndex.value = index;
-                            },
-                          ),
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Obx(() {
-                          return selectedTabIndex.value == 0
-                              ? _buildPosts()
-                              : _buildEntries();
-                        }),
-                      ),
-                      
-                    ],
+                    isLoading: controller.isPrLoading,
                   ),
                 ),
-
-                /// **👤 Person Sekmesi - ToggleTabBar olmadan göster**
-                RefreshIndicator(
-                  onRefresh: _refreshProfile,
-                  color: const Color(0xFFef5050),
-                  backgroundColor: Color(0xfffafafa),
-                  elevation: 0,
-                  strokeWidth: 2.0,
-                  displacement: 40.0,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: _buildAboutSection(),
-                  ),
-                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
+        ],
+        body: RefreshIndicator(
+          onRefresh: _refreshProfile,
+          color: const Color(0xFFEF5050),
+          backgroundColor: const Color(0xfffafafa),
+          elevation: 0,
+          strokeWidth: 2.0,
+          displacement: 40.0,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              /// About bölümü üstte - açılıp kapanabilir
+              SliverToBoxAdapter(
+                child: _buildAboutSection(),
+              ),
+              /// Grid içeriği (Postlar / Entryler) altta
+              SliverToBoxAdapter(
+                child: Container(
+                  color: const Color(0xfffafafa),
+                  child: ToggleTabBar(
+                    selectedIndex: selectedTabIndex,
+                    onTabChanged: (index) {
+                      selectedTabIndex.value = index;
+                    },
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Obx(() {
+                  return selectedTabIndex.value == 0
+                      ? _buildPosts()
+                      : _buildEntries();
+                }),
+              ),
+            ],
+          ),
         ),
+      ),
     );
   }
 

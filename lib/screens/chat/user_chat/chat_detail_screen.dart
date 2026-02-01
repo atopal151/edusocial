@@ -30,7 +30,7 @@ class ChatDetailScreen extends StatelessWidget {
       return ListView.builder(
         controller: controller.scrollController,
         itemCount: messages.length,
-        padding: const EdgeInsets.only(bottom: 75),
+        padding: const EdgeInsets.only(bottom: 16),
         addAutomaticKeepAlives: false,
         addRepaintBoundaries: true,
         cacheExtent: 500.0,

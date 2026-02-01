@@ -483,6 +483,7 @@
     },
     "entryDetail": {
       "noCategory": "No Category",
+      "topic": "Topic",
       "noTopicInfo": "No Topic Info",
       "commentPlaceholder": "Share an entry on this topic",
       "sendComment": "Send comment",
@@ -1500,6 +1501,8 @@
       "personalInfo": "Personal Information",
       "birthDate": "Birth Date",
       "email": "Email Address",
+      "topicCount": "Topic Count",
+      "entryCount": "Entry Count",
       "courses": "Courses Taken",
       "school": "School Attended",
       "joinedGroups": "Joined Groups"

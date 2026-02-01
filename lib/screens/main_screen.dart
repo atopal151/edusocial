@@ -197,6 +197,19 @@ class MainScreen extends StatelessWidget {
       _checkAndLoadData();
     });
 
+    // Bildirimden gelindiğinde chat sekmesini seç (notification_handler main'e selectedIndex ile yönlendirir)
+    final mainArgs = Get.arguments as Map<String, dynamic>?;
+    if (mainArgs != null && mainArgs['selectedIndex'] != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          final index = mainArgs['selectedIndex'] as int;
+          if (index >= 0 && index <= 4) {
+            navigationController.changeIndex(index);
+          }
+        } catch (_) {}
+      });
+    }
+
     return Scaffold(
       body: Stack(
         children: [
