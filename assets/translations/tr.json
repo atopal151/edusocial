@@ -374,6 +374,8 @@
       },
       "documentInfo": "Mb •"
     },
+    "replyPhoto": "Fotoğraf",
+    "replyLink": "Bağlantı",
     "messageInput": {
       "placeholder": "Bir mesaj yazınız...",
       "fileSelected": "Dosya seçildi. Mesaj yazabilir veya direkt gönderebilirsiniz...",

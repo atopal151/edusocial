@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../controllers/match_controller.dart';
-import '../../../services/language_service.dart';
+import '../../controllers/match_controller.dart';
+import '../../services/language_service.dart';
 
 class MatchCard extends StatefulWidget {
   const MatchCard({super.key});
@@ -77,9 +77,9 @@ class _MatchCardState extends State<MatchCard> {
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              _dragOffset.dx > 0 
-                                ? _getFollowButtonText(match, languageService)
-                                : languageService.tr("match.card.next"),
+                              _dragOffset.dx > 0
+                                  ? _getFollowButtonText(match, languageService)
+                                  : languageService.tr("match.card.next"),
                               style: GoogleFonts.inter(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w600,
@@ -146,8 +146,7 @@ class _MatchCardState extends State<MatchCard> {
                     backgroundColor: Color(0xff4DD64B),
                   ),
                   const SizedBox(width: 4),
-                   Text(
-                      languageService.tr("match.card.online"),
+                  Text(languageService.tr("match.card.online"),
                       style: GoogleFonts.inter(
                           color: Color(0xffffffff),
                           fontSize: 12,
@@ -155,8 +154,7 @@ class _MatchCardState extends State<MatchCard> {
                 ],
               ),
             const SizedBox(height: 16),
-             Text(
-                languageService.tr("match.card.education"),
+            Text(languageService.tr("match.card.education"),
                 style: GoogleFonts.inter(
                     color: Color(0xffffffff),
                     fontSize: 12,
@@ -206,23 +204,23 @@ class _MatchCardState extends State<MatchCard> {
               ],
             ),
             const SizedBox(height: 16),
-             Text(
-                languageService.tr("match.card.about"),
+            Text(languageService.tr("match.card.about"),
                 style: GoogleFonts.inter(
                     color: Color(0xffffffff),
                     fontSize: 12,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             Text(
-              match.about.isNotEmpty ? match.about : languageService.tr("match.card.noInfoYet"),
+              match.about.isNotEmpty
+                  ? match.about
+                  : languageService.tr("match.card.noInfoYet"),
               style: GoogleFonts.inter(
                   color: Color(0xffffffff),
                   fontSize: 10,
                   fontWeight: FontWeight.w400),
             ),
             const SizedBox(height: 16),
-             Text(
-                languageService.tr("match.card.matchedTopics"),
+            Text(languageService.tr("match.card.matchedTopics"),
                 style: GoogleFonts.inter(
                     color: Color(0xffffffff),
                     fontSize: 12,
@@ -255,10 +253,10 @@ class _MatchCardState extends State<MatchCard> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildActionButton(
-                  iconPath: 'images/icons/match_user_add_icon.svg',
-                  label: _getFollowButtonText(match, languageService),
-                  color: _getFollowButtonColor(match),
-                  onTap: match.isPending ? () {} : controller.followUser,
+                  iconPath: 'images/icons/match_next_icon.svg',
+                  label: languageService.tr("match.card.next"),
+                  color: const Color(0xffEF5050),
+                  onTap: controller.nextMatch,
                 ),
                 _buildActionButton(
                   iconPath: 'images/icons/match_message_icon.svg',
@@ -267,11 +265,11 @@ class _MatchCardState extends State<MatchCard> {
                   onTap: controller.startChat,
                 ),
                 _buildActionButton(
-                  iconPath: 'images/icons/match_next_icon.svg',
-                  label: languageService.tr("match.card.next"),
-                  color: const Color(0xffEF5050),
-                  onTap: controller.nextMatch,
-                ),
+                  iconPath: 'images/icons/match_user_add_icon.svg',
+                  label: _getFollowButtonText(match, languageService),
+                  color: _getFollowButtonColor(match),
+                  onTap: match.isPending ? () {} : controller.followUser,
+                )
               ],
             )
           ],
@@ -285,17 +283,17 @@ class _MatchCardState extends State<MatchCard> {
     if (match.isFollowing) {
       return languageService.tr("match.card.following");
     }
-    
+
     // Eğer takip isteği beklemedeyse
     if (match.isPending) {
       return languageService.tr("match.card.pendingApproval");
     }
-    
+
     // Eğer profil gizliyse
     if (match.isPrivate) {
       return languageService.tr("match.card.sendFollowRequest");
     }
-    
+
     // Eğer profil açıksa
     return languageService.tr("match.card.follow");
   }
@@ -305,12 +303,12 @@ class _MatchCardState extends State<MatchCard> {
     if (match.isFollowing) {
       return const Color(0xff9CA3AE); // Gri renk
     }
-    
+
     // Eğer takip isteği beklemedeyse
     if (match.isPending) {
       return const Color(0xffFFA500); // Turuncu renk
     }
-    
+
     // Diğer durumlar için yeşil
     return const Color(0xff65D384);
   }

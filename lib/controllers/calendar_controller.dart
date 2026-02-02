@@ -113,7 +113,8 @@ class CalendarController extends GetxController {
     }
     
     RxString selectedColorName = getSelectedColorName().obs;
-    
+    RxBool isSaving = false.obs;
+
     // Debug: Dil servisinin çalışıp çalışmadığını kontrol et
     debugPrint("🔍 Dil Servisi Debug:");
     debugPrint("  - createTitle: ${languageService.tr("calendar.reminderForm.createTitle")}");
@@ -445,72 +446,86 @@ class CalendarController extends GetxController {
                   SizedBox(width: 12),
                   // Kaydet/Güncelle Butonu
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final formatted = DateFormat('yyyy-MM-dd HH:mm:ss')
-                            .format(selectedDateTime.value);
-                        final colorHex = selectedColor.value.toHex();
+                    child: Obx(() {
+                      final saving = isSaving.value;
+                      return GestureDetector(
+                        onTap: saving
+                            ? null
+                            : () async {
+                                final formatted = DateFormat('yyyy-MM-dd HH:mm:ss')
+                                    .format(selectedDateTime.value);
+                                final colorHex = selectedColor.value.toHex();
 
-                        // 🔍 Renk dönüşümünü debug et
-                        debugPrint("🎨 Seçilen Renk Debug:");
-                        debugPrint("  - Seçilen Color: ${selectedColor.value}");
-                        debugPrint("  - Hex Kodu: $colorHex");
+                                debugPrint("🎨 Seçilen Renk Debug:");
+                                debugPrint("  - Seçilen Color: ${selectedColor.value}");
+                                debugPrint("  - Hex Kodu: $colorHex");
 
-                        final reminder = Reminder(
-                          id: existing?.id ?? 0,
-                          title: titleController.text,
-                          dateTime: formatted,
-                          sendNotification: sendNotification.value,
-                          color: colorHex, // renk hex olarak gönderilecek
-                        );
-                        try {
-                          if (existing != null) {
-                            await CalendarService.updateReminder(reminder);
-                            CustomSnackbar.show(
-                              title: languageService.tr("common.success"),
-                              message: languageService.tr("calendar.success.reminderUpdated"),
-                              type: SnackbarType.success,
-                            );
-                          } else {
-                            await CalendarService.createReminder(reminder);
-                            CustomSnackbar.show(
-                              title: languageService.tr("common.success"),
-                              message: languageService.tr("calendar.success.reminderAdded"),
-                              type: SnackbarType.success,
-                            );
-                          }
-                          await loadReminders();
-                          Get.back();
-                        } catch (e) {
-                          CustomSnackbar.show(
-                            title: languageService.tr("common.error"),
-                            message: "${languageService.tr("calendar.errors.operationFailed")}: $e",
-                            type: SnackbarType.error,
-                          );
-                        }
-                      },
-                      child: Container(
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Color(0xffef5050),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            existing != null
-                                ? languageService
-                                    .tr("calendar.reminderForm.update")
-                                : languageService
-                                    .tr("calendar.reminderForm.save"),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
+                                final reminder = Reminder(
+                                  id: existing?.id ?? 0,
+                                  title: titleController.text,
+                                  dateTime: formatted,
+                                  sendNotification: sendNotification.value,
+                                  color: colorHex,
+                                );
+                                isSaving.value = true;
+                                await Future.delayed(const Duration(milliseconds: 100));
+                                try {
+                                  if (existing != null) {
+                                    await CalendarService.updateReminder(reminder);
+                                  } else {
+                                    await CalendarService.createReminder(reminder);
+                                  }
+                                  if (Get.isBottomSheetOpen == true) {
+                                    Get.back(closeOverlays: false);
+                                  }
+                                  CustomSnackbar.show(
+                                    title: languageService.tr("common.success"),
+                                    message: existing != null
+                                        ? languageService.tr("calendar.success.reminderUpdated")
+                                        : languageService.tr("calendar.success.reminderAdded"),
+                                    type: SnackbarType.success,
+                                  );
+                                  await loadReminders();
+                                } catch (e) {
+                                  CustomSnackbar.show(
+                                    title: languageService.tr("common.error"),
+                                    message: "${languageService.tr("calendar.errors.operationFailed")}: $e",
+                                    type: SnackbarType.error,
+                                  );
+                                } finally {
+                                  isSaving.value = false;
+                                }
+                              },
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: saving ? Color(0xffef5050).withAlpha(180) : Color(0xffef5050),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: saving
+                                ? SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : Text(
+                                    existing != null
+                                        ? languageService.tr("calendar.reminderForm.update")
+                                        : languageService.tr("calendar.reminderForm.save"),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                   ),
                 ],
               ),

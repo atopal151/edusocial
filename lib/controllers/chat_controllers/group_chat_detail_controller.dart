@@ -73,6 +73,47 @@ class GroupChatDetailController extends GetxController {
   final RxList<File> selectedFiles = <File>[].obs;
   final RxBool isSendingMessage = false.obs;
 
+  /// Yanıtlanacak mesaj (grup reply)
+  final Rxn<GroupMessageModel> replyingToMessage = Rxn<GroupMessageModel>();
+
+  void setReplyingTo(GroupMessageModel? message) {
+    replyingToMessage.value = message;
+  }
+
+  void clearReplyingTo() {
+    replyingToMessage.value = null;
+  }
+
+  /// Yanıtlanan mesaja scroll ve vurgu (reply önizlemesine tıklanınca)
+  void navigateToMessage(String messageId) {
+    try {
+      final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+      if (messageIndex == -1) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          if (!scrollController.hasClients) return;
+          final messagePosition = messageIndex * 100.0;
+          final screenHeight = Get.mediaQuery.size.height;
+          final targetPosition = messagePosition - (screenHeight * 0.3);
+          final finalPosition = targetPosition.clamp(0.0, scrollController.position.maxScrollExtent);
+
+          scrollController.animateTo(
+            finalPosition,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
+
+          highlightMessage(messageId);
+        } catch (e) {
+          debugPrint('❌ [GroupChatDetailController] navigateToMessage scroll error: $e');
+        }
+      });
+    } catch (e) {
+      debugPrint('❌ [GroupChatDetailController] navigateToMessage error: $e');
+    }
+  }
+
   RxString pollQuestion = ''.obs;
   RxList<String> pollOptions = <String>[].obs;
   RxMap<String, int> pollVotes = <String, int>{}.obs;
@@ -662,9 +703,30 @@ class GroupChatDetailController extends GetxController {
         final linkList = messageData['group_chat_link'] as List<dynamic>;
         links = linkList.map((l) => l['link'] ?? '').cast<String>().toList();
       }
-      
 
-      
+      // Reply (yanıt) bilgisi — socket'ten gelen mesajda varsa
+      String? replyId = messageData['reply_id']?.toString();
+      String? replyMessageText;
+      String? replyMessageSenderName;
+      bool replyHasImageMedia = false;
+      bool replyHasLinkMedia = false;
+      final replyMessage = messageData['reply_message'] ?? messageData['reply'];
+      if (replyMessage is Map<String, dynamic>) {
+        replyMessageText = replyMessage['content']?.toString() ?? replyMessage['message']?.toString();
+        final replySender = replyMessage['sender'] ?? replyMessage['user'];
+        if (replySender is Map<String, dynamic>) {
+          replyMessageSenderName = replySender['name']?.toString();
+        }
+        final replyMedia = replyMessage['media'] as List<dynamic>?;
+        if (replyMedia != null && replyMedia.isNotEmpty) {
+          replyHasImageMedia = true;
+        }
+        final replyLinks = replyMessage['links'] as List<dynamic>? ?? replyMessage['group_chat_link'] as List<dynamic>?;
+        if (replyLinks != null && replyLinks.isNotEmpty) {
+          replyHasLinkMedia = true;
+        }
+      }
+
       final newMessage = GroupMessageModel(
         id: messageId,
         senderId: messageData['user_id']?.toString() ?? '',
@@ -683,6 +745,11 @@ class GroupChatDetailController extends GetxController {
         surveyId: surveyId,
         links: links,
         media: media,
+        replyId: replyId,
+        replyMessageText: replyMessageText,
+        replyMessageSenderName: replyMessageSenderName,
+        replyHasImageMedia: replyHasImageMedia,
+        replyHasLinkMedia: replyHasLinkMedia,
       );
       
       messages.add(newMessage);
@@ -802,7 +869,12 @@ class GroupChatDetailController extends GetxController {
                   surveyId: messageData['surveyId'],
                   choiceIds: messageData['choiceIds'],
                   surveyData: messageData['surveyData'],
-                  isPinned: chat.isPinned, // Pin durumunu ekle
+                  isPinned: chat.isPinned,
+                  replyId: chat.replyId,
+                  replyMessageText: chat.replyMessageText,
+                  replyMessageSenderName: chat.replyMessageSenderName,
+                  replyHasImageMedia: chat.replyHasImageMedia,
+                  replyHasLinkMedia: chat.replyHasLinkMedia,
                 );
             
             processedMessages.add(message);
@@ -1606,6 +1678,7 @@ class GroupChatDetailController extends GetxController {
           message: nonLinkText,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
           links: normalizedUrls,
+          replyId: replyingToMessage.value?.id,
         );
       } else {
         success = await _groupServices.sendGroupMessage(
@@ -1613,10 +1686,12 @@ class GroupChatDetailController extends GetxController {
           message: text,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
           links: null,
+          replyId: replyingToMessage.value?.id,
         );
       }
 
       if (success) {
+        clearReplyingTo();
         selectedFiles.clear();
         debugPrint('✅ Mesaj API\'ye gönderildi, socket\'ten gelmesi bekleniyor.');
         scrollToBottomForNewMessage();
@@ -1663,9 +1738,11 @@ class GroupChatDetailController extends GetxController {
         message: '', // Boş text
         mediaFiles: selectedFiles,
         links: null,
+        replyId: replyingToMessage.value?.id,
       );
       
       if (success) {
+        clearReplyingTo();
         selectedFiles.clear();
         scrollToBottomForNewMessage();
         Future.delayed(Duration(milliseconds: 300), () async {

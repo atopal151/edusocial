@@ -23,6 +23,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   // Socket'ten gelen toplam okunmamış mesaj sayısı
   var totalUnreadCount = 0.obs;
 
+  /// Groups tab badge'in anlık yenilenmesi için tetikleyici
+  var groupUnreadTrigger = 0.obs;
+
   final TextEditingController searchController = TextEditingController();
 
   late SocketService _socketService;
@@ -407,9 +410,10 @@ class ChatController extends GetxController with WidgetsBindingObserver {
                   debugPrint("📡 [ChatController] ⏭️ Kendi grup mesajımız - unread count değişmedi");
                 }
                 
-                // UI'ı güncelle
+                // UI'ı güncelle (tab badge anlık yenilensin)
                 groupChatList.refresh();
-                
+                groupUnreadTrigger.value++;
+
                 // GroupController'daki veriyi de güncelle (tab bar badge için)
                 try {
                   final groupController = Get.find<GroupController>();

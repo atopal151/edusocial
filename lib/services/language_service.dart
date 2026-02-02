@@ -185,8 +185,8 @@ class LanguageService extends GetxService {
         }
         
         if (response.statusCode == 200) {
-          final endpoint = token != null ? 'json-language' : 'json-language-noauth';
-          printFullText('🌐 [LanguageService] Dil API ham veri ($endpoint): ${response.body}');
+          //final endpoint = token != null ? 'json-language' : 'json-language-noauth';
+          //printFullText('🌐 [LanguageService] Dil API ham veri ($endpoint): ${response.body}');
           final jsonData = json.decode(response.body);
           final translations = jsonData['translations'] as Map<String, dynamic>?;
           debugPrint('✅ API\'dan çeviriler başarıyla alındı (deneme $attempt)');
@@ -381,12 +381,12 @@ class LanguageService extends GetxService {
       //debugPrint('🌐 Languages API Status Code: ${response.statusCode}');
       
       if (response.statusCode == 200) {
-        printFullText('🌐 Languages API Response: ${response.body}');
+        //printFullText('🌐 Languages API Response: ${response.body}');
         
         // JSON parsing
         try {
-          final jsonData = json.decode(response.body);
-          printFullText('🌐 Languages API Parsed JSON: ${json.encode(jsonData)}');
+          //final jsonData = json.decode(response.body);
+          //printFullText('🌐 Languages API Parsed JSON: ${json.encode(jsonData)}');
         } catch (e) {
           debugPrint('❌ Languages API JSON parsing error: $e');
         }
@@ -418,7 +418,7 @@ class LanguageService extends GetxService {
       //debugPrint('🌐 Frontend Language API Status Code: ${response.statusCode}');
       
       if (response.statusCode == 200) {
-        printFullText('🌐 Frontend Language API Response: ${response.body}');
+        //printFullText('🌐 Frontend Language API Response: ${response.body}');
         
         // JSON parsing
         try {
@@ -448,12 +448,12 @@ class LanguageService extends GetxService {
       //debugPrint('🌐 Frontend No-Auth Language API Status Code: ${response.statusCode}');
       
       if (response.statusCode == 200) {
-        printFullText('🌐 Frontend No-Auth Language API Response: ${response.body}');
+        //printFullText('🌐 Frontend No-Auth Language API Response: ${response.body}');
         
         // JSON parsing
         try {
-          final jsonData = json.decode(response.body);
-          printFullText('🌐 Frontend No-Auth Language API Parsed JSON: ${json.encode(jsonData)}');
+          //final jsonData = json.decode(response.body);
+          //printFullText('🌐 Frontend No-Auth Language API Parsed JSON: ${json.encode(jsonData)}');
         } catch (e) {
           debugPrint('❌ Frontend No-Auth Language API JSON parsing error: $e');
         }

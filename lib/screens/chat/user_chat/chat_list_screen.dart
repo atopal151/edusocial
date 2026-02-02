@@ -273,10 +273,9 @@ class _ChatListScreenState extends State<ChatListScreen>
                   color: Color(0xff272727),
                 ),
                 tabs: [
-                  // Kişisel Mesajlar Tab'ı (Sadece private chat unread count ile)
+                  // Kişisel Mesajlar Tab'ı (okunmamış varsa kırmızı nokta)
                   Obx(() {
-                    // People sekmesi sadece private chat unread count'unu gösterir
-                    final unreadCount = chatController.privateUnreadCount;
+                    final hasUnread = chatController.privateUnreadCount > 0;
                     final peopleText = languageService.tr("chat.chatList.tabs.people");
                     return Tab(
                       child: Row(
@@ -290,21 +289,14 @@ class _ChatListScreenState extends State<ChatListScreen>
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          if (unreadCount > 0) ...[
+                          if (hasUnread) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              width: 8,
+                              height: 8,
                               decoration: BoxDecoration(
                                 color: const Color(0xffef5050),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                unreadCount.toString(),
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                                shape: BoxShape.circle,
                               ),
                             ),
                           ],
@@ -312,9 +304,10 @@ class _ChatListScreenState extends State<ChatListScreen>
                       ),
                     );
                   }),
-                  // Grup Mesajları Tab'ı (ChatController'dan gelen groupUnreadCount ile)
+                  // Grup Mesajları Tab'ı (okunmamış varsa kırmızı nokta)
                   Obx(() {
-                    final unreadCount = chatController.groupUnreadCount;
+                    chatController.groupUnreadTrigger.value;
+                    final hasUnread = chatController.groupUnreadCount > 0;
                     final groupsText = languageService.tr("chat.chatList.tabs.groups");
                     return Tab(
                       child: Row(
@@ -328,21 +321,14 @@ class _ChatListScreenState extends State<ChatListScreen>
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          if (unreadCount > 0) ...[
+                          if (hasUnread) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              width: 8,
+                              height: 8,
                               decoration: BoxDecoration(
                                 color: const Color(0xffef5050),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                unreadCount.toString(),
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                                shape: BoxShape.circle,
                               ),
                             ),
                           ],

@@ -22,7 +22,16 @@ class GroupMessageModel {
   final List<int>? choiceIds;
   final Map<String, dynamic>? surveyData;
   final bool isPinned; // Pin durumu için field ekle
-
+  /// Yanıtlanan mesajın ID'si (reply)
+  final String? replyId;
+  /// Yanıtlanan mesajın metni (API'dan dönerse)
+  final String? replyMessageText;
+  /// Yanıtlanan mesajın gönderen adı
+  final String? replyMessageSenderName;
+  /// Yanıtlanan mesaj görsel içeriyor mu — önizlemede "Fotoğraf" göstermek için
+  final bool replyHasImageMedia;
+  /// Yanıtlanan mesaj link içeriyor mu — önizlemede "Link" göstermek için
+  final bool replyHasLinkMedia;
 
   GroupMessageModel({
     required this.id,
@@ -45,7 +54,12 @@ class GroupMessageModel {
     this.surveyId,
     this.choiceIds,
     this.surveyData,
-    this.isPinned = false, // Default value for isPinned
+    this.isPinned = false,
+    this.replyId,
+    this.replyMessageText,
+    this.replyMessageSenderName,
+    this.replyHasImageMedia = false,
+    this.replyHasLinkMedia = false,
   });
 
   // Create a copy with updated pin status
@@ -71,6 +85,11 @@ class GroupMessageModel {
     List<int>? choiceIds,
     Map<String, dynamic>? surveyData,
     bool? isPinned,
+    String? replyId,
+    String? replyMessageText,
+    String? replyMessageSenderName,
+    bool? replyHasImageMedia,
+    bool? replyHasLinkMedia,
   }) {
     return GroupMessageModel(
       id: id ?? this.id,
@@ -94,7 +113,30 @@ class GroupMessageModel {
       choiceIds: choiceIds ?? this.choiceIds,
       surveyData: surveyData ?? this.surveyData,
       isPinned: isPinned ?? this.isPinned,
+      replyId: replyId ?? this.replyId,
+      replyMessageText: replyMessageText ?? this.replyMessageText,
+      replyMessageSenderName: replyMessageSenderName ?? this.replyMessageSenderName,
+      replyHasImageMedia: replyHasImageMedia ?? this.replyHasImageMedia,
+      replyHasLinkMedia: replyHasLinkMedia ?? this.replyHasLinkMedia,
     );
+  }
+
+  /// Yanıt önizlemesi için metin (metin, görsel, link, belge)
+  String get replyPreviewDisplayText {
+    final text = (content).trim();
+    if (text.isNotEmpty) {
+      return text.length > 40 ? '${text.substring(0, 40)}...' : text;
+    }
+    if (messageType == GroupMessageType.image || (media?.isNotEmpty ?? false)) return '📷 Photo';
+    if (messageType == GroupMessageType.link || (links?.isNotEmpty ?? false)) return '🔗 Link';
+    if (messageType == GroupMessageType.document) return '📎 Document';
+    return 'Media';
+  }
+
+  /// Yanıt önizlemesinde gösterilecek görsel URL (varsa)
+  String? get replyPreviewImageUrl {
+    if (media != null && media!.isNotEmpty) return media!.first;
+    return null;
   }
 
   // Factory constructor to create GroupMessageModel from JSON
@@ -149,6 +191,28 @@ class GroupMessageModel {
     // Parse isPinned status
     final bool isPinned = json['is_pinned'] == true;
 
+    // Reply (yanıt) bilgisi
+    final replyId = json['reply_id'] != null ? json['reply_id'].toString() : null;
+    String? replyMessageText;
+    String? replyMessageSenderName;
+    bool replyHasImageMedia = false;
+    bool replyHasLinkMedia = false;
+    final replyMessage = json['reply_message'] ?? json['reply'];
+    if (replyMessage is Map<String, dynamic>) {
+      replyMessageText = replyMessage['content']?.toString() ?? replyMessage['message']?.toString();
+      final replySender = replyMessage['sender'];
+      if (replySender is Map<String, dynamic>) {
+        replyMessageSenderName = replySender['name']?.toString();
+      }
+      final replyMedia = replyMessage['media'] as List<dynamic>?;
+      if (replyMedia != null && replyMedia.isNotEmpty) {
+        replyHasImageMedia = true;
+      }
+      final replyLinks = replyMessage['links'] as List<dynamic>? ?? replyMessage['group_chat_link'] as List<dynamic>? ?? replyMessage['message_link'] as List<dynamic>?;
+      if (replyLinks != null && replyLinks.isNotEmpty) {
+        replyHasLinkMedia = true;
+      }
+    }
 
     // Sender bilgisi (doğrulama için)
     final Map<String, dynamic>? sender =
@@ -176,6 +240,11 @@ class GroupMessageModel {
       choiceIds: json['choice_ids'] != null ? List<int>.from(json['choice_ids']) : null,
       surveyData: surveyData,
       isPinned: isPinned,
+      replyId: replyId,
+      replyMessageText: replyMessageText,
+      replyMessageSenderName: replyMessageSenderName,
+      replyHasImageMedia: replyHasImageMedia,
+      replyHasLinkMedia: replyHasLinkMedia,
     );
   }
 

@@ -55,28 +55,29 @@ class NotificationHandler {
   }
 
   String _resolveType(Map<String, dynamic> data) {
-    final raw = data['type']?.toString() ?? '';
+    String raw = data['type']?.toString() ?? '';
+    if (raw.isEmpty && data['data'] != null && data['data'] is Map) {
+      raw = data['data']['type']?.toString() ?? '';
+    }
+    if (raw.isEmpty) {
+      final nested = data['notification_data'];
+      if (nested is Map && nested['type'] != null) {
+        raw = nested['type'].toString();
+      }
+    }
     if (raw.isNotEmpty) {
+      // OneSignal / backend bazen "new_message", "new_group_message" gönderir
+      if (raw == 'new_message' || raw == 'message' || raw == 'text') {
+        debugPrint('🔍 [NotificationHandler] Type resolved: message');
+        return 'message';
+      }
+      if (raw == 'new_group_message' || raw == 'group_message' || raw == 'group') {
+        debugPrint('🔍 [NotificationHandler] Type resolved: group_message');
+        return 'group_message';
+      }
       debugPrint('🔍 [NotificationHandler] Type resolved (direct): $raw');
       return raw;
     }
-    
-    // data.data.type kontrolü
-    if (data['data'] != null && data['data'] is Map) {
-      final dataType = data['data']['type']?.toString();
-      if (dataType != null && dataType.isNotEmpty) {
-        debugPrint('🔍 [NotificationHandler] Type resolved (data.data.type): $dataType');
-        return dataType;
-      }
-    }
-    
-    final nested = data['notification_data'];
-    if (nested is Map && nested['type'] != null) {
-      final nestedType = nested['type'].toString();
-      debugPrint('🔍 [NotificationHandler] Type resolved (notification_data): $nestedType');
-      return nestedType;
-    }
-    
     debugPrint('⚠️ [NotificationHandler] Type not found, using default: notification');
     return 'notification';
   }
@@ -191,11 +192,47 @@ class NotificationHandler {
     if (id != null) return id;
     if (data['data'] is Map) {
       final d = data['data'] as Map;
+      final n = d['notification_data'];
+      if (n is Map) {
+        final cid = n['conversation_id'] ?? n['conversationId'];
+        if (cid != null) return cid;
+      }
       return d['conversation_id'] ?? d['conversationId'];
     }
     if (data['notification_data'] is Map) {
       final n = data['notification_data'] as Map;
+      final full = n['notification_full_data'];
+      if (full is Map) {
+        final cid = full['conversation_id'] ?? full['conversationId'];
+        if (cid != null) return cid;
+      }
       return n['conversation_id'] ?? n['conversationId'];
+    }
+    return null;
+  }
+
+  /// Grup mesajı bildirimi için group_id çıkarır (data, data.data, notification_data)
+  dynamic _extractGroupId(Map<String, dynamic> data) {
+    final id = data['group_id'] ?? data['groupId'];
+    if (id != null) return id;
+    if (data['data'] is Map) {
+      final d = data['data'] as Map;
+      final n = d['notification_data'];
+      if (n is Map) {
+        final gid = n['group_id'] ?? n['groupId'];
+        if (gid != null) return gid;
+      }
+      final gid = d['group_id'] ?? d['groupId'];
+      if (gid != null) return gid;
+    }
+    if (data['notification_data'] is Map) {
+      final n = data['notification_data'] as Map;
+      final full = n['notification_full_data'];
+      if (full is Map) {
+        final gid = full['group_id'] ?? full['groupId'];
+        if (gid != null) return gid;
+      }
+      return n['group_id'] ?? n['groupId'];
     }
     return null;
   }
@@ -284,9 +321,16 @@ class NotificationHandler {
         break;
       case 'group':
       case 'group_message':
-        final groupId = data['group_id'] ?? data['id'];
+        final groupId = _extractGroupId(data) ?? data['group_id'] ?? data['id'];
         if (groupId != null) {
-          Get.toNamed(Routes.groupChatDetail, arguments: {'group_id': groupId});
+          debugPrint('🔔 [NotificationHandler] Grup mesajı bildirimi - group_id: $groupId');
+          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
+          Future.delayed(const Duration(milliseconds: 150), () {
+            Get.toNamed(Routes.groupChatDetail, arguments: {'groupId': groupId});
+          });
+        } else {
+          debugPrint('❌ [NotificationHandler] Grup mesajı - group_id eksik');
+          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
         }
         break;
       case 'post-like':
@@ -371,7 +415,39 @@ class NotificationHandler {
         }
         break;
       default:
-        Get.toNamed('/home');
+        // type "notification" veya bilinmeyen: payload'dan mesaj/grup mesajı olup olmadığını tahmin et
+        final groupId = _extractGroupId(data);
+        final conversationId = _extractConversationId(data);
+        final senderId = _extractSenderId(data);
+        if (groupId != null) {
+          debugPrint('🔔 [NotificationHandler] Varsayılan - grup mesajı olarak yönlendiriliyor: $groupId');
+          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
+          Future.delayed(const Duration(milliseconds: 150), () {
+            Get.toNamed(Routes.groupChatDetail, arguments: {'groupId': groupId});
+          });
+        } else if (conversationId != null && senderId != null) {
+          final sender = _extractSenderMap(data);
+          final name = _extractSenderName(sender, data);
+          final username = (sender?['username'] ?? data['sender_username'])?.toString() ?? '';
+          final avatarUrl = (sender?['avatar_url'] ?? sender?['avatar'])?.toString() ?? '';
+          final isOnline = (sender?['is_online'] ?? data['sender_is_online']) == true;
+          final isVerified = (sender?['is_verified'] ?? data['sender_is_verified']) == true;
+          debugPrint('🔔 [NotificationHandler] Varsayılan - özel mesaj olarak yönlendiriliyor');
+          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
+          Future.delayed(const Duration(milliseconds: 150), () {
+            Get.toNamed(Routes.chatDetail, arguments: {
+              'userId': senderId is int ? senderId : int.tryParse(senderId.toString()),
+              'conversationId': conversationId,
+              'name': name ?? 'Bilinmeyen',
+              'username': username,
+              'avatarUrl': avatarUrl,
+              'isOnline': isOnline,
+              'isVerified': isVerified,
+            });
+          });
+        } else {
+          Get.toNamed('/home');
+        }
     }
   }
 

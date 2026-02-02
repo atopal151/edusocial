@@ -174,15 +174,15 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
                     children: [
                       Icon(
                         Icons.push_pin,
-                        size: 18,
+                        size: 12,
                         color: Color(0xFFef5050),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 3),
                       Expanded(
                         child: Text(
                           '${_languageService.tr('groups.pinnedMessages.title')} (${pinnedMessages.length})',
                           style: GoogleFonts.inter(
-                            fontSize: 13,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xff414751),
                           ),
@@ -418,28 +418,7 @@ class _PinnedMessagesWidgetState extends State<PinnedMessagesWidget> {
   void _navigateToMessage(int messageId) {
     try {
       final controller = Get.find<ChatDetailController>();
-      final messageIndex = controller.messages.indexWhere((msg) => msg.id == messageId);
-      
-      if (messageIndex != -1) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          try {
-            final messagePosition = messageIndex * 100.0;
-            final screenHeight = MediaQuery.of(context).size.height;
-            final targetPosition = messagePosition - (screenHeight * 0.3);
-            final finalPosition = math.max(0, targetPosition).toDouble();
-            
-            controller.scrollController.animateTo(
-              finalPosition,
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeInOut,
-            );
-            
-            controller.highlightMessage(messageId);
-          } catch (e) {
-            debugPrint('❌ [PinnedMessagesWidget] Scroll animation error: $e');
-          }
-        });
-      }
+      controller.navigateToMessage(messageId);
     } catch (e) {
       debugPrint('❌ [PinnedMessagesWidget] Navigation error: $e');
     }

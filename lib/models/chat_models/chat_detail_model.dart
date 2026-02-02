@@ -20,7 +20,17 @@ class MessageModel {
   final List<MessageLinkModel> messageLink;
   final List<DetailDocumentModel>? messageDocument;
   final String? senderAvatarUrl;
-  final bool isPinned; // New field for pin status
+  final bool isPinned;
+  /// Yanıtlanan mesajın ID'si (reply)
+  final int? replyId;
+  /// Yanıtlanan mesajın metni (API'dan dönerse gösterim için)
+  final String? replyMessageText;
+  /// Yanıtlanan mesajın gönderen adı (API'dan dönerse gösterim için)
+  final String? replyMessageSenderName;
+  /// Yanıtlanan mesaj görsel (fotoğraf) içeriyor mu — önizlemede "Fotoğraf" göstermek için
+  final bool replyHasImageMedia;
+  /// Yanıtlanan mesaj link içeriyor mu — önizlemede "Link" göstermek için
+  final bool replyHasLinkMedia;
 
   MessageModel({
     required this.id,
@@ -37,7 +47,12 @@ class MessageModel {
     required this.messageLink,
     this.messageDocument,
     this.senderAvatarUrl,
-    this.isPinned = false, // Default to false
+    this.isPinned = false,
+    this.replyId,
+    this.replyMessageText,
+    this.replyMessageSenderName,
+    this.replyHasImageMedia = false,
+    this.replyHasLinkMedia = false,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json, {int? currentUserId}) {
@@ -57,6 +72,34 @@ class MessageModel {
 
     // Check if message is pinned
     final isPinned = json['is_pinned'] == true || (json['is_pinned'] is int && json['is_pinned'] == 1);
+
+    // Reply (yanıt) bilgisi
+    final replyId = json['reply_id'] != null ? int.tryParse(json['reply_id'].toString()) : null;
+    String? replyMessageText;
+    String? replyMessageSenderName;
+    bool replyHasImageMedia = false;
+    bool replyHasLinkMedia = false;
+    final replyMessage = json['reply_message'] ?? json['reply'];
+    if (replyMessage is Map<String, dynamic>) {
+      replyMessageText = replyMessage['message']?.toString();
+      final replySender = replyMessage['sender'];
+      if (replySender is Map<String, dynamic>) {
+        replyMessageSenderName = replySender['name']?.toString();
+      }
+      // Yanıtlanan mesaj görsel içeriyorsa önizlemede "Fotoğraf" göstereceğiz
+      final replyMedia = replyMessage['message_media'] as List<dynamic>?;
+      if (replyMedia != null && replyMedia.isNotEmpty) {
+        replyHasImageMedia = replyMedia.any((m) {
+          final type = m is Map ? (m['type'] as String?) : null;
+          return type != null && type.startsWith('image/');
+        });
+      }
+      // Yanıtlanan mesaj link içeriyorsa önizlemede "Link" göstereceğiz
+      final replyLink = replyMessage['message_link'] as List<dynamic>?;
+      if (replyLink != null && replyLink.isNotEmpty) {
+        replyHasLinkMedia = true;
+      }
+    }
 
     return MessageModel(
       id: json['id'] is int
@@ -92,8 +135,37 @@ class MessageModel {
           ? senderJson['avatar_url'] ?? ""
           : "",
       isPinned: isPinned,
+      replyId: replyId,
+      replyMessageText: replyMessageText,
+      replyMessageSenderName: replyMessageSenderName,
+      replyHasImageMedia: replyHasImageMedia,
+      replyHasLinkMedia: replyHasLinkMedia,
     );
   }
+
+  /// Yanıt önizlemesi için metin — her mesaj tipi için (metin, görsel, link, belge)
+  String get replyPreviewDisplayText {
+    final text = message.trim();
+    if (text.isNotEmpty) {
+      return text.length > 40 ? '${text.substring(0, 40)}...' : text;
+    }
+    if (messageMedia.any((m) => m.isImage)) return '📷 Photo';
+    if (messageLink.isNotEmpty) return '🔗 Link';
+    if ((messageDocument?.isNotEmpty ?? false) || messageMedia.any((m) => m.isDocument)) {
+      return '📎 Document';
+    }
+    return 'Media';
+  }
+
+  /// Yanıt önizlemesinde gösterilecek görsel URL (varsa)
+  String? get replyPreviewImageUrl {
+    final imageList = messageMedia.where((m) => m.isImage).toList();
+    if (imageList.isEmpty) return null;
+    return imageList.first.fullPath;
+  }
+
+  /// Yanıtlanan mesaj görsel içeriyor mu (önizlemede thumbnail göstermek için)
+  bool get hasReplyPreviewImage => replyPreviewImageUrl != null;
 
   // Create a copy with updated pin status
   MessageModel copyWith({
@@ -112,6 +184,11 @@ class MessageModel {
     List<DetailDocumentModel>? messageDocument,
     String? senderAvatarUrl,
     bool? isPinned,
+    int? replyId,
+    String? replyMessageText,
+    String? replyMessageSenderName,
+    bool? replyHasImageMedia,
+    bool? replyHasLinkMedia,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -129,6 +206,11 @@ class MessageModel {
       messageDocument: messageDocument ?? this.messageDocument,
       senderAvatarUrl: senderAvatarUrl ?? this.senderAvatarUrl,
       isPinned: isPinned ?? this.isPinned,
+      replyId: replyId ?? this.replyId,
+      replyMessageText: replyMessageText ?? this.replyMessageText,
+      replyMessageSenderName: replyMessageSenderName ?? this.replyMessageSenderName,
+      replyHasImageMedia: replyHasImageMedia ?? this.replyHasImageMedia,
+      replyHasLinkMedia: replyHasLinkMedia ?? this.replyHasLinkMedia,
     );
   }
 }

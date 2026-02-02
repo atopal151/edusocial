@@ -374,6 +374,8 @@
       },
       "documentInfo": "MB •"
     },
+    "replyPhoto": "Zdjęcie",
+    "replyLink": "Link",
     "messageInput": {
       "placeholder": "Napisz wiadomość...",
       "fileSelected": "Plik wybrany. Możesz napisać wiadomość lub wysłać bezpośrednio...",

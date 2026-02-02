@@ -50,8 +50,13 @@ class ChatDetailScreen extends StatelessWidget {
             widgets.add(DateSeparatorWidget(date: messageDate));
           }
 
-          // Mesaj widget'ı
-          widgets.add(MessageWidgetFactory.buildMessageWidget(message, controller));
+          // Mesaj widget'ı — index ile benzersiz key (GlobalKey duplicate hatasını önler)
+          widgets.add(
+            KeyedSubtree(
+              key: ValueKey('msg_${message.id}_$messageIndex'),
+              child: MessageWidgetFactory.buildMessageWidget(message, controller),
+            ),
+          );
 
           return Column(
             children: widgets,

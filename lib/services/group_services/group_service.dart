@@ -490,6 +490,7 @@ class GroupServices {
     List<File>? mediaFiles,
     List<String>? links,
     List<String>? pollOptions,
+    String? replyId,
   }) async {
     final box = GetStorage();
     final token = box.read('token');
@@ -503,6 +504,11 @@ class GroupServices {
 
       // Message alanını her zaman gönder (boş string olsa bile)
       request.fields['message'] = message ?? '';
+
+      // Yanıtlanan mesaj ID'si (grup mesajı reply)
+      if (replyId != null && replyId.isNotEmpty) {
+        request.fields['reply_id'] = replyId;
+      }
 
       // Media dosyalarını ekle
       if (mediaFiles != null && mediaFiles.isNotEmpty) {

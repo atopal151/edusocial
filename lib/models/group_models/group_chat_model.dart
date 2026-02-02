@@ -15,6 +15,11 @@ class GroupChatModel {
   final int? surveyId;
   final Map<String, dynamic>? survey;
   final bool isPinned; // Pin status field
+  final String? replyId;
+  final String? replyMessageText;
+  final String? replyMessageSenderName;
+  final bool replyHasImageMedia;
+  final bool replyHasLinkMedia;
 
   GroupChatModel({
     required this.id,
@@ -31,15 +36,39 @@ class GroupChatModel {
     required this.groupChatLink,
     this.surveyId,
     this.survey,
-    this.isPinned = false, // Default to false
+    this.isPinned = false,
+    this.replyId,
+    this.replyMessageText,
+    this.replyMessageSenderName,
+    this.replyHasImageMedia = false,
+    this.replyHasLinkMedia = false,
   });
 
   factory GroupChatModel.fromJson(Map<String, dynamic> json) {
-    // Parse pin status
     final isPinned = json['is_pinned'] == true || (json['is_pinned'] is int && json['is_pinned'] == 1);
-    
 
-    
+    String? replyId = json['reply_id']?.toString();
+    String? replyMessageText;
+    String? replyMessageSenderName;
+    bool replyHasImageMedia = false;
+    bool replyHasLinkMedia = false;
+    final replyMessage = json['reply_message'] ?? json['reply'];
+    if (replyMessage is Map<String, dynamic>) {
+      replyMessageText = replyMessage['content']?.toString() ?? replyMessage['message']?.toString();
+      final replySender = replyMessage['sender'] ?? replyMessage['user'];
+      if (replySender is Map<String, dynamic>) {
+        replyMessageSenderName = replySender['name']?.toString();
+      }
+      final replyMedia = replyMessage['media'] as List<dynamic>?;
+      if (replyMedia != null && replyMedia.isNotEmpty) {
+        replyHasImageMedia = true;
+      }
+      final replyLinks = replyMessage['links'] as List<dynamic>? ?? replyMessage['group_chat_link'] as List<dynamic>?;
+      if (replyLinks != null && replyLinks.isNotEmpty) {
+        replyHasLinkMedia = true;
+      }
+    }
+
     return GroupChatModel(
       id: json['id'] ?? 0,
       groupId: json['group_id'] ?? 0,
@@ -62,6 +91,11 @@ class GroupChatModel {
       surveyId: json['survey_id'],
       survey: json['survey'] as Map<String, dynamic>?,
       isPinned: isPinned,
+      replyId: replyId,
+      replyMessageText: replyMessageText,
+      replyMessageSenderName: replyMessageSenderName,
+      replyHasImageMedia: replyHasImageMedia,
+      replyHasLinkMedia: replyHasLinkMedia,
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../components/snackbars/custom_snackbar.dart';
+import '../../controllers/calendar_controller.dart';
 import '../../models/calendar_model.dart';
 import '../../services/calendar_service.dart';
 import '../../services/language_service.dart';
@@ -12,14 +14,13 @@ Future<void> showReminderDetailDialog(BuildContext context, int reminderId) asyn
   showDialog(
     context: context,
     barrierDismissible: true,
-    builder: (BuildContext context) {
+    builder: (BuildContext dialogContext) {
       return FutureBuilder<Reminder>(
         future: CalendarService.getReminderById(reminderId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const AlertDialog(
-
-            backgroundColor: Color(0xffffffff),
+              backgroundColor: Color(0xffffffff),
               content: SizedBox(
                 height: 80,
                 child: Center(child: CircularProgressIndicator(color: Color(0xffef5050),)),
@@ -35,51 +36,122 @@ Future<void> showReminderDetailDialog(BuildContext context, int reminderId) asyn
           }
 
           final reminder = snapshot.data!;
-          return AlertDialog(
-            backgroundColor: Color(0xffffffff),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Text(languageService.tr("calendar.reminderDetail.title")),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Renk göstergesi
-                Row(
-                  children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: HexColor.fromHex(reminder.color),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey.shade300, width: 1),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text("🎨 ${languageService.tr("calendar.reminderDetail.colorLabel")}: ${reminder.color}",
-                        style: TextStyle(fontSize: 14)),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text("📝 ${languageService.tr("calendar.reminderDetail.titleLabel")}: ${reminder.title}",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                SizedBox(height: 10),
-                Text("⏰ ${languageService.tr("calendar.reminderDetail.timeLabel")}: ${formatSimpleDateClock(reminder.dateTime)}",
-                    style: TextStyle(fontSize: 14)),
-                SizedBox(height: 10),
-                Text("🔔 ${languageService.tr("calendar.reminderDetail.notificationLabel")}: ${reminder.sendNotification ? languageService.tr("calendar.reminderDetail.notificationOn") : languageService.tr("calendar.reminderDetail.notificationOff")}",
-                    style: TextStyle(fontSize: 14)),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(languageService.tr("calendar.reminderDetail.close"), style: TextStyle(color: Color(0xffef5050))),
-              ),
-            ],
+          return _ReminderDetailDialogContent(
+            reminder: reminder,
+            dialogContext: dialogContext,
+            languageService: languageService,
           );
         },
       );
     },
   );
+}
+
+class _ReminderDetailDialogContent extends StatefulWidget {
+  final Reminder reminder;
+  final BuildContext dialogContext;
+  final LanguageService languageService;
+
+  const _ReminderDetailDialogContent({
+    required this.reminder,
+    required this.dialogContext,
+    required this.languageService,
+  });
+
+  @override
+  State<_ReminderDetailDialogContent> createState() => _ReminderDetailDialogContentState();
+}
+
+class _ReminderDetailDialogContentState extends State<_ReminderDetailDialogContent> {
+  bool _isSaving = false;
+
+  Future<void> _onSave() async {
+    setState(() => _isSaving = true);
+    // Loading'in ekranda görünmesi için bir frame bekle
+    await Future.delayed(Duration.zero);
+    if (!mounted) return;
+    try {
+      await CalendarService.updateReminder(widget.reminder);
+      try {
+        Get.find<CalendarController>().loadReminders();
+      } catch (_) {}
+      if (widget.dialogContext.mounted) {
+        Navigator.of(widget.dialogContext).pop();
+      }
+    } catch (e) {
+      CustomSnackbar.show(
+        title: widget.languageService.tr("common.error"),
+        message: "${widget.languageService.tr("calendar.errors.operationFailed")}: $e",
+        type: SnackbarType.error,
+      );
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final reminder = widget.reminder;
+    final lang = widget.languageService;
+    return AlertDialog(
+      backgroundColor: const Color(0xffffffff),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Text('dsdsds'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: HexColor.fromHex(reminder.color),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey.shade300, width: 1),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text("🎨 ${lang.tr("calendar.reminderDetail.colorLabel")}: ${reminder.color}",
+                  style: const TextStyle(fontSize: 14)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text("📝 ${lang.tr("calendar.reminderDetail.titleLabel")}: ${reminder.title}",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 10),
+          Text("⏰ ${lang.tr("calendar.reminderDetail.timeLabel")}: ${formatSimpleDateClock(reminder.dateTime)}",
+              style: const TextStyle(fontSize: 14)),
+          const SizedBox(height: 10),
+          Text("🔔 ${lang.tr("calendar.reminderDetail.notificationLabel")}: ${reminder.sendNotification ? lang.tr("calendar.reminderDetail.notificationOn") : lang.tr("calendar.reminderDetail.notificationOff")}",
+              style: const TextStyle(fontSize: 14)),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.of(widget.dialogContext).pop(),
+          child: Text(
+            lang.tr("calendar.reminderDetail.close"),
+            style: const TextStyle(color: Color(0xffef5050)),
+          ),
+        ),
+        TextButton(
+          onPressed: _isSaving ? null : _onSave,
+          child: _isSaving
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Color(0xffef5050),
+                  ),
+                )
+              : Text(
+                  lang.tr("calendar.reminderForm.save"),
+                  style: const TextStyle(color: Color(0xffef5050), fontWeight: FontWeight.w600),
+                ),
+        ),
+      ],
+    );
+  }
 }

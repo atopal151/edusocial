@@ -44,6 +44,85 @@ class _MessageInputFieldState extends State<MessageInputField> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Yanıtlanacak mesaj önizlemesi (reply) — tüm mesaj tipleri: metin, görsel, link, belge
+          Obx(() {
+            final replyingTo = widget.controller.replyingToMessage.value;
+            if (replyingTo != null) {
+              // Görsel / link içeren mesaja yanıt: "Fotoğraf" veya "Link" göster
+              final previewText = replyingTo.messageMedia.any((m) => m.isImage)
+                  ? '📸 ${languageService.tr("chat.replyPhoto")}'
+                  : replyingTo.messageLink.isNotEmpty
+                      ? '🔗 ${languageService.tr("chat.replyLink")}'
+                      : replyingTo.replyPreviewDisplayText;
+              final imageUrl = replyingTo.replyPreviewImageUrl;
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Color(0xfff0f0f0),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                  border: Border(bottom: BorderSide(color: Color(0xffe5e7eb), width: 1)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.reply, size: 18, color: Color(0xffef5050)),
+                    const SizedBox(width: 8),
+                    if (imageUrl != null && imageUrl.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.network(
+                            imageUrl,
+                            width: 36,
+                            height: 36,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              width: 36,
+                              height: 36,
+                              color: Colors.grey.shade300,
+                              child: Icon(Icons.image, size: 20, color: Colors.grey.shade600),
+                            ),
+                          ),
+                        ),
+                      ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            languageService.tr("comments.reply.replyTo"),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff6b7280),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            previewText,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xff374151),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, size: 20, color: Color(0xff6b7280)),
+                      onPressed: () => widget.controller.clearReplyingTo(),
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(minWidth: 32, minHeight: 32),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
           // Seçilen dosyaların önizlemesi
           Obx(() {
             if (widget.controller.selectedFiles.isNotEmpty) {

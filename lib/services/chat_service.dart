@@ -275,6 +275,7 @@ class ChatServices {
     String? conversationId,
     List<File>? mediaFiles,
     List<String>? links,
+    int? replyId,
   }) async {
     final token = _box.read('token');
     final url = Uri.parse('${AppConstants.baseUrl}/conversation');
@@ -286,6 +287,9 @@ class ChatServices {
     request.fields['receiver_id'] = receiverId.toString();
     if (conversationId != null) {
       request.fields['conversation_id'] = conversationId;
+    }
+    if (replyId != null) {
+      request.fields['reply_id'] = replyId.toString();
     }
 
     // Mesaj alanını her zaman gönder (boş string olsa bile)
@@ -478,9 +482,8 @@ class ChatServices {
       ),
       operation: 'Fetch Conversation Messages',
     );
-
     // API'dan gelen ham conversation messages response datasını printfulltext ile yazdır
-    printFullText('💬 =======================================');
+    /*printFullText('💬 =======================================');
     printFullText('💬 [ChatService] Conversation Messages API Response');
     printFullText('💬 =======================================');
     printFullText('💬 URL: $uri');
@@ -489,6 +492,7 @@ class ChatServices {
     printFullText('💬 Status Code: ${response.statusCode}');
     printFullText('💬 Response Body: ${response.body}');
     printFullText('💬 =======================================');
+*/
 
     final body = jsonDecode(response.body);
     final List<dynamic> messagesJson = body['data'];

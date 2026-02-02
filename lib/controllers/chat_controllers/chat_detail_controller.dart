@@ -59,6 +59,16 @@ class ChatDetailController extends GetxController {
   // Highlighted message for navigation
   final RxInt highlightedMessageId = RxInt(-1);
 
+  /// Yanıtlanacak mesaj (reply)
+  final Rxn<MessageModel> replyingToMessage = Rxn<MessageModel>();
+
+  /// Gönderilen mesaja API reply bilgisi dönmeyebiliyor; bu yüzden gönderimden hemen önce saklanır, fetch sonrası birleştirilir
+  int? _pendingReplyId;
+  String? _pendingReplyMessageText;
+  bool _pendingReplyHasImageMedia = false;
+  bool _pendingReplyHasLinkMedia = false;
+  String? _pendingReplySenderName;
+
   // Controllers
   final ProfileController profileController = Get.find<ProfileController>();
 
@@ -95,6 +105,14 @@ class ChatDetailController extends GetxController {
   // Link olmayan text'i çıkar
   String extractNonLinkText(String text) {
     return text.replaceAll(urlRegex, '').trim();
+  }
+
+  void setReplyingTo(MessageModel? message) {
+    replyingToMessage.value = message;
+  }
+
+  void clearReplyingTo() {
+    replyingToMessage.value = null;
   }
 
   @override
@@ -371,6 +389,35 @@ class ChatDetailController extends GetxController {
         messages.addAll(fetchedMessages);
       }
 
+      // API bazen görsel/link/belge yanıtında reply_id/reply_message dönmüyor; saklanan yanıt bilgisini az önce gönderilen mesaja birleştir
+      if (_pendingReplyId != null && (_pendingReplyMessageText != null || _pendingReplyHasImageMedia || _pendingReplyHasLinkMedia) && messages.isNotEmpty) {
+        MessageModel? newestMe;
+        int newestIndex = -1;
+        for (int i = messages.length - 1; i >= 0; i--) {
+          if (messages[i].isMe) {
+            newestMe = messages[i];
+            newestIndex = i;
+            break;
+          }
+        }
+        if (newestMe != null && newestIndex >= 0) {
+          messages[newestIndex] = newestMe.copyWith(
+            replyId: _pendingReplyId,
+            replyMessageText: _pendingReplyMessageText,
+            replyMessageSenderName: _pendingReplySenderName,
+            replyHasImageMedia: _pendingReplyHasImageMedia,
+            replyHasLinkMedia: _pendingReplyHasLinkMedia,
+          );
+          messages.refresh();
+          debugPrint('✅ [ChatDetailController] Reply bilgisi az önce gönderilen mesaja birleştirildi (reply_id: $_pendingReplyId)');
+        }
+        _pendingReplyId = null;
+        _pendingReplyMessageText = null;
+        _pendingReplySenderName = null;
+        _pendingReplyHasImageMedia = false;
+        _pendingReplyHasLinkMedia = false;
+      }
+
       // Performans optimizasyonu: Map kullanarak belge, link ve fotoğrafları topla
       final allDocuments = <DetailDocumentModel>[];
       final allLinks = <LinkModel>[];
@@ -636,15 +683,20 @@ class ChatDetailController extends GetxController {
         // Linkleri normalize et
         final normalizedUrls = urls.map((url) => normalizeUrl(url)).toList();
         
-        // Text alanında sadece link olmayan kısmı gönder, linkleri ayrı parametrede gönder
+        // Backend: "message required when media is not present" — sadece link varsa mesaj alanına link metnini yaz
+        final messageText = nonLinkText.trim().isEmpty
+            ? (normalizedUrls.isNotEmpty ? normalizedUrls.first : ' ')
+            : nonLinkText.trim();
+        
         debugPrint('  - Sending message with separated text and links');
         
         await ChatServices.sendMessage(
           currentChatId.value!,
-          nonLinkText.isEmpty ? ' ' : nonLinkText, // Boş string yerine space gönder
+          messageText,
           conversationId: currentConversationId.value,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
-          links: normalizedUrls, // Linkleri ayrı parametrede gönder
+          links: normalizedUrls,
+          replyId: replyingToMessage.value?.id,
         );
       } else {
         // Normal text mesajı gönder (link yok)
@@ -655,11 +707,24 @@ class ChatDetailController extends GetxController {
           message,
           conversationId: currentConversationId.value,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
+          replyId: replyingToMessage.value?.id,
         );
       }
+
+      // API bazen reply mesajında reply_id/reply_message dönmüyor; gönderilen mesaja yanıt bilgisini birleştirmek için sakla
+      final replyingTo = replyingToMessage.value;
+      if (replyingTo != null) {
+        _pendingReplyId = replyingTo.id;
+        _pendingReplyMessageText = replyingTo.replyPreviewDisplayText;
+        _pendingReplySenderName = '${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim();
+        if ((_pendingReplySenderName ?? '').isEmpty) _pendingReplySenderName = replyingTo.sender.username;
+        _pendingReplyHasImageMedia = replyingTo.messageMedia.any((m) => m.isImage);
+        _pendingReplyHasLinkMedia = replyingTo.messageLink.isNotEmpty;
+      }
       
-      // Başarılı ise seçilen dosyaları temizle
+      // Başarılı ise seçilen dosyaları ve yanıt hedefini temizle
       selectedFiles.clear();
+      clearReplyingTo();
       
       // Mesaj gönderildikten sonra mesajları yeniden yükle
       await fetchConversationMessages();
@@ -704,10 +769,22 @@ class ChatDetailController extends GetxController {
         '', // Boş text
         conversationId: currentConversationId.value,
         mediaFiles: selectedFiles,
+        replyId: replyingToMessage.value?.id,
       );
+
+      final replyingTo = replyingToMessage.value;
+      if (replyingTo != null) {
+        _pendingReplyId = replyingTo.id;
+        _pendingReplyMessageText = replyingTo.replyPreviewDisplayText;
+        _pendingReplySenderName = '${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim();
+        if ((_pendingReplySenderName ?? '').isEmpty) _pendingReplySenderName = replyingTo.sender.username;
+        _pendingReplyHasImageMedia = replyingTo.messageMedia.any((m) => m.isImage);
+        _pendingReplyHasLinkMedia = replyingTo.messageLink.isNotEmpty;
+      }
       
       debugPrint('✅ Media files sent successfully');
       selectedFiles.clear();
+      clearReplyingTo();
       
       // Mesajları yeniden yükle
       await fetchConversationMessages();
@@ -740,22 +817,47 @@ class ChatDetailController extends GetxController {
     
   }
 
+  /// Pinlenen veya yanıtlanan mesaja git — pin listesindeki tıklama ile aynı davranış
+  void navigateToMessage(int messageId) {
+    try {
+      final messageIndex = messages.indexWhere((msg) => msg.id == messageId);
+      if (messageIndex == -1) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          if (!scrollController.hasClients) return;
+          final messagePosition = messageIndex * 100.0;
+          final screenHeight = Get.mediaQuery.size.height;
+          final targetPosition = messagePosition - (screenHeight * 0.3);
+          final finalPosition = targetPosition.clamp(0.0, scrollController.position.maxScrollExtent);
+
+          scrollController.animateTo(
+            finalPosition,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
+
+          highlightMessage(messageId);
+        } catch (e) {
+          debugPrint('❌ [ChatDetailController] navigateToMessage scroll error: $e');
+        }
+      });
+    } catch (e) {
+      debugPrint('❌ [ChatDetailController] navigateToMessage error: $e');
+    }
+  }
+
   /// Highlight a message (for navigation from pinned messages)
   void highlightMessage(int messageId) {
     try {
       debugPrint('📌 [ChatDetailController] Highlighting message: $messageId');
-      
-      // Highlight the message
       highlightedMessageId.value = messageId;
-      
-      // Remove highlight after 3 seconds
-      Future.delayed(Duration(seconds: 3), () {
+      Future.delayed(const Duration(seconds: 3), () {
         if (highlightedMessageId.value == messageId) {
           highlightedMessageId.value = -1;
           debugPrint('📌 [ChatDetailController] Highlight removed for message: $messageId');
         }
       });
-      
     } catch (e) {
       debugPrint('❌ [ChatDetailController] Highlight message error: $e');
     }

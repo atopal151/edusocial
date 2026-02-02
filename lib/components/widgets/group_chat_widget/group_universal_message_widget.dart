@@ -187,11 +187,7 @@ class GroupUniversalMessageWidget extends StatelessWidget {
             alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
             child: Builder(
               builder: (builderContext) => GestureDetector(
-                onLongPress: controller.isCurrentUserAdmin
-                    ? () {
-                        _showMessageMenu(builderContext);
-                      }
-                    : null,
+                onLongPress: () => _showMessageMenu(builderContext),
                 child: Stack(
                   children: [
                     Container(
@@ -217,6 +213,64 @@ class GroupUniversalMessageWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Yanıtlanan mesaj önizlemesi (reply)
+                      if (message.replyId != null || (message.replyMessageText?.isNotEmpty ?? false) || message.replyHasImageMedia || message.replyHasLinkMedia) ...[
+                        Builder(
+                          builder: (ctx) {
+                            final lang = Get.find<LanguageService>();
+                            final replyPreview = message.replyHasImageMedia
+                                ? '📸 ${lang.tr("chat.replyPhoto")}'
+                                : message.replyHasLinkMedia
+                                    ? '🔗 ${lang.tr("chat.replyLink")}'
+                                    : () {
+                                        final replyText = message.replyMessageText?.trim() ?? '';
+                                        return replyText.isEmpty
+                                            ? (message.replyId != null ? '📷 Media' : '-')
+                                            : (replyText.length > 50 ? '${replyText.substring(0, 50)}...' : replyText);
+                                      }();
+                            final senderName = message.replyMessageSenderName;
+                            final replyId = message.replyId;
+                            return GestureDetector(
+                              onTap: replyId != null && replyId.isNotEmpty
+                                  ? () => controller.navigateToMessage(replyId)
+                                  : null,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                margin: const EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
+                                  color: message.isSentByMe ? Colors.white.withAlpha(40) : Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border(left: BorderSide(color: const Color(0xffef5050), width: 3)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      senderName != null ? '$senderName · ${lang.tr("comments.reply.replyTo")}' : lang.tr("comments.reply.replyTo"),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: message.isSentByMe ? Colors.white.withAlpha(200) : Colors.grey.shade700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      replyPreview,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        color: message.isSentByMe ? Colors.white.withAlpha(230) : const Color(0xff374151),
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                       // Text içeriği (varsa)
                       if (hasText && displayText.isNotEmpty) ...[
                         Text(
@@ -604,7 +658,7 @@ class GroupUniversalMessageWidget extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     
     final menuWidth = 200.0;
-    final menuHeight = 56.0;
+    final menuHeight = controller.isCurrentUserAdmin ? 112.0 : 56.0; // Pin + Reply veya sadece Reply
     
     final left = position.dx + size.width / 2 - menuWidth / 2;
     final top = position.dy + size.height + 8;
@@ -663,35 +717,69 @@ class GroupUniversalMessageWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      _handlePinMessage();
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Row(
-                        children: [
-                          Icon(
-                            message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-                            size: 20,
-                            color: message.isPinned 
-                                ? const Color(0xff414751) 
-                                : const Color(0xff9ca3ae),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            message.isPinned ? 'Remove Pin' : 'Pin Message',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xff000000),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (controller.isCurrentUserAdmin)
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(dialogContext);
+                            _handlePinMessage();
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                                  size: 20,
+                                  color: message.isPinned
+                                      ? const Color(0xff414751)
+                                      : const Color(0xff9ca3ae),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  message.isPinned ? 'Remove Pin' : 'Pin Message',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color(0xff000000),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(dialogContext);
+                          controller.setReplyingTo(message);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.reply,
+                                size: 20,
+                                color: const Color(0xff9ca3ae),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                Get.find<LanguageService>().tr("comments.reply.replyButton"),
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xff000000),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

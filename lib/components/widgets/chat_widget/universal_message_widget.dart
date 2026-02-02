@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/chat_models/chat_detail_model.dart';
 import '../../../controllers/chat_controllers/chat_detail_controller.dart';
+import '../../../services/language_service.dart';
 import '../../dialogs/image_preview_dialog.dart';
 
 class UniversalMessageWidget extends StatelessWidget {
@@ -104,6 +105,65 @@ class UniversalMessageWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Yanıtlanan mesaj önizlemesi (reply) — tüm tipler; tıklanınca o mesaja gider
+                        if (message.replyId != null || (message.replyMessageText?.isNotEmpty ?? false) || message.replyHasImageMedia || message.replyHasLinkMedia) ...[
+                          Builder(
+                            builder: (ctx) {
+                              final lang = Get.find<LanguageService>();
+                              // Görsel / link içeren mesaja yanıt: "Fotoğraf" veya "Link" göster
+                              final replyPreview = message.replyHasImageMedia
+                                  ? '📸 ${lang.tr("chat.replyPhoto")}'
+                                  : message.replyHasLinkMedia
+                                      ? '🔗 ${lang.tr("chat.replyLink")}'
+                                      : () {
+                                          final replyText = message.replyMessageText?.trim() ?? '';
+                                          return replyText.isEmpty
+                                              ? (message.replyId != null ? '📷 Media' : '-')
+                                              : (replyText.length > 50 ? '${replyText.substring(0, 50)}...' : replyText);
+                                        }();
+                              final senderName = message.replyMessageSenderName;
+                              final replyId = message.replyId;
+                              return GestureDetector(
+                                onTap: replyId != null
+                                    ? () => controller.navigateToMessage(replyId)
+                                    : null,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  decoration: BoxDecoration(
+                                    color: message.isMe ? Colors.white.withAlpha(40) : Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border(left: BorderSide(color: const Color(0xffef5050), width: 3)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        senderName != null ? '$senderName · ${lang.tr("comments.reply.replyTo")}' : lang.tr("comments.reply.replyTo"),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: message.isMe ? Colors.white.withAlpha(200) : Colors.grey.shade700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        replyPreview,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: message.isMe ? Colors.white.withAlpha(230) : const Color(0xff374151),
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                         // Text içeriği (varsa)
                         if (hasText && displayText.isNotEmpty) ...[
                           Text(
@@ -568,11 +628,12 @@ class UniversalMessageWidget extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     
     final menuWidth = 200.0;
-    final menuHeight = 56.0;
-    
+    final menuHeight = 112.0; // 2 items: Reply, Pin
+    final languageService = Get.find<LanguageService>();
+
     final left = position.dx + size.width / 2 - menuWidth / 2;
     final top = position.dy + size.height + 8;
-    
+
     showGeneralDialog(
       context: context,
       barrierColor: Colors.transparent,
@@ -582,14 +643,12 @@ class UniversalMessageWidget extends StatelessWidget {
       pageBuilder: (BuildContext dialogContext, Animation<double> animation, Animation<double> secondaryAnimation) {
         return Stack(
           children: [
-            // Tıklanabilir arka plan - menüyü kapatmak için
             Positioned.fill(
               child: GestureDetector(
                 onTap: () => Navigator.pop(dialogContext),
                 child: Container(color: Colors.transparent),
               ),
             ),
-            // Menü widget'ı
             Positioned(
               left: left.clamp(8.0, screenSize.width - menuWidth - 8),
               top: top.clamp(8.0, screenSize.height - menuHeight - 8),
@@ -627,35 +686,71 @@ class UniversalMessageWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      controller.pinMessage(message.id);
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Row(
-                        children: [
-                          Icon(
-                            message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
-                            size: 20,
-                            color: message.isPinned 
-                                ? const Color(0xff414751) 
-                                : const Color(0xff9ca3ae),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Yanıtla (Reply)
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(dialogContext);
+                          controller.setReplyingTo(message);
+                        },
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.reply,
+                                size: 20,
+                                color: const Color(0xff9ca3ae),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                languageService.tr("comments.reply.replyButton"),
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xff000000),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            message.isPinned ? 'Remove Pin' : 'Pin the message',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xff000000),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      Divider(height: 1, color: Colors.grey.shade200),
+                      // Pin
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(dialogContext);
+                          controller.pinMessage(message.id);
+                        },
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Icon(
+                                message.isPinned ? Icons.push_pin_outlined : Icons.push_pin,
+                                size: 20,
+                                color: message.isPinned
+                                    ? const Color(0xff414751)
+                                    : const Color(0xff9ca3ae),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                message.isPinned ? 'Remove Pin' : 'Pin the message',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xff000000),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
