@@ -14,6 +14,13 @@ class PeopleProfileController extends GetxController {
   var profile = Rxn<PeopleProfileModel>(); // Kullanıcı profili
   var peopleEntries = <EntryModel>[].obs; // Kullanıcının entries'ları
 
+  /// Görüntülenen kullanıcının takipçi listesi (API'den)
+  var followersList = <Map<String, dynamic>>[].obs;
+  /// Görüntülenen kullanıcının takip edilen listesi (API'den)
+  var followingsList = <Map<String, dynamic>>[].obs;
+  var isFollowersLoading = false.obs;
+  var isFollowingsLoading = false.obs;
+
   // Kullanıcı cache'i - performans için
   final Map<int, UserModel> _userCache = {};
 
@@ -32,10 +39,15 @@ class PeopleProfileController extends GetxController {
         profile.value = data;
         isFollowing.value = data.isFollowing;
         isFollowingPending.value = data.isFollowingPending;
-        
+        followersList.clear();
+        followingsList.clear();
+
         // Profil bilgileri yüklendi, ana loading'i kapat
         isLoading.value = false;
-        
+
+        // Tek API çağrısı ile takipçi ve takip edilen listelerini yükle
+        loadFollowLists(data.id);
+
         // Entries'ları ayrı olarak yükle (progressive loading)
         if (data.entries.isNotEmpty) {
           //debugPrint("📝 Entries sayısı: ${data.entries.length}");
@@ -241,7 +253,10 @@ class PeopleProfileController extends GetxController {
         profile.value = data;
         isFollowing.value = data.isFollowing;
         isFollowingPending.value = data.isFollowingPending;
-        
+        followersList.clear();
+        followingsList.clear();
+        loadFollowLists(data.id);
+
         // API'den gelen entries verilerini kullanıcı bilgileriyle işle
         await _processEntriesWithUserDataOptimized(data.entries);
         //debugPrint("✅ Kullanıcının ${data.entries.length} entries'ı yüklendi");
@@ -252,6 +267,27 @@ class PeopleProfileController extends GetxController {
       debugPrint("❌ Profil yüklenirken hata oluştu: $e", wrapWidth: 1024);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  static const int _followListPerPage = 20;
+
+  /// Tek API çağrısı ile takipçi ve takip edilen listelerini yükler (type alanına göre ayrılır)
+  Future<void> loadFollowLists(int userId) async {
+    try {
+      isFollowersLoading.value = true;
+      isFollowingsLoading.value = true;
+      final result = await PeopleProfileService.fetchUserFollowList(userId,
+          page: 1, perPage: _followListPerPage);
+      followersList.assignAll(result['followers'] ?? []);
+      followingsList.assignAll(result['followings'] ?? []);
+    } catch (e) {
+      debugPrint("❌ loadFollowLists error: $e");
+      followersList.clear();
+      followingsList.clear();
+    } finally {
+      isFollowersLoading.value = false;
+      isFollowingsLoading.value = false;
     }
   }
 

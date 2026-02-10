@@ -145,6 +145,112 @@ class PeopleProfileService {
     }
   }
 
+  /// Tek API çağrısı ile takip listesini getirir.
+  /// API cevabı: data.followers.data (takipçiler) ve data.followings.data (takip edilenler).
+  static Future<Map<String, List<Map<String, dynamic>>>> fetchUserFollowList(
+    int userId, {
+    int page = 1,
+    int perPage = 50,
+  }) async {
+    final url = Uri.parse('${AppConstants.frontendBaseUrl}/user/follow').replace(
+      queryParameters: {
+        'page': page.toString(),
+        'per_page': perPage.toString(),
+        'user_id': userId.toString(),
+      },
+    );
+    final token = box.read('token');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {"Authorization": "Bearer $token"},
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200) {
+        debugPrint(
+            "❌ [fetchUserFollowList] API başarısız: ${response.statusCode}");
+        return {'followers': [], 'followings': []};
+      }
+
+      // Ham API cevabını debug et (frontend/user/follow endpoint)
+      printFullText('👥 =======================================');
+      printFullText('👥 [PeopleProfileService] /frontend/user/follow API Ham Veri');
+      printFullText('👥 =======================================');
+      printFullText('👥 URL: $url');
+      printFullText('👥 Status Code: ${response.statusCode}');
+      printFullText('👥 Response Body: ${response.body}');
+      printFullText('👥 =======================================');
+
+      final body = jsonDecode(response.body);
+      final data = body['data'];
+
+      if (data == null || data is! Map<String, dynamic>) {
+        return {'followers': [], 'followings': []};
+      }
+
+      final rawFollowers = _extractPaginatedDataList(data['followers']);
+      final rawFollowings = _extractPaginatedDataList(data['followings']);
+
+      final followers = rawFollowers
+          .map((e) => _userFollowItemToMap(e as Map<String, dynamic>))
+          .toList();
+      final followings = rawFollowings
+          .map((e) => _userFollowItemToMap(e as Map<String, dynamic>))
+          .toList();
+
+      return {'followers': followers, 'followings': followings};
+    } catch (e) {
+      debugPrint("❌ fetchUserFollowList error: $e");
+      return {'followers': [], 'followings': []};
+    }
+  }
+
+  /// data.followers / data.followings gibi { data: [...], meta: {} } yapısından listeyi çıkarır
+  static List<dynamic> _extractPaginatedDataList(dynamic section) {
+    if (section == null) return [];
+    if (section is Map<String, dynamic>) {
+      final inner = section['data'];
+      if (inner is List<dynamic>) return inner;
+    }
+    return [];
+  }
+
+  /// Takipçi listesi (data.followers.data)
+  static Future<List<Map<String, dynamic>>> fetchUserFollowers(
+    int userId, {
+    int page = 1,
+    int perPage = 50,
+  }) async {
+    final result = await fetchUserFollowList(userId, page: page, perPage: perPage);
+    return result['followers'] ?? [];
+  }
+
+  /// Takip edilen listesi (data.followings.data)
+  static Future<List<Map<String, dynamic>>> fetchUserFollowing(
+    int userId, {
+    int page = 1,
+    int perPage = 50,
+  }) async {
+    final result = await fetchUserFollowList(userId, page: page, perPage: perPage);
+    return result['followings'] ?? [];
+  }
+
+  static Map<String, dynamic> _userFollowItemToMap(Map<String, dynamic> json) {
+    return {
+      'id': json['id'],
+      'name': json['name'] ?? '',
+      'surname': json['surname'] ?? '',
+      'username': json['username'] ?? '',
+      'avatar_url': json['avatar_url'] ?? json['avatar'] ?? '',
+      'is_following': json['is_following'] ?? false,
+      'is_following_pending': json['is_following_pending'] ?? false,
+      'is_verified': json['is_verified'] ?? false,
+      'account_type': json['account_type'],
+      'created_at': json['created_at'],
+    };
+  }
+
   /// Birden fazla kullanıcıyı tek seferde çek (performans için)
   static Future<Map<int, PeopleProfileModel>> fetchUsersByIds(
       List<int> userIds) async {

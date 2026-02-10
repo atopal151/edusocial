@@ -192,7 +192,7 @@ class GroupMessageModel {
     final bool isPinned = json['is_pinned'] == true;
 
     // Reply (yanıt) bilgisi
-    final replyId = json['reply_id'] != null ? json['reply_id'].toString() : null;
+    final replyId = json['reply_id']?.toString();
     String? replyMessageText;
     String? replyMessageSenderName;
     bool replyHasImageMedia = false;

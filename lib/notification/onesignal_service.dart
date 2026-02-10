@@ -87,9 +87,9 @@ class OneSignalService extends GetxService {
         // Subscription ID değiştiğinde external ID ile tekrar bağlanmak kritik
         if (currentId != null && _loggedInExternalId != null && _loggedInExternalId!.isNotEmpty) {
           if (subscriptionIdChanged) {
-            debugPrint('🔄 Re-login with externalUserId=${_loggedInExternalId} (subscription ID changed)');
+            debugPrint('🔄 Re-login with externalUserId=$_loggedInExternalId (subscription ID changed)');
           } else {
-            debugPrint('🔄 Ensuring login with externalUserId=${_loggedInExternalId}');
+            debugPrint('🔄 Ensuring login with externalUserId=$_loggedInExternalId');
           }
           loginUser(_loggedInExternalId!);
         }

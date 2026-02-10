@@ -36,6 +36,10 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   // Kalıcı kırmızı nokta durumları
   var unreadConversationIds = <int>[].obs;
   var unreadGroupIds = <int>[].obs; // Grup mesajları için kalıcı kırmızı nokta durumları
+
+  /// Sohbet ekranından çıkılırken okundu işaretlenen conversation; fetchChatList bu id'yi API ile tekrar unread yapmasın.
+  int? _conversationIdMarkedAsReadOnExit;
+  DateTime? _conversationMarkedAsReadAt;
   
   @override
   void onInit() {
@@ -262,21 +266,36 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
       // Mevcut chat listesindeki unread count'ları koru (Socket'ten gelen anlık değerler)
       // API'den gelen değer sadece daha büyükse veya mevcut değer 0 ise kullan
+      // Sohbet ekranından çıkarken okundu işaretlenen conversation'ı API ile tekrar unread yapma
+      final justMarkedId = _conversationIdMarkedAsReadOnExit;
+      final justMarkedAt = _conversationMarkedAsReadAt;
+      final keepAsRead = justMarkedId != null &&
+          justMarkedAt != null &&
+          DateTime.now().difference(justMarkedAt).inSeconds < 15;
+
       for (final fetchedChat in filteredChats) {
         final existingChatIndex = chatList.indexWhere((c) => c.conversationId == fetchedChat.conversationId);
         if (existingChatIndex != -1) {
           final existingChat = chatList[existingChatIndex];
           final currentUnreadCount = existingChat.unreadCount;
           final apiUnreadCount = fetchedChat.unreadCount;
-          
-          // API'den gelen değer mevcut socket değerinden büyükse veya mevcut değer 0 ise API'yi kullan
-          if (apiUnreadCount > currentUnreadCount || currentUnreadCount == 0) {
+          final isJustMarkedAsRead = keepAsRead && fetchedChat.conversationId == justMarkedId;
+
+          if (isJustMarkedAsRead) {
+            existingChat.unreadCount = 0;
+            existingChat.hasUnreadMessages = false;
+            debugPrint("🔄 Chat: ${existingChat.name} (ID: ${fetchedChat.conversationId}) - Ekrandan çıkıldığında okundu, API değeri yok sayıldı");
+          } else if (apiUnreadCount > currentUnreadCount || currentUnreadCount == 0) {
             existingChat.unreadCount = apiUnreadCount;
             existingChat.hasUnreadMessages = apiUnreadCount > 0;
           }
           // lastMessage güncellenebilir, diğer alanlar final olduğu için değiştirilemez
           existingChat.lastMessage = fetchedChat.lastMessage;
         }
+      }
+      if (keepAsRead) {
+        _conversationIdMarkedAsReadOnExit = null;
+        _conversationMarkedAsReadAt = null;
       }
       
       // Yeni chat'leri ekle (mevcut listede olmayanlar)
@@ -337,13 +356,21 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         final chatIndex = chatList.indexWhere((c) => c.conversationId == conversationId);
         if (chatIndex != -1) {
           final chat = chatList[chatIndex];
-          
+          final intConvId = conversationId is int ? conversationId : int.tryParse(conversationId.toString());
+          final justLeftThisChat = intConvId != null &&
+              _conversationIdMarkedAsReadOnExit == intConvId &&
+              _conversationMarkedAsReadAt != null &&
+              DateTime.now().difference(_conversationMarkedAsReadAt!).inSeconds < 5;
+
           // Eğer başkasının mesajı ise (sender_id != my_user_id), unread count'u +1 artır
           if (!isMyMessage) {
-            chat.unreadCount = chat.unreadCount + 1;
-            chat.hasUnreadMessages = true;
-            
-            debugPrint("📥 [ChatController] ✅ Başkasının mesajı - unread count artırıldı: ${chat.unreadCount}");
+            if (justLeftThisChat) {
+              debugPrint("📥 [ChatController] ⏭️ Az önce bu sohbet okundu işaretlendi, unread artırılmadı (conversation: $conversationId)");
+            } else {
+              chat.unreadCount = chat.unreadCount + 1;
+              chat.hasUnreadMessages = true;
+              debugPrint("📥 [ChatController] ✅ Başkasının mesajı - unread count artırıldı: ${chat.unreadCount}");
+            }
           } else {
             debugPrint("📥 [ChatController] ⏭️ Kendi mesajımız - unread count değişmedi");
           }
@@ -577,6 +604,10 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       }
       
       debugPrint("📖 Chat okundu olarak işaretlendi: conversationId=$targetConversationId");
+      
+      // Sohbet ekranından çıkınca refreshChatList API'den unread döndürebilir; bu conversation'ı kısa süre koru
+      _conversationIdMarkedAsReadOnExit = targetConversationId;
+      _conversationMarkedAsReadAt = DateTime.now();
       
       // Profile API'sini yeniden yükle ki unread_messages_total_count güncellensin
       _refreshProfileAfterMessageRead();

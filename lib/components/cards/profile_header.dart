@@ -11,6 +11,23 @@ import '../../components/widgets/verification_badge.dart';
 
 final ProfileController controller = Get.find();
 
+void _openFollowList({required int initialTabIndex}) {
+  final displayName = controller.username.value.replaceFirst('@', '').trim().isNotEmpty
+      ? controller.username.value.replaceFirst('@', '').trim()
+      : controller.fullName.value;
+  final userId = int.tryParse(controller.userId.value);
+  Get.toNamed(Routes.followList, arguments: {
+    'displayName': displayName,
+    'isVerified': controller.profile.value?.isVerified ?? false,
+    'userId': userId,
+    'initialTabIndex': initialTabIndex,
+    'followers': controller.followerList.map((item) => item as Map<String, dynamic>).toList(),
+    'followings': controller.followingList.map((item) => item as Map<String, dynamic>).toList(),
+    'followerCount': controller.filteredFollowers.value,
+    'followingCount': controller.filteredFollowing.value,
+  });
+}
+
 /// Profil Bilgileri Bölümü
 Widget buildProfileHeader() {
   final LanguageService languageService = Get.find<LanguageService>();
@@ -162,10 +179,7 @@ Widget buildProfileHeader() {
           Expanded(
             child: InkWell(
               onTap: () {
-                Get.toNamed(Routes.followers, arguments: {
-                  'followers': controller.followerList.map((item) => item as Map<String, dynamic>).toList(),
-                  'screenTitle': languageService.tr("profile.header.followers"),
-                });
+                _openFollowList(initialTabIndex: 0);
               },
               child: _buildProfileInfo(languageService.tr("profile.header.followers"), controller.filteredFollowers),
             ),
@@ -176,10 +190,7 @@ Widget buildProfileHeader() {
           Expanded(
             child: InkWell(
               onTap: () {
-                Get.toNamed(Routes.following, arguments: {
-                  'followings': controller.followingList.map((item) => item as Map<String, dynamic>).toList(),
-                  'screenTitle': languageService.tr("profile.header.following"),
-                });
+                _openFollowList(initialTabIndex: 1);
               },
               child: _buildProfileInfo(languageService.tr("profile.header.following"), controller.filteredFollowing),
             ),

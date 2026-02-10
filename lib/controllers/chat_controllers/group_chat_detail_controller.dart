@@ -84,6 +84,60 @@ class GroupChatDetailController extends GetxController {
     replyingToMessage.value = null;
   }
 
+  /// Echo yoksa kendi mesajımızın hemen görünmesi için geçici grup mesajı (optimistic update).
+  /// id "pending_" ile başlar; socket echo gelirse _addNewMessageFromSocket bu kaydı gerçek mesajla değiştirir.
+  GroupMessageModel? _buildOptimisticGroupMessage({
+    required String content,
+    GroupMessageType messageType = GroupMessageType.text,
+    String? replyId,
+    String? replyMessageText,
+    String? replyMessageSenderName,
+    bool replyHasImageMedia = false,
+    bool replyHasLinkMedia = false,
+    List<String>? media,
+    List<String>? links,
+  }) {
+    try {
+      final profileController = Get.find<ProfileController>();
+      final profile = profileController.profile.value;
+      final currentUserId = profileController.userId.value;
+      if (profile == null || currentUserId.isEmpty) return null;
+
+      final tempId = 'pending_${DateTime.now().millisecondsSinceEpoch}';
+      final now = DateTime.now();
+
+      return GroupMessageModel(
+        id: tempId,
+        senderId: currentUserId,
+        receiverId: currentGroupId.value,
+        name: profile.name,
+        surname: profile.surname,
+        username: profile.username,
+        profileImage: profile.avatarUrl.isNotEmpty ? profile.avatarUrl : profile.avatar,
+        content: content,
+        messageType: messageType,
+        timestamp: now,
+        isSentByMe: true,
+        isVerified: profile.isVerified ?? false,
+        links: links,
+        media: media,
+        replyId: replyId,
+        replyMessageText: replyMessageText,
+        replyMessageSenderName: replyMessageSenderName,
+        replyHasImageMedia: replyHasImageMedia,
+        replyHasLinkMedia: replyHasLinkMedia,
+      );
+    } catch (e) {
+      debugPrint('⚠️ [GroupChatDetailController] _buildOptimisticGroupMessage error: $e');
+      return null;
+    }
+  }
+
+  void _removeOptimisticGroupMessage(String optimisticId) {
+    messages.removeWhere((m) => m.id == optimisticId);
+    debugPrint('🔄 [GroupChatDetailController] Optimistic grup mesajı kaldırıldı (API hata): id=$optimisticId');
+  }
+
   /// Yanıtlanan mesaja scroll ve vurgu (reply önizlemesine tıklanınca)
   void navigateToMessage(String messageId) {
     try {
@@ -752,15 +806,23 @@ class GroupChatDetailController extends GetxController {
         replyHasLinkMedia: replyHasLinkMedia,
       );
       
-      messages.add(newMessage);
-      debugPrint('✅ [GroupChatDetailController] Yeni grup mesajı eklendi: ID ${newMessage.id}, Content: "${newMessage.content}"');
-      debugPrint('✅ [GroupChatDetailController] Toplam grup mesaj sayısı: ${messages.length}');
-
-      // Bizim gönderdiğimiz mesaj socket'ten gelince loading'i kapat
+      // Echo: Kendi gönderdiğimiz mesaj socket'ten geldi; optimistic (id pending_*) kaydı gerçek mesajla değiştir.
       if (newMessage.isSentByMe) {
+        final pendingIndex = messages.lastIndexWhere((m) => m.id.startsWith('pending_'));
+        if (pendingIndex != -1) {
+          messages[pendingIndex] = newMessage;
+          debugPrint('✅ [GroupChatDetailController] Pending mesaj gerçek mesajla değiştirildi: ID ${newMessage.id}, Content: "${newMessage.content}"');
+        } else {
+          messages.add(newMessage);
+          debugPrint('✅ [GroupChatDetailController] Yeni grup mesajı eklendi: ID ${newMessage.id}, Content: "${newMessage.content}"');
+        }
         isSendingMessage.value = false;
         debugPrint('✅ [GroupChatDetailController] Kendi mesajımız socket\'ten geldi, loading kapatıldı.');
+      } else {
+        messages.add(newMessage);
+        debugPrint('✅ [GroupChatDetailController] Yeni grup mesajı eklendi: ID ${newMessage.id}, Content: "${newMessage.content}"');
       }
+      debugPrint('✅ [GroupChatDetailController] Toplam grup mesaj sayısı: ${messages.length}');
 
       // Yeni mesaj eklendiğinde en alta git
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1664,10 +1726,27 @@ class GroupChatDetailController extends GetxController {
     debugPrint('🔌 Group Message Subscription aktif: ${!_groupMessageSubscription.isPaused}');
     
     isSendingMessage.value = true;
+    String? optimisticId;
+    final replyingTo = replyingToMessage.value;
 
     try {
-      bool success;
+      // Optimistic update: Echo yoksa mesaj hemen görünsün.
+      final displayContent = text.trim();
+      final optimisticMessage = _buildOptimisticGroupMessage(
+        content: displayContent.isEmpty ? ' ' : displayContent,
+        replyId: replyingTo?.id,
+        replyMessageText: replyingTo?.replyMessageText,
+        replyMessageSenderName: replyingTo?.replyMessageSenderName,
+        replyHasImageMedia: replyingTo?.replyHasImageMedia ?? false,
+        replyHasLinkMedia: replyingTo?.replyHasLinkMedia ?? false,
+      );
+      if (optimisticMessage != null) {
+        optimisticId = optimisticMessage.id;
+        messages.add(optimisticMessage);
+        WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottomForNewMessage());
+      }
 
+      bool success;
       if (text.isNotEmpty && hasLinksInText(text)) {
         debugPrint('🔗 Links detected in text, processing...');
         final urls = extractUrlsFromText(text);
@@ -1693,20 +1772,16 @@ class GroupChatDetailController extends GetxController {
       if (success) {
         clearReplyingTo();
         selectedFiles.clear();
-        debugPrint('✅ Mesaj API\'ye gönderildi, socket\'ten gelmesi bekleniyor.');
+        debugPrint('✅ Mesaj API\'ye gönderildi; listeye socket (echo) ile eklenecek veya optimistic kalacak.');
         scrollToBottomForNewMessage();
-        Future.delayed(Duration(milliseconds: 300), () async {
-          await refreshMessagesOptimized();
-          scrollToBottomForNewMessage();
-        });
-        // Loading sadece socket'ten mesaj gelince kapatılacak; socket gelmezse 8 sn sonra fallback
-        Future.delayed(Duration(seconds: 8), () {
+        // Socket echo gelirse loading kapatılacak; gelmezse 5 sn sonra kapat
+        Future.delayed(Duration(seconds: 5), () {
           if (isSendingMessage.value) {
             isSendingMessage.value = false;
-            debugPrint('⚠️ Socket mesajı gelmedi, loading fallback ile kapatıldı.');
           }
         });
       } else {
+        if (optimisticId != null) _removeOptimisticGroupMessage(optimisticId);
         Get.snackbar(
           _languageService.tr('groupChat.errors.messageSendFailed'),
           _languageService.tr('groupChat.errors.tryAgain'),
@@ -1716,6 +1791,7 @@ class GroupChatDetailController extends GetxController {
       }
     } catch (e) {
       debugPrint('💥 Message sending error: $e');
+      if (optimisticId != null) _removeOptimisticGroupMessage(optimisticId);
       Get.snackbar(
         _languageService.tr('groupChat.errors.messageSendFailed'),
         _languageService.tr('groupChat.errors.tryAgain'),
@@ -1731,11 +1807,27 @@ class GroupChatDetailController extends GetxController {
     
     debugPrint('📁 Sending media files only');
     isSendingMessage.value = true;
-    
+    String? optimisticId;
+    final replyingTo = replyingToMessage.value;
+
     try {
+      final optimisticMessage = _buildOptimisticGroupMessage(
+        content: '📷',
+        replyId: replyingTo?.id,
+        replyMessageText: replyingTo?.replyMessageText,
+        replyMessageSenderName: replyingTo?.replyMessageSenderName,
+        replyHasImageMedia: replyingTo?.replyHasImageMedia ?? false,
+        replyHasLinkMedia: replyingTo?.replyHasLinkMedia ?? false,
+      );
+      if (optimisticMessage != null) {
+        optimisticId = optimisticMessage.id;
+        messages.add(optimisticMessage);
+        WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottomForNewMessage());
+      }
+
       final success = await _groupServices.sendGroupMessage(
         groupId: currentGroupId.value,
-        message: '', // Boş text
+        message: ' ',
         mediaFiles: selectedFiles,
         links: null,
         replyId: replyingToMessage.value?.id,
@@ -1745,18 +1837,13 @@ class GroupChatDetailController extends GetxController {
         clearReplyingTo();
         selectedFiles.clear();
         scrollToBottomForNewMessage();
-        Future.delayed(Duration(milliseconds: 300), () async {
-          await refreshMessagesOptimized();
-          scrollToBottomForNewMessage();
-        });
-        // Loading sadece socket'ten mesaj gelince kapatılacak
-        Future.delayed(Duration(seconds: 8), () {
+        Future.delayed(Duration(seconds: 5), () {
           if (isSendingMessage.value) {
             isSendingMessage.value = false;
-            debugPrint('⚠️ Socket mesajı gelmedi (media), loading fallback ile kapatıldı.');
           }
         });
       } else {
+        if (optimisticId != null) _removeOptimisticGroupMessage(optimisticId);
         Get.snackbar(
           _languageService.tr('groupChat.errors.messageSendFailed'),
           _languageService.tr('groupChat.errors.tryAgain'),
@@ -1766,6 +1853,7 @@ class GroupChatDetailController extends GetxController {
       }
     } catch (e) {
       debugPrint('💥 Media sending error: $e');
+      if (optimisticId != null) _removeOptimisticGroupMessage(optimisticId);
       Get.snackbar(
         _languageService.tr('groupChat.errors.messageSendFailed'),
         _languageService.tr('groupChat.errors.tryAgain'),

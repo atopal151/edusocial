@@ -310,7 +310,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       ),
                                       child: _buildCommentItem(comment),
                                     );
-                                  }).toList(),
+                                  }),
                                 ],
                               );
                             }),

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:edusocial/services/language_service.dart';
 import 'package:edusocial/components/dialogs/profile_image_preview_dialog.dart';
 import 'package:edusocial/components/widgets/verification_badge.dart';
+import 'package:edusocial/routes/app_routes.dart';
 
 Widget buildPeopleProfileHeader(PeopleProfileController controller) {
   final LanguageService languageService = Get.find<LanguageService>();
@@ -162,10 +163,16 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  /* Get.toNamed(Routes.followers, arguments: {
-                    'followers': profile.followers.map((item) => item as Map<String, dynamic>).toList(),
-                    'screenTitle': '${profile.name} ${profile.surname} - Takipçi',
-                  });*/
+                  Get.toNamed(Routes.followList, arguments: {
+                    'displayName': profile.username.isNotEmpty ? profile.username : '${profile.name} ${profile.surname}',
+                    'isVerified': profile.isVerified,
+                    'userId': profile.id,
+                    'initialTabIndex': 0,
+                    'followers': controller.followersList.toList(),
+                    'followings': controller.followingsList.toList(),
+                    'followerCount': profile.followerCount,
+                    'followingCount': profile.followingCount,
+                  });
                 },
                 child: _buildProfileInfo(languageService.tr("profile.header.followers"), profile.followerCount),
               ),
@@ -176,10 +183,16 @@ Widget buildPeopleProfileHeader(PeopleProfileController controller) {
             Expanded(
               child: InkWell(
                 onTap: () {
-                  /*Get.toNamed(Routes.following, arguments: {
-                    'followings': profile.followings.map((item) => item as Map<String, dynamic>).toList(),
-                    'screenTitle': '${profile.name} ${profile.surname} - Takip Edilen',
-                  });*/
+                  Get.toNamed(Routes.followList, arguments: {
+                    'displayName': profile.username.isNotEmpty ? profile.username : '${profile.name} ${profile.surname}',
+                    'isVerified': profile.isVerified,
+                    'userId': profile.id,
+                    'initialTabIndex': 1,
+                    'followers': controller.followersList.toList(),
+                    'followings': controller.followingsList.toList(),
+                    'followerCount': profile.followerCount,
+                    'followingCount': profile.followingCount,
+                  });
                 },
                 child: _buildProfileInfo(languageService.tr("profile.header.following"), profile.followingCount),
               ),

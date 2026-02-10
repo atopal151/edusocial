@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:edusocial/components/print_full_text.dart';
 import 'package:edusocial/models/topic_with_entry_model.dart';
 import 'package:edusocial/utils/constants.dart';
 import 'package:flutter/material.dart';

@@ -25,7 +25,7 @@ class StoryController extends GetxController {
 
       final allStories = await StoryService.fetchStories();
       debugPrint("📦 API'den ${allStories.length} story alındı");
-      printFullText('📦 API\'den ${allStories} story alındı');
+      printFullText('📦 API\'den $allStories story alındı');
       
       final currentUserIdStr = profileController.userId.value.trim();
 

@@ -1,5 +1,7 @@
 class AppConstants {
   static const String baseUrl = "https://stageapi.edusocial.pl/mobile";
+  /// Frontend API base (follow list vb. için)
+  static const String frontendBaseUrl = "https://stageapi.edusocial.pl/frontend";
   
   /// Avatar URL'ini düzeltir
   static String fixAvatarUrl(String? avatarUrl) {

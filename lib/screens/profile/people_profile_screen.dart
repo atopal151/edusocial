@@ -46,7 +46,12 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
   @override
   void initState() {
     super.initState();
-    controller.loadUserProfileByUsername(widget.username);
+    // Build sırasında state güncellemesini önlemek için yüklemeyi ilk frame sonrasına ertele
+    controller.profile.value = null;
+    controller.isLoading.value = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadUserProfileByUsername(widget.username);
+    });
   }
 
   @override
@@ -123,13 +128,13 @@ class _PeopleProfileScreenState extends State<PeopleProfileScreen> {
                                   ? const Color(0xFFEF5050) // unfollow: kırmızı metin
                                   : const Color(0xFF28A745); // follow: yeşil metin
 
-                          final Color? borderColor = isPending
+                          final Color borderColor = isPending
                               ? const Color(0xFFFF8C00) // pending outline turuncu
                               : isFollowing
                                   ? const Color(0xFFEF5050) // unfollow outline kırmızı
                                   : const Color(0xFF28A745); // follow outline yeşil
 
-                          final double? borderWidth = isFollowing ? 1 : 1;
+                          final double borderWidth = isFollowing ? 1 : 1;
 
                           return SizedBox(
                             width: 140,

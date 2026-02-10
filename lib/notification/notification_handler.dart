@@ -442,9 +442,7 @@ class NotificationHandler {
         Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
         Future.delayed(Duration(milliseconds: groupId != null ? 150 : 600), () {
           // Soğuk başlangıçta GroupController henüz yok olabilir; gecikmeden sonra başlıktan tekrar dene
-          if (groupId == null) {
-            groupId = _extractGroupIdFromTitle(data['_notification_title']?.toString());
-          }
+          groupId ??= _extractGroupIdFromTitle(data['_notification_title']?.toString());
           if (groupId != null) {
             Get.toNamed(Routes.groupChatDetail, arguments: {'groupId': groupId});
           }
@@ -473,9 +471,7 @@ class NotificationHandler {
         }
         
         // Recursive fallback
-        if (postId == null) {
-          postId = _extractPostId(data);
-        }
+        postId ??= _extractPostId(data);
         
         if (postId != null) {
           debugPrint('🔔 [NotificationHandler] Post bildirimi tıklandı - Post ID: $postId');

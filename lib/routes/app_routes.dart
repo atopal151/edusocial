@@ -30,8 +30,7 @@ import 'package:edusocial/screens/match/match_result_screen.dart';
 import 'package:edusocial/screens/match/match_screen.dart';
 import 'package:edusocial/screens/notifications/notifications_screen.dart';
 import 'package:edusocial/screens/profile/edit_profile_screen.dart';
-import 'package:edusocial/screens/profile/profile_follower_screen.dart';
-import 'package:edusocial/screens/profile/profile_following_screen.dart';
+import 'package:edusocial/screens/profile/profile_follow_list_screen.dart';
 import 'package:edusocial/screens/profile/profile_screen.dart';
 import 'package:edusocial/screens/search/search_text_screen.dart';
 import 'package:edusocial/screens/settings/settings_screen.dart';
@@ -88,8 +87,7 @@ class Routes {
   static const String peopleProfile = "/peopleProfile";
   static const String groupChatDetail = '/group_chat_detail';
   static const String userChatDetail = '/user_chat_detail';
-  static const String followers = '/followers';
-  static const String following = '/following';
+  static const String followList = '/follow-list';
   static const String addStory = '/addStory';
   static const String notifications = '/notifications';
   static const String createGroup = '/createGroup';
@@ -226,18 +224,16 @@ class Routes {
       binding: SettingsBinding(),
     ),
     GetPage(
-      name: followers,
-      page: () => ProfileFollowerScreen(
-        followers: Get.arguments['followers'] ?? [],
-        screenTitle: Get.arguments['screenTitle'] ?? 'Takipçi',
-      ),
-      binding: ProfileBinding(),
-    ),
-    GetPage(
-      name: following,
-      page: () => ProfileFollowingScreen(
-        followings: Get.arguments['followings'] ?? [],
-        screenTitle: Get.arguments['screenTitle'] ?? 'Takip edilen',
+      name: followList,
+      page: () => ProfileFollowListScreen(
+        displayName: Get.arguments['displayName'] ?? '',
+        isVerified: Get.arguments['isVerified'] ?? false,
+        userId: Get.arguments['userId'],
+        initialTabIndex: Get.arguments['initialTabIndex'] ?? 0,
+        initialFollowers: List<Map<String, dynamic>>.from(Get.arguments['followers'] ?? []),
+        initialFollowings: List<Map<String, dynamic>>.from(Get.arguments['followings'] ?? []),
+        followerCount: Get.arguments['followerCount'] ?? 0,
+        followingCount: Get.arguments['followingCount'] ?? 0,
       ),
       binding: ProfileBinding(),
     ),

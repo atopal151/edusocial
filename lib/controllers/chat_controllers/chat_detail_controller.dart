@@ -11,6 +11,9 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../models/chat_models/chat_detail_model.dart';
+import '../../models/chat_models/conversation_model.dart';
+import '../../models/chat_models/message_link_model.dart';
+import '../../models/chat_models/message_media_model.dart';
 import '../../models/chat_models/sender_model.dart';
 import '../../models/user_chat_detail_model.dart';
 import '../../models/document_model.dart';
@@ -115,6 +118,68 @@ class ChatDetailController extends GetxController {
     replyingToMessage.value = null;
   }
 
+  /// Echo yoksa kendi mesajımızın hemen görünmesi için geçici mesaj oluşturur (optimistic update).
+  /// id negatif kullanılır; socket echo gelirse _onNewPrivateMessage bu kaydı gerçek mesajla değiştirir.
+  MessageModel? _buildOptimisticMessage({
+    required String messageText,
+    List<MessageMediaModel>? messageMedia,
+    List<MessageLinkModel>? messageLink,
+    int? replyId,
+    String? replyMessageText,
+    String? replyMessageSenderName,
+    bool replyHasImageMedia = false,
+    bool replyHasLinkMedia = false,
+  }) {
+    final profile = profileController.profile.value;
+    final currentUserId = profile?.id;
+    if (currentUserId == null) return null;
+
+    final convId = messages.isNotEmpty
+        ? messages.last.conversationId
+        : (int.tryParse(currentConversationId.value ?? '') ?? 0);
+    final conversation = messages.isNotEmpty
+        ? messages.last.conversation
+        : ConversationModel.empty();
+    final sender = profile != null
+        ? SenderModel(
+            id: profile.id,
+            accountType: profile.accountType,
+            name: profile.name,
+            surname: profile.surname,
+            username: profile.username,
+            avatarUrl: profile.avatarUrl.isNotEmpty ? profile.avatarUrl : profile.avatar,
+          )
+        : SenderModel.empty();
+
+    final now = DateTime.now().toUtc().toIso8601String();
+    final tempId = -DateTime.now().millisecondsSinceEpoch;
+
+    return MessageModel(
+      id: tempId,
+      conversationId: convId,
+      senderId: currentUserId,
+      message: messageText,
+      isRead: false,
+      isMe: true,
+      createdAt: now,
+      updatedAt: now,
+      sender: sender,
+      conversation: conversation,
+      messageMedia: messageMedia ?? [],
+      messageLink: messageLink ?? [],
+      replyId: replyId,
+      replyMessageText: replyMessageText,
+      replyMessageSenderName: replyMessageSenderName,
+      replyHasImageMedia: replyHasImageMedia,
+      replyHasLinkMedia: replyHasLinkMedia,
+    );
+  }
+
+  void _removeOptimisticMessage(int optimisticId) {
+    messages.removeWhere((m) => m.id == optimisticId);
+    debugPrint('🔄 [ChatDetailController] Optimistic mesaj kaldırıldı (API hata): id=$optimisticId');
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -210,6 +275,20 @@ class ChatDetailController extends GetxController {
 
   @override
   void onClose() {
+    // Sohbet ekranından çıkılırken bu konuşmayı okundu işaretle (liste ve kırmızı nokta güncellenir)
+    try {
+      final chatController = Get.find<ChatController>();
+      final userId = currentChatId.value;
+      final convIdStr = currentConversationId.value;
+      final convId = convIdStr != null && convIdStr.isNotEmpty ? int.tryParse(convIdStr) : null;
+      if (userId != null) {
+        chatController.markChatAsRead(userId, convId);
+        debugPrint('📖 [ChatDetailController] Sohbet ekranından çıkıldı, okundu işaretlendi: userId=$userId, conversationId=$convId');
+      }
+    } catch (e) {
+      debugPrint('⚠️ [ChatDetailController] Okundu işaretlenirken hata: $e');
+    }
+
     // Chat liste controller'ın private message listener'ını tekrar başlat
     try {
       final chatController = Get.find<ChatController>();
@@ -259,6 +338,19 @@ class ChatDetailController extends GetxController {
           if (isDuplicate) {
             debugPrint('🚫 [ChatDetailController] DUPLICATE MESSAGE BLOCKED: ID ${message.id} already exists');
             return;
+          }
+          
+          // Echo varsa: Kendi gönderdiğimiz mesaj socket'ten geldi; optimistic (id < 0) kaydı gerçek mesajla değiştir.
+          if (message.isMe) {
+            final pendingIndex = messages.lastIndexWhere((m) => m.id < 0);
+            if (pendingIndex != -1) {
+              messages[pendingIndex] = message;
+              debugPrint('✅ [ChatDetailController] Pending mesaj gerçek mesajla değiştirildi: ID ${message.id}, Content: "${message.message}"');
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                scrollToBottom(animated: true);
+              });
+              return;
+            }
           }
           
           messages.add(message);
@@ -668,40 +760,60 @@ class ChatDetailController extends GetxController {
     }
     
     isSendingMessage.value = true;
-    
+    int? optimisticId;
+    final replyingTo = replyingToMessage.value;
+    final replyId = replyingTo?.id;
+    final replyMessageText = replyingTo?.replyPreviewDisplayText;
+    final replySenderName = replyingTo != null
+        ? ('${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim().isEmpty ? replyingTo.sender.username : '${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim())
+        : null;
+    final replyHasImageMedia = replyingTo?.messageMedia.any((m) => m.isImage) ?? false;
+    final replyHasLinkMedia = replyingTo?.messageLink.isNotEmpty ?? false;
+
     try {
-      // Text içinde link var mı kontrol et
+      String displayText = message;
+      String messageTextToSend = message;
+      List<String>? linksToSend;
+
       if (message.isNotEmpty && hasLinksInText(message)) {
         debugPrint('🔗 Links detected in text, processing...');
-        
         final urls = extractUrlsFromText(message);
         final nonLinkText = extractNonLinkText(message);
-        
-        debugPrint('  - Detected URLs: $urls');
-        debugPrint('  - Non-link text: "$nonLinkText"');
-        
-        // Linkleri normalize et
         final normalizedUrls = urls.map((url) => normalizeUrl(url)).toList();
-        
-        // Backend: "message required when media is not present" — sadece link varsa mesaj alanına link metnini yaz
-        final messageText = nonLinkText.trim().isEmpty
+        messageTextToSend = nonLinkText.trim().isEmpty
             ? (normalizedUrls.isNotEmpty ? normalizedUrls.first : ' ')
             : nonLinkText.trim();
-        
+        displayText = messageTextToSend;
+        linksToSend = normalizedUrls.isNotEmpty ? normalizedUrls : null;
+      }
+
+      // Optimistic update: Echo yoksa mesaj hemen görünsün.
+      final optimisticMessage = _buildOptimisticMessage(
+        messageText: displayText,
+        replyId: replyId,
+        replyMessageText: replyMessageText,
+        replyMessageSenderName: replySenderName,
+        replyHasImageMedia: replyHasImageMedia,
+        replyHasLinkMedia: replyHasLinkMedia,
+      );
+      if (optimisticMessage != null) {
+        optimisticId = optimisticMessage.id;
+        messages.add(optimisticMessage);
+        WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom(animated: true));
+      }
+
+      if (message.isNotEmpty && hasLinksInText(message)) {
         debugPrint('  - Sending message with separated text and links');
-        
         await ChatServices.sendMessage(
           currentChatId.value!,
-          messageText,
+          messageTextToSend,
           conversationId: currentConversationId.value,
           mediaFiles: selectedFiles.isNotEmpty ? selectedFiles : null,
-          links: normalizedUrls,
+          links: linksToSend,
           replyId: replyingToMessage.value?.id,
         );
       } else {
-        // Normal text mesajı gönder (link yok)
         debugPrint('📝 Sending normal text message');
-        
         await ChatServices.sendMessage(
           currentChatId.value!,
           message,
@@ -711,25 +823,16 @@ class ChatDetailController extends GetxController {
         );
       }
 
-      // API bazen reply mesajında reply_id/reply_message dönmüyor; gönderilen mesaja yanıt bilgisini birleştirmek için sakla
-      final replyingTo = replyingToMessage.value;
       if (replyingTo != null) {
         _pendingReplyId = replyingTo.id;
         _pendingReplyMessageText = replyingTo.replyPreviewDisplayText;
-        _pendingReplySenderName = '${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim();
-        if ((_pendingReplySenderName ?? '').isEmpty) _pendingReplySenderName = replyingTo.sender.username;
-        _pendingReplyHasImageMedia = replyingTo.messageMedia.any((m) => m.isImage);
-        _pendingReplyHasLinkMedia = replyingTo.messageLink.isNotEmpty;
+        _pendingReplySenderName = replySenderName;
+        _pendingReplyHasImageMedia = replyHasImageMedia;
+        _pendingReplyHasLinkMedia = replyHasLinkMedia;
       }
-      
-      // Başarılı ise seçilen dosyaları ve yanıt hedefini temizle
       selectedFiles.clear();
       clearReplyingTo();
-      
-      // Mesaj gönderildikten sonra mesajları yeniden yükle
-      await fetchConversationMessages();
-      
-      // Chat listesini de yenile (mesaj gönderildiği için liste güncellenmeli)
+
       try {
         final chatController = Get.find<ChatController>();
         await chatController.refreshChatList();
@@ -737,14 +840,10 @@ class ChatDetailController extends GetxController {
       } catch (e) {
         debugPrint("⚠️ Chat listesi yenilenirken hata: $e");
       }
-      
-      // Mesaj gönderildikten sonra en alta git
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToBottom(animated: true);
-      });
-      
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom(animated: true));
     } catch (e) {
       debugPrint("🛑 Mesaj gönderilemedi: $e");
+      if (optimisticId != null) _removeOptimisticMessage(optimisticId);
       Get.snackbar(
         languageService.tr("common.error"),
         languageService.tr("common.messages.messageSendFailed"),
@@ -762,40 +861,53 @@ class ChatDetailController extends GetxController {
     
     debugPrint('📁 Sending media files only');
     isSendingMessage.value = true;
-    
+    int? optimisticId;
+    final replyingTo = replyingToMessage.value;
+    final replyId = replyingTo?.id;
+    final replyMessageText = replyingTo?.replyPreviewDisplayText;
+    final replySenderName = replyingTo != null
+        ? ('${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim().isEmpty ? replyingTo.sender.username : '${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim())
+        : null;
+    final replyHasImageMedia = replyingTo?.messageMedia.any((m) => m.isImage) ?? false;
+    final replyHasLinkMedia = replyingTo?.messageLink.isNotEmpty ?? false;
+
     try {
+      final optimisticMessage = _buildOptimisticMessage(
+        messageText: '📷',
+        replyId: replyId,
+        replyMessageText: replyMessageText,
+        replyMessageSenderName: replySenderName,
+        replyHasImageMedia: replyHasImageMedia,
+        replyHasLinkMedia: replyHasLinkMedia,
+      );
+      if (optimisticMessage != null) {
+        optimisticId = optimisticMessage.id;
+        messages.add(optimisticMessage);
+        WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom(animated: true));
+      }
+
       await ChatServices.sendMessage(
         currentChatId.value!,
-        '', // Boş text
+        ' ',
         conversationId: currentConversationId.value,
         mediaFiles: selectedFiles,
         replyId: replyingToMessage.value?.id,
       );
 
-      final replyingTo = replyingToMessage.value;
       if (replyingTo != null) {
         _pendingReplyId = replyingTo.id;
         _pendingReplyMessageText = replyingTo.replyPreviewDisplayText;
-        _pendingReplySenderName = '${replyingTo.sender.name} ${replyingTo.sender.surname}'.trim();
-        if ((_pendingReplySenderName ?? '').isEmpty) _pendingReplySenderName = replyingTo.sender.username;
-        _pendingReplyHasImageMedia = replyingTo.messageMedia.any((m) => m.isImage);
-        _pendingReplyHasLinkMedia = replyingTo.messageLink.isNotEmpty;
+        _pendingReplySenderName = replySenderName;
+        _pendingReplyHasImageMedia = replyHasImageMedia;
+        _pendingReplyHasLinkMedia = replyHasLinkMedia;
       }
-      
       debugPrint('✅ Media files sent successfully');
       selectedFiles.clear();
       clearReplyingTo();
-      
-      // Mesajları yeniden yükle
-      await fetchConversationMessages();
-      
-      // Medya gönderildikten sonra en alta git
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        scrollToBottom(animated: true);
-      });
-      
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom(animated: true));
     } catch (e) {
       debugPrint('💥 Media sending error: $e');
+      if (optimisticId != null) _removeOptimisticMessage(optimisticId);
       Get.snackbar(
         'Hata',
         'Dosyalar gönderilemedi',
