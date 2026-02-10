@@ -136,21 +136,45 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             ),
           ),
 
-          // Yorumlar Listesi (Entry'ler)
-          // Ana entry (ilk entry) - yorumların üstünde göster
-          Obx(() {
-            final main = entryDetailController.mainEntry.value ?? widget.entry;
-            final topic = main.topic ?? widget.entry.topic;
-            final categoryTitle = topic?.category?.title ??
-                languageService.tr("entryDetail.noCategory");
-            final topicName = topic?.name ?? "Konu Bilgisi Yok";
+          // İlk entry + yorumlar tek listede, birlikte kayar
+          Expanded(
+            child: Obx(() {
+              if (entryDetailController.isCommentsLoading.value) {
+                return Center(
+                    child: GeneralLoadingIndicator(
+                  size: 32,
+                  showIcon: false,
+                ));
+              }
 
-            return EntryCommentCard(
-              entry: main,
-              onDownvote: () => entryController.voteEntry(main.id, "down"),
-              onUpvote: () => entryController.voteEntry(main.id, "up"),
-              onShare: () {
-                final String shareText = """
+              final main =
+                  entryDetailController.mainEntry.value ?? widget.entry;
+              final topic = main.topic ?? widget.entry.topic;
+              final categoryTitle = topic?.category?.title ??
+                  languageService.tr("entryDetail.noCategory");
+              final topicName = topic?.name ?? "Konu Bilgisi Yok";
+              final comments = entryDetailController.entryComments;
+              final totalCount = 1 + comments.length;
+
+              return RefreshIndicator(
+                color: Color(0xFFef5050),
+                backgroundColor: Color(0xfffafafa),
+                elevation: 0,
+                onRefresh: () async {
+                  await entryDetailController.fetchEntryComments();
+                },
+                child: ListView.builder(
+                  itemCount: totalCount,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return EntryCommentCard(
+                        entry: main,
+                        onDownvote: () =>
+                            entryController.voteEntry(main.id, "down"),
+                        onUpvote: () =>
+                            entryController.voteEntry(main.id, "up"),
+                        onShare: () {
+                          final String shareText = """
 📝 **$topicName** (#${main.id})
 
 🏷️ $categoryTitle
@@ -162,33 +186,13 @@ ${main.content}
 📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
 
 """;
-                Share.share(shareText);
-              },
-              onPressed: () {},
-            );
-          }),
+                          Share.share(shareText);
+                        },
+                        onPressed: () {},
+                      );
+                    }
 
-          Expanded(
-            child: Obx(() {
-              if (entryDetailController.isCommentsLoading.value) {
-                return Center(
-                    child: GeneralLoadingIndicator(
-                  size: 32,
-                  showIcon: false,
-                ));
-              }
-
-              return RefreshIndicator(
-                color: Color(0xFFef5050),
-                backgroundColor: Color(0xfffafafa),
-                elevation: 0,
-                onRefresh: () async {
-                  await entryDetailController.fetchEntryComments();
-                },
-                child: ListView.builder(
-                  itemCount: entryDetailController.entryComments.length,
-                  itemBuilder: (context, index) {
-                    final comment = entryDetailController.entryComments[index];
+                    final comment = comments[index - 1];
                     return EntryCommentCard(
                       entry: comment,
                       onDownvote: () =>
@@ -196,25 +200,19 @@ ${main.content}
                       onUpvote: () =>
                           entryController.voteEntry(comment.id, "up"),
                       onShare: () {
-                        // Konunun ilk entry'sini bul
                         String firstEntryContent = "";
-                        if (entryDetailController.entryComments.isNotEmpty) {
-                          firstEntryContent =
-                              entryDetailController.entryComments.first.content;
+                        if (comments.isNotEmpty) {
+                          firstEntryContent = comments.first.content;
                         }
-
-                        // Konu bilgilerini al
-                        final topic = widget.entry.topic;
-                        final categoryTitle = topic?.category?.title ??
+                        final t = widget.entry.topic;
+                        final catTitle = t?.category?.title ??
                             languageService.tr("entryDetail.noCategory");
-                        final topicName = topic?.name ?? "Konu Bilgisi Yok";
-                        final entryCount =
-                            entryDetailController.entryComments.length;
-
+                        final tName = t?.name ?? "Konu Bilgisi Yok";
+                        final entryCount = comments.length;
                         final String shareText = """
-📝 **$topicName** (#${comment.id})
+📝 **$tName** (#${comment.id})
 
-🏷️ **Kategori:** $categoryTitle
+🏷️ **Kategori:** $catTitle
 📊 **Entry Sayısı:** $entryCount
 
 💬 **Bu Entry:**
@@ -228,7 +226,7 @@ $firstEntryContent
 📲 App Store: https://apps.apple.com/app/edusocial/id123456789
 📱 Play Store: https://play.google.com/store/apps/details?id=com.edusocial.app
 
-#EduSocial #Eğitim #$categoryTitle
+#EduSocial #Eğitim #$catTitle
 """;
                         Share.share(shareText);
                       },

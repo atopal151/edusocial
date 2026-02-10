@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
+import '../controllers/group_controller/group_controller.dart';
 import '../routes/app_routes.dart';
 import '../screens/profile/people_profile_screen.dart';
 import '../services/people_profile_services.dart';
@@ -19,7 +20,7 @@ class NotificationHandler {
   final NotificationRenderer _renderer;
 
   Future<void> handleForeground(OSNotification notification) async {
-    final data = notification.additionalData ?? <String, dynamic>{};
+    final data = _normalizePayload(notification.additionalData);
     final type = _resolveType(data);
 
     if (!await _settings.shouldShow(type, data)) return;
@@ -48,10 +49,36 @@ class NotificationHandler {
   }
 
   void handleClick(OSNotification notification) {
-    final data = notification.additionalData ?? <String, dynamic>{};
-    debugPrint('🔔 [NotificationHandler] Notification clicked - Data: $data');
+    final raw = notification.additionalData;
+    final data = _normalizePayload(raw);
+    final title = notification.title ?? '';
+    data['_notification_title'] = title;
+    // Başlık "X group" ile bitiyorsa grup bildirimi (backend bazen type/group_id göndermiyor)
+    data['_is_group_notification'] = title.toString().toLowerCase().contains(' group');
+    debugPrint('🔔 [NotificationHandler] Notification clicked - title: "$title", _is_group_notification: ${data['_is_group_notification']}');
     debugPrint('🔔 [NotificationHandler] Notification type: ${_resolveType(data)}');
-    _route(data); // async metod ama await etmeden çağırıyoruz
+    _route(data);
+  }
+
+  /// OneSignal/native Map<Object?, Object?> geliyor; tüm payload'ı Map<String, dynamic> yap
+  static Map<String, dynamic> _normalizePayload(dynamic raw) {
+    if (raw == null) return <String, dynamic>{};
+    if (raw is! Map) return <String, dynamic>{};
+    final map = raw;
+    final out = <String, dynamic>{};
+    for (final e in map.entries) {
+      final k = e.key?.toString();
+      if (k == null || k.isEmpty) continue;
+      final v = e.value;
+      if (v is Map) {
+        out[k] = _normalizePayload(v);
+      } else if (v is List) {
+        out[k] = v.map((x) => x is Map ? _normalizePayload(x) : x).toList();
+      } else {
+        out[k] = v;
+      }
+    }
+    return out;
   }
 
   String _resolveType(Map<String, dynamic> data) {
@@ -63,6 +90,42 @@ class NotificationHandler {
       final nested = data['notification_data'];
       if (nested is Map && nested['type'] != null) {
         raw = nested['type'].toString();
+      }
+    }
+    if (raw.isEmpty) {
+      // Backend bazen type/group_id göndermez; handleClick'te başlıktan set edilen bayrak öncelikli
+      if (data['_is_group_notification'] == true) {
+        debugPrint('🔍 [NotificationHandler] Type resolved: group_message (_is_group_notification)');
+        return 'group_message';
+      }
+      final d = _toStrDynMap(data['data']);
+      if (d != null) {
+        final hasGroupId = (d['group_id'] ?? d['groupId']) != null;
+        if (hasGroupId) {
+          debugPrint('🔍 [NotificationHandler] Type resolved: group_message (data.group_id)');
+          return 'group_message';
+        }
+        final titleSuggestsGroup = (data['_notification_title']?.toString() ?? '').toLowerCase().contains(' group');
+        if (titleSuggestsGroup) {
+          debugPrint('🔍 [NotificationHandler] Type resolved: group_message (title contains " group")');
+          return 'group_message';
+        }
+        if (d['sender_user'] != null) {
+          debugPrint('🔍 [NotificationHandler] Type resolved: message (data.sender_user)');
+          return 'message';
+        }
+      }
+      if ((data['group_id'] ?? data['groupId']) != null) {
+        debugPrint('🔍 [NotificationHandler] Type resolved: group_message (group_id)');
+        return 'group_message';
+      }
+      if ((data['_notification_title']?.toString() ?? '').toLowerCase().contains(' group')) {
+        debugPrint('🔍 [NotificationHandler] Type resolved: group_message (title fallback)');
+        return 'group_message';
+      }
+      if (data['sender_user'] != null) {
+        debugPrint('🔍 [NotificationHandler] Type resolved: message (sender_user)');
+        return 'message';
       }
     }
     if (raw.isNotEmpty) {
@@ -192,12 +255,13 @@ class NotificationHandler {
     if (id != null) return id;
     if (data['data'] is Map) {
       final d = data['data'] as Map;
+      final cid = d['conversation_id'] ?? d['conversationId'];
+      if (cid != null) return cid;
       final n = d['notification_data'];
       if (n is Map) {
-        final cid = n['conversation_id'] ?? n['conversationId'];
-        if (cid != null) return cid;
+        final nid = n['conversation_id'] ?? n['conversationId'];
+        if (nid != null) return nid;
       }
-      return d['conversation_id'] ?? d['conversationId'];
     }
     if (data['notification_data'] is Map) {
       final n = data['notification_data'] as Map;
@@ -215,24 +279,55 @@ class NotificationHandler {
   dynamic _extractGroupId(Map<String, dynamic> data) {
     final id = data['group_id'] ?? data['groupId'];
     if (id != null) return id;
-    if (data['data'] is Map) {
-      final d = data['data'] as Map;
-      final n = d['notification_data'];
-      if (n is Map) {
-        final gid = n['group_id'] ?? n['groupId'];
-        if (gid != null) return gid;
-      }
+    final d = _toStrDynMap(data['data']);
+    if (d != null) {
       final gid = d['group_id'] ?? d['groupId'];
       if (gid != null) return gid;
-    }
-    if (data['notification_data'] is Map) {
-      final n = data['notification_data'] as Map;
-      final full = n['notification_full_data'];
-      if (full is Map) {
-        final gid = full['group_id'] ?? full['groupId'];
-        if (gid != null) return gid;
+      final n = _toStrDynMap(d['notification_data']);
+      if (n != null) {
+        final nid = n['group_id'] ?? n['groupId'];
+        if (nid != null) return nid;
       }
-      return n['group_id'] ?? n['groupId'];
+    }
+    final n = _toStrDynMap(data['notification_data']);
+    if (n != null) {
+      final gid = n['group_id'] ?? n['groupId'];
+      if (gid != null) return gid;
+      final full = _toStrDynMap(n['notification_full_data']);
+      if (full != null) {
+        final fid = full['group_id'] ?? full['groupId'];
+        if (fid != null) return fid;
+      }
+    }
+    // Backend group_id göndermiyorsa: başlıktan grup adı çıkar ("New message from Lilyum Food group" -> "Lilyum Food")
+    final fromTitle = _extractGroupIdFromTitle(data['_notification_title']?.toString());
+    if (fromTitle != null) return fromTitle;
+    return null;
+  }
+
+  /// Bildirim başlığından grup adı çıkarıp GroupController'da eşleşen grubun id'sini döner
+  String? _extractGroupIdFromTitle(String? title) {
+    if (title == null || title.isEmpty) return null;
+    final lower = title.toLowerCase();
+    const fromMarker = ' from ';
+    const groupSuffix = ' group';
+    final fromIdx = lower.indexOf(fromMarker);
+    final groupIdx = lower.indexOf(groupSuffix);
+    if (fromIdx < 0 || groupIdx <= fromIdx) return null;
+    final nameStart = fromIdx + fromMarker.length;
+    if (nameStart >= groupIdx) return null;
+    final groupName = title.substring(nameStart, groupIdx).trim();
+    if (groupName.isEmpty) return null;
+    try {
+      final groupController = Get.find<GroupController>();
+      for (final g in groupController.userGroups) {
+        if (g.name.trim().toLowerCase() == groupName.toLowerCase()) {
+          debugPrint('🔍 [NotificationHandler] Grup başlıktan bulundu: "${g.name}" -> id=${g.id}');
+          return g.id;
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ [NotificationHandler] Grup başlıktan çözülemedi: $e');
     }
     return null;
   }
@@ -243,29 +338,50 @@ class NotificationHandler {
     if (id != null) return id;
     final sender = _extractSenderMap(data);
     if (sender != null) return sender['id'];
-    if (data['data'] is Map) {
-      final d = data['data'] as Map;
-      return d['sender_id'] ?? d['senderId'];
+    final d = _toStrDynMap(data['data']);
+    if (d != null) {
+      final sid = d['sender_id'] ?? d['senderId'];
+      if (sid != null) return sid;
+      final su = _toStrDynMap(d['sender_user']);
+      if (su != null && su['id'] != null) return su['id'];
     }
-    if (data['notification_data'] is Map) {
-      final n = data['notification_data'] as Map;
-      return n['sender_id'] ?? n['senderId'];
-    }
+    final topSu = _toStrDynMap(data['sender_user']);
+    if (topSu != null && topSu['id'] != null) return topSu['id'];
+    final n = _toStrDynMap(data['notification_data']);
+    if (n != null) return n['sender_id'] ?? n['senderId'];
     return null;
+  }
+
+  /// OneSignal/native'den gelen map'ler Map<Object?, Object?> olabiliyor; güvenli dönüştürme
+  static Map<String, dynamic>? _toStrDynMap(dynamic m) {
+    if (m == null || m is! Map) return null;
+    try {
+      return Map<String, dynamic>.from(m);
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Mesaj bildirimi için sender objesini çıkarır (name, username, avatar_url, is_online, is_verified)
   Map<String, dynamic>? _extractSenderMap(Map<String, dynamic> data) {
-    if (data['sender'] is Map) return data['sender'] as Map<String, dynamic>;
-    if (data['data'] is Map) {
-      final d = data['data'] as Map;
-      if (d['sender'] is Map) return d['sender'] as Map<String, dynamic>;
+    final sender = _toStrDynMap(data['sender']);
+    if (sender != null) return sender;
+    final d = _toStrDynMap(data['data']);
+    if (d != null) {
+      final fromD = _toStrDynMap(d['sender']);
+      if (fromD != null) return fromD;
+      final senderUser = _toStrDynMap(d['sender_user']);
+      if (senderUser != null) return senderUser;
     }
-    if (data['notification_data'] is Map) {
-      final n = data['notification_data'] as Map;
-      if (n['sender'] is Map) return n['sender'] as Map<String, dynamic>;
-      final full = n['notification_full_data'];
-      if (full is Map && full['user'] is Map) return full['user'] as Map<String, dynamic>;
+    final topSenderUser = _toStrDynMap(data['sender_user']);
+    if (topSenderUser != null) return topSenderUser;
+    final n = _toStrDynMap(data['notification_data']);
+    if (n != null) {
+      final fromN = _toStrDynMap(n['sender']);
+      if (fromN != null) return fromN;
+      final full = _toStrDynMap(n['notification_full_data']);
+      final user = full != null ? _toStrDynMap(full['user']) : null;
+      if (user != null) return user;
     }
     return null;
   }
@@ -299,7 +415,7 @@ class NotificationHandler {
         final isOnline = (sender?['is_online'] ?? data['sender_is_online']) == true;
         final isVerified = (sender?['is_verified'] ?? data['sender_is_verified']) == true;
 
-        if (conversationId != null && senderId != null) {
+        if (senderId != null) {
           debugPrint('🔔 [NotificationHandler] Mesaj bildirimi - conversation_id: $conversationId, sender_id: $senderId');
           // Önce ana ekrana git ve chat sekmesini seç (geri basınca sohbet listesine dönülsün)
           Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
@@ -315,23 +431,24 @@ class NotificationHandler {
             });
           });
         } else {
-          debugPrint('❌ [NotificationHandler] Mesaj bildirimi - conversation_id veya sender_id eksik');
+          debugPrint('❌ [NotificationHandler] Mesaj bildirimi - sender_id eksik');
           Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
         }
         break;
       case 'group':
       case 'group_message':
-        final groupId = _extractGroupId(data) ?? data['group_id'] ?? data['id'];
-        if (groupId != null) {
-          debugPrint('🔔 [NotificationHandler] Grup mesajı bildirimi - group_id: $groupId');
-          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
-          Future.delayed(const Duration(milliseconds: 150), () {
+        var groupId = _extractGroupId(data) ?? data['group_id'] ?? data['id'];
+        debugPrint('🔔 [NotificationHandler] Grup mesajı bildirimi - group_id: $groupId');
+        Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
+        Future.delayed(Duration(milliseconds: groupId != null ? 150 : 600), () {
+          // Soğuk başlangıçta GroupController henüz yok olabilir; gecikmeden sonra başlıktan tekrar dene
+          if (groupId == null) {
+            groupId = _extractGroupIdFromTitle(data['_notification_title']?.toString());
+          }
+          if (groupId != null) {
             Get.toNamed(Routes.groupChatDetail, arguments: {'groupId': groupId});
-          });
-        } else {
-          debugPrint('❌ [NotificationHandler] Grup mesajı - group_id eksik');
-          Get.offAllNamed(Routes.main, arguments: {'selectedIndex': 3});
-        }
+          }
+        });
         break;
       case 'post-like':
       case 'post-comment':
